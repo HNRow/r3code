@@ -36,7 +36,8 @@ import { useTurnItemDetail } from "~/state/queries";
 import { mcpAppEnvironment } from "~/state/mcpApps";
 import { useAtomCommand } from "~/state/use-atom-command";
 import { observeResize } from "~/lib/observeResize";
-import { Var, T, useGT, t } from "gt-react";
+import { useNativeTitlebarHeight } from "~/lib/windowControlsOverlay";
+import { useGT, t, T, Var } from "gt-react";
 
 const commandFailure = (result: {
   readonly cause: Parameters<typeof squashAtomCommandFailure>[0]["cause"];
@@ -92,6 +93,7 @@ export function McpAppFrame(props: {
   const gt = useGT();
   const { app } = props;
   const theme = useHtmlRenderTheme();
+  const nativeTitlebarHeight = useNativeTitlebarHeight();
   const frameRef = useRef<HTMLIFrameElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
@@ -460,6 +462,8 @@ export function McpAppFrame(props: {
             ? "fixed inset-0 m-0 flex h-dvh max-h-none w-dvw max-w-none flex-col border-0 bg-background p-0"
             : "block! static! m-0 border-0 bg-transparent p-0 text-inherit",
         )}
+        // Keep the header clear of the native window controls.
+        style={fullscreen ? { paddingTop: nativeTitlebarHeight } : undefined}
       >
         {fullscreen ? (
           <div
