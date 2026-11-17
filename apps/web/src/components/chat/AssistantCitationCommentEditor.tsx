@@ -132,7 +132,7 @@ export function AssistantCitationCommentEditor({
             onPointerDown={(event) => event.preventDefault()}
             onClick={onCancel}
           >
-            <T>Cancel</T>
+            Cancel
           </Button>
           <Button
             size="xs"
