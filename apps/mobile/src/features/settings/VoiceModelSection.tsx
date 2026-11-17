@@ -151,9 +151,7 @@ function ModelStats(props: { readonly model: EnvironmentSpeechModel; readonly la
             "speed",
             <>
               <Text className="font-t3-medium text-foreground">
-                <T>
-                  <Var>{data.secondsPer30s.accelerated}</Var> s
-                </T>
+                {Number(data.secondsPer30s.accelerated.toFixed(2))} s
               </Text>{" "}
               / 30 s
             </>,
