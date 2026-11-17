@@ -15,6 +15,7 @@ import { SymbolView } from "../../components/ui/AppSymbol";
 import { environmentCatalog } from "../../connection/catalog";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { SettingsSection } from "../settings/components/SettingsSection";
+import { useGT, T } from "gt-react-native";
 
 const options: ReadonlyArray<{
   value: PullRequestRoutingPermission;
@@ -36,6 +37,7 @@ const options: ReadonlyArray<{
 ];
 
 export function PullRequestRoutingSettings() {
+  const gt = useGT();
   const catalog = useAtomValue(environmentCatalog.catalogValueAtom);
   const permissions = useAtomValue(environmentCatalog.pullRequestRoutingPermissionsValueAtom);
   const update = useAtomCommand(environmentCatalog.setPullRequestRoutingPermission);
@@ -45,7 +47,7 @@ export function PullRequestRoutingSettings() {
 
   return (
     <View className="mt-5 gap-3">
-      <SettingsSection title="Pull request routing">
+      <SettingsSection title={gt("Pull request routing")}>
         {[...catalog.entries.values()].map((entry) => {
           const environmentId = entry.target.environmentId;
           const selected = pullRequestRoutingPermissionFor(entry, permissions);
@@ -65,7 +67,7 @@ export function PullRequestRoutingSettings() {
                     {entry.target.label}
                   </Text>
                   <Text className="text-xs text-foreground-muted" numberOfLines={1}>
-                    {connectionCatalogDisplayUrl(entry) ?? "T3 Connect"}
+                    {connectionCatalogDisplayUrl(entry) ?? "R3 Connect"}
                   </Text>
                 </View>
                 <Text className="text-sm text-foreground-muted">
@@ -104,8 +106,10 @@ export function PullRequestRoutingSettings() {
         })}
       </SettingsSection>
       <Text className="px-2 text-sm text-foreground-muted">
-        Choose environments you trust to share PR data and use each other's source control access.
-        Enable both environments. This applies only to this client.
+        <T>
+          Choose environments you trust to share PR data and use each other's source control access.
+          Enable both environments. This applies only to this client.
+        </T>
       </Text>
     </View>
   );

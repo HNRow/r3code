@@ -320,6 +320,7 @@ import { ZoomableImagePressable } from "./ZoomableImagePressable";
 import { openSettings } from "../settings/settings-navigation";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { useMessageTimeFormatter } from "./useMessageTimeFormatter";
+import { useGT, T, Var, t } from "gt-react-native";
 
 const WIDE_MARKDOWN_BLOCK_OPTIONS = {
   // iOS blockquotes and selectable text measure separately; definite bubble width matches UIKit's drawing width.
@@ -400,9 +401,10 @@ function UserMessageCopyButton(props: {
   readonly onCopy: (() => Promise<void>) | undefined;
   readonly tintColor: ColorValue;
 }) {
+  const gt = useGT();
   const button = (
     <CopyTextButton
-      accessibilityLabel="Copy message"
+      accessibilityLabel={gt("Copy message")}
       text={props.text}
       onCopy={props.onCopy}
       tintColor={props.tintColor}
@@ -433,6 +435,7 @@ function AssistantForkButton(props: {
   readonly projectedItem: OrchestrationV2ProjectedTurnItem;
   readonly sourceTitle: string;
 }) {
+  const gt = useGT();
   const support = useV2ItemSupport({
     environmentId: props.environmentId,
     sourceThreadId: props.projectedItem.sourceThreadId,
@@ -452,7 +455,7 @@ function AssistantForkButton(props: {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Fork from this response"
+      accessibilityLabel={gt("Fork from this response")}
       disabled={busy}
       onPress={() => {
         const targetThreadId = ThreadId.make(uuidv4());
@@ -1251,6 +1254,7 @@ function ArtifactTemplateCard(props: {
   readonly template: CodexArtifactTemplate;
   readonly onUse?: ((template: CodexArtifactTemplate) => void) | undefined;
 }) {
+  const gt = useGT();
   const direction = textDirection(props.template.displayName);
   return (
     <View
@@ -1275,7 +1279,7 @@ function ArtifactTemplateCard(props: {
       </View>
       {props.onUse ? (
         <Button
-          label="Use template"
+          label={gt("Use template")}
           tone="secondary"
           accessibilityLabel={`Use ${props.template.displayName} template`}
           onPress={() => props.onUse?.(props.template)}
@@ -1572,7 +1576,9 @@ function OpenSenderThreadButton(props: {
         })
       }
     >
-      <Text className="font-t3-medium text-xs text-foreground-secondary">Open thread</Text>
+      <Text className="font-t3-medium text-xs text-foreground-secondary">
+        <T>Open thread</T>
+      </Text>
     </Pressable>
   );
 }
@@ -1635,7 +1641,7 @@ function ThreadAutomationMessageRow(props: {
             type="monochrome"
           />
           <Text className="font-t3-medium text-sm text-user-bubble-foreground-muted">
-            Automation
+            <T>Automation</T>
           </Text>
           <Text numberOfLines={1} className="min-w-0 shrink text-sm text-user-bubble-foreground">
             {summary}
@@ -1673,7 +1679,7 @@ function ThreadAutomationMessageRow(props: {
               onPress={() => openSettings(navigation, "SettingsScheduledTasks")}
             >
               <Text className="font-t3-medium text-xs text-foreground-secondary">
-                Open automation
+                <T>Open automation</T>
               </Text>
             </Pressable>
           ) : null}
@@ -1691,7 +1697,7 @@ function ThreadAutomationMessageRow(props: {
   );
 }
 
-/** Leads with why T3 Code compacted, when it did so without being asked. */
+/** Leads with why R3 Code compacted, when it did so without being asked. */
 function compactionLabel(label: string, title: string | undefined) {
   const text =
     title !== undefined && label.startsWith("Context compacted")
@@ -1718,7 +1724,9 @@ function RunFoldWorking(props: {
         numberOfLines={1}
         className="shrink font-t3-medium text-sm tabular-nums text-foreground-muted"
       >
-        Working for {seconds > 0 ? formatDuration(seconds * 1_000) : "0s"}
+        <T>
+          Working for <Var>{seconds > 0 ? formatDuration(seconds * 1_000) : "0s"}</Var>
+        </T>
       </Text>
     </View>
   );
@@ -1901,7 +1909,7 @@ function renderFeedEntry(
             numberOfLines={1}
             className="shrink font-t3-medium text-sm text-foreground-muted"
           >
-            Pending
+            <T>Pending</T>
           </Text>
         </View>
       </View>
@@ -2238,7 +2246,7 @@ function renderFeedEntry(
         >
           {presentation.attribution === "t3code" ? (
             <Text className="mb-1 pr-1 font-t3-medium text-2xs text-foreground-muted opacity-60">
-              Sent by T3 Code
+              <T>Sent by R3 Code</T>
             </Text>
           ) : null}
           {presentation.guestName !== undefined ? (
@@ -2459,7 +2467,7 @@ function renderFeedEntry(
               entry.pendingMessage.messageId !== props.dispatchingMessageId ? (
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel="Edit pending message"
+                  accessibilityLabel={t("Edit pending message")}
                   hitSlop={8}
                   className="size-7 items-center justify-center"
                   onPress={() => {
@@ -2537,7 +2545,7 @@ function renderFeedEntry(
         {showAssistantMeta ? (
           <View className="mt-1 flex-row items-center gap-1">
             <CopyTextButton
-              accessibilityLabel="Copy message"
+              accessibilityLabel={t("Copy message")}
               text={renderedText}
               tintColor={iconSubtleColor}
               buttonSize={props.replyActionSize.button}
@@ -2948,6 +2956,7 @@ const THREAD_FEED_MAINTAIN_SCROLL_AT_END = {
 let lastSplitViewport: { windowWidth: number; width: number; height: number } | null = null;
 
 export const ThreadFeed = memo(function ThreadFeed(props: ThreadFeedProps) {
+  const gt = useGT();
   const formatMessageTime = useMessageTimeFormatter();
   const { listRef, onIsAtEndChange, onHeaderMaterialVisibilityChange } = props;
   const workflowOpening = useWorkflowOpening(props.detailRef);
@@ -4012,7 +4021,7 @@ export const ThreadFeed = memo(function ThreadFeed(props: ThreadFeedProps) {
           info.item.message.projectedItem?.item.type === "user_message" &&
           info.item.message.projectedItem.item.freshContext ? (
             <ThreadContextDivider
-              label="New session"
+              label={gt("New session")}
               icon="arrow.clockwise"
               iconColor={iconSubtleColor}
             />
@@ -4208,7 +4217,7 @@ export const ThreadFeed = memo(function ThreadFeed(props: ThreadFeedProps) {
                       endpoints={props.pendingHandoff}
                       iconColor={iconSubtleColor}
                       surfaceColor={screenColor}
-                      label="Context handoff pending"
+                      label={gt("Context handoff pending")}
                     />
                   ) : null}
                   {props.statusLines?.map((line) => (
@@ -4234,8 +4243,10 @@ export const ThreadFeed = memo(function ThreadFeed(props: ThreadFeedProps) {
             style={[StyleSheet.absoluteFill, { left: contentLeftInset, right: contentRightInset }]}
           >
             <ThreadFeedPlaceholder
-              title="No conversation yet"
-              detail="Ask the agent to inspect the repo, run a command, or continue the active thread."
+              title={gt("No conversation yet")}
+              detail={gt(
+                "Ask the agent to inspect the repo, run a command, or continue the active thread.",
+              )}
               topInset={topContentInset}
               bottomInset={bottomContentInset}
               horizontalPadding={horizontalPadding}
@@ -4256,6 +4267,7 @@ export const ThreadFeed = memo(function ThreadFeed(props: ThreadFeedProps) {
 });
 
 function ThreadFeedLoadEarlierControl(props: ThreadFeedHistoryControls) {
+  const gt = useGT();
   const theme = useUniwindTheme();
   const mutedColor = theme["--color-icon-subtle"];
   if (!props.hasMoreHistory && props.error === null) {
@@ -4268,7 +4280,7 @@ function ThreadFeedLoadEarlierControl(props: ThreadFeedHistoryControls) {
           <Button
             label={props.loading ? "Loading earlier activity…" : "Load earlier activity"}
             tone="secondary"
-            accessibilityLabel="Load earlier activity"
+            accessibilityLabel={gt("Load earlier activity")}
             disabled={props.loading}
             onPress={props.onLoadEarlier}
             icon="chevron.up"

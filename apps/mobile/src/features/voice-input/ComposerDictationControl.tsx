@@ -19,6 +19,7 @@ import { useAndroidControlSizing } from "../../components/ui/useAndroidControlSi
 import { cn } from "../../lib/cn";
 import type { VoiceComposerPresentation } from "./voiceInputPresentation";
 import { VOICE_WAVEFORM_SAMPLE_COUNT } from "./voiceInputMetering";
+import { useGT } from "gt-react-native";
 
 const DICTATION_TIMING = {
   duration: 220,
@@ -323,6 +324,7 @@ export function ComposerDictationError(props: {
   readonly error: string | null;
   readonly onDismiss: () => void;
 }) {
+  const gt = useGT();
   if (!props.error) return null;
   return (
     <View className="min-w-0 flex-row items-center gap-2 px-4 py-3">
@@ -330,7 +332,7 @@ export function ComposerDictationError(props: {
         {props.error}
       </Text>
       <Pressable
-        accessibilityLabel="Dismiss voice input error"
+        accessibilityLabel={gt("Dismiss voice input error")}
         accessibilityRole="button"
         className="size-7 items-center justify-center active:opacity-70"
         hitSlop={8}
@@ -392,11 +394,12 @@ export function ComposerDictationCancelAction(props: {
   readonly presentation: VoiceComposerPresentation;
   readonly onCancel: () => void;
 }) {
+  const gt = useGT();
   if (props.presentation.leadingAction !== "cancel") return null;
   return (
     <VoiceActionButton
       size={props.size}
-      accessibilityLabel="Cancel dictation"
+      accessibilityLabel={gt("Cancel dictation")}
       icon="xmark"
       onPress={props.onCancel}
     />

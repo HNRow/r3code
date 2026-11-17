@@ -7,6 +7,7 @@ import { AppText as Text } from "../../../../components/ui/AppText";
 import { ListChoiceRow } from "../../../../components/ui/ListChoiceRow";
 import { mobilePreferencesAtom, updateMobilePreferencesAtom } from "../../../../state/preferences";
 import { SettingsSection } from "../../components/SettingsSection";
+import { useGT, T } from "gt-react-native";
 
 const TOOL_CALL_VISIBILITY_OPTIONS: ReadonlyArray<{
   readonly value: ToolCallVisibility;
@@ -19,6 +20,7 @@ const TOOL_CALL_VISIBILITY_OPTIONS: ReadonlyArray<{
 ];
 
 export function ToolCallsAppearanceSection() {
+  const gt = useGT();
   const savePreferences = useAtomSet(updateMobilePreferencesAtom);
   const preferences = useAtomValue(mobilePreferencesAtom);
   const selected = AsyncResult.isSuccess(preferences)
@@ -27,7 +29,7 @@ export function ToolCallsAppearanceSection() {
 
   return (
     <View className="gap-3">
-      <SettingsSection title="Tool calls in chat">
+      <SettingsSection title={gt("Tool calls in chat")}>
         {TOOL_CALL_VISIBILITY_OPTIONS.map((option, index) => (
           <ListChoiceRow
             key={option.value}
@@ -40,8 +42,10 @@ export function ToolCallsAppearanceSection() {
         ))}
       </SettingsSection>
       <Text className="px-2 text-sm text-foreground-muted">
-        Hide the commands, edits, and searches agents run. Hide successful keeps failures. Zen shows
-        only final answers. Approvals, questions, and errors always show.
+        <T>
+          Hide the commands, edits, and searches agents run. Hide successful keeps failures. Zen
+          shows only final answers. Approvals, questions, and errors always show.
+        </T>
       </Text>
     </View>
   );

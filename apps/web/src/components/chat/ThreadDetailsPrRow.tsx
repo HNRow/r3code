@@ -81,6 +81,7 @@ import {
   THREAD_DETAILS_PANEL_SPLIT_GROUP_CLASS,
   THREAD_DETAILS_PANEL_SPLIT_SEPARATOR_CLASS,
 } from "./threadDetailsPanelStyles";
+import { Var, T, useGT } from "gt-react";
 
 // A null checks response is settled; polling cannot find checks.
 const isSettledWithoutChecks = (result: AsyncResult.AsyncResult<unknown, unknown>) =>
@@ -114,6 +115,7 @@ export function ThreadDetailsPrRow({
   /** Fix and Resolve write here instead of checking the pull request out in a new thread. */
   composerTarget?: ComposerThreadTarget | undefined;
 }) {
+  const gt = useGT();
   const serverConfigs = useServerConfigs();
   const supportsPullRequests = serverConfigs.get(environmentId) !== undefined;
   const repository = sourceControlClients.repositorySelector(project?.repositoryIdentity);
@@ -317,7 +319,9 @@ export function ThreadDetailsPrRow({
               <div className="flex min-w-0 items-start gap-2 text-destructive">
                 <TriangleAlertIcon aria-hidden className="mt-0.5 size-3 shrink-0 stroke-current" />
                 <div className="min-w-0 flex-1 wrap-break-word">
-                  Merge conflicts with {detail.baseBranch}
+                  <T>
+                    Merge conflicts with <Var>{detail.baseBranch}</Var>
+                  </T>
                 </div>
               </div>
             ) : null}
@@ -377,7 +381,7 @@ export function ThreadDetailsPrRow({
               destructive: true,
               suffix:
                 handoff === "findings" ? (
-                  <Spinner size="xs" aria-label="Preparing fix" />
+                  <Spinner size="xs" aria-label={gt("Preparing fix")} />
                 ) : (
                   newThreadSuffix
                 ),
@@ -430,8 +434,10 @@ export function ThreadDetailsPrRow({
           />
         </TooltipTrigger>
         <TooltipPopup side="top">
-          Watching: the agent wakes when checks finish, someone comments, or the branch conflicts.
-          Click to stop.
+          <T>
+            Watching: the agent wakes when checks finish, someone comments, or the branch conflicts.
+            Click to stop.
+          </T>
         </TooltipPopup>
       </Tooltip>
     ) : null;
@@ -523,14 +529,20 @@ export function ThreadDetailsPrRow({
         <AlertDialog open={confirmingMerge} onOpenChange={(open) => setConfirmingMerge(open)}>
           <AlertDialogPopup>
             <AlertDialogHeader>
-              <AlertDialogTitle>Merge {terminology.singular}?</AlertDialogTitle>
+              <AlertDialogTitle>
+                <T>
+                  Merge <Var>{terminology.singular}</Var>?
+                </T>
+              </AlertDialogTitle>
               <AlertDialogDescription>
-                This merges #{number} using {selectedMergeMethod}.
+                <T>
+                  This merges #<Var>{number}</Var> using <Var>{selectedMergeMethod}</Var>.
+                </T>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogClose render={<Button variant="outline" size="sm" />}>
-                Cancel
+                <T>Cancel</T>
               </AlertDialogClose>
               <Button
                 size="sm"
@@ -540,7 +552,7 @@ export function ThreadDetailsPrRow({
                   void perform("merge", selectedMergeMethod);
                 }}
               >
-                Merge
+                <T>Merge</T>
               </Button>
             </AlertDialogFooter>
           </AlertDialogPopup>

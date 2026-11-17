@@ -1,3 +1,4 @@
+import { msg } from "gt-react";
 import type {
   EnvironmentId,
   EnvironmentMachineKind,
@@ -92,7 +93,7 @@ export function resolveContextStripLabelsCompact(input: {
 }
 
 export function resolveEnvModeLabel(mode: EnvMode): string {
-  return mode === "worktree" ? "New worktree" : "Current checkout";
+  return mode === "worktree" ? msg("New worktree") : msg("Current checkout");
 }
 
 export const WORKTREE_SUBMODULES_LABELS: Record<WorktreeSubmodules, string> = {

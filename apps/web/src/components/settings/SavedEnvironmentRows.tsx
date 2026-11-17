@@ -69,6 +69,7 @@ import {
 } from "../ServerUpdateAction";
 import { CloudEnvironmentConnectRows } from "../cloud/CloudEnvironmentConnectList";
 import { useT3ConnectAuthPrompt } from "../clerk/useT3ConnectAuthPrompt";
+import { T, useGT, msg, useMessages } from "gt-react";
 
 type SavedBackendListRowProps = {
   environment: EnvironmentPresentation;
@@ -293,14 +294,16 @@ export function SavedBackendListRow({
             onClick={() => setPermissionsOpen((open) => !open)}
             className="inline-flex shrink-0 items-center gap-0.5 rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
           >
-            Permissions
-            <ChevronRightIcon
-              aria-hidden
-              className={cn(
-                "size-3 shrink-0 transition-transform duration-150 motion-reduce:transition-none",
-                permissionsOpen && "rotate-90",
-              )}
-            />
+            <T>
+              Permissions
+              <ChevronRightIcon
+                aria-hidden
+                className={cn(
+                  "size-3 shrink-0 transition-transform duration-150 motion-reduce:transition-none",
+                  permissionsOpen && "rotate-90",
+                )}
+              />
+            </T>
           </button>
         </span>
       }
@@ -416,10 +419,14 @@ export function SavedBackendListRow({
             {routesOpen ? "Hide routes" : "Routes"}
           </MenuItem>
           {mcpUrl ? (
-            <MenuItem onClick={() => copyMcpUrl(mcpUrl, { url: mcpUrl })}>Copy MCP URL</MenuItem>
+            <MenuItem onClick={() => copyMcpUrl(mcpUrl, { url: mcpUrl })}>
+              <T>Copy MCP URL</T>
+            </MenuItem>
           ) : null}
           {errorTraceId ? (
-            <MenuItem onClick={() => copyTraceId(errorTraceId)}>Copy trace ID</MenuItem>
+            <MenuItem onClick={() => copyTraceId(errorTraceId)}>
+              <T>Copy trace ID</T>
+            </MenuItem>
           ) : null}
           <MenuSeparator />
           <MenuItem variant="destructive" onClick={() => onRemove(environment)}>
@@ -436,7 +443,7 @@ function CloudLinkSwitch({
   disabled,
   disabledReason,
   onCheckedChange,
-  ariaLabel = "Enable T3 Connect",
+  ariaLabel = "Enable R3 Connect",
 }: {
   readonly checked: boolean;
   readonly disabled: boolean;
@@ -487,10 +494,12 @@ function T3ConnectTunnelUsage({ tunnelLimit }: { readonly tunnelLimit: number | 
         action={
           // At the cap the alert below carries the same actions.
           !openAccountPage || showLimitAlert ? null : usage.upgrade ? (
-            <InlineButton onClick={() => openAccountPage("t3-chat")}>Get more tunnels</InlineButton>
+            <InlineButton onClick={() => openAccountPage("t3-chat")}>
+              <T>Get more tunnels</T>
+            </InlineButton>
           ) : usage.used >= usage.limit ? (
             <InlineButton onClick={() => openAccountPage("t3-connect")}>
-              Manage tunnels
+              <T>Manage tunnels</T>
             </InlineButton>
           ) : null
         }
@@ -525,6 +534,8 @@ function ConfiguredCloudLinkRow({
   readonly canManageRelay: boolean;
   readonly connectDeviceApproval: ConnectDeviceApprovalControl | null;
 }) {
+  const gt = useGT();
+  const m = useMessages();
   const updateEnvironmentSettings = useUpdateEnvironmentSettings(environmentId);
   const {
     isSignedIn,
@@ -549,7 +560,7 @@ function ConfiguredCloudLinkRow({
 
   const disabledReason = canManageRelay
     ? null
-    : "Your session does not have permission to manage T3 Connect access.";
+    : "Your session does not have permission to manage R3 Connect access.";
   const isBusy = isUpdating || isUpdatingPreference;
   const switchDisabled =
     !canManageRelay ||
@@ -563,7 +574,7 @@ function ConfiguredCloudLinkRow({
   const signedOut = isSignedIn === false;
   const signInButton = (
     <Button size="sm" variant="outline" onClick={openAuthPrompt}>
-      Sign in
+      <T>Sign in</T>
     </Button>
   );
   const refreshLinkState = useEffectEvent(cloudLinkState.refresh);
@@ -589,7 +600,7 @@ function ConfiguredCloudLinkRow({
           rel="noreferrer"
           className="underline underline-offset-2"
         >
-          More info
+          <T>More info</T>
         </a>
       </span>
     ) : null;
@@ -602,15 +613,15 @@ function ConfiguredCloudLinkRow({
       toastManager.add({
         type: "success",
         title: enabled
-          ? "T3 Connect linked"
+          ? "R3 Connect linked"
           : publishAgentActivity
-            ? "T3 Connect tunnel disabled"
-            : "T3 Connect unlinked",
+            ? "R3 Connect tunnel disabled"
+            : "R3 Connect unlinked",
         description: enabled
-          ? "This environment is available through T3 Connect."
+          ? "This environment is available through R3 Connect."
           : publishAgentActivity
             ? "The managed tunnel was removed. Agent activity publishing stays on."
-            : "This environment is no longer available through T3 Connect.",
+            : "This environment is no longer available through R3 Connect.",
       });
     }
     setIsUpdating(false);
@@ -644,7 +655,7 @@ function ConfiguredCloudLinkRow({
         type: "success",
         title: enabled ? "Webhooks held while offline" : "Webhooks no longer held",
         description: enabled
-          ? "T3 Connect keeps webhook requests for up to 24 hours while this environment is offline."
+          ? "R3 Connect keeps webhook requests for up to 24 hours while this environment is offline."
           : "Requests to an offline environment now fail. Anything already held is still delivered.",
       });
     }
@@ -655,23 +666,33 @@ function ConfiguredCloudLinkRow({
     <>
       {showSwitch ? (
         <SettingsRow
-          title={searchableSetting("t3-connect").title}
+          title={m(searchableSetting("t3-connect").title)}
           description={
             connectDenial !== undefined && !managedTunnelActive
               ? connectDenial
               : signedOut
-                ? "Sign in to make this environment available to your other devices through T3 Connect."
+                ? msg(
+                    "Sign in to make this environment available to your other devices through R3 Connect.",
+                  )
                 : linkRevoked
-                  ? "This environment was removed from T3 Connect. Turn it on to link it again."
+                  ? msg(
+                      "This environment was removed from R3 Connect. Turn it on to link it again.",
+                    )
                   : managedTunnelActive
                     ? reachability?.status === "unreachable"
-                      ? "T3 Connect is on, but other devices cannot reach this environment."
+                      ? msg("R3 Connect is on, but other devices cannot reach this environment.")
                       : reachability?.status === "reachable"
-                        ? "This environment is available to your other devices through T3 Connect."
-                        : "T3 Connect is on. Reachability has not been checked yet."
+                        ? msg(
+                            "This environment is available to your other devices through R3 Connect.",
+                          )
+                        : msg("R3 Connect is on. Reachability has not been checked yet.")
                     : managedTunnelOutOfSync
-                      ? "T3 Connect is out of sync. This environment is linked only to publish agent activity, so other devices cannot connect. Turn T3 Connect on to repair it."
-                      : "Make this environment available to your other devices through T3 Connect."
+                      ? msg(
+                          "R3 Connect is out of sync. This environment is linked only to publish agent activity, so other devices cannot connect. Turn R3 Connect on to repair it.",
+                        )
+                      : msg(
+                          "Make this environment available to your other devices through R3 Connect.",
+                        )
           }
           status={operationError ?? cloudLinkState.error ?? reachabilityStatus}
           managed={managedTunnelActive ? undefined : connectDenial}
@@ -694,22 +715,24 @@ function ConfiguredCloudLinkRow({
         </SettingsRow>
       ) : linkRevoked ? (
         <SettingsRow
-          title={searchableSetting("t3-connect").title}
-          description="This environment was removed from T3 Connect. Run `t3 connect link` on the host to link it again."
+          title={m(searchableSetting("t3-connect").title)}
+          description={gt(
+            "This environment was removed from R3 Connect. Run `t3 connect link` on the host to link it again.",
+          )}
         />
       ) : isElectron ? (
         <SettingsRow
-          title={searchableSetting("t3-connect").title}
-          description="Run `t3 connect link` on the host, then restart T3 Code there."
+          title={m(searchableSetting("t3-connect").title)}
+          description={gt("Run `t3 connect link` on the host, then restart R3 Code there.")}
         />
       ) : null}
       {signedOut && showSwitch ? null : (
         <SettingsRow
-          title={searchableSetting("publish-agent-activity").title}
+          title={m(searchableSetting("publish-agent-activity").title)}
           description={
             signedOut
-              ? "Sign in to send activity to mobile notifications and Live Activities."
-              : "Send activity to mobile notifications and Live Activities without T3 Connect."
+              ? msg("Sign in to send activity to mobile notifications and Live Activities.")
+              : msg("Send activity to mobile notifications and Live Activities without R3 Connect.")
           }
           managed={connectDenial}
           control={
@@ -717,7 +740,7 @@ function ConfiguredCloudLinkRow({
               signInButton
             ) : (
               <CloudLinkSwitch
-                ariaLabel="Publish agent activity to mobile clients"
+                ariaLabel={gt("Publish agent activity to mobile clients")}
                 checked={publishAgentActivity}
                 disabled={switchDisabled}
                 disabledReason={disabledReason}
@@ -729,12 +752,14 @@ function ConfiguredCloudLinkRow({
       )}
       {managedTunnelActive && !signedOut ? (
         <SettingsRow
-          title={searchableSetting("hold-webhooks-while-offline").title}
-          description="Keep webhook requests for up to 24 hours while this environment is offline, then deliver them. Off: T3 Connect only forwards requests and stores nothing."
+          title={m(searchableSetting("hold-webhooks-while-offline").title)}
+          description={gt(
+            "Keep webhook requests for up to 24 hours while this environment is offline, then deliver them. Off: R3 Connect only forwards requests and stores nothing.",
+          )}
           managed={connectDenial}
           control={
             <CloudLinkSwitch
-              ariaLabel="Hold webhook requests while this environment is offline"
+              ariaLabel={gt("Hold webhook requests while this environment is offline")}
               checked={holdWebhooksWhileOffline}
               disabled={switchDisabled}
               disabledReason={disabledReason}
@@ -745,12 +770,14 @@ function ConfiguredCloudLinkRow({
       ) : null}
       {managedTunnelActive && connectDeviceApproval ? (
         <SettingsRow
-          title={searchableSetting("connect-device-approval").title}
-          description="Devices that sign in to your T3 Connect account wait until someone already connected here approves them."
+          title={m(searchableSetting("connect-device-approval").title)}
+          description={gt(
+            "Devices that sign in to your R3 Connect account wait until someone already connected here approves them.",
+          )}
           managed={connectDenial}
           control={
             <CloudLinkSwitch
-              ariaLabel="Require approval for new T3 Connect devices"
+              ariaLabel={gt("Require approval for new R3 Connect devices")}
               checked={connectDeviceApproval.required}
               disabled={!connectDeviceApproval.canManage}
               disabledReason={
@@ -786,12 +813,15 @@ export function CloudLinkRow({
   readonly canManageRelay: boolean;
   readonly connectDeviceApproval: ConnectDeviceApprovalControl | null;
 }) {
+  const gt = useGT();
   if (!hasCloudPublicConfig()) return null;
   if (!canReadRelay) {
     return (
       <SettingsRow
-        title="T3 Connect"
-        description="To edit these settings, pair this connection with both View relay and Manage relay permissions."
+        title={gt("R3 Connect")}
+        description={gt(
+          "To edit these settings, pair this connection with both View relay and Manage relay permissions.",
+        )}
       />
     );
   }
@@ -811,11 +841,17 @@ function EmptyRemoteEnvironments({ cloudEnabled = true }: { readonly cloudEnable
         <ChevronsLeftRightEllipsisIcon />
       </EmptyMedia>
       <EmptyHeader>
-        <EmptyTitle>No saved remote environments</EmptyTitle>
+        <EmptyTitle>
+          <T>No saved remote environments</T>
+        </EmptyTitle>
         <EmptyDescription>
-          {cloudEnabled
-            ? "Click “Add environment” to pair another environment, or connect one from T3 Connect."
-            : "Click “Add environment” to pair another environment."}
+          {cloudEnabled ? (
+            <T>
+              Click “Add environment” to pair another environment, or connect one from R3 Connect.
+            </T>
+          ) : (
+            <T>Click “Add environment” to pair another environment.</T>
+          )}
         </EmptyDescription>
       </EmptyHeader>
     </Empty>

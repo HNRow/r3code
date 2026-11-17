@@ -22,6 +22,7 @@ import { useControlTheme } from "./useControlTheme";
 import { IconButton } from "./IconButton";
 import { AppActivityIndicator } from "./AppActivityIndicator";
 import { SymbolView } from "./AppSymbol";
+import { useGT } from "gt-react-native";
 
 export type ToastProps = {
   readonly message: string;
@@ -44,6 +45,7 @@ export function Toast(props: ToastProps) {
 }
 
 function ToastContent(props: ToastProps & { readonly glassReady?: boolean }) {
+  const gt = useGT();
   const { fontScale } = useWindowDimensions();
   const { colorScheme } = useControlTheme();
   const borderRadius = Platform.OS === "ios" ? 28 : MOBILE_SHAPE.toast;
@@ -107,7 +109,11 @@ function ToastContent(props: ToastProps & { readonly glassReady?: boolean }) {
         </View>
         {inlineAction && action ? <View className="self-center">{action}</View> : null}
         {props.onDismiss && props.dismissMode !== "swipe" ? (
-          <IconButton accessibilityLabel="Dismiss message" icon="xmark" onPress={props.onDismiss} />
+          <IconButton
+            accessibilityLabel={gt("Dismiss message")}
+            icon="xmark"
+            onPress={props.onDismiss}
+          />
         ) : null}
       </View>
       {action && !inlineAction ? <View className="mt-2 self-end">{action}</View> : null}

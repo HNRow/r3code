@@ -25,6 +25,7 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { SettingsRow } from "./settingsLayout";
 import { RedactedSensitiveText } from "./RedactedSensitiveText";
+import { useGT, Var, T } from "gt-react";
 
 const ProviderAuthTerminal = lazy(() => import("./ProviderAuthTerminal"));
 
@@ -41,6 +42,7 @@ export function ProviderAuthenticationSection({
   readonly provider: ServerProvider;
   readonly readOnly: boolean;
 }) {
+  const gt = useGT();
   const target = { environmentId, input: { instanceId } };
   const query = useEnvironmentQuery(serverEnvironment.providerAuthState(target));
   const commands = { reportFailure: false, reportDefect: false };
@@ -170,19 +172,21 @@ export function ProviderAuthenticationSection({
 
   return (
     <SettingsRow
-      title="Account"
+      title={gt("Account")}
       description={
         signedIn && !active && provider.auth.email?.trim() ? (
           <span>
-            Signed in as{" "}
-            <RedactedSensitiveText
-              key={provider.auth.email}
-              value={provider.auth.email}
-              ariaLabel="Toggle account email visibility"
-              revealTooltip="Click to reveal email"
-              hideTooltip="Click to hide email"
-              className="max-w-full truncate"
-            />
+            <T>
+              Signed in as<Var> </Var>
+              <RedactedSensitiveText
+                key={provider.auth.email}
+                value={provider.auth.email}
+                ariaLabel={gt("Toggle account email visibility")}
+                revealTooltip={gt("Click to reveal email")}
+                hideTooltip={gt("Click to hide email")}
+                className="max-w-full truncate"
+              />
+            </T>
           </span>
         ) : (
           <span role="status">{accountDescription}</span>
@@ -203,14 +207,16 @@ export function ProviderAuthenticationSection({
               disabled={disabled}
               onValueChange={(value) => setMethodId(value ?? "")}
             >
-              <SelectTrigger size="sm" aria-label="Sign-in method" className="w-44">
+              <SelectTrigger size="sm" aria-label={gt("Sign-in method")} className="w-44">
                 <SelectValue>
                   {auth?.methods?.find((method) => method.id === methodId)?.name ??
                     "Provider default"}
                 </SelectValue>
               </SelectTrigger>
               <SelectPopup>
-                <SelectItem value="">Provider default</SelectItem>
+                <SelectItem value="">
+                  <T>Provider default</T>
+                </SelectItem>
                 {auth?.methods?.map((method) => (
                   <SelectItem key={method.id} value={method.id}>
                     {method.name}
@@ -227,13 +233,13 @@ export function ProviderAuthenticationSection({
                 disabled={disabled}
                 onClick={() => void openBrowser()}
               >
-                Open browser
+                <T>Open browser</T>
               </Button>
               <Tooltip>
                 <TooltipTrigger
                   render={
                     <Button
-                      aria-label="Copy sign-in link"
+                      aria-label={gt("Copy sign-in link")}
                       size="icon-sm"
                       variant="ghost-muted"
                       disabled={disabled}
@@ -252,7 +258,9 @@ export function ProviderAuthenticationSection({
                     </Button>
                   }
                 />
-                <TooltipPopup>Copy sign-in link</TooltipPopup>
+                <TooltipPopup>
+                  <T>Copy sign-in link</T>
+                </TooltipPopup>
               </Tooltip>
             </>
           ) : null}
@@ -265,13 +273,13 @@ export function ProviderAuthenticationSection({
                   <a href={provider.setup.documentationUrl} target="_blank" rel="noreferrer" />
                 }
               >
-                Open docs
+                <T>Open docs</T>
               </Button>
             ) : active && auth?.flowId ? (
               <Button
                 size="sm"
                 variant="ghost-muted"
-                aria-label="Cancel sign-in"
+                aria-label={gt("Cancel sign-in")}
                 disabled={disabled}
                 onClick={() =>
                   void run(() =>
@@ -279,7 +287,7 @@ export function ProviderAuthenticationSection({
                   )
                 }
               >
-                Cancel
+                <T>Cancel</T>
               </Button>
             ) : !active && !needsExternalSetup && provider.setup?.canAuthenticate !== false ? (
               <Button
@@ -326,7 +334,7 @@ export function ProviderAuthenticationSection({
                     });
                 }}
               >
-                Sign out
+                <T>Sign out</T>
               </Button>
             ) : null}
           </>
@@ -342,16 +350,23 @@ export function ProviderAuthenticationSection({
         <>
           {interaction?.type === "deviceCode" ? (
             <p className="py-2 text-sm text-muted-foreground">
-              Enter code{" "}
-              <code className="select-all font-mono text-foreground">{interaction.userCode}</code>{" "}
-              in your browser.
+              <T>
+                Enter code<Var> </Var>
+                <code className="select-all font-mono text-foreground">
+                  <Var>{interaction.userCode}</Var>
+                </code>
+                <Var> </Var>
+                in your browser.
+              </T>
             </p>
           ) : null}
           {interaction?.type === "terminal" ? (
             <div className="py-2">
               <Suspense
                 fallback={
-                  <p className="text-xs text-muted-foreground">Loading sign-in terminal…</p>
+                  <p className="text-xs text-muted-foreground">
+                    <T>Loading sign-in terminal…</T>
+                  </p>
                 }
               >
                 <ProviderAuthTerminal
@@ -432,7 +447,7 @@ export function ProviderAuthenticationSection({
                 className="w-fit"
                 disabled={disabled}
               >
-                Connect
+                <T>Connect</T>
               </Button>
             </form>
           ) : null}
@@ -453,17 +468,19 @@ export function ProviderAuthenticationSection({
               }}
             >
               <label className="grid gap-1">
-                If the final localhost page does not load, paste its full URL here.
-                <Input
-                  size="sm"
-                  id={`provider-callback-${instanceId}`}
-                  type="url"
-                  autoComplete="off"
-                  value={values.callback ?? ""}
-                  disabled={disabled}
-                  maxLength={16_384}
-                  onChange={(event) => updateDraft("callback", event.target.value)}
-                />
+                <T>
+                  If the final localhost page does not load, paste its full URL here.
+                  <Input
+                    size="sm"
+                    id={`provider-callback-${instanceId}`}
+                    type="url"
+                    autoComplete="off"
+                    value={values.callback ?? ""}
+                    disabled={disabled}
+                    maxLength={16_384}
+                    onChange={(event) => updateDraft("callback", event.target.value)}
+                  />
+                </T>
               </label>
               <Button
                 type="submit"
@@ -472,7 +489,7 @@ export function ProviderAuthenticationSection({
                 className="w-fit"
                 disabled={disabled || !values.callback?.trim()}
               >
-                Continue
+                <T>Continue</T>
               </Button>
             </form>
           ) : null}

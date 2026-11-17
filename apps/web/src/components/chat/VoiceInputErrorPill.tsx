@@ -5,6 +5,7 @@ import { CircleAlertIcon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { VoiceInputPill } from "./VoiceInputPill";
+import { useGT, Var, T } from "gt-react";
 
 const VOICE_ERROR_LABELS: Record<string, string> = {
   [MICROPHONE_PERMISSION_ERROR]: "Mic blocked",
@@ -40,6 +41,7 @@ export function VoiceInputErrorPill(props: {
   onRetry(): void;
   onDismiss(): void;
 }) {
+  const gt = useGT();
   const navigate = useNavigate();
   const message = props.error ?? "Voice input failed";
   const openSettings = props.errorAction === "settings";
@@ -58,7 +60,7 @@ export function VoiceInputErrorPill(props: {
               type="button"
               size={compact ? "icon-xs" : "icon-sm-pill"}
               variant="ghost"
-              aria-label="Dismiss voice input error"
+              aria-label={gt("Dismiss voice input error")}
               onPointerDown={(event) => event.preventDefault()}
               onClick={props.onDismiss}
               className="shrink-0"
@@ -68,8 +70,10 @@ export function VoiceInputErrorPill(props: {
           }
         />
         <TooltipPopup side="top">
-          Dismiss
-          {props.cancelShortcutLabel ? ` (${props.cancelShortcutLabel})` : ""}
+          <T>
+            Dismiss
+            <Var>{props.cancelShortcutLabel ? ` (${props.cancelShortcutLabel})` : ""}</Var>
+          </T>
         </TooltipPopup>
       </Tooltip>
       <Tooltip>

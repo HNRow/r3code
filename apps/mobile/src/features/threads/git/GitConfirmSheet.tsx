@@ -14,6 +14,7 @@ import { useSelectedThreadGitActions } from "../../../state/use-selected-thread-
 import { useSelectedThreadGitState } from "../../../state/use-selected-thread-git-state";
 import { useThreadSelection } from "../../../state/use-thread-selection";
 import { SheetActionButton } from "./gitSheetComponents";
+import { useGT } from "gt-react-native";
 
 type GitConfirmSheetProps = StaticScreenProps<{
   readonly environmentId: string;
@@ -26,6 +27,7 @@ type GitConfirmSheetProps = StaticScreenProps<{
 }>;
 
 export function GitConfirmSheet(props: GitConfirmSheetProps) {
+  const gt = useGT();
   const navigation = useNavigation();
   const gitState = useSelectedThreadGitState();
   const gitActions = useSelectedThreadGitActions();
@@ -112,7 +114,7 @@ export function GitConfirmSheet(props: GitConfirmSheetProps) {
 
   return (
     <FitSheet
-      header={<SheetHeader title="Confirm action" onClose={() => navigation.goBack()} />}
+      header={<SheetHeader title={gt("Confirm action")} onClose={() => navigation.goBack()} />}
       showsVerticalScrollIndicator={false}
     >
       <SheetIntro
@@ -130,7 +132,7 @@ export function GitConfirmSheet(props: GitConfirmSheetProps) {
         />
         <SheetActionButton
           icon="arrow.branch"
-          label="Feature branch & continue"
+          label={gt("Feature branch & continue")}
           disabled={!canChangeThreadBranch}
           tone="primary"
           onPress={() => void movePendingActionToFeatureBranch()}

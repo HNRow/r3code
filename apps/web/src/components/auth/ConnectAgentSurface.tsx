@@ -31,6 +31,7 @@ import { Input } from "../ui/input";
 import { RadioGroup } from "../ui/radio-group";
 import { Spinner } from "../ui/spinner";
 import { StandalonePage, StandalonePageHeader } from "../ui/standalone-page";
+import { useGT, T, Var } from "gt-react";
 
 export const accessConfig: Record<
   AuthMcpClientAccess,
@@ -145,6 +146,7 @@ export function McpConsent({
   readonly environmentLabel?: string | undefined;
   readonly footer?: ReactNode;
 }) {
+  const gt = useGT();
   const [loaded, setLoaded] = useState<Loaded>({ status: "loading" });
   const [requestedAccess, setAccess] = useState<AuthMcpClientAccess | null>(null);
   const [pairingCode, setPairingCode] = useState("");
@@ -224,8 +226,8 @@ export function McpConsent({
     return (
       <StandalonePage>
         <ConnectAgentHeading
-          title="Checking the sign-in request"
-          description="One moment while this environment verifies the agent's request."
+          title={gt("Checking the sign-in request")}
+          description={gt("One moment while this environment verifies the agent's request.")}
         />
         <Spinner className="mt-6" size="lg" tone="muted" />
       </StandalonePage>
@@ -235,9 +237,12 @@ export function McpConsent({
   if (loaded.status === "invalid") {
     return (
       <StandalonePage>
-        <ConnectAgentHeading title="This sign-in cannot continue" description={loaded.message} />
+        <ConnectAgentHeading
+          title={gt("This sign-in cannot continue")}
+          description={loaded.message}
+        />
         <p className="mt-4 text-sm text-muted-foreground">
-          Close this page and start the sign-in again from your agent.
+          <T>Close this page and start the sign-in again from your agent.</T>
         </p>
         {footer}
       </StandalonePage>
@@ -250,7 +255,7 @@ export function McpConsent({
     pending === null &&
     access !== null &&
     resolveApprovalDecision({ code: pairingCode, access, details }) !== null;
-  // A code from "Use T3 Code in another app" names its level, so the page does not ask again.
+  // A code from "Use R3 Code in another app" names its level, so the page does not ask again.
   const codeAccess = parseMcpApprovalCode(pairingCode)?.access;
   const approveLevel = codeAccess ?? access;
 
@@ -260,36 +265,50 @@ export function McpConsent({
         title={`Connect ${details.clientName}`}
         description={
           <>
-            This agent wants to use the threads in every project on{" "}
-            <span className="font-medium text-foreground">
-              {environmentLabel ?? details.environmentHost}
-            </span>
-            {environmentLabel ? ` (${details.environmentHost})` : null}.
+            <T>
+              This agent wants to use the threads in every project on<Var> </Var>
+              <span className="font-medium text-foreground">
+                <Var>{environmentLabel ?? details.environmentHost}</Var>
+              </span>
+              <Var>{environmentLabel ? ` (${details.environmentHost})` : null}</Var>.
+            </T>
           </>
         }
       />
       <dl className="mt-4 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 text-sm">
-        <dt className="text-muted-foreground">App</dt>
+        <dt className="text-muted-foreground">
+          <T>App</T>
+        </dt>
         <dd className="min-w-0 break-words">
-          {details.clientName} <span className="text-muted-foreground">· name set by the app</span>
+          {details.clientName}{" "}
+          <span className="text-muted-foreground">
+            <T>· name set by the app</T>
+          </span>
         </dd>
-        <dt className="text-muted-foreground">Access goes to</dt>
+        <dt className="text-muted-foreground">
+          <T>Access goes to</T>
+        </dt>
         <dd className="min-w-0 break-words font-medium">
           {details.redirectHost}
           {redirectsToThisComputer(details.redirectHost) ? (
             <span className="font-normal text-muted-foreground">
-              {" "}
-              on the computer that opened this page
+              <T>
+                <Var> </Var>
+                on the computer that opened this page
+              </T>
             </span>
           ) : (
             <span className="font-normal text-muted-foreground">
-              {" "}
-              · whoever runs it gets this access
+              <T>
+                <Var> </Var>· whoever runs it gets this access
+              </T>
             </span>
           )}
         </dd>
       </dl>
-      <p className="mt-2 text-xs text-muted-foreground">Only approve a sign-in you just started.</p>
+      <p className="mt-2 text-xs text-muted-foreground">
+        <T>Only approve a sign-in you just started.</T>
+      </p>
 
       <form
         className="mt-6 space-y-5"
@@ -301,7 +320,7 @@ export function McpConsent({
         {acceptsCode ? (
           <div className="space-y-2">
             <label className="text-sm font-medium" htmlFor="connect-agent-pairing-code">
-              Sign-in code
+              <T>Sign-in code</T>
             </label>
             <Input
               id="connect-agent-pairing-code"
@@ -311,26 +330,31 @@ export function McpConsent({
               disabled={pending !== null}
               nativeInput
               onChange={(event) => setPairingCode(event.currentTarget.value)}
-              placeholder="Paste a code"
+              placeholder={gt("Paste a code")}
               spellCheck={false}
               value={pairingCode}
             />
             <p className="text-xs text-muted-foreground">
-              Get one from Use T3 Code in another app (MCP), Settings → Sharing & access, or{" "}
-              <code>t3 auth pairing create</code> on this machine.
+              <T>
+                Get one from Use R3 Code in another app (MCP), Settings → Sharing & access, or
+                <Var> </Var>
+                <code>t3 auth pairing create</code> on this machine.
+              </T>
             </p>
           </div>
         ) : null}
 
         {codeAccess ? (
           <p className="text-sm">
-            <span className="text-muted-foreground">Access</span>{" "}
+            <span className="text-muted-foreground">
+              <T>Access</T>
+            </span>{" "}
             <span className="font-medium">{accessConfig[codeAccess].label}</span>
           </p>
         ) : (
           <div className="space-y-2">
             <span id="connect-agent-access-label" className="text-sm font-medium">
-              What it may do
+              <T>What it may do</T>
             </span>
             <RadioGroup
               aria-labelledby="connect-agent-access-label"
@@ -347,8 +371,10 @@ export function McpConsent({
               ))}
             </RadioGroup>
             <p className="text-xs text-muted-foreground">
-              Beyond read only, it can start, message and stop threads, and none of them can run
-              with more than the mode you pick.
+              <T>
+                Beyond read only, it can start, message and stop threads, and none of them can run
+                with more than the mode you pick.
+              </T>
             </p>
           </div>
         )}

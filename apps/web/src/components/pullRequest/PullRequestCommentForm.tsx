@@ -16,6 +16,7 @@ import {
 } from "./PullRequestMarkdownTextarea";
 import { pullRequestReviewKey } from "./pullRequestReviewStore";
 import { useInlineActionConfirm } from "./useInlineActionConfirm";
+import { useGT, T } from "gt-react";
 
 export function PullRequestCommentForm({
   environmentId,
@@ -42,6 +43,7 @@ export function PullRequestCommentForm({
   onCommented: () => void;
   onClose: () => void;
 }) {
+  const gt = useGT();
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState<"comment" | "close" | "reopen" | null>(null);
   const locked = submitting !== null || actionPending;
@@ -119,7 +121,7 @@ export function PullRequestCommentForm({
         readOnly={speech.freezesEditor}
         value={body}
         rows={3}
-        placeholder="Leave a comment"
+        placeholder={gt("Leave a comment")}
         aria-label={`Comment on this ${sourceControlClients.get(detail.provider).changeRequest.singular}`}
         onValueChange={setBody}
         onKeyDown={(event) => {
@@ -156,7 +158,7 @@ export function PullRequestCommentForm({
               // The longest label holds the width, so the confirming click lands on the button.
               <span className="inline-grid">
                 <span aria-hidden className="invisible col-start-1 row-start-1">
-                  Close with comment
+                  <T>Close with comment</T>
                 </span>
                 <span className="col-start-1 row-start-1">
                   {submitting === "close"

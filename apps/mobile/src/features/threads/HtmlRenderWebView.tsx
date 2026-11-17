@@ -20,6 +20,7 @@ import { tryOpenExternalUrl } from "../../lib/openExternalUrl";
 import { useAssetUrlState, useRefreshAssetUrl } from "../../state/assets";
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
 import { webViewDecelerationRate } from "../../lib/webViewDecelerationRate";
+import { T } from "gt-react-native";
 
 const ROW_BOTTOM_MARGIN = 8;
 const ACTION_ROW_HEIGHT = 32;
@@ -262,7 +263,9 @@ export function ThreadHtmlRender(props: {
               if (uri === null) void refresh().then((next) => next !== null && setUri(next));
             }}
           >
-            <Text className="text-sm text-foreground-muted">Page unavailable</Text>
+            <Text className="text-sm text-foreground-muted">
+              <T>Page unavailable</T>
+            </Text>
           </Pressable>
         ) : (
           <View className="flex-1 items-center justify-center">

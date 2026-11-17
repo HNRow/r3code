@@ -24,6 +24,7 @@ import { InlineButton } from "../ui/button";
 import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
 import { ComposerServerUpdateIcon } from "./ComposerServerUpdateStatus";
+import { T } from "gt-react";
 
 export function useAutoBalanceUpdateBanner(
   environments: readonly EnvironmentPresentation[],
@@ -105,7 +106,9 @@ export function useAutoBalanceUpdateBanner(
                   <ServerUpdateProgress state={machine.state} />
                 ) : !machine.remoteUpdate ? (
                   <>
-                    <div className="text-muted-foreground">Manual update required</div>
+                    <div className="text-muted-foreground">
+                      <T>Manual update required</T>
+                    </div>
                     <ServerUpdateAction {...machine} />
                   </>
                 ) : (

@@ -47,6 +47,7 @@ import {
   SnapShotAttachmentDetails,
 } from "./SnapShotAttachmentDetails";
 import { prepareVideoFirstFrame } from "../../lib/videoFirstFrame";
+import { useGT, T } from "gt-react";
 
 function ComposerAttachmentUploadProgress({
   id,
@@ -61,10 +62,11 @@ function ComposerAttachmentUploadProgress({
 }
 
 function ComposerImageFallback() {
+  const gt = useGT();
   return (
     <span
       role="img"
-      aria-label="Image attachment"
+      aria-label={gt("Image attachment")}
       className="flex size-full items-center justify-center p-3 text-secondary-label"
     >
       <ImageIcon aria-hidden="true" className="size-4" />
@@ -174,6 +176,7 @@ export function ComposerAttachmentMediaRow({
   readonly onRemoveImage: (imageId: string) => void;
   readonly onRemoveFile: (fileId: string) => void;
 }) {
+  const gt = useGT();
   const uploadsByImageId = useAttachmentUploadStore((state) => state.uploadsByImageId);
   const pendingSnapShotIdSet = new Set(pendingSnapShotIds);
   const nonPersistedImageIdSet = new Set(nonPersistedImageIds);
@@ -269,7 +272,7 @@ export function ComposerAttachmentMediaRow({
                     render={
                       <span
                         role="img"
-                        aria-label="Draft attachment may not persist"
+                        aria-label={gt("Draft attachment may not persist")}
                         className="absolute left-1 top-1 inline-flex items-center justify-center rounded bg-background/85 p-0.5 text-warning-foreground"
                       >
                         <CircleAlertIcon className="size-3" />
@@ -277,7 +280,9 @@ export function ComposerAttachmentMediaRow({
                     }
                   />
                   <TooltipPopup side="top">
-                    Draft attachment could not be saved locally and may be lost on navigation.
+                    <T>
+                      Draft attachment could not be saved locally and may be lost on navigation.
+                    </T>
                   </TooltipPopup>
                 </Tooltip>
               )}
@@ -711,6 +716,7 @@ export function ComposerAttachButton({
   readonly addComposerAttachments: (files: File[]) => Promise<boolean>;
   readonly focusComposer: () => void;
 }) {
+  const gt = useGT();
   const inputRef = useRef<HTMLInputElement>(null);
   return (
     <>
@@ -739,14 +745,16 @@ export function ComposerAttachButton({
               size="icon-sm"
               onPointerDown={(event) => event.preventDefault()}
               onClick={() => inputRef.current?.click()}
-              aria-label="Attach files"
+              aria-label={gt("Attach files")}
             />
           }
         >
           {/* The clip's weight sits in its upper loop; 1px down reads as centered on the row. */}
           <PaperclipIcon className="translate-y-px" />
         </TooltipTrigger>
-        <TooltipPopup>Attach files</TooltipPopup>
+        <TooltipPopup>
+          <T>Attach files</T>
+        </TooltipPopup>
       </Tooltip>
     </>
   );

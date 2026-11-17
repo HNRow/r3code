@@ -37,6 +37,7 @@ import { ThreadScreenFallback } from "./ThreadScreenHost";
 import { NewTaskDraftScreen } from "./NewTaskDraftScreen";
 
 import type { NewTaskDraftRouteParams } from "./thread-route-state";
+import { useGT, T } from "gt-react-native";
 export type { NewTaskDraftRouteParams } from "./thread-route-state";
 
 const branchCheckouts = makeNewTaskBranchCheckouts({
@@ -89,6 +90,7 @@ const idleBranchCheckoutAtom = Atom.make(AsyncResult.initial<BranchCheckoutResul
 );
 
 export function NewTaskDraftRouteScreen({ route }: StaticScreenProps<NewTaskDraftRouteParams>) {
+  const gt = useGT();
   const currentRoute = useRoute();
   const goBack = useWorkspaceBackNavigation();
   const params = route.params ?? {};
@@ -199,9 +201,11 @@ export function NewTaskDraftRouteScreen({ route }: StaticScreenProps<NewTaskDraf
   return (
     <>
       {preparingBranch ? (
-        <ThreadScreenFallback header={<AppBar title="New thread" onBack={goBack} />}>
+        <ThreadScreenFallback header={<AppBar title={gt("New thread")} onBack={goBack} />}>
           <View className="flex-1 items-center justify-center bg-screen">
-            <Text className="text-foreground">Switching branch...</Text>
+            <Text className="text-foreground">
+              <T>Switching branch...</T>
+            </Text>
           </View>
         </ThreadScreenFallback>
       ) : (

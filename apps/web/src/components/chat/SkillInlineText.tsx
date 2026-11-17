@@ -10,6 +10,7 @@ import { ContextChipPopover } from "../contextChipParts";
 import { Button } from "../ui/button";
 import { PopoverClose } from "../ui/popover";
 import { ModelMentionChip } from "./ModelMentionChip";
+import { T } from "gt-react";
 
 function SkillInlineText(props: {
   text: string;
@@ -140,7 +141,7 @@ export function SkillChipPopover(props: {
             render={<Button variant="outline" size="sm" />}
             onClick={props.onViewInstructions}
           >
-            View instructions
+            <T>View instructions</T>
           </PopoverClose>
         ) : null}
       </div>

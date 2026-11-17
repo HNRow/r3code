@@ -126,6 +126,7 @@ import { MiddleTruncate } from "../ui/middle-truncate";
 import { ActivityShimmerOverlay } from "../chat/TimelineRowParts";
 import { observeVisibleAnimation } from "~/lib/visibleAnimation";
 import { useThreadHasUnsentDraft } from "../../composerDraftStore";
+import { T, Var, useGT } from "gt-react";
 
 // The fields thread rows show. Provider status pushes refresh `checkedAt`,
 // status and auth on every provider; leaving those out keeps each
@@ -311,7 +312,7 @@ function SidebarThreadTooltip({
           <div className="flex min-w-0 items-start gap-2 text-warning">
             <CircleAlertIcon aria-hidden className="mt-0.5 size-3 shrink-0 stroke-current" />
             <div className="min-w-0 flex-1 wrap-break-word">
-              You're currently checked out on another branch.
+              <T>You're currently checked out on another branch.</T>
             </div>
           </div>
         ) : null}
@@ -341,7 +342,9 @@ function SidebarThreadTooltip({
           <div className="flex min-w-0 items-center gap-2">
             <ArrowRightLeftIcon className="size-3 shrink-0 stroke-muted-foreground" />
             <div className="min-w-0 truncate text-foreground/75">
-              Handed off from {previousProviderNames.join(", ")}
+              <T>
+                Handed off from <Var>{previousProviderNames.join(", ")}</Var>
+              </T>
             </div>
           </div>
         ) : null}
@@ -383,6 +386,7 @@ function SnoozeMenuButton(props: {
   timestampFormat: TimestampFormat;
   environmentId: EnvironmentId;
 }) {
+  const gt = useGT();
   const { open, onOpenChange, onSnooze, timestampFormat, environmentId } = props;
   const presets = open
     ? // oxlint-disable-next-line react/purity -- Presets are resolved only while the menu is open, so each opening reads a fresh time.
@@ -397,7 +401,7 @@ function SnoozeMenuButton(props: {
               render={
                 <button
                   type="button"
-                  aria-label="Snooze thread"
+                  aria-label={gt("Snooze thread")}
                   onClick={(event) => event.stopPropagation()}
                   onDoubleClick={(event) => event.stopPropagation()}
                   className="inline-flex h-full cursor-pointer items-center gap-0.5 rounded-md bg-transparent px-1.5 text-xs text-muted-foreground hover:text-foreground"
@@ -408,7 +412,9 @@ function SnoozeMenuButton(props: {
         >
           <ClockIcon className="size-3" />
         </TooltipTrigger>
-        <TooltipPopup>Snooze thread</TooltipPopup>
+        <TooltipPopup>
+          <T>Snooze thread</T>
+        </TooltipPopup>
       </Tooltip>
       <MenuPopup side="bottom" align="end">
         {presets.map((preset) => (
@@ -432,7 +438,7 @@ function SnoozeMenuButton(props: {
             if (choice) onSnooze(choice);
           }}
         >
-          Custom…
+          <T>Custom…</T>
         </MenuItem>
       </MenuPopup>
     </Menu>
@@ -503,32 +509,42 @@ export type SidebarSweepAction = "settle" | "unsettle" | "unsnooze";
 const dropVerbBadge: Record<SidebarDropVerb, ReactNode> = {
   pin: (
     <>
-      <PinIcon aria-hidden className="size-3" />
-      Pin
+      <T>
+        <PinIcon aria-hidden className="size-3" />
+        Pin
+      </T>
     </>
   ),
   unpin: (
     <>
-      <PinOffIcon aria-hidden className="size-3" />
-      Unpin
+      <T>
+        <PinOffIcon aria-hidden className="size-3" />
+        Unpin
+      </T>
     </>
   ),
   settle: (
     <>
-      <CircleCheckIcon aria-hidden className="size-3" />
-      Settle
+      <T>
+        <CircleCheckIcon aria-hidden className="size-3" />
+        Settle
+      </T>
     </>
   ),
   unsettle: (
     <>
-      <Undo2Icon aria-hidden className="size-3" />
-      Un-settle
+      <T>
+        <Undo2Icon aria-hidden className="size-3" />
+        Un-settle
+      </T>
     </>
   ),
   wake: (
     <>
-      <AlarmClockOffIcon aria-hidden className="size-3" />
-      Wake
+      <T>
+        <AlarmClockOffIcon aria-hidden className="size-3" />
+        Wake
+      </T>
     </>
   ),
 };
@@ -617,6 +633,7 @@ function ThreadRenameInput(props: {
   onCommit: () => void;
   onCancel: () => void;
 }) {
+  const gt = useGT();
   // Enter and Escape blur the input as it unmounts; that blur must not commit again.
   const settledRef = useRef(false);
   const handleKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
@@ -637,7 +654,7 @@ function ThreadRenameInput(props: {
       autoFocus
       value={props.title}
       dir="auto"
-      aria-label="Thread title"
+      aria-label={gt("Thread title")}
       onChange={(event) => props.onTitleChange(event.target.value)}
       onFocus={(event) => event.currentTarget.select()}
       onKeyDown={handleKeyDown}
@@ -652,6 +669,7 @@ function ThreadRenameInput(props: {
 }
 
 const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowProps) {
+  const gt = useGT();
   const {
     isRenaming,
     onCancelRename,
@@ -1119,7 +1137,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
         render={
           <span
             role="img"
-            aria-label="Unsent draft"
+            aria-label={gt("Unsent draft")}
             data-testid={`sidebar-draft-indicator-${thread.id}`}
             className="inline-flex shrink-0 items-center"
           />
@@ -1127,7 +1145,9 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
       >
         <SquarePenIcon aria-hidden className={draftPenClassName} />
       </TooltipTrigger>
-      <TooltipPopup side="top">Unsent draft</TooltipPopup>
+      <TooltipPopup side="top">
+        <T>Unsent draft</T>
+      </TooltipPopup>
     </Tooltip>
   ) : null;
   const showPin =
@@ -1139,7 +1159,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
           render={
             <button
               type="button"
-              aria-label="Unpin thread"
+              aria-label={gt("Unpin thread")}
               onClick={handleUnpinClick}
               className="group/unpin inline-flex cursor-pointer items-center rounded-sm text-muted-foreground/65 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
             />
@@ -1154,11 +1174,13 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
             className="hidden size-3 shrink-0 group-hover/unpin:block group-focus-visible/unpin:block"
           />
         </TooltipTrigger>
-        <TooltipPopup>Unpin thread</TooltipPopup>
+        <TooltipPopup>
+          <T>Unpin thread</T>
+        </TooltipPopup>
       </Tooltip>
     ) : (
       <PinIcon
-        aria-label="Pinned"
+        aria-label={gt("Pinned")}
         role="img"
         className="size-3 shrink-0 text-muted-foreground/65"
       />
@@ -1294,7 +1316,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
               {multiline ? null : terminalStatusIcon}
               {isRegeneratingTitle ? (
                 <span role="status" className="sr-only">
-                  Regenerating title
+                  <T>Regenerating title</T>
                 </span>
               ) : null}
               {sortable?.isDragging ? (
@@ -1325,16 +1347,20 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                           render={
                             <button
                               type="button"
-                              aria-label="Dismiss Woke notification"
+                              aria-label={gt("Dismiss Woke notification")}
                               onClick={handleAcknowledgeWokeClick}
                               className="inline-flex cursor-pointer items-center gap-1 rounded-sm text-xs font-medium text-warning-foreground outline-none hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                             >
                               <AlarmClockIcon aria-hidden className="size-3" />
-                              <span role="status">Woke</span>
+                              <span role="status">
+                                <T>Woke</T>
+                              </span>
                             </button>
                           }
                         />
-                        <TooltipPopup side="top">Dismiss Woke notification</TooltipPopup>
+                        <TooltipPopup side="top">
+                          <T>Dismiss Woke notification</T>
+                        </TooltipPopup>
                       </Tooltip>
                     ) : inFolder && topStatus ? (
                       // Folder rows have no status line, so the status takes the time slot.
@@ -1363,7 +1389,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                     !props.snoozeSupported ? null : (
                       <button
                         type="button"
-                        aria-label="Wake thread now"
+                        aria-label={gt("Wake thread now")}
                         onClick={handleUnsnoozeClick}
                         onPointerDown={handleActionPointerDown}
                         className={cn(
@@ -1380,7 +1406,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                         render={
                           <button
                             type="button"
-                            aria-label="Un-settle thread"
+                            aria-label={gt("Un-settle thread")}
                             onClick={handleUnsettleClick}
                             onPointerDown={handleActionPointerDown}
                             className={cn(
@@ -1392,7 +1418,9 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                       >
                         <Undo2Icon className="mb-px size-3.5" />
                       </TooltipTrigger>
-                      <TooltipPopup side="top">Un-settle thread</TooltipPopup>
+                      <TooltipPopup side="top">
+                        <T>Un-settle thread</T>
+                      </TooltipPopup>
                     </Tooltip>
                   ) : (
                     <Tooltip>
@@ -1400,7 +1428,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                         render={
                           <button
                             type="button"
-                            aria-label="Settle thread"
+                            aria-label={gt("Settle thread")}
                             onClick={handleSettleClick}
                             onPointerDown={handleActionPointerDown}
                             className={cn(
@@ -1412,7 +1440,9 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                       >
                         <CheckIcon className="size-3" />
                       </TooltipTrigger>
-                      <TooltipPopup side="top">Settle thread</TooltipPopup>
+                      <TooltipPopup side="top">
+                        <T>Settle thread</T>
+                      </TooltipPopup>
                     </Tooltip>
                   )}
                   {jumpHintLabel ? <JumpHintBadge label={jumpHintLabel} /> : null}
@@ -1511,7 +1541,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                             render={
                               <button
                                 type="button"
-                                aria-label="Dismiss Woke notification"
+                                aria-label={gt("Dismiss Woke notification")}
                                 onClick={handleAcknowledgeWokeClick}
                                 className={cn(
                                   "inline-flex cursor-pointer items-center gap-1 rounded-sm font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
@@ -1523,7 +1553,9 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                               </button>
                             }
                           />
-                          <TooltipPopup side="top">Dismiss Woke notification</TooltipPopup>
+                          <TooltipPopup side="top">
+                            <T>Dismiss Woke notification</T>
+                          </TooltipPopup>
                         </Tooltip>
                       ) : (
                         <span
@@ -1573,7 +1605,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                             render={
                               <button
                                 type="button"
-                                aria-label="Discard draft"
+                                aria-label={gt("Discard draft")}
                                 onClick={handleDiscardDraftClick}
                                 className="inline-flex cursor-pointer items-center rounded-md bg-transparent px-1.5 text-xs text-muted-foreground hover:text-foreground"
                               />
@@ -1581,7 +1613,9 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                           >
                             <XIcon className="size-3.5" />
                           </TooltipTrigger>
-                          <TooltipPopup side="top">Discard draft</TooltipPopup>
+                          <TooltipPopup side="top">
+                            <T>Discard draft</T>
+                          </TooltipPopup>
                         </Tooltip>
                       ) : null}
                       {showSnoozeButton ? (
@@ -1599,17 +1633,21 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                             render={
                               <button
                                 type="button"
-                                aria-label="Settle thread"
+                                aria-label={gt("Settle thread")}
                                 onClick={handleSettleClick}
                                 onPointerDown={handleActionPointerDown}
                                 className="-mr-1 inline-flex cursor-pointer items-center gap-1 rounded-md bg-transparent px-1.5 text-xs text-muted-foreground hover:text-foreground"
                               />
                             }
                           >
-                            <CheckIcon className="size-3.5" />
-                            Settle
+                            <T>
+                              <CheckIcon className="size-3.5" />
+                              Settle
+                            </T>
                           </TooltipTrigger>
-                          <TooltipPopup>Settle thread</TooltipPopup>
+                          <TooltipPopup>
+                            <T>Settle thread</T>
+                          </TooltipPopup>
                         </Tooltip>
                       ) : null}
                     </span>
@@ -1623,7 +1661,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
               {title}
               {isRegeneratingTitle ? (
                 <span role="status" className="sr-only">
-                  Regenerating title
+                  <T>Regenerating title</T>
                 </span>
               ) : null}
               {titleLineIcons}

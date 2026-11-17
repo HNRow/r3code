@@ -35,6 +35,7 @@ import {
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
+import { Var, T } from "gt-react";
 
 /** Moves this app and every connected machine to `channel`. */
 export function UpdateTrackSwitchDialog({
@@ -54,7 +55,11 @@ export function UpdateTrackSwitchDialog({
     <AlertDialog open onOpenChange={(open) => !open && onClose()}>
       <AlertDialogPopup>
         <AlertDialogHeader>
-          <AlertDialogTitle>Switch to {label}</AlertDialogTitle>
+          <AlertDialogTitle>
+            <T>
+              Switch to <Var>{label}</Var>
+            </T>
+          </AlertDialogTitle>
           <AlertDialogDescription>
             {AsyncResult.isFailure(release)
               ? npmReleaseFailureMessage(release.cause)
@@ -64,7 +69,9 @@ export function UpdateTrackSwitchDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+          <AlertDialogClose render={<Button variant="outline" />}>
+            <T>Cancel</T>
+          </AlertDialogClose>
         </AlertDialogFooter>
       </AlertDialogPopup>
     </AlertDialog>
@@ -177,7 +184,7 @@ function SwitchPlan({
           ? ["This app's updates are off here, so reinstall it yourself to switch."]
           : []),
         ...(switchesLocal && isMacPlatform(navigator.platform)
-          ? ["If T3 Code does not reopen after it restarts, open it again."]
+          ? ["If R3 Code does not reopen after it restarts, open it again."]
           : []),
       ]}
       restarts={everything.restarts}

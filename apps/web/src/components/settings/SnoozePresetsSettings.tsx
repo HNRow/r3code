@@ -35,6 +35,7 @@ import {
   useScopedSettingsMixed,
   useUpdateScopedSettings,
 } from "./useScopedSettings";
+import { useGT, T, Var } from "gt-react";
 
 const UNIT_MINUTES = { minutes: 1, hours: 60, days: 24 * 60 } as const;
 type DurationUnit = keyof typeof UNIT_MINUTES;
@@ -124,6 +125,7 @@ function withWhen(
  * leaves the list, so a row never moves under the pointer mid-edit.
  */
 export function SnoozePresetsRow() {
+  const gt = useGT();
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
   const saved = settings.snoozePresets;
@@ -186,11 +188,13 @@ export function SnoozePresetsRow() {
       serverScoped
       settingKeys={["snoozePresets"]}
       {...searchableSetting("snooze-options")}
-      description="Choices in every snooze menu, listed soonest first. Weekdays mean the next one after today."
+      description={gt(
+        "Choices in every snooze menu, listed soonest first. Weekdays mean the next one after today.",
+      )}
       resetAction={
         !mixed && sameSnoozePresets(presets, DEFAULT_SNOOZE_PRESETS) ? null : (
           <SettingResetButton
-            label="snooze options"
+            label={gt("snooze options")}
             onClick={() => {
               const sorted = sortSnoozeRows(
                 DEFAULT_SNOOZE_PRESETS,
@@ -316,12 +320,16 @@ function SnoozePresetList(props: {
           disabled={props.presets.length >= MAX_SNOOZE_PRESETS}
           onClick={props.onAdd}
         >
-          <PlusIcon />
-          Add option
+          <T>
+            <PlusIcon />
+            Add option
+          </T>
         </Button>
         {props.presets.length >= MAX_SNOOZE_PRESETS ? (
           <span className="ps-2 text-xs text-muted-foreground">
-            Up to {MAX_SNOOZE_PRESETS} options
+            <T>
+              Up to <Var>{MAX_SNOOZE_PRESETS}</Var> options
+            </T>
           </span>
         ) : null}
       </div>
@@ -333,6 +341,7 @@ function SnoozePresetFields(props: {
   preset: SnoozePresetSetting;
   onChange: (preset: SnoozePresetSetting) => void;
 }) {
+  const gt = useGT();
   const { preset, onChange } = props;
   const when = preset.kind === "after" ? "after" : preset.day;
   // Switching between a duration and a set time keeps the other kind's last value, so a
@@ -356,7 +365,7 @@ function SnoozePresetFields(props: {
           onChange(next);
         }}
       >
-        <SelectTrigger size="sm" className="w-32" aria-label="When">
+        <SelectTrigger size="sm" className="w-32" aria-label={gt("When")}>
           <SelectValue />
         </SelectTrigger>
         <SelectPopup>
@@ -374,13 +383,15 @@ function SnoozePresetFields(props: {
         />
       ) : (
         <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <span className="text-xs text-muted-foreground">at</span>
+          <span className="text-xs text-muted-foreground">
+            <T>at</T>
+          </span>
           <Input
             nativeInput
             size="sm"
             type="time"
             className="w-32"
-            aria-label="Time"
+            aria-label={gt("Time")}
             value={preset.time}
             onChange={(event) => {
               if (/^\d{2}:\d{2}$/.test(event.target.value)) {
@@ -395,6 +406,7 @@ function SnoozePresetFields(props: {
 }
 
 function DurationFields(props: { minutes: number; onChange: (minutes: number) => void }) {
+  const gt = useGT();
   // The chosen unit stays put while stepping, so 59 → 60 minutes does not jump to hours.
   const [chosenUnit, setChosenUnit] = useState(() => splitMinutes(props.minutes).unit);
   const unit =
@@ -430,9 +442,9 @@ function DurationFields(props: { minutes: number; onChange: (minutes: number) =>
         }}
       >
         <NumberFieldGroup>
-          <NumberFieldDecrement aria-label="Decrease" />
+          <NumberFieldDecrement aria-label={gt("Decrease")} />
           <NumberFieldInput
-            aria-label="Amount"
+            aria-label={gt("Amount")}
             // Base UI commits on blur but not on Enter; refocus so keyboard users stay put.
             onKeyDown={(event) => {
               if (event.key !== "Enter") return;
@@ -441,7 +453,7 @@ function DurationFields(props: { minutes: number; onChange: (minutes: number) =>
               input.focus();
             }}
           />
-          <NumberFieldIncrement aria-label="Increase" />
+          <NumberFieldIncrement aria-label={gt("Increase")} />
         </NumberFieldGroup>
       </NumberField>
       <Select
@@ -454,7 +466,7 @@ function DurationFields(props: { minutes: number; onChange: (minutes: number) =>
           }
         }}
       >
-        <SelectTrigger size="sm" className="w-28" aria-label="Unit">
+        <SelectTrigger size="sm" className="w-28" aria-label={gt("Unit")}>
           <SelectValue />
         </SelectTrigger>
         <SelectPopup>

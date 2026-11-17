@@ -30,12 +30,14 @@ import { usePullRequestPermissions } from "./usePullRequestPermissions";
 import { PullRequestGlyph } from "./pullRequestGlyphs";
 import type { AppSymbolName } from "../../components/ui/AppSymbol";
 import type { PullRequestStackState } from "./usePullRequestStack";
+import { useGT } from "gt-react-native";
 
 export function PullRequestMergeControls(props: {
   readonly pr: PullRequestDetail;
   readonly params: PullRequestParams;
   readonly stack: PullRequestStackState;
 }) {
+  const gt = useGT();
   const { pr, stack } = props;
   const terminology = sourceControlClients.get(pr.provider).changeRequest;
   const target = pullRequestTarget(props.params);
@@ -261,7 +263,7 @@ export function PullRequestMergeControls(props: {
         <Text className="px-1 text-xs text-foreground-muted">{reason}</Text>
       ) : null}
       {stack.error && stack.supportsStackActions ? (
-        <Button label="Retry stack lookup" tone="text" onPress={stack.refresh} />
+        <Button label={gt("Retry stack lookup")} tone="text" onPress={stack.refresh} />
       ) : null}
     </View>
   );

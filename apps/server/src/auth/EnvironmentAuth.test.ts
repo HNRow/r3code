@@ -305,7 +305,7 @@ it.layer(Layer.mergeAll(NodeServices.layer, NodePlatformCrypto.layer))(
     );
 
     it.effect(
-      "holds an untrusted T3 Connect device until it is approved, and revocation cuts it off",
+      "holds an untrusted R3 Connect device until it is approved, and revocation cuts it off",
       () =>
         Effect.gen(function* () {
           const serverAuth = yield* EnvironmentAuth.EnvironmentAuth;
@@ -377,8 +377,8 @@ it.layer(Layer.mergeAll(NodeServices.layer, NodePlatformCrypto.layer))(
           });
           const [oldestDeviceSession, newestDeviceSession] = yield* deviceSessions();
           expect(newestDeviceSession).toBeDefined();
-          // Authorized clients lists T3 Connect sessions under this name.
-          expect(newestDeviceSession?.client.label).toBe("T3 Connect");
+          // Authorized clients lists R3 Connect sessions under this name.
+          expect(newestDeviceSession?.client.label).toBe("R3 Connect");
           // Revoking any one of the device's sessions ends all of them and its trust.
           expect(
             yield* serverAuth.revokeClientSession(admin.sessionId, oldestDeviceSession!.sessionId),
@@ -580,7 +580,7 @@ it.layer(Layer.mergeAll(NodeServices.layer, NodePlatformCrypto.layer))(
         const paired = yield* serverAuth.exchangeBootstrapCredentialForAccessToken(
           pairing.credential,
           undefined,
-          { ...requestMetadata, label: "T3 Code Desktop" },
+          { ...requestMetadata, label: "R3 Code Desktop" },
         );
         const first = yield* serverAuth.exchangeBootstrapCredentialForAccessToken(
           "desktop-bootstrap-token",

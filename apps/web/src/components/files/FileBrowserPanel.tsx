@@ -41,6 +41,7 @@ import { useDirectoryEntries } from "./useDirectoryEntries";
 import { useProjectPathSearch } from "~/state/queries";
 import { isMacPlatform } from "~/lib/utils";
 import { type PreviewAction, subscribePreviewAction } from "../preview/previewActionBus";
+import { useGT, Var, T } from "gt-react";
 
 interface FileBrowserPanelProps {
   environmentId: EnvironmentId;
@@ -62,6 +63,7 @@ function treePath(entry: ProjectEntry): string {
 }
 
 function RefreshFilesButton(props: { isPending: boolean; onRefresh: () => void }) {
+  const gt = useGT();
   return (
     <Tooltip>
       <TooltipTrigger
@@ -70,7 +72,7 @@ function RefreshFilesButton(props: { isPending: boolean; onRefresh: () => void }
             type="button"
             variant="ghost"
             size="icon-xs"
-            aria-label="Refresh workspace files"
+            aria-label={gt("Refresh workspace files")}
             onClick={props.onRefresh}
           />
         }
@@ -93,6 +95,7 @@ function FileSearchField({
   ref: Ref<HTMLInputElement>;
   value: string;
 }) {
+  const gt = useGT();
   return (
     <InputGroup variant="ghost" className="h-7 min-w-0 flex-1">
       <InputGroupInput
@@ -102,7 +105,7 @@ function FileSearchField({
         size="sm"
         value={props.value}
         aria-label={props.ariaLabel}
-        placeholder="Search files"
+        placeholder={gt("Search files")}
         data-workspace-focus-default
         spellCheck={false}
         onChange={(event) => props.onValueChange(event.target.value)}
@@ -585,12 +588,14 @@ export default function FileBrowserPanel({
           onClick={handleRefresh}
           className="p-4 text-left text-xs leading-relaxed text-destructive"
         >
-          {error ?? pathSearch.error} Click to retry.
+          <T>
+            <Var>{error ?? pathSearch.error}</Var> Click to retry.
+          </T>
         </button>
       ) : null}
       {query.trim() && pathSearch.truncated && !pathSearch.isPending ? (
         <div className="px-3 py-1 text-xs text-muted-foreground">
-          More matches available. Refine your search.
+          <T>More matches available. Refine your search.</T>
         </div>
       ) : null}
       {(!ready || pathSearch.isPending) && (
@@ -602,13 +607,13 @@ export default function FileBrowserPanel({
               : "px-3 py-1 text-xs text-muted-foreground"
           }
         >
-          Loading files…
+          <T>Loading files…</T>
         </div>
       )}
       {hasNoSearchMatches ? (
         ready && !isPending && !pathSearch.isPending && !error && !pathSearch.error ? (
           <div role="status" className="px-3 py-4 text-xs text-muted-foreground">
-            No matching files.
+            <T>No matching files.</T>
           </div>
         ) : null
       ) : (

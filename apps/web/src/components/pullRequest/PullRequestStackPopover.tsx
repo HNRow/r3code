@@ -6,6 +6,7 @@ import { Menu, MenuTrigger, MenuPopup, MenuGroup, MenuGroupLabel, MenuItem } fro
 import { PullRequestStackLayers } from "./PullRequestStackLayers";
 import { PullRequestStackHeader } from "./PullRequestStackHeader";
 import { PullRequestGlyph } from "./pullRequestIcons";
+import { T, Var } from "gt-react";
 
 // Mount only on open to avoid per-row stack fetches.
 function StackBody({
@@ -28,7 +29,11 @@ function StackBody({
           notice={query.notice}
           stale={!!query.error}
         />
-        {query.error ? <MenuItem onClick={query.refresh}>Retry stack refresh</MenuItem> : null}
+        {query.error ? (
+          <MenuItem onClick={query.refresh}>
+            <T>Retry stack refresh</T>
+          </MenuItem>
+        ) : null}
         <PullRequestStackLayers stack={query.data} reference={reference} onSelect={onSelect} />
       </>
     );
@@ -80,7 +85,10 @@ export function PullRequestStackPopover({
           }
         />
         <TooltipPopup>
-          View stack #{membership.number}, layer {membership.position} of {membership.size}
+          <T>
+            View stack #<Var>{membership.number}</Var>, layer <Var>{membership.position}</Var> of{" "}
+            <Var>{membership.size}</Var>
+          </T>
         </TooltipPopup>
       </Tooltip>
       <MenuPopup

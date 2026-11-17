@@ -124,6 +124,7 @@ import {
   resetPullRequestHosts,
   type PullRequestHostRead,
 } from "./pullRequestProjectAssignment.logic";
+import { useGT, Var, T } from "gt-react";
 
 function getShortcutContext() {
   return {
@@ -181,6 +182,7 @@ function usePendingListEntries(
 }
 
 export function PullRequestsPage() {
+  const gt = useGT();
   const search = useSearch({ from: "/_chat/pull-requests" });
   const sort = search.sort ?? "ready";
   const statsPolicy: PullRequestStatsPolicy =
@@ -1191,8 +1193,8 @@ export function PullRequestsPage() {
   const searchInput = (
     <PullRequestSearchInput
       value={search.q ?? ""}
-      label="Search pull requests"
-      placeholder="Search pull requests, or label:bug"
+      label={gt("Search pull requests")}
+      placeholder={gt("Search pull requests, or label:bug")}
       busy={typedQuery.length > 0 && (!querySettled || showingCarried)}
       onChange={(query) => updateListScope({ q: query || undefined })}
       onSubmit={submitQuery}
@@ -1244,14 +1246,14 @@ export function PullRequestsPage() {
   const listBody = (
     <>
       {!capabilityKnown ? (
-        <PullRequestListGhost rows={7} caption="Loading pull requests…" />
+        <PullRequestListGhost rows={7} caption={gt("Loading pull requests…")} />
       ) : !pullRequestsSupported ? (
         <PullRequestsUnavailableState
-          title="Pull requests unavailable"
-          error="Update your T3 Code servers to browse pull requests."
+          title={gt("Pull requests unavailable")}
+          error={gt("Update your R3 Code servers to browse pull requests.")}
         />
       ) : firstLoad ? (
-        <PullRequestListGhost rows={7} caption="Loading pull requests…" />
+        <PullRequestListGhost rows={7} caption={gt("Loading pull requests…")} />
       ) : listError && shownCount === 0 ? (
         <PullRequestsUnavailableState
           error={listError}
@@ -1299,9 +1301,13 @@ export function PullRequestsPage() {
 
       {listError && shownCount > 0 ? (
         <div className="flex items-center justify-between gap-3 rounded-lg border border-warning/30 bg-warning-surface px-3 py-2 text-xs">
-          <span>{listError} Showing the last pull requests loaded.</span>
+          <span>
+            <T>
+              <Var>{listError}</Var> Showing the last pull requests loaded.
+            </T>
+          </span>
           <Button size="xs" variant="outline" onClick={() => listQuery.refresh()}>
-            Retry
+            <T>Retry</T>
           </Button>
         </div>
       ) : null}
@@ -1319,10 +1325,12 @@ export function PullRequestsPage() {
               onClick={loadMore}
               disabled={listQuery.isPending || showingCarried}
             >
-              Load more pull requests
+              <T>Load more pull requests</T>
             </Button>
           ) : (
-            <span>Narrow your search to find more pull requests.</span>
+            <span>
+              <T>Narrow your search to find more pull requests.</T>
+            </span>
           )}
         </div>
       ) : null}
@@ -1353,9 +1361,9 @@ export function PullRequestsPage() {
   ];
   const sortMenu = (
     <PullRequestCompactFilterMenu
-      label="Sort pull requests"
+      label={gt("Sort pull requests")}
       triggerIcon={<ArrowDownUpIcon aria-hidden className="size-4" />}
-      triggerLabel="Sort"
+      triggerLabel={gt("Sort")}
       outlined
       value={sort}
       options={SORT_OPTIONS}

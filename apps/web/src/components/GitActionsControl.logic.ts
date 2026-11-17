@@ -1,3 +1,4 @@
+import { msg } from "gt-react";
 import type {
   GitRunStackedActionResult,
   GitStackedAction,
@@ -401,6 +402,10 @@ export function resolveQuickAction(
   };
 }
 
+function fill(template: string, vars: Readonly<Record<number, string>>): string {
+  return template.replace(/\{(\d+)\}/g, (match, index: string) => vars[Number(index)] ?? match);
+}
+
 export function resolveDefaultBranchActionDialogCopy(input: {
   action: DefaultBranchConfirmableAction;
   branchName: string;
@@ -408,35 +413,47 @@ export function resolveDefaultBranchActionDialogCopy(input: {
   terminology: ChangeRequestTerminology;
 }): DefaultBranchActionDialogCopy {
   const branchLabel = input.branchName;
-  const suffix = ` on "${branchLabel}". You can continue on this ref or create a feature ref and run the same action there.`;
   const { terminology } = input;
+  const suffix = msg(
+    " You can continue on this ref or create a feature ref and run the same action there.",
+  );
 
   if (input.action === "push" || input.action === "commit_push") {
     if (input.includesCommit) {
       return {
-        title: "Commit & push to default ref?",
-        description: `This action will commit and push changes${suffix}`,
-        continueLabel: `Commit & push to ${branchLabel}`,
+        title: msg("Commit & push to default ref?"),
+        description: msg("This action will commit and push changes on {1}.") + suffix,
+        continueLabel: fill(msg("Commit & push to {1}"), { 1: branchLabel }),
       };
     }
     return {
-      title: "Push to default ref?",
-      description: `This action will push local commits${suffix}`,
-      continueLabel: `Push to ${branchLabel}`,
+      title: msg("Push to default ref?"),
+      description: msg("This action will push local commits on {1}.") + suffix,
+      continueLabel: fill(msg("Push to {1}"), { 1: branchLabel }),
     };
   }
 
   if (input.includesCommit) {
     return {
-      title: `Commit, push & create ${terminology.shortLabel} from default ref?`,
-      description: `This action will commit, push, and create a ${terminology.singular}${suffix}`,
-      continueLabel: `Commit, push & create ${terminology.shortLabel}`,
+      title: fill(msg("Commit, push & create {1} from default ref?"), {
+        1: terminology.shortLabel,
+      }),
+      description:
+        fill(msg("This action will commit, push, and create a {1} on {2}."), {
+          1: terminology.singular,
+          2: branchLabel,
+        }) + suffix,
+      continueLabel: fill(msg("Commit, push & create {1}"), { 1: terminology.shortLabel }),
     };
   }
   return {
-    title: `Push & create ${terminology.shortLabel} from default ref?`,
-    description: `This action will push local commits and create a ${terminology.singular}${suffix}`,
-    continueLabel: `Push & create ${terminology.shortLabel}`,
+    title: fill(msg("Push & create {1} from default ref?"), { 1: terminology.shortLabel }),
+    description:
+      fill(msg("This action will push local commits and create a {1} on {2}."), {
+        1: terminology.singular,
+        2: branchLabel,
+      }) + suffix,
+    continueLabel: fill(msg("Push & create {1}"), { 1: terminology.shortLabel }),
   };
 }
 

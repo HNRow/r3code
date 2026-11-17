@@ -15,6 +15,7 @@ import {
   useLinkedPullRequestLines,
 } from "./LinkedPullRequestList";
 import { useLinkedPullRequestActions } from "./useLinkedPullRequestActions";
+import { Var, T } from "gt-react-native";
 
 export function ThreadPullRequestsSheet(
   _props: StaticScreenProps<{ readonly environmentId: string; readonly threadId: string }>,
@@ -72,13 +73,17 @@ export function ThreadPullRequestsSheet(
         ListHeaderComponent={
           lines.length > 0 ? (
             <Text className="px-4 pt-2 pb-1 text-xs text-foreground-muted">
-              {openCount} open · {lines.length} linked
+              <T>
+                <Var>{openCount}</Var> open · <Var>{lines.length}</Var> linked
+              </T>
             </Text>
           ) : null
         }
         ListEmptyComponent={
           <Text className="pt-6 text-center text-sm text-foreground-muted">
-            No linked {actions.terminology.plural}.
+            <T>
+              No linked <Var>{actions.terminology.plural}</Var>.
+            </T>
           </Text>
         }
       />

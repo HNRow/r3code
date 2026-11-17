@@ -20,6 +20,7 @@ import { Toggle, ToggleGroup } from "~/components/ui/toggle-group";
 import { cn } from "~/lib/utils";
 import type { DeviceControls } from "./useDeviceControls";
 import { deviceEventLogAtom } from "./deviceHubAtoms";
+import { T, useGT } from "gt-react";
 
 const TEXT_SIZES: ReadonlyArray<{ value: DeviceTextSize; label: string }> = [
   { value: "small", label: "Small" },
@@ -86,6 +87,7 @@ export function DeviceToolsPanel(props: {
   readonly onClose: () => void;
   readonly className?: string;
 }) {
+  const gt = useGT();
   const { device, controls } = props;
   const { detail, pending, error, foregroundApp, disabled, act } = controls;
   const settings = detail?.settings;
@@ -96,12 +98,14 @@ export function DeviceToolsPanel(props: {
       className={cn("flex min-h-0 flex-col border-border bg-background text-sm", props.className)}
     >
       <div className="flex h-9 shrink-0 items-center gap-2 border-b px-3">
-        <span className="font-medium">Tools</span>
+        <span className="font-medium">
+          <T>Tools</T>
+        </span>
         {pending ? <Spinner size="sm" /> : null}
         <Button
           size="icon-xs"
           variant="ghost-muted"
-          aria-label="Close tools"
+          aria-label={gt("Close tools")}
           className="ml-auto"
           onClick={props.onClose}
         >
@@ -114,20 +118,22 @@ export function DeviceToolsPanel(props: {
         ) : null}
         {detail === null && !error ? (
           <div className="flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground">
-            <Spinner size="sm" /> Reading device settings…
+            <T>
+              <Spinner size="sm" /> Reading device settings…
+            </T>
           </div>
         ) : null}
 
         {props.hostDiagnostics ? (
-          <Section title="Host diagnostics">
+          <Section title={gt("Host diagnostics")}>
             <p className="whitespace-pre-line text-xs text-muted-foreground">
               {props.hostDiagnostics}
             </p>
           </Section>
         ) : null}
 
-        <Section title="App">
-          <Row label="Foreground">
+        <Section title={gt("App")}>
+          <Row label={gt("Foreground")}>
             <span className="truncate font-mono text-xs">{foregroundApp?.id ?? "-"}</span>
           </Row>
           {foregroundApp ? (
@@ -138,7 +144,7 @@ export function DeviceToolsPanel(props: {
                 disabled={disabled}
                 onClick={() => void act({ type: "terminateApp", appId: foregroundApp.id })}
               >
-                Terminate
+                <T>Terminate</T>
               </Button>
               <Button
                 size="xs"
@@ -146,7 +152,7 @@ export function DeviceToolsPanel(props: {
                 disabled={disabled}
                 onClick={() => void act({ type: "launchApp", appId: foregroundApp.id })}
               >
-                Relaunch
+                <T>Relaunch</T>
               </Button>
             </div>
           ) : null}
@@ -165,9 +171,9 @@ export function DeviceToolsPanel(props: {
         </Section>
 
         <Section title={isIos ? "Simulator" : "Emulator"}>
-          <Row label="Appearance">
+          <Row label={gt("Appearance")}>
             <ToggleGroup
-              aria-label="Appearance"
+              aria-label={gt("Appearance")}
               value={settings?.appearance ? [settings.appearance] : []}
               disabled={disabled}
               onValueChange={(value) => {
@@ -176,13 +182,17 @@ export function DeviceToolsPanel(props: {
                   void act({ type: "setAppearance", value: next });
               }}
             >
-              <Toggle value="light">Light</Toggle>
-              <Toggle value="dark">Dark</Toggle>
+              <Toggle value="light">
+                <T>Light</T>
+              </Toggle>
+              <Toggle value="dark">
+                <T>Dark</T>
+              </Toggle>
             </ToggleGroup>
           </Row>
-          <Row label="Text size">
+          <Row label={gt("Text size")}>
             <ChoiceSelect
-              ariaLabel="Text size"
+              ariaLabel={gt("Text size")}
               value={settings?.textSize ?? null}
               options={TEXT_SIZES}
               disabled={disabled}
@@ -191,9 +201,9 @@ export function DeviceToolsPanel(props: {
           </Row>
           {isIos ? (
             <>
-              <Row label="Liquid Glass">
+              <Row label={gt("Liquid Glass")}>
                 <ToggleGroup
-                  aria-label="Liquid Glass"
+                  aria-label={gt("Liquid Glass")}
                   value={settings?.liquidGlass ? [settings.liquidGlass] : []}
                   disabled={disabled || settings?.liquidGlass === undefined}
                   onValueChange={(value) => {
@@ -203,13 +213,17 @@ export function DeviceToolsPanel(props: {
                     }
                   }}
                 >
-                  <Toggle value="clear">Clear</Toggle>
-                  <Toggle value="tinted">Tinted</Toggle>
+                  <Toggle value="clear">
+                    <T>Clear</T>
+                  </Toggle>
+                  <Toggle value="tinted">
+                    <T>Tinted</T>
+                  </Toggle>
                 </ToggleGroup>
               </Row>
-              <Row label="Color filter">
+              <Row label={gt("Color filter")}>
                 <ChoiceSelect
-                  ariaLabel="Color filter"
+                  ariaLabel={gt("Color filter")}
                   value={settings?.colorFilter ?? null}
                   options={COLOR_FILTERS}
                   disabled={disabled}
@@ -218,11 +232,11 @@ export function DeviceToolsPanel(props: {
               </Row>
             </>
           ) : (
-            <Row label="Orientation">
+            <Row label={gt("Orientation")}>
               <ChoiceSelect
-                ariaLabel="Orientation"
+                ariaLabel={gt("Orientation")}
                 value={null}
-                placeholder="Rotate to…"
+                placeholder={gt("Rotate to…")}
                 options={ORIENTATIONS}
                 disabled={disabled}
                 onChange={(value) => act({ type: "setOrientation", value })}
@@ -230,7 +244,7 @@ export function DeviceToolsPanel(props: {
             </Row>
           )}
           <SwitchRow
-            label="Reduce Motion"
+            label={gt("Reduce Motion")}
             checked={settings?.reduceMotion}
             disabled={disabled}
             onChange={(value) => act({ type: "setToggle", setting: "reduceMotion", value })}
@@ -238,13 +252,13 @@ export function DeviceToolsPanel(props: {
           {isIos ? (
             <>
               <SwitchRow
-                label="Increase Contrast"
+                label={gt("Increase Contrast")}
                 checked={settings?.increaseContrast}
                 disabled={disabled}
                 onChange={(value) => act({ type: "setToggle", setting: "increaseContrast", value })}
               />
               <SwitchRow
-                label="Reduce Transparency"
+                label={gt("Reduce Transparency")}
                 checked={settings?.reduceTransparency}
                 disabled={disabled}
                 onChange={(value) =>
@@ -252,7 +266,7 @@ export function DeviceToolsPanel(props: {
                 }
               />
               <SwitchRow
-                label="Show Borders"
+                label={gt("Show Borders")}
                 checked={settings?.showBorders}
                 disabled={disabled}
                 onChange={(value) => act({ type: "setToggle", setting: "showBorders", value })}
@@ -266,7 +280,7 @@ export function DeviceToolsPanel(props: {
             </>
           ) : (
             <SwitchRow
-              label="Network"
+              label={gt("Network")}
               checked={settings?.networkEnabled}
               disabled={disabled}
               onChange={(value) => act({ type: "setToggle", setting: "networkEnabled", value })}
@@ -274,9 +288,9 @@ export function DeviceToolsPanel(props: {
           )}
         </Section>
 
-        <Section title="Accessibility">
+        <Section title={gt("Accessibility")}>
           <SwitchRow
-            label="Overlay element frames"
+            label={gt("Overlay element frames")}
             checked={props.axOverlay}
             disabled={props.access === null}
             onChange={(value) => {
@@ -304,9 +318,9 @@ export function DeviceToolsPanel(props: {
         />
 
         {isIos ? (
-          <Section title="Push notification">
+          <Section title={gt("Push notification")}>
             <SubmitRow
-              placeholder="Alert text"
+              placeholder={gt("Alert text")}
               action="Send"
               disabled={disabled || !foregroundApp}
               onSubmit={(payload) =>
@@ -316,7 +330,9 @@ export function DeviceToolsPanel(props: {
               }
             />
             {!foregroundApp ? (
-              <p className="text-xs text-muted-foreground">Open an app first.</p>
+              <p className="text-xs text-muted-foreground">
+                <T>Open an app first.</T>
+              </p>
             ) : null}
           </Section>
         ) : null}
@@ -450,6 +466,7 @@ function LocationSection(props: {
   readonly onSet: (latitude: number, longitude: number) => Promise<unknown>;
   readonly onClear: () => Promise<unknown>;
 }) {
+  const gt = useGT();
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const parsed = { latitude: Number(latitude), longitude: Number(longitude) };
@@ -459,13 +476,13 @@ function LocationSection(props: {
     Math.abs(parsed.latitude) <= 90 &&
     Math.abs(parsed.longitude) <= 180;
   return (
-    <Section title="Location">
+    <Section title={gt("Location")}>
       <div className="flex gap-1.5">
         <Input
           size="compact"
           font="mono"
           className="min-w-0 flex-1"
-          placeholder="Latitude"
+          placeholder={gt("Latitude")}
           inputMode="decimal"
           value={latitude}
           disabled={props.disabled}
@@ -475,7 +492,7 @@ function LocationSection(props: {
           size="compact"
           font="mono"
           className="min-w-0 flex-1"
-          placeholder="Longitude"
+          placeholder={gt("Longitude")}
           inputMode="decimal"
           value={longitude}
           disabled={props.disabled}
@@ -494,9 +511,11 @@ function LocationSection(props: {
             void props.onSet(preset.latitude, preset.longitude);
           }}
         >
-          <SelectTrigger size="xs" className="w-32" aria-label="Location preset">
+          <SelectTrigger size="xs" className="w-32" aria-label={gt("Location preset")}>
             <SelectValue>
-              <span className="text-muted-foreground">Preset…</span>
+              <span className="text-muted-foreground">
+                <T>Preset…</T>
+              </span>
             </SelectValue>
           </SelectTrigger>
           <SelectPopup align="start" alignItemWithTrigger={false}>
@@ -513,7 +532,7 @@ function LocationSection(props: {
           disabled={props.disabled || !valid}
           onClick={() => void props.onSet(parsed.latitude, parsed.longitude)}
         >
-          Set
+          <T>Set</T>
         </Button>
         {props.canClear ? (
           <Button
@@ -526,7 +545,7 @@ function LocationSection(props: {
               void props.onClear();
             }}
           >
-            Clear
+            <T>Clear</T>
           </Button>
         ) : null}
       </div>
@@ -545,13 +564,14 @@ function PermissionsSection(props: {
     decision: "grant" | "revoke" | "reset",
   ) => Promise<unknown>;
 }) {
+  const gt = useGT();
   const [appId, setAppId] = useState("");
   const [permission, setPermission] = useState<DevicePermission>("camera");
   const resolvedAppId = appId.trim() || props.defaultAppId;
   const decide = (decision: "grant" | "revoke" | "reset") =>
     void props.onDecide(resolvedAppId, permission, decision);
   return (
-    <Section title="Permissions">
+    <Section title={gt("Permissions")}>
       <Input
         size="compact"
         font="mono"
@@ -562,7 +582,7 @@ function PermissionsSection(props: {
       />
       <div className="flex flex-wrap items-center gap-1.5">
         <ChoiceSelect
-          ariaLabel="Permission"
+          ariaLabel={gt("Permission")}
           value={permission}
           options={props.permissions}
           disabled={props.disabled}
@@ -577,7 +597,7 @@ function PermissionsSection(props: {
           disabled={props.disabled || !resolvedAppId}
           onClick={() => decide("grant")}
         >
-          Grant
+          <T>Grant</T>
         </Button>
         <Button
           size="xs"
@@ -585,7 +605,7 @@ function PermissionsSection(props: {
           disabled={props.disabled || !resolvedAppId}
           onClick={() => decide("revoke")}
         >
-          Revoke
+          <T>Revoke</T>
         </Button>
         {props.canReset ? (
           <Button
@@ -594,7 +614,7 @@ function PermissionsSection(props: {
             disabled={props.disabled || !resolvedAppId}
             onClick={() => decide("reset")}
           >
-            Reset
+            <T>Reset</T>
           </Button>
         ) : null}
       </div>
@@ -611,10 +631,12 @@ function EventLogSection(props: {
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger className="flex w-full items-center gap-1.5 border-b px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">
-        Event log
-        <ChevronDown
-          className={cn("ml-auto size-3.5 transition-transform", open && "rotate-180")}
-        />
+        <T>
+          Event log
+          <ChevronDown
+            className={cn("ml-auto size-3.5 transition-transform", open && "rotate-180")}
+          />
+        </T>
       </CollapsibleTrigger>
       <CollapsiblePanel>
         <EventLogEntries access={props.access} device={props.device} />
@@ -638,7 +660,9 @@ function EventLogEntries(props: {
   return (
     <ol className="max-h-64 overflow-y-auto px-3 py-2 font-mono text-2xs leading-relaxed">
       {entries.length === 0 ? (
-        <li className="text-muted-foreground">No events yet.</li>
+        <li className="text-muted-foreground">
+          <T>No events yet.</T>
+        </li>
       ) : (
         entries.map((entry) => (
           <li key={entry.id} className="flex gap-2">

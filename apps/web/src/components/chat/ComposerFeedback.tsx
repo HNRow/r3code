@@ -8,6 +8,7 @@ import { writeTextToClipboard } from "../../hooks/useCopyToClipboard";
 import { Button } from "../ui/button";
 import { toastManager } from "../ui/toast";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
+import { T } from "gt-react";
 
 export function feedbackBannerItem(
   submission: CodexFeedbackSubmission,
@@ -38,7 +39,7 @@ export function feedbackBannerItem(
             );
           }}
         >
-          Copy ID
+          <T>Copy ID</T>
         </Button>
       ) : undefined,
     ...(submission.status !== "uploading"

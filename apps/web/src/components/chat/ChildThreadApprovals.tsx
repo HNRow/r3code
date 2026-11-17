@@ -11,6 +11,7 @@ import { useEnvironmentScope } from "../../state/session";
 import { childThreadApprovalsAtom, threadEnvironment } from "../../state/threads";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { ComposerPendingApprovalActions } from "./ComposerPendingApprovalActions";
+import { Var, T } from "gt-react";
 
 function ChildApproval({ entry }: { entry: ChildThreadApproval }) {
   const canRespond = useEnvironmentScope(entry.thread.environmentId, AuthOrchestrationOperateScope);
@@ -23,14 +24,18 @@ function ChildApproval({ entry }: { entry: ChildThreadApproval }) {
       aria-label={`Approval from ${entry.title}`}
       className="rounded-lg border border-border bg-background p-3 text-xs"
     >
-      <p className="mb-2 font-medium">Approval needed from {entry.title}</p>
+      <p className="mb-2 font-medium">
+        <T>
+          Approval needed from <Var>{entry.title}</Var>
+        </T>
+      </p>
       <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words font-mono">
         {approval.detail || approval.requestKind}
       </pre>
       {approval.appName ? <p className="mt-2 text-muted-foreground">{approval.appName}</p> : null}
       {approval.responseCapability !== "live" ? (
         <p className="mt-2 text-warning">
-          Provider process is gone. Interrupt or restart the child thread to respond.
+          <T>Provider process is gone. Interrupt or restart the child thread to respond.</T>
         </p>
       ) : null}
       {approval.reason ? <p className="mt-2 text-muted-foreground">{approval.reason}</p> : null}

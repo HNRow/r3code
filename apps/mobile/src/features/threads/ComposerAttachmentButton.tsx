@@ -4,6 +4,7 @@ import { Pressable } from "react-native";
 import { useAndroidControlSizing } from "../../components/ui/useAndroidControlSizing";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { Menu } from "../../components/ui/Menu";
+import { useGT } from "gt-react-native";
 
 const ATTACHMENT_MENU_ACTIONS: MenuAction[] = [
   { id: "photos", title: "Photo Library", image: "photo" },
@@ -17,10 +18,11 @@ export function ComposerAttachmentButton(props: {
   readonly onPickMedia: () => Promise<void>;
   readonly onPickFiles: () => Promise<void>;
 }) {
+  const gt = useGT();
   const { scale } = useAndroidControlSizing();
   const button = (
     <Pressable
-      accessibilityLabel="Add attachment"
+      accessibilityLabel={gt("Add attachment")}
       accessibilityRole="button"
       accessibilityState={{ disabled: props.disabled }}
       className="size-[44px] shrink-0 items-center justify-center rounded-full active:opacity-70 disabled:opacity-50"
@@ -44,7 +46,7 @@ export function ComposerAttachmentButton(props: {
   return (
     <Menu
       accessible
-      accessibilityLabel="Add attachment"
+      accessibilityLabel={gt("Add attachment")}
       accessibilityRole="button"
       actions={ATTACHMENT_MENU_ACTIONS}
       onPressAction={({ nativeEvent }) => {

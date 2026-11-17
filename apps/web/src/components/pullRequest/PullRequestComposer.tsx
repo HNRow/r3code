@@ -17,6 +17,7 @@ import {
   usePullRequestReviewStore,
 } from "./pullRequestReviewStore";
 import { pullRequestCompletionScope } from "./PullRequestMarkdownTextarea";
+import { useGT, T } from "gt-react";
 
 export function PullRequestComposer({
   environmentId,
@@ -40,6 +41,7 @@ export function PullRequestComposer({
   onReviewSubmitted: () => void;
   openReviewRequest?: number | undefined;
 }) {
+  const gt = useGT();
   const term = sourceControlClients.get(detail.provider).changeRequest.singular;
   const [open, setOpen] = useState(false);
   const [reviewPending, setReviewPending] = useState(false);
@@ -109,7 +111,7 @@ export function PullRequestComposer({
         <div className="mb-3 flex items-center justify-between gap-2">
           {canComment && verdicts.length > 0 ? (
             <ToggleGroup
-              aria-label="Composer mode"
+              aria-label={gt("Composer mode")}
               variant="segmented"
               value={[mode]}
               onValueChange={(next) => {
@@ -117,7 +119,9 @@ export function PullRequestComposer({
                 if (value === "comment" || value === "review") setRequestedMode(value);
               }}
             >
-              <Toggle value="comment">Comment</Toggle>
+              <Toggle value="comment">
+                <T>Comment</T>
+              </Toggle>
               <Toggle value="review">
                 {pendingComments.length > 0 ? `Review (${pendingComments.length})` : "Review"}
               </Toggle>
@@ -132,8 +136,8 @@ export function PullRequestComposer({
               <Button
                 size="icon-xs"
                 variant="ghost"
-                aria-label="Discard pending line comments"
-                title="Discard pending line comments"
+                aria-label={gt("Discard pending line comments")}
+                title={gt("Discard pending line comments")}
                 disabled={reviewPending}
                 onClick={() => clearComments(reviewKey)}
               >
@@ -142,7 +146,7 @@ export function PullRequestComposer({
             ) : null}
             <PopoverClose
               render={<Button size="icon-xs" variant="ghost" />}
-              aria-label="Close composer"
+              aria-label={gt("Close composer")}
             >
               <XIcon className="size-3.5" />
             </PopoverClose>

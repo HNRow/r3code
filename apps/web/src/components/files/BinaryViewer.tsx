@@ -29,6 +29,7 @@ import {
 } from "./binaryPreviewProtocol";
 import { PreviewImage } from "./PreviewImage";
 import { readBinaryPreview } from "./readBinaryPreview";
+import { useGT, T } from "gt-react";
 
 const SourcePreview = lazy(() => import("./ReadOnlySourcePreview"));
 type Archive = Extract<BinaryWorkerResult, { type: "archive" }>;
@@ -39,6 +40,7 @@ const countLabel = (count: number, one: string, many: string) =>
   `${count.toLocaleString()} ${count === 1 ? one : many}`;
 
 function ArchiveFile(props: { readonly path: string; readonly bytes: Uint8Array<ArrayBuffer> }) {
+  const gt = useGT();
   const [url, setUrl] = useState<string | null>(null);
   const kind = filePreviewKind({ name: props.path });
   const text = (() => {
@@ -66,12 +68,16 @@ function ArchiveFile(props: { readonly path: string; readonly bytes: Uint8Array<
     return url ? <PreviewImage key={url} src={url} name={props.path} /> : <FileSurfaceLoading />;
   if (!text)
     return (
-      <FileSurfaceFailure message="Only UTF-8 text and images can be opened inside an archive." />
+      <FileSurfaceFailure
+        message={gt("Only UTF-8 text and images can be opened inside an archive.")}
+      />
     );
   return (
     <>
       {text.truncated ? (
-        <FileSurfaceNotice>Preview limited to the first 1 MB.</FileSurfaceNotice>
+        <FileSurfaceNotice>
+          <T>Preview limited to the first 1 MB.</T>
+        </FileSurfaceNotice>
       ) : null}
       <Suspense fallback={<FileSurfaceLoading />}>
         <SourcePreview name={props.path} text={text.text} />
@@ -86,6 +92,7 @@ export default function BinaryViewer(props: {
   readonly kind: "archive" | "sqlite";
   readonly onRetry?: () => void;
 }) {
+  const gt = useGT();
   const [sizeBytes, setSizeBytes] = useState<number | null>(null);
   const [archive, setArchive] = useState<Archive | null>(null);
   const [database, setDatabase] = useState<Database | null>(null);
@@ -228,7 +235,12 @@ export default function BinaryViewer(props: {
                   if (!busy && value !== null) selectPage(0, value);
                 }}
               >
-                <SelectTrigger aria-label="Table" aria-disabled={busy} aria-busy={busy} size="xs">
+                <SelectTrigger
+                  aria-label={gt("Table")}
+                  aria-disabled={busy}
+                  aria-busy={busy}
+                  size="xs"
+                >
                   <SelectValue>
                     {table.name} ({countLabel(table.count, "row", "rows")})
                   </SelectValue>
@@ -243,7 +255,7 @@ export default function BinaryViewer(props: {
               </Select>
             </div>
             <FileSurfaceAction
-              label="Previous rows"
+              label={gt("Previous rows")}
               disabled={busy || page === 0}
               onPress={() => selectPage(page - 1)}
             >
@@ -255,7 +267,7 @@ export default function BinaryViewer(props: {
                 : `${page * SQLITE_PAGE_SIZE + 1}–${Math.min(table.count, (page + 1) * SQLITE_PAGE_SIZE)} of ${table.count.toLocaleString()}`}
             </span>
             <FileSurfaceAction
-              label="Next rows"
+              label={gt("Next rows")}
               disabled={busy || (page + 1) * SQLITE_PAGE_SIZE >= table.count}
               onPress={() => selectPage(page + 1)}
             >
@@ -271,7 +283,9 @@ export default function BinaryViewer(props: {
             {sizeBytes !== null ? ` · ${formatAttachmentSize(sizeBytes)}` : ""}
           </div>
           <FileSurfaceNotice>
-            Read-only. Up to 50 columns and 1,024 characters per cell. Blob contents are omitted.
+            <T>
+              Read-only. Up to 50 columns and 1,024 characters per cell. Blob contents are omitted.
+            </T>
           </FileSurfaceNotice>
         </>
       ) : null}
@@ -289,19 +303,19 @@ export default function BinaryViewer(props: {
       ) : archive ? (
         <div className="scrollbar-gutter-both min-h-0 flex-1 overflow-auto">
           <table
-            aria-label="Archive entries"
+            aria-label={gt("Archive entries")}
             className="w-full border-separate border-spacing-0 text-xs"
           >
             <thead className="sticky top-0 bg-background text-muted-foreground">
               <tr>
                 <th scope="col" className="px-3 py-2 text-left font-normal">
-                  Name
+                  <T>Name</T>
                 </th>
                 <th scope="col" className="px-3 py-2 text-right font-normal">
-                  Size
+                  <T>Size</T>
                 </th>
                 <th scope="col" className="px-3 py-2 text-right font-normal">
-                  Modified
+                  <T>Modified</T>
                 </th>
               </tr>
             </thead>
@@ -348,7 +362,9 @@ export default function BinaryViewer(props: {
             </tbody>
           </table>
           {children.size === 0 ? (
-            <p className="p-6 text-xs text-muted-foreground">This folder is empty.</p>
+            <p className="p-6 text-xs text-muted-foreground">
+              <T>This folder is empty.</T>
+            </p>
           ) : null}
         </div>
       ) : rows ? (
@@ -386,11 +402,15 @@ export default function BinaryViewer(props: {
             </tbody>
           </table>
           {rows.rows.length === 0 ? (
-            <p className="p-6 text-xs text-muted-foreground">This table is empty.</p>
+            <p className="p-6 text-xs text-muted-foreground">
+              <T>This table is empty.</T>
+            </p>
           ) : null}
         </div>
       ) : (
-        <p className="p-6 text-xs text-muted-foreground">This database has no readable tables.</p>
+        <p className="p-6 text-xs text-muted-foreground">
+          <T>This database has no readable tables.</T>
+        </p>
       )}
     </div>
   );

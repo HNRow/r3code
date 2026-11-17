@@ -97,6 +97,7 @@ import { ConnectionStatusDot } from "../connection/ConnectionStatusDot";
 import { appAtomRegistry } from "../../state/atom-registry";
 
 import { readEnvironmentScope, useEnvironmentScope } from "../../state/session";
+import { T, useGT } from "gt-react-native";
 
 // Below this (keyboard up on iPad, phone landscape) the hero cannot fit above the composer,
 // so the project and environment pickers move into the composer controls instead.
@@ -158,6 +159,7 @@ export function NewTaskDraftScreen(props: {
   readonly draftId?: string;
   readonly incomingShareId?: string;
 }) {
+  const gt = useGT();
   const [creationMetadata] = useState(makeTurnCommandMetadata);
   const projects = useProjects();
   const flow = useNewTaskFlow();
@@ -731,22 +733,22 @@ export function NewTaskDraftScreen(props: {
   );
   const shareUnavailableNotice = isIncomingShareUnavailable ? (
     <Text textRole="footnote" className="text-center text-foreground-muted">
-      The shared content is no longer in the inbox. You can continue editing this task draft.
+      <T>The shared content is no longer in the inbox. You can continue editing this task draft.</T>
     </Text>
   ) : null;
   const hero = flow.isScratchDraft ? (
     <View className="items-center gap-2 px-6" testID="new-task-hero">
       <Text className="text-center text-2xl font-t3-medium tracking-tight text-foreground">
-        What should we work on?
+        <T>What should we work on?</T>
       </Text>
       <View className="flex-row flex-wrap items-center justify-center gap-x-1">
         <ComposerInlineControl
-          accessibilityHint="Opens the project picker"
-          accessibilityLabel="No project"
+          accessibilityHint={gt("Opens the project picker")}
+          accessibilityLabel={gt("No project")}
           chevronDirection="right"
           disabled={isComposerInteractionLocked}
           icon="folder"
-          label="No project"
+          label={gt("No project")}
           onPress={chooseProject}
         />
         {environmentControl}
@@ -757,12 +759,14 @@ export function NewTaskDraftScreen(props: {
     <View className="items-center gap-6 px-6" testID="new-task-hero">
       <View className="w-full items-center gap-1.5">
         <Text className="text-center text-2xl font-t3-medium tracking-tight text-foreground">
-          What should we build
+          <T>What should we build</T>
         </Text>
         <View className="max-w-full flex-row items-center justify-center">
-          <Text className="text-2xl font-t3-medium tracking-tight text-foreground">in </Text>
+          <Text className="text-2xl font-t3-medium tracking-tight text-foreground">
+            <T>in </T>
+          </Text>
           <Pressable
-            accessibilityHint="Opens the project picker"
+            accessibilityHint={gt("Opens the project picker")}
             accessibilityLabel={selectedProjectLabel ?? selectedProject.title}
             accessibilityRole="button"
             disabled={isComposerInteractionLocked}
@@ -828,7 +832,7 @@ export function NewTaskDraftScreen(props: {
     <View className="flex-row items-center gap-1 px-2">
       <View className="min-w-0 shrink">
         <ComposerInlineControl
-          accessibilityHint="Opens the project picker"
+          accessibilityHint={gt("Opens the project picker")}
           accessibilityLabel={`Project: ${contextProjectLabel}`}
           chevronDirection="right"
           disabled={isComposerInteractionLocked}
@@ -929,17 +933,20 @@ export function NewTaskDraftScreen(props: {
 
   if (!flow.selectedModel) {
     return (
-      <ThreadScreenFallback header={<AppBar title="New thread" onBack={goBack} />}>
+      <ThreadScreenFallback header={<AppBar title={gt("New thread")} onBack={goBack} />}>
         <View className="flex-1 justify-end gap-3 p-4">
           {environmentControl}
           <Text className="text-foreground-muted">
-            Your draft is saved on this device. Connect to an environment to choose its first model.
+            <T>
+              Your draft is saved on this device. Connect to an environment to choose its first
+              model.
+            </T>
           </Text>
           <ComposerEditor
             draftKey={flow.draftKey}
             value={flow.prompt}
             onChangeText={flow.setPrompt}
-            placeholder="Ask anything"
+            placeholder={gt("Ask anything")}
             multiline
             style={{ minHeight: 64 }}
           />

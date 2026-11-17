@@ -17,6 +17,7 @@ import type { FilePreviewItem } from "../../components/ui/FilePreviewModal";
 import { isBotBadgeImage } from "./botBadgeImages";
 import { PullRequestMarkdown } from "./PullRequestMarkdown";
 import { pullRequestDescriptionContent } from "./pullRequestDescriptionContent";
+import { T } from "gt-react-native";
 
 const COLLAPSED_HEIGHT = 240;
 
@@ -58,7 +59,9 @@ export function PullRequestDescription(props: {
   return (
     <View className="gap-5">
       <View className="gap-3">
-        <PullRequestSectionHeading>Description</PullRequestSectionHeading>
+        <PullRequestSectionHeading>
+          <T>Description</T>
+        </PullRequestSectionHeading>
         {props.markdown.trim() ? (
           <View className="overflow-hidden">
             <View
@@ -140,13 +143,17 @@ export function PullRequestDescription(props: {
             ) : null}
           </View>
         ) : (
-          <Text className="text-sm text-foreground-muted">No description provided.</Text>
+          <Text className="text-sm text-foreground-muted">
+            <T>No description provided.</T>
+          </Text>
         )}
         {props.footer}
       </View>
       {content.attachments.length ? (
         <View className="gap-3">
-          <PullRequestSectionHeading>Attachments</PullRequestSectionHeading>
+          <PullRequestSectionHeading>
+            <T>Attachments</T>
+          </PullRequestSectionHeading>
           <ScrollView
             horizontal
             keyboardShouldPersistTaps="always"

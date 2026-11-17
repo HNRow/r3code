@@ -29,6 +29,7 @@ import { SettingsScreen } from "../settings/components/SettingsScreen";
 import { environmentPresentations } from "../../state/presentation";
 import { ResetCredits } from "./UsageLimitsSection";
 import { usageProviderKind, useProviderColors } from "./usageProviders";
+import { T, useGT, Var } from "gt-react-native";
 
 const PACE_LABEL = { ahead: "Ahead of pace", on: "On pace", under: "Under pace" } as const;
 
@@ -175,6 +176,7 @@ function PoolWindowCard({
   readonly description?: string;
   readonly wide: boolean;
 }) {
+  const gt = useGT();
   const navigation = useNavigation();
   const [barWidth, setBarWidth] = useState(0);
   // Each segment needs room for its account, percent and reset to label itself.
@@ -202,7 +204,9 @@ function PoolWindowCard({
             <Text className="text-3xl font-t3-bold tabular-nums text-foreground">
               {pool.remainingPercent}%
             </Text>
-            <Text className="text-sm text-foreground-muted">left</Text>
+            <Text className="text-sm text-foreground-muted">
+              <T>left</T>
+            </Text>
           </View>
         </View>
         {pool.pace ? (
@@ -242,7 +246,7 @@ function PoolWindowCard({
             key={account.key}
             accessibilityRole="button"
             accessibilityLabel={`Segment ${index + 1}, ${accountName(account)}, ${remainingPercent(window)}% left${timeLeft === null ? "" : `, ${timeLeft}% of the window left`}`}
-            accessibilityHint="Show account details"
+            accessibilityHint={gt("Show account details")}
             onPress={() => openAccount(account)}
             className={wide ? "h-9 min-w-0 flex-1 rounded-md" : "h-7 min-w-0 flex-1 rounded-md"}
           >
@@ -330,7 +334,7 @@ function PoolWindowCard({
             key={account.key}
             accessibilityRole="button"
             accessibilityLabel={`Segment ${index + 1}, ${accountName(account)}, ${remainingPercent(window)}% left${resetsIn ? `, ${resetsIn}` : ""}${credits ? `, ${credits} reset credits banked` : ""}`}
-            accessibilityHint="Show account details"
+            accessibilityHint={gt("Show account details")}
             onPress={() => openAccount(account)}
             className="min-h-[44px] flex-row items-center gap-2 active:opacity-60"
           >
@@ -478,7 +482,9 @@ export function UsageLimitsSection({
             className="min-h-11 justify-center"
             onPress={() => void Linking.openURL(link.url).catch(() => undefined)}
           >
-            <Text className="text-sm font-t3-medium text-primary">Manage usage</Text>
+            <Text className="text-sm font-t3-medium text-primary">
+              <T>Manage usage</T>
+            </Text>
           </Pressable>
         </View>
       ))}
@@ -502,7 +508,10 @@ export function UsageLimitsSection({
             ))}
             {failedLabels.length > 0 ? (
               <Text className="text-sm font-t3-medium text-warning-foreground">
-                {failedLabels.join(", ")} could not refresh limits. Showing the last known values.
+                <T>
+                  <Var>{failedLabels.join(", ")}</Var> could not refresh limits. Showing the last
+                  known values.
+                </T>
               </Text>
             ) : null}
           </View>
@@ -521,6 +530,7 @@ type AccountScreenProps = StaticScreenProps<{
 }>;
 
 export function UsageLimitAccountScreen({ route }: AccountScreenProps) {
+  const gt = useGT();
   const insets = useSafeAreaInsets();
   const presentations = useAtomValue(environmentPresentations.presentationsWithProvidersAtom);
   const { accountKey, windowId, windowKind, environmentIds, now } = route.params;
@@ -540,7 +550,7 @@ export function UsageLimitAccountScreen({ route }: AccountScreenProps) {
   const reset = pool?.resets.find((candidate) => candidate.member.account.key === accountKey);
   const [revealed, setRevealed] = useState(false);
   return (
-    <SettingsScreen title="Account">
+    <SettingsScreen title={gt("Account")}>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         contentContainerClassName="gap-5 p-5"
@@ -548,7 +558,7 @@ export function UsageLimitAccountScreen({ route }: AccountScreenProps) {
       >
         {!account || !window ? (
           <Text className="text-base text-foreground-muted">
-            This account is no longer reporting limits on the selected environments.
+            <T>This account is no longer reporting limits on the selected environments.</T>
           </Text>
         ) : (
           <>
@@ -582,25 +592,35 @@ export function UsageLimitAccountScreen({ route }: AccountScreenProps) {
             <View className="gap-3 rounded-[24px] border-continuous bg-grouped-card p-4">
               <Text className="text-sm font-t3-medium text-foreground">{window.label}</Text>
               <Text className="text-3xl font-t3-bold tabular-nums text-foreground">
-                {remainingPercent(window)}% left
+                <T>
+                  <Var>{remainingPercent(window)}</Var>% left
+                </T>
               </Text>
               {window.resetsAt ? (
                 <Text selectable className="text-sm text-foreground-muted">
-                  Resets{" "}
-                  {new Date(window.resetsAt).toLocaleString(undefined, {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                  })}
+                  <T>
+                    Resets<Var> </Var>
+                    <Var>
+                      {new Date(window.resetsAt).toLocaleString(undefined, {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
+                    </Var>
+                  </T>
                 </Text>
               ) : null}
               {evenPace !== null ? (
                 <Text className="text-sm text-foreground-muted">
-                  Even pace: {evenPace}% left by now
+                  <T>
+                    Even pace: <Var>{evenPace}</Var>% left by now
+                  </T>
                 </Text>
               ) : null}
               {reset && reset.restoresPercent > 0 ? (
                 <Text className="text-sm text-foreground-muted">
-                  Restores {reset.restoresPercent}% of the pool
+                  <T>
+                    Restores <Var>{reset.restoresPercent}</Var>% of the pool
+                  </T>
                 </Text>
               ) : null}
             </View>
@@ -620,7 +640,9 @@ export function UsageLimitAccountScreen({ route }: AccountScreenProps) {
             </View>
             {account.redeem && account.limits.resetCredits ? (
               <View className="gap-3 rounded-[24px] border-continuous bg-grouped-card p-4">
-                <Text className="text-sm font-t3-medium text-foreground">Reset credits</Text>
+                <Text className="text-sm font-t3-medium text-foreground">
+                  <T>Reset credits</T>
+                </Text>
                 <ResetCredits
                   key={account.key}
                   environmentId={account.redeem.environmentId}

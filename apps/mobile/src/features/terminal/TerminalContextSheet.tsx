@@ -15,6 +15,7 @@ import { Sheet } from "../../components/ui/Sheet";
 import { Button } from "../../components/ui/Button";
 import { uuidv4 } from "../../lib/uuid";
 import { insertComposerDraftContext } from "../../state/use-composer-drafts";
+import { useGT, T } from "gt-react-native";
 
 export function TerminalContextSheet(props: {
   text: string;
@@ -25,6 +26,7 @@ export function TerminalContextSheet(props: {
   onClose: () => void;
   onAttach: () => void;
 }) {
+  const gt = useGT();
   const insets = useSafeAreaInsets();
   const lines = props.text.replace(/\n+$/, "").split("\n");
   const [range, setRange] = useState({ start: 0, end: lines.length - 1 });
@@ -56,7 +58,7 @@ export function TerminalContextSheet(props: {
     props.onAttach();
   };
   return (
-    <Sheet title="Terminal output" onClose={props.onClose}>
+    <Sheet title={gt("Terminal output")} onClose={props.onClose}>
       <ScrollView
         nestedScrollEnabled
         className="flex-1"
@@ -64,7 +66,7 @@ export function TerminalContextSheet(props: {
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 20 }}
       >
         <Text className="pb-4 text-sm text-foreground-muted">
-          Tap the first and last line to select a range.
+          <T>Tap the first and last line to select a range.</T>
         </Text>
         <View className="overflow-hidden rounded-xl bg-card-alt">
           {lines.map(
@@ -112,11 +114,11 @@ export function TerminalContextSheet(props: {
       >
         {tooLarge ? (
           <Text className="text-sm text-foreground-muted">
-            Select fewer lines to fit the context limit.
+            <T>Select fewer lines to fit the context limit.</T>
           </Text>
         ) : null}
         <Button
-          label="Attach selected output"
+          label={gt("Attach selected output")}
           tone="primary"
           fullWidth
           disabled={!selectedText.trim() || tooLarge}

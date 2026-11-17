@@ -48,6 +48,7 @@ import { useRefreshLimits } from "./UsageLimitsSection";
 import { UsageLimitsSection } from "./UsageLimitsPooled";
 import type { UsageChartMetric } from "./usageChartData";
 import { PROVIDER_LABEL, useProviderColors, useUsageMixColors } from "./usageProviders";
+import { useGT, Var, T } from "gt-react-native";
 
 type UsageView = UsageChartMetric | "limits";
 const VIEW_OPTIONS = [
@@ -79,6 +80,7 @@ function UsageScreen(props: {
   readonly workspace?: boolean;
   readonly tabParam: string | undefined;
 }) {
+  const gt = useGT();
   const insets = useSafeAreaInsets();
   const headerOnly = use(NativeWorkspaceTabActivityContext)?.headerOnly === true;
   const [selection, setSelection] = useState(() => ({
@@ -216,7 +218,7 @@ function UsageScreen(props: {
 
   return (
     <SettingsScreen
-      title="Usage"
+      title={gt("Usage")}
       menus={showEnvironmentFilter ? [environmentMenu] : undefined}
       workspaceRoot={props.workspace}
     >
@@ -293,13 +295,15 @@ function UsageScreen(props: {
                   <ChatGptUsageSummary selectedEnvironmentIds={selectedEnvironmentIds} />
                   {merged.duplicateSources.length > 0 ? (
                     <Text className="text-sm text-foreground-muted">
-                      Counted once across environments sharing a transcript directory:{" "}
-                      {merged.duplicateSources.join(", ")}
+                      <T>
+                        Counted once across environments sharing a transcript directory:<Var> </Var>
+                        <Var>{merged.duplicateSources.join(", ")}</Var>
+                      </T>
                     </Text>
                   ) : null}
                   {isPending ? (
                     <Text className="py-16 text-center text-base text-foreground-muted">
-                      Scanning provider transcripts…
+                      <T>Scanning provider transcripts…</T>
                     </Text>
                   ) : selectedEnvironments.length === 0 ? (
                     <Text className="py-16 text-center text-base text-foreground-muted">
@@ -434,7 +438,9 @@ function ChartCard(props: {
     <UsageDailyChart days={props.days} daily={props.daily} metric={metric} height={height} />
   ) : (
     <View style={{ height }} className="items-center justify-center">
-      <Text className="text-base text-foreground-muted">No activity in this window.</Text>
+      <Text className="text-base text-foreground-muted">
+        <T>No activity in this window.</T>
+      </Text>
     </View>
   );
 
@@ -517,6 +523,7 @@ function ProviderSection(props: {
   /** Drops the share bar so the list fits beside the chart. */
   readonly compact: boolean;
 }) {
+  const gt = useGT();
   const { merged, metric } = props;
   const colors = useProviderColors();
   if (merged.providers.length === 0) return null;
@@ -527,7 +534,7 @@ function ProviderSection(props: {
   );
 
   return (
-    <SettingsSection title="Providers">
+    <SettingsSection title={gt("Providers")}>
       {ordered.map((provider, index) => {
         const share = metric === "cost" ? provider.costShare : provider.tokenShare;
         return (
@@ -590,6 +597,7 @@ function TotalsSection(props: {
   readonly isPast24Hours: boolean;
   readonly columns: number;
 }) {
+  const gt = useGT();
   const { merged } = props;
   const activePeriods = (props.isPast24Hours ? merged.hourly : merged.daily).filter(
     (period) => period.totalTokens > 0,
@@ -599,17 +607,17 @@ function TotalsSection(props: {
   const cachedShare = observedInput === 0 ? 0 : merged.cachedInputTokens / observedInput;
 
   return (
-    <SettingsSection title="Totals">
+    <SettingsSection title={gt("Totals")}>
       <View className="flex-row flex-wrap">
         <MetricCell
           columns={props.columns}
-          label="Processed tokens"
+          label={gt("Processed tokens")}
           value={formatTokens(merged.totalTokens)}
           detail={`${formatTokens(periodAverage)} per active ${props.isPast24Hours ? "hour" : "day"}`}
         />
         <MetricCell
           columns={props.columns}
-          label="Cache savings"
+          label={gt("Cache savings")}
           value={formatUsd(merged.costQuality.cacheSavingsUsd)}
           detail={
             merged.costUsd > 0
@@ -619,27 +627,27 @@ function TotalsSection(props: {
         />
         <MetricCell
           columns={props.columns}
-          label="Cached input"
+          label={gt("Cached input")}
           value={formatTokens(merged.cachedInputTokens)}
           detail={`${formatPercent(cachedShare)} of observed input`}
         />
         <MetricCell
           columns={props.columns}
-          label="Uncached input"
+          label={gt("Uncached input")}
           value={formatTokens(merged.uncachedInputTokens)}
           detail={`${formatTokens(merged.cacheCreationTokens)} cache writes`}
         />
         <MetricCell
           columns={props.columns}
-          label="Output"
+          label={gt("Output")}
           value={formatTokens(merged.outputTokens)}
           detail={`incl. ${formatTokens(merged.reasoningTokens)} reasoning`}
         />
         <MetricCell
           columns={props.columns}
-          label="Unpriced"
+          label={gt("Unpriced")}
           value={formatPercent(merged.costQuality.unpricedShare)}
-          detail="of records, excluded from cost"
+          detail={gt("of records, excluded from cost")}
         />
       </View>
     </SettingsSection>
@@ -647,6 +655,7 @@ function TotalsSection(props: {
 }
 
 function CostSection(props: { readonly merged: MergedUsage; readonly wide: boolean }) {
+  const gt = useGT();
   const { categoryCost, speedCost } = props.merged;
   const colors = useUsageMixColors();
   const byType = [
@@ -670,10 +679,10 @@ function CostSection(props: { readonly merged: MergedUsage; readonly wide: boole
   if (props.merged.costUsd <= 0) return null;
 
   return (
-    <SettingsSection title="Cost">
+    <SettingsSection title={gt("Cost")}>
       <View className={props.wide ? "flex-row" : undefined}>
         <View className={props.wide ? "min-w-0 flex-1" : undefined}>
-          <ShareBar label="By type" segments={byType} />
+          <ShareBar label={gt("By type")} segments={byType} />
         </View>
         {speedCost.fast + speedCost.ultrafast > 0 ? (
           <View
@@ -684,7 +693,7 @@ function CostSection(props: { readonly merged: MergedUsage; readonly wide: boole
             }
           >
             <ShareBar
-              label="By speed"
+              label={gt("By speed")}
               segments={bySpeed}
               aside={`${formatUsd(speedCost.premium)} premium`}
             />
@@ -753,6 +762,7 @@ function ModelsSection(props: {
   readonly metric: UsageChartMetric;
   readonly columns: 1 | 2;
 }) {
+  const gt = useGT();
   const { merged, metric } = props;
   const colors = useProviderColors();
   if (merged.models.length === 0) return null;
@@ -765,7 +775,7 @@ function ModelsSection(props: {
   );
 
   return (
-    <SettingsSection title="By model">
+    <SettingsSection title={gt("By model")}>
       <View className="flex-row flex-wrap">
         {ordered.map((model, index) => (
           <View

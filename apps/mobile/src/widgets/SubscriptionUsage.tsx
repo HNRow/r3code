@@ -17,6 +17,7 @@ import {
 import { createWidget, type WidgetEnvironment } from "expo-widgets";
 
 import type { SubscriptionUsageSnapshot as SubscriptionUsageProps } from "./subscriptionUsageSnapshot";
+import { Var, T } from "gt-react-native";
 
 type UsageConfiguration = {
   codexPeriod?: "auto" | "session" | "weekly";
@@ -212,7 +213,9 @@ function SubscriptionUsage(
                   ),
                 ]}
               >
-                {window.remaining}% left
+                <T>
+                  <Var>{window.remaining}</Var>% left
+                </T>
               </Text>
             </HStack>
             <ProgressView value={window.remaining / 100} modifiers={barModifiers} />
@@ -229,9 +232,14 @@ function SubscriptionUsage(
           <Text
             modifiers={[font({ textStyle: "caption2" }), foregroundStyle(secondary), lineLimit(1)]}
           >
-            {(period === "auto" ? (provider.totalWindows ?? windows.length) : windows.length) -
-              limit}{" "}
-            more in T3
+            <T>
+              <Var>
+                {(period === "auto" ? (provider.totalWindows ?? windows.length) : windows.length) -
+                  limit}
+              </Var>
+              <Var> </Var>
+              more in T3
+            </T>
           </Text>
         ) : null}
       </VStack>
@@ -253,7 +261,7 @@ function SubscriptionUsage(
     >
       {providers.length === 0 ? (
         <Text modifiers={[font({ textStyle: "caption" }), foregroundStyle(secondary)]}>
-          No subscription limits available.
+          <T>No subscription limits available.</T>
         </Text>
       ) : compact ? (
         <VStack alignment="leading" spacing={accessory || dense ? 4 : 8}>

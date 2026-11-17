@@ -48,6 +48,7 @@ import { useDebouncedValue } from "../../state/queries";
 import { useWorkspaceTabs } from "../layout/workspace/WorkspaceTabsContext";
 import { useSearchScrollRestoration } from "../layout/workspace/useSearchScrollRestoration";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
+import { useGT } from "gt-react-native";
 
 function PullRequestListError(props: { readonly message: string }) {
   const [expanded, setExpanded] = useState(false);
@@ -95,6 +96,7 @@ export function PullRequestsScreen(
     readonly renderFrame?: (filters: PullRequestFilterMenu | null, list: ReactNode) => ReactNode;
   } = {},
 ) {
+  const gt = useGT();
   const navigation = useNavigation();
   const primaryColumn = use(NativePrimaryColumnContext);
   const workspace = useWorkspaceTabs()!;
@@ -376,15 +378,15 @@ export function PullRequestsScreen(
             <View className="items-center py-5">
               <AppActivityIndicator
                 colorClassName="accent-icon"
-                accessibilityLabel="Loading more pull requests"
+                accessibilityLabel={gt("Loading more pull requests")}
               />
             </View>
           ) : result.loadMoreError ? (
             <View className="items-center gap-2 px-8 py-4">
               <Text className="text-xs text-foreground-muted">{result.loadMoreError}</Text>
               <Button
-                label="Try again"
-                accessibilityLabel="Retry loading more pull requests"
+                label={gt("Try again")}
+                accessibilityLabel={gt("Retry loading more pull requests")}
                 onPress={() => void result.loadMore(true)}
               />
             </View>
@@ -392,8 +394,8 @@ export function PullRequestsScreen(
             // A filtered page can be too short to scroll, which leaves nothing to reach the end of.
             <View className="items-center py-4">
               <Button
-                label="Load more"
-                accessibilityLabel="Load more pull requests"
+                label={gt("Load more")}
+                accessibilityLabel={gt("Load more pull requests")}
                 onPress={() => void result.loadMore()}
               />
             </View>

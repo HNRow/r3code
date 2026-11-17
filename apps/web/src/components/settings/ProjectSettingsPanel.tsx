@@ -61,6 +61,7 @@ import {
 import { useSettingsProjectGroups } from "./useSettingsProjectGroups";
 import { readUnloadedThreadCount } from "../../state/olderSettledShelf";
 import { settingsScopeEnvironmentLabels } from "./settingsScopeAxis";
+import { T, useGT, msg } from "gt-react";
 
 const ProjectIconPickerDialog = lazy(() =>
   import("./ProjectIconPickerDialog").then((module) => ({
@@ -124,7 +125,7 @@ function CheckoutGroupingSelect({ member }: { member: SidebarProjectGroupMember 
       </SelectTrigger>
       <SelectPopup align="end" alignItemWithTrigger={false}>
         <SelectItem hideIndicator value="inherit">
-          Use global default
+          <T>Use global default</T>
         </SelectItem>
         <SelectItem hideIndicator value="repository">
           {PROJECT_GROUPING_MODE_LABELS.repository}
@@ -234,7 +235,7 @@ export function ProjectSettingsPanel({
   if (members.length === 0)
     return (
       <p className="p-8 text-sm text-muted-foreground">
-        This checkout is no longer available in the selected project and environment.
+        <T>This checkout is no longer available in the selected project and environment.</T>
       </p>
     );
   const scopedGroup = scopeProjectSettingsGroup(selected, members);
@@ -258,6 +259,7 @@ function ProjectDetail({
   allMembers: ReadonlyArray<SidebarProjectGroupMember>;
   hasOtherMembers: boolean;
 }) {
+  const gt = useGT();
   const navigate = useNavigate({ from: "/settings" });
   const primaryEnvironmentId = usePrimaryEnvironmentId();
   const { environments } = useEnvironments();
@@ -437,16 +439,18 @@ function ProjectDetail({
           onClick={() => void removeMembers([member])}
           aria-label={`Remove checkout ${member.workspaceRoot}`}
         >
-          Remove
+          <T>Remove</T>
         </Button>
       ) : null}
     </div>
   );
   const checkoutChoices = (
-    <SettingsSection title="Checkouts">
+    <SettingsSection title={gt("Checkouts")}>
       <p className="px-3 py-2.5 text-xs text-muted-foreground sm:px-4">
-        Grouping rule decides how each checkout joins project groups in the sidebar. Changing it can
-        move a checkout to a different project.
+        <T>
+          Grouping rule decides how each checkout joins project groups in the sidebar. Changing it
+          can move a checkout to a different project.
+        </T>
       </p>
       {Array.from(checkoutsByEnvironment, ([environmentId, members]) => {
         if (checkoutsByEnvironment.size === 1) {
@@ -520,10 +524,13 @@ function ProjectDetail({
         <Alert variant="info">
           <InfoIcon aria-hidden />
           <AlertDescription>
-            Can't find a setting? Keep this project picked above and hop to any other settings page.
+            <T>
+              Can't find a setting? Keep this project picked above and hop to any other settings
+              page.
+            </T>
           </AlertDescription>
         </Alert>
-        <SettingsSection id="project-overview" title="Project" hideTitle>
+        <SettingsSection id="project-overview" title={gt("Project")} hideTitle>
           {!canEditGroup ? (
             <p className="px-3 py-2 text-sm text-muted-foreground sm:px-4">
               {group.memberProjects.length > 1
@@ -532,12 +539,14 @@ function ProjectDetail({
             </p>
           ) : null}
           <SettingsRow
-            title="Name"
-            description="The shared name for this project group in the sidebar and thread lists."
+            title={gt("Name")}
+            description={gt(
+              "The shared name for this project group in the sidebar and thread lists.",
+            )}
             resetAction={
               canResetScratchTitle ? (
                 <SettingResetButton
-                  label="project name"
+                  label={gt("project name")}
                   disabled={!canEditGroup}
                   onClick={() =>
                     void updateAllMembers(
@@ -553,7 +562,7 @@ function ProjectDetail({
                 key={`${group.projectKey}:${group.displayName}`}
                 size="sm"
                 className="w-full sm:w-64"
-                aria-label="Project name"
+                aria-label={gt("Project name")}
                 disabled={!canEditGroup}
                 defaultValue={group.displayName}
                 onChange={() => {
@@ -572,7 +581,7 @@ function ProjectDetail({
             }
           />
           <SettingsRow
-            title="Project icon"
+            title={gt("Project icon")}
             description={
               projectIcon?.kind === "lucide"
                 ? `${projectIcon.name} · ${projectIcon.color}`
@@ -585,7 +594,7 @@ function ProjectDetail({
             resetAction={
               group.memberProjects.some((member) => !hasDefaultProjectIcon(member)) ? (
                 <SettingResetButton
-                  label="project icon"
+                  label={gt("project icon")}
                   disabled={isSavingFavicon || !canEditGroup}
                   onClick={() => void setProjectIcon(defaultProjectIcon)}
                 />
@@ -598,21 +607,21 @@ function ProjectDetail({
                   size="sm"
                   variant="outline"
                   type="button"
-                  aria-label="Choose a project icon"
+                  aria-label={gt("Choose a project icon")}
                   disabled={isSavingFavicon || !canEditGroup}
                   onClick={() => setIconPickerOpen(true)}
                 >
-                  Choose icon
+                  <T>Choose icon</T>
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
                   type="button"
-                  aria-label="Choose a project icon file"
+                  aria-label={gt("Choose a project icon file")}
                   disabled={isSavingFavicon || !canEditGroup}
                   onClick={() => setFaviconPickerOpen(true)}
                 >
-                  Choose file
+                  <T>Choose file</T>
                 </Button>
               </div>
             }
@@ -620,8 +629,8 @@ function ProjectDetail({
           {canOrganize ? (
             <>
               <SettingsRow
-                title="Pin"
-                description="Pinned projects come first in project pickers."
+                title={gt("Pin")}
+                description={gt("Pinned projects come first in project pickers.")}
                 control={
                   <Switch
                     checked={group.pinned}
@@ -632,16 +641,16 @@ function ProjectDetail({
                         checked ? "Failed to pin project" : "Failed to unpin project",
                       )
                     }
-                    aria-label="Pin project"
+                    aria-label={gt("Pin project")}
                   />
                 }
               />
               <SettingsRow
-                title="Archive"
+                title={gt("Archive")}
                 description={
                   group.archived
-                    ? "Hidden from project pickers. Threads and files are kept."
-                    : "Hides the project from project pickers. Threads and files are kept."
+                    ? msg("Hidden from project pickers. Threads and files are kept.")
+                    : msg("Hides the project from project pickers. Threads and files are kept.")
                 }
                 control={
                   <Button
@@ -667,21 +676,23 @@ function ProjectDetail({
         <ProjectDefaultsSettings category="project" />
         <ProjectActionsSettings />
         {checkoutChoices}
-        <SettingsSection title="Danger">
+        <SettingsSection title={gt("Danger")}>
           <SettingsRow
             title={
               hasOtherMembers
-                ? "Remove checkout"
+                ? msg("Remove checkout")
                 : group.memberProjects.length > 1
-                  ? "Remove this project everywhere"
-                  : "Remove project"
+                  ? msg("Remove this project everywhere")
+                  : msg("Remove project")
             }
             description={
               hasOtherMembers
-                ? "Deletes the selected machine's checkout entries and their threads. Other machines and files on disk are not touched."
+                ? msg(
+                    "Deletes the selected machine's checkout entries and their threads. Other machines and files on disk are not touched.",
+                  )
                 : group.memberProjects.length > 1
                   ? `Deletes all ${group.memberProjects.length} checkout entries and their threads on every machine. Files on disk are not touched.`
-                  : "Deletes the project entry and its threads. Files on disk are not touched."
+                  : msg("Deletes the project entry and its threads. Files on disk are not touched.")
             }
             control={
               <Button

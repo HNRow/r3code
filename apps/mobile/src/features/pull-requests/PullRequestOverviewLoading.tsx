@@ -8,6 +8,7 @@ import type { PullRequestParams } from "./usePullRequestDiff";
 import type { PullRequestStackState } from "./usePullRequestStack";
 import { pullRequestListReviewStatus } from "./pullRequestList";
 import { PullRequestGlyph } from "./pullRequestGlyphs";
+import { useGT, T } from "gt-react-native";
 
 export function PullRequestOverviewLoading({
   summary,
@@ -18,6 +19,7 @@ export function PullRequestOverviewLoading({
   readonly params: PullRequestParams;
   readonly stack: PullRequestStackState;
 }) {
+  const gt = useGT();
   const review = pullRequestListReviewStatus({
     reviewDecision: summary.reviewDecision ?? undefined,
     viewerReviewRequested: "viewerReviewRequested" in summary && summary.viewerReviewRequested,
@@ -27,7 +29,7 @@ export function PullRequestOverviewLoading({
   return (
     <View
       className="gap-5"
-      accessibilityLabel="Loading pull request details"
+      accessibilityLabel={gt("Loading pull request details")}
       accessibilityState={{ busy: true }}
     >
       <PullRequestStackCard params={params} state={stack} />
@@ -100,7 +102,9 @@ export function PullRequestOverviewLoading({
         </View>
       ) : null}
       <View className="gap-3">
-        <PullRequestSectionHeading>Description</PullRequestSectionHeading>
+        <PullRequestSectionHeading>
+          <T>Description</T>
+        </PullRequestSectionHeading>
         <View className="gap-3 py-1">
           <View className="h-4 w-full rounded bg-subtle-strong" />
           <View className="h-4 w-full rounded bg-subtle-strong" />

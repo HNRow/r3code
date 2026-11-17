@@ -3,6 +3,7 @@ import { memo } from "react";
 
 import { cn } from "~/lib/utils";
 import { ComposerBanner } from "./ComposerBanner";
+import { T } from "gt-react";
 
 export const ComposerStashBadge = memo(function ComposerStashBadge(props: {
   count: number;
@@ -54,7 +55,9 @@ export const ComposerStashBadge = memo(function ComposerStashBadge(props: {
         <ComposerBanner.Icon>
           <BookmarkIcon />
         </ComposerBanner.Icon>
-        <ComposerBanner.Content>Stash</ComposerBanner.Content>
+        <ComposerBanner.Content>
+          <T>Stash</T>
+        </ComposerBanner.Content>
         <ComposerBanner.Actions>{count}</ComposerBanner.Actions>
       </ComposerBanner.Row>
     </ComposerBanner.Root>

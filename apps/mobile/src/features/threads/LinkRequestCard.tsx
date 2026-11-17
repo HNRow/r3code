@@ -42,6 +42,7 @@ import { SettingsSection } from "../settings/components/SettingsSection";
 import { Button } from "../../components/ui/Button";
 import { Sheet } from "../../components/ui/Sheet";
 import { RUNTIME_MODE_CHOICES } from "./thread-settings-options";
+import { T, useGT, Var } from "gt-react-native";
 
 /** The same five levels as web's access picker: read-only, then the runtime modes. */
 const ACCESS_CHOICES: ReadonlyArray<{
@@ -169,13 +170,15 @@ function PendingLinkRequest(props: {
               className="px-1 py-1 active:opacity-60 disabled:opacity-50"
               onPress={() => void decline()}
             >
-              <Text className="font-sans text-xs text-foreground-muted">Decline</Text>
+              <Text className="font-sans text-xs text-foreground-muted">
+                <T>Decline</T>
+              </Text>
             </Pressable>
           </View>
         </>
       ) : (
         <Text className="font-sans text-xs text-foreground-muted">
-          Only a session that manages access here can answer this.
+          <T>Only a session that manages access here can answer this.</T>
         </Text>
       )}
       {open ? (
@@ -194,6 +197,7 @@ function LinkRequestSheet(props: {
   readonly item: LinkRequestItem;
   readonly onClose: () => void;
 }) {
+  const gt = useGT();
   const { item } = props;
   const insets = useSafeAreaInsets();
   const pickMachine = picksMachine(item);
@@ -299,8 +303,10 @@ function LinkRequestSheet(props: {
       >
         <View className="gap-1">
           <Text className="font-sans text-sm leading-5 text-foreground-muted">
-            Agents here can then launch, message and wait on threads there. It appears under
-            Authorized clients in that machine's Sharing & access, where it can be revoked.
+            <T>
+              Agents here can then launch, message and wait on threads there. It appears under
+              Authorized clients in that machine's Sharing & access, where it can be revoked.
+            </T>
           </Text>
           {item.url !== undefined && target.kind === "machine" ? (
             <Text className="font-sans text-xs text-foreground-muted" numberOfLines={1}>
@@ -313,10 +319,14 @@ function LinkRequestSheet(props: {
             accessibilityRole="alert"
             className="gap-1 rounded-xl border border-warning-border bg-warning p-3"
           >
-            <Text className="font-t3-bold text-sm text-warning-foreground">Check this address</Text>
+            <Text className="font-t3-bold text-sm text-warning-foreground">
+              <T>Check this address</T>
+            </Text>
             <Text className="font-sans text-xs leading-snug text-warning-foreground">
-              This app cannot confirm it is one of your machines. The pairing code you paste is sent
-              there.
+              <T>
+                This app cannot confirm it is one of your machines. The pairing code you paste is
+                sent there.
+              </T>
             </Text>
             <Text selectable className="font-sans text-xs leading-snug text-warning-foreground">
               {linkDestination(address)}
@@ -324,7 +334,7 @@ function LinkRequestSheet(props: {
           </View>
         ) : null}
         {pickMachine ? (
-          <SettingsSection title="Machine">
+          <SettingsSection title={gt("Machine")}>
             {machines.map((machine, index) => (
               <MachineRow
                 key={machine.environmentId}
@@ -339,8 +349,10 @@ function LinkRequestSheet(props: {
               />
             ))}
             <SettingsChoiceRow
-              label="Another address…"
-              description="Link a machine this app does not know, by its https or Tailscale address."
+              label={gt("Another address…")}
+              description={gt(
+                "Link a machine this app does not know, by its https or Tailscale address.",
+              )}
               selected={selected === ANOTHER_ADDRESS}
               separated={machines.length > 0}
               disabled={busy}
@@ -354,7 +366,7 @@ function LinkRequestSheet(props: {
         {needsAddress && item.url === undefined ? (
           <View className="gap-2">
             <TextInput
-              accessibilityLabel="Address"
+              accessibilityLabel={gt("Address")}
               placeholder="https://machine.tailnet.ts.net"
               value={address}
               onChangeText={setAddress}
@@ -366,24 +378,28 @@ function LinkRequestSheet(props: {
             />
             {target.kind === "machine" ? (
               <Text className="font-sans text-xs text-foreground-muted">
-                This app has no address for {target.label} that another machine can reach. Enter its
-                https or Tailscale address.
+                <T>
+                  This app has no address for <Var>{target.label}</Var> that another machine can
+                  reach. Enter its https or Tailscale address.
+                </T>
               </Text>
             ) : null}
           </View>
         ) : null}
         {useExisting ? (
           <Text className="font-sans text-sm leading-5 text-foreground-muted">
-            This environment is already linked to {targetName}. The agent can use that link as it
-            is; change its access in Settings → Environments.
+            <T>
+              This environment is already linked to <Var>{targetName}</Var>. The agent can use that
+              link as it is; change its access in Settings → Environments.
+            </T>
           </Text>
         ) : target.kind === "none" ? null : (
           <>
             {canMint ? null : (
               <View className="gap-2">
                 <TextInput
-                  accessibilityLabel="Pairing code"
-                  placeholder="Paste the code"
+                  accessibilityLabel={gt("Pairing code")}
+                  placeholder={gt("Paste the code")}
                   value={pairingCode}
                   onChangeText={setPairingCode}
                   editable={!busy}
@@ -394,12 +410,14 @@ function LinkRequestSheet(props: {
                   spellCheck={false}
                 />
                 <Text className="font-sans text-xs text-foreground-muted">
-                  Create a link on {targetName}: Settings → Sharing & access → Authorized clients →
-                  Create link, then paste its code here.
+                  <T>
+                    Create a link on <Var>{targetName}</Var>: Settings → Sharing & access →
+                    Authorized clients → Create link, then paste its code here.
+                  </T>
                 </Text>
               </View>
             )}
-            <SettingsSection title="What agents here may do there">
+            <SettingsSection title={gt("What agents here may do there")}>
               {ACCESS_CHOICES.map((choice, index) => (
                 <SettingsChoiceRow
                   key={choice.access}
@@ -413,8 +431,10 @@ function LinkRequestSheet(props: {
               ))}
             </SettingsSection>
             <Text className="font-sans text-xs text-foreground-muted">
-              An agent here never gets more there than its own mode here either. Threads it starts
-              there cannot change that environment's own threads, projects or settings.
+              <T>
+                An agent here never gets more there than its own mode here either. Threads it starts
+                there cannot change that environment's own threads, projects or settings.
+              </T>
             </Text>
           </>
         )}
@@ -434,7 +454,13 @@ function LinkRequestSheet(props: {
           tone="primary"
           fullWidth
         />
-        <Button label="Cancel" tone="secondary" disabled={busy} onPress={props.onClose} fullWidth />
+        <Button
+          label={gt("Cancel")}
+          tone="secondary"
+          disabled={busy}
+          onPress={props.onClose}
+          fullWidth
+        />
       </ScrollView>
     </Sheet>
   );
@@ -454,7 +480,7 @@ function MachineRow(props: {
     : machine.connected
       ? null
       : machine.connectOnly
-        ? "T3 Connect"
+        ? "R3 Connect"
         : "Not connected";
   return (
     <Pressable

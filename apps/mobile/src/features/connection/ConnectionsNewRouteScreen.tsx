@@ -31,6 +31,7 @@ import { autoConnectReport, devAutoConnectAttemptAtom } from "./devAutoConnect";
 import { splitEnvironmentSections } from "./environmentSections";
 import { leaveSettingsPage } from "../settings/settings-navigation";
 import { workspaceHasColumns } from "../layout/workspace/workspace-selection-store";
+import { useGT, T } from "gt-react-native";
 
 type ConnectionsNewRouteParams = {
   readonly mode?: string;
@@ -62,6 +63,7 @@ function PairingForm({
   readonly routePairingUrl: string;
   readonly routeFor: EnvironmentId | undefined;
 }) {
+  const gt = useGT();
   const { connectionPairingUrl, onChangeConnectionPairingUrl, onConnectPress } =
     useRemoteConnections();
   const navigation = useNavigation();
@@ -182,7 +184,7 @@ function PairingForm({
 
   return (
     <SettingsScreen
-      title="Add environment"
+      title={gt("Add environment")}
       actions={[
         {
           accessibilityLabel: connecting ? "Connecting" : "Add environment",
@@ -218,7 +220,9 @@ function PairingForm({
           />
 
           <View collapsable={false} className="gap-2">
-            <Text className="px-4 text-sm font-t3-medium text-foreground-muted">Or enter it</Text>
+            <Text className="px-4 text-sm font-t3-medium text-foreground-muted">
+              <T>Or enter it</T>
+            </Text>
             <View
               collapsable={false}
               className={cn(
@@ -227,7 +231,7 @@ function PairingForm({
               )}
             >
               <PairingInputRow
-                label="Address"
+                label={gt("Address")}
                 keyboardType="url"
                 placeholder="192.168.1.100:3773"
                 value={hostInput}
@@ -235,8 +239,8 @@ function PairingForm({
               />
               <View className="ml-4 border-t border-border-subtle" />
               <PairingInputRow
-                label="Code"
-                placeholder="Pairing code"
+                label={gt("Code")}
+                placeholder={gt("Pairing code")}
                 returnKeyType="go"
                 value={codeInput}
                 onChangeText={handleCodeChange}
@@ -343,13 +347,13 @@ function PairingScanCard(props: {
               <Text
                 className={cn("font-t3-medium text-sm", light ? "text-black/70" : "text-white/80")}
               >
-                Tap to scan
+                <T>Tap to scan</T>
               </Text>
             </>
           )}
         </View>
         <Text className={cn("text-center text-sm", light ? "text-black/70" : "text-white/80")}>
-          Scan the code from t3 pair or desktop Connections settings
+          <T>Scan the code from t3 pair or desktop Connections settings</T>
         </Text>
       </View>
     </Pressable>
@@ -357,6 +361,7 @@ function PairingScanCard(props: {
 }
 
 function T3ConnectSection() {
+  const gt = useGT();
   const { isLoaded, isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
   const navigation = useNavigation();
   const { connectedEnvironments, onSetEnvironmentEnabled, onRemoveEnvironmentPress } =
@@ -369,7 +374,7 @@ function T3ConnectSection() {
   return (
     <View collapsable={false} className="gap-2">
       <Text className="px-4 text-sm font-t3-medium text-foreground-muted">
-        Or use the managed relay
+        <T>Or use the managed relay</T>
       </Text>
       {isSignedIn ? (
         <CloudEnvironmentRows
@@ -380,8 +385,8 @@ function T3ConnectSection() {
         />
       ) : (
         <ListRow
-          label="Sign in to T3 Connect"
-          description="Reach your machines from anywhere, no network setup."
+          label={gt("Sign in to R3 Connect")}
+          description={gt("Reach your machines from anywhere, no network setup.")}
           disabled={!isLoaded}
           onPress={() => navigation.navigate("SettingsAuth")}
         />

@@ -13,6 +13,7 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { serverEnvironment } from "../../state/server";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { RefreshIcon } from "../ui/refresh-icon";
+import { T } from "gt-react";
 
 function getIncompatibleVersion(status: ServerProvider) {
   const compatibility = status.compatibilityAdvisory;
@@ -193,7 +194,7 @@ export const ProviderStatusBanner = memo(function ProviderStatusBanner({
             <div className="flex flex-wrap items-center justify-end gap-3">
               {onOpenProviderSetup && hasProviderSetup(status) ? (
                 <InlineButton onClick={() => onOpenProviderSetup(status.instanceId)}>
-                  Open provider setup
+                  <T>Open provider setup</T>
                 </InlineButton>
               ) : null}
               <Button

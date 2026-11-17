@@ -33,6 +33,7 @@ import {
   type WorkflowRailTone,
 } from "./threadAgentsPresentation";
 import { useVisibleSecondClock } from "./use-visible-second-clock";
+import { T } from "gt-react-native";
 
 const RAIL_ICON = {
   working: "circle.inset.filled",
@@ -121,7 +122,7 @@ export function ThreadWorkflowGroup(props: {
             textRole="footnote"
             className="border-t border-border-subtle px-4 py-3 text-foreground-muted"
           >
-            No agents yet
+            <T>No agents yet</T>
           </Text>
         ) : (
           open.members.map((member) => (

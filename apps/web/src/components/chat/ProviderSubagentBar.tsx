@@ -10,6 +10,7 @@ import { tickTextContent } from "~/lib/tickTextContent";
 import type { ProviderInstanceEntry } from "../../providerInstances";
 import { Button } from "../ui/button";
 import { ProviderInstanceIcon } from "./ProviderInstanceIcon";
+import { T } from "gt-react";
 
 export function ProviderSubagentBar(props: {
   readonly provider: ProviderInstanceEntry | null;
@@ -64,13 +65,15 @@ export function ProviderSubagentBar(props: {
         {`${modelDescription} subagent: ${announcement}`}
       </span>
       <span className="shrink-0 text-muted-foreground @max-[640px]/composer-surface:sr-only">
-        Runs on its own
+        <T>Runs on its own</T>
       </span>
       {props.actions}
       {props.onOpenParent ? (
         <Button size="sm" variant="ghost" onClick={props.onOpenParent}>
           <ArrowUpLeftIcon />
-          <span className="@max-[320px]/composer-surface:sr-only">Open parent</span>
+          <span className="@max-[320px]/composer-surface:sr-only">
+            <T>Open parent</T>
+          </span>
         </Button>
       ) : null}
     </div>

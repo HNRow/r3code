@@ -28,8 +28,10 @@ import { pullRequestLabelColor } from "./pullRequestList";
 import { PullRequestSearchSheet } from "./PullRequestSearchSheet";
 import { usePullRequestConnected } from "./usePullRequestConnected";
 import { pullRequestTarget, type PullRequestParams } from "./usePullRequestDiff";
+import { useGT, T } from "gt-react-native";
 
 export function PullRequestLabelsScreen({ route }: StaticScreenProps<PullRequestParams>) {
+  const gt = useGT();
   const navigation = useNavigation();
   const target = pullRequestTarget(route.params);
   const pr = useEnvironmentQuery(composerPullRequests.detail(target)).data;
@@ -98,10 +100,10 @@ export function PullRequestLabelsScreen({ route }: StaticScreenProps<PullRequest
   );
   return (
     <PullRequestSearchSheet
-      title="Labels"
-      placeholder="Search labels"
+      title={gt("Labels")}
+      placeholder={gt("Search labels")}
       closeAccessibilityLabel="Close labels"
-      clearAccessibilityLabel="Clear label search"
+      clearAccessibilityLabel={gt("Clear label search")}
       query={query}
       onQueryChange={setQuery}
     >
@@ -164,15 +166,17 @@ export function PullRequestLabelsScreen({ route }: StaticScreenProps<PullRequest
                   }
                   variant="plain"
                 />
-                {result.error ? <Button label="Retry" onPress={result.refresh} /> : null}
+                {result.error ? <Button label={gt("Retry")} onPress={result.refresh} /> : null}
               </View>
             )
           }
           ListFooterComponent={
             result.data?.truncated ? (
               <Text className="py-4 text-xs text-foreground-muted">
-                This repository has more labels than are listed here. Apply the rest on the
-                provider.
+                <T>
+                  This repository has more labels than are listed here. Apply the rest on the
+                  provider.
+                </T>
               </Text>
             ) : undefined
           }

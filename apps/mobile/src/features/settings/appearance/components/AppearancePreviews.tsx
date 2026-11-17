@@ -7,6 +7,7 @@ import {
 } from "../../../../lib/appearancePreferences";
 import { getMobileTerminalTheme } from "../../../terminal/terminalTheme";
 import { useAppearancePreferences } from "../AppearancePreferencesProvider";
+import { T } from "gt-react-native";
 
 const CODE_FONT_FAMILY = Platform.select({
   ios: "ui-monospace",
@@ -27,13 +28,13 @@ export function TextAppearancePreview(props: { readonly fontSize: number }) {
         className="text-foreground"
         style={{ fontSize: sizes.m, lineHeight: sizes.bodyLineHeight }}
       >
-        The quick brown fox jumps over the lazy dog.
+        <T>The quick brown fox jumps over the lazy dog.</T>
       </Text>
       <Text
         className="text-foreground-muted"
         style={{ fontSize: sizes.s, lineHeight: Math.round(sizes.s * 1.4) }}
       >
-        Messages, labels, and headings scale with this size.
+        <T>Messages, labels, and headings scale with this size.</T>
       </Text>
     </View>
   );
@@ -57,35 +58,59 @@ export function TerminalAppearancePreview(props: { readonly fontSize: number }) 
     <View className="p-4">
       <Text style={span(theme.foreground)}>
         <Text style={span(theme.palette[2])}>→ </Text>
-        <Text style={span(theme.palette[6])}>t3code </Text>
-        <Text style={span(theme.palette[4])}>git:(</Text>
-        <Text style={span(theme.palette[1])}>main</Text>
+        <Text style={span(theme.palette[6])}>
+          <T>t3code </T>
+        </Text>
+        <Text style={span(theme.palette[4])}>
+          <T>git:(</T>
+        </Text>
+        <Text style={span(theme.palette[1])}>
+          <T>main</T>
+        </Text>
         <Text style={span(theme.palette[4])}>)</Text>
         <Text style={span(theme.palette[3])}> ✗</Text>
-        <Text style={span(theme.foreground)}> vpr dev</Text>
+        <Text style={span(theme.foreground)}>
+          <T> vpr dev</T>
+        </Text>
       </Text>
       <Text style={span(theme.foreground)}>
-        <Text style={span(theme.palette[2])}>VITE v7.1.1</Text>
-        <Text style={span(theme.mutedForeground)}> ready in</Text>
-        <Text style={span(theme.foreground)}> 1.24s</Text>
+        <Text style={span(theme.palette[2])}>
+          <T>VITE v7.1.1</T>
+        </Text>
+        <Text style={span(theme.mutedForeground)}>
+          <T> ready in</T>
+        </Text>
+        <Text style={span(theme.foreground)}>
+          <T> 1.24s</T>
+        </Text>
       </Text>
       <Text style={span(theme.foreground)}>
         <Text style={span(theme.palette[2])}>→ </Text>
-        <Text style={span(theme.mutedForeground)}>Local: </Text>
+        <Text style={span(theme.mutedForeground)}>
+          <T>Local: </T>
+        </Text>
         <Text style={span(theme.palette[6], { textDecorationLine: "underline" })}>
           http://127.0.0.1:5173/
         </Text>
       </Text>
       <Text style={span(theme.foreground)}>
-        <Text style={span(theme.palette[2])}>✓ 85 passed</Text>
-        <Text style={span(theme.palette[3])}> △ 2 warnings</Text>
-        <Text style={span(theme.palette[1])}> ✗ 0 failed</Text>
+        <Text style={span(theme.palette[2])}>
+          <T>✓ 85 passed</T>
+        </Text>
+        <Text style={span(theme.palette[3])}>
+          <T> △ 2 warnings</T>
+        </Text>
+        <Text style={span(theme.palette[1])}>
+          <T> ✗ 0 failed</T>
+        </Text>
       </Text>
       <Text style={span(theme.foreground)}>
         <Text style={span(theme.background, { backgroundColor: theme.palette[2] })}>
           {" READY "}
         </Text>
-        <Text style={span(theme.mutedForeground)}> watching for changes</Text>{" "}
+        <Text style={span(theme.mutedForeground)}>
+          <T> watching for changes</T>
+        </Text>{" "}
         <Text style={span(theme.cursorForeground)}>▏</Text>
       </Text>
     </View>

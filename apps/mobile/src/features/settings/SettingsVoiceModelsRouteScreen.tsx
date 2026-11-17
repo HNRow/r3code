@@ -15,10 +15,12 @@ import { useEnvironments } from "../../state/environments";
 import { voiceSpeechBenchmarksAtom } from "../voice-input/voiceDestination";
 import { PullRequestSearchSheet } from "../pull-requests/PullRequestSearchSheet";
 import { useVoiceModels, VoiceModelRow } from "./VoiceModelSection";
+import { useGT, Var, T } from "gt-react-native";
 
 export function SettingsVoiceModelsRouteScreen({
   route,
 }: StaticScreenProps<{ readonly environmentId: EnvironmentId }>) {
+  const gt = useGT();
   const { environments } = useEnvironments();
   const label =
     environments.find((environment) => environment.environmentId === route.params.environmentId)
@@ -48,10 +50,10 @@ export function SettingsVoiceModelsRouteScreen({
     );
   return (
     <PullRequestSearchSheet
-      title="Transcription models"
-      placeholder="Search models or languages"
+      title={gt("Transcription models")}
+      placeholder={gt("Search models or languages")}
       closeAccessibilityLabel="Close transcription models"
-      clearAccessibilityLabel="Clear model search"
+      clearAccessibilityLabel={gt("Clear model search")}
       query={query}
       onQueryChange={setQuery}
     >
@@ -73,7 +75,9 @@ export function SettingsVoiceModelsRouteScreen({
           ListHeaderComponent={
             voice.canManage ? undefined : (
               <Text className="pb-3 text-xs text-foreground-muted">
-                This connection can’t change settings on {label}.
+                <T>
+                  This connection can’t change settings on <Var>{label}</Var>.
+                </T>
               </Text>
             )
           }

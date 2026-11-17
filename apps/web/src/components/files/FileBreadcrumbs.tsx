@@ -29,6 +29,7 @@ import {
   isListableHostFolder,
 } from "./filePath";
 import { useProjectEntriesQuery } from "./projectFilesQueryState";
+import { Var, T, useGT } from "gt-react";
 
 interface FileBreadcrumbsProps {
   readonly cwd: string;
@@ -118,7 +119,11 @@ function BreadcrumbMenuContent(props: {
         <>
           <MenuItem closeOnClick={false} onClick={() => props.onDirectoryChange(parentPath)}>
             <ArrowLeftIcon />
-            <span className="truncate">Back to {pathLabel(parentPath, props.projectName)}</span>
+            <span className="truncate">
+              <T>
+                Back to <Var>{pathLabel(parentPath, props.projectName)}</Var>
+              </T>
+            </span>
           </MenuItem>
           <MenuSeparator />
         </>
@@ -126,16 +131,22 @@ function BreadcrumbMenuContent(props: {
       <MenuGroup key={props.directoryPath}>
         {entriesQuery.isPending && entriesQuery.data === null ? (
           <MenuItem disabled>
-            <Spinner />
-            Loading folder…
+            <T>
+              <Spinner />
+              Loading folder…
+            </T>
           </MenuItem>
         ) : entriesQuery.error && entriesQuery.data === null ? (
           <MenuItem closeOnClick={false} onClick={entriesQuery.refresh}>
             <RefreshIcon refreshing={entriesQuery.isPending} />
-            <span className="min-w-0 flex-1 truncate">Retry loading folder</span>
+            <span className="min-w-0 flex-1 truncate">
+              <T>Retry loading folder</T>
+            </span>
           </MenuItem>
         ) : !directoryAvailable && !entriesTruncated ? (
-          <MenuItem disabled>This folder is no longer available.</MenuItem>
+          <MenuItem disabled>
+            <T>This folder is no longer available.</T>
+          </MenuItem>
         ) : children.length === 0 ? (
           <MenuItem disabled>
             {entriesTruncated
@@ -199,15 +210,19 @@ function BreadcrumbMenuContent(props: {
         <>
           <MenuSeparator />
           <MenuItem closeOnClick={false} onClick={entriesQuery.refresh}>
-            <RefreshIcon refreshing={entriesQuery.isPending} />
-            Refresh failed. Retry
+            <T>
+              <RefreshIcon refreshing={entriesQuery.isPending} />
+              Refresh failed. Retry
+            </T>
           </MenuItem>
         </>
       ) : null}
       {entriesTruncated ? (
         <>
           <MenuSeparator />
-          <MenuItem disabled>Some workspace entries are not shown.</MenuItem>
+          <MenuItem disabled>
+            <T>Some workspace entries are not shown.</T>
+          </MenuItem>
         </>
       ) : null}
     </MenuPopup>
@@ -293,13 +308,14 @@ function FolderBreadcrumb(props: {
 
 /** Host paths outside the workspace omit contents menus; the browser already lists their destination. */
 export function FileBreadcrumbs(props: FileBreadcrumbsProps) {
+  const gt = useGT();
   const hostPath = isHostPath(props.relativePath);
   const breadcrumbs = fileBreadcrumbs(props.projectName, props.trail);
   const currentPath = breadcrumbPathOf(props.relativePath);
   const currentIndex = breadcrumbs.findIndex((crumb) => crumb.path === currentPath);
 
   return (
-    <nav aria-label="File path" className="flex h-full">
+    <nav aria-label={gt("File path")} className="flex h-full">
       <ol className="flex items-center">
         {breadcrumbs.map((crumb, index) => {
           const current = index === currentIndex;

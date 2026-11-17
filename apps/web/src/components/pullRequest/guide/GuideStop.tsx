@@ -29,6 +29,7 @@ import { GuideFileDiff } from "./GuideFileDiff";
 import { GuideNotes } from "./GuideNotes";
 import { GuideProse } from "./GuideProse";
 import { letterStopNotes } from "@t3tools/client-runtime/review-guide-tour";
+import { Var, T, useGT } from "gt-react";
 
 const ATTENTION_LABELS = {
   tradeoff: "A tradeoff to weigh",
@@ -71,6 +72,7 @@ export function GuideStop({
   onFinish: (() => void) | null;
   onOpenFile: (path: string) => void;
 }) {
+  const gt = useGT();
   const { lettered, byExcerpt } = letterStopNotes(stop);
   const excerptPaths = new Set(stop.excerpts.map((excerpt) => excerpt.path));
   const otherFiles = stop.files.filter((file) => !excerptPaths.has(file.path));
@@ -85,7 +87,9 @@ export function GuideStop({
         <Collapsible open={railOpen} onOpenChange={onRailOpenChange}>
           <header className="flex items-center justify-between gap-2">
             <p className="text-xs text-muted-foreground tabular-nums @max-[56rem]/guide:hidden">
-              Stop {index + 1} of {stopCount}
+              <T>
+                Stop <Var>{index + 1}</Var> of <Var>{stopCount}</Var>
+              </T>
             </p>
             <CollapsibleTrigger
               render={
@@ -93,7 +97,9 @@ export function GuideStop({
               }
             >
               <span className="tabular-nums">
-                Stop {index + 1} of {stopCount}
+                <T>
+                  Stop <Var>{index + 1}</Var> of <Var>{stopCount}</Var>
+                </T>
               </span>
               <ChevronDownIcon aria-hidden className={cn(railOpen && "rotate-180")} />
             </CollapsibleTrigger>
@@ -101,7 +107,7 @@ export function GuideStop({
               <Button
                 size="icon-xs"
                 variant="outline"
-                aria-label="Previous stop"
+                aria-label={gt("Previous stop")}
                 disabled={index === 0}
                 onClick={() => onStep(-1)}
               >
@@ -110,7 +116,7 @@ export function GuideStop({
               <Button
                 size="icon-xs"
                 variant="outline"
-                aria-label="Next stop"
+                aria-label={gt("Next stop")}
                 disabled={index === stopCount - 1}
                 onClick={() => onStep(1)}
               >
@@ -120,8 +126,12 @@ export function GuideStop({
                 aria-hidden
                 className="ml-1 flex items-center gap-0.5 @max-[30rem]/guide:hidden"
               >
-                <Kbd>J</Kbd>
-                <Kbd>K</Kbd>
+                <Kbd>
+                  <T>J</T>
+                </Kbd>
+                <Kbd>
+                  <T>K</T>
+                </Kbd>
               </span>
             </div>
           </header>
@@ -232,7 +242,9 @@ export function GuideStop({
         {stop.questions.length > 0 || onAsk !== null ? (
           <section className="flex flex-col gap-1.5">
             {stop.questions.length > 0 ? (
-              <h3 className="text-xs font-medium text-muted-foreground">Questions to consider</h3>
+              <h3 className="text-xs font-medium text-muted-foreground">
+                <T>Questions to consider</T>
+              </h3>
             ) : null}
             <div className="flex flex-col items-start gap-1.5">
               {stop.questions.map((question) =>
@@ -251,7 +263,9 @@ export function GuideStop({
                       aria-hidden
                       className="size-3.5 h-lh shrink-0 text-muted-foreground"
                     />
-                    <span className="sr-only">Ask an agent: </span>
+                    <span className="sr-only">
+                      <T>Ask an agent: </T>
+                    </span>
                     <span>
                       <GuideProse text={question} plain />
                     </span>
@@ -260,8 +274,10 @@ export function GuideStop({
               )}
               {onAsk !== null ? (
                 <Button size="sm" variant="ghost-muted" onClick={() => onAsk("")}>
-                  <MessageCircleQuestionIcon aria-hidden />
-                  Ask about this stop
+                  <T>
+                    <MessageCircleQuestionIcon aria-hidden />
+                    Ask about this stop
+                  </T>
                 </Button>
               ) : null}
             </div>
@@ -271,13 +287,19 @@ export function GuideStop({
         <footer className="flex flex-wrap items-center justify-end gap-3 border-t border-border/60 pt-4">
           {nextTitle !== null ? (
             <Button size="multiline" className="max-w-full" onClick={() => onStep(1)}>
-              <span className="min-w-0 break-words">Next: {nextTitle}</span>
+              <span className="min-w-0 break-words">
+                <T>
+                  Next: <Var>{nextTitle}</Var>
+                </T>
+              </span>
               <ArrowRightIcon aria-hidden />
             </Button>
           ) : onFinish !== null ? (
             <Button onClick={onFinish}>
-              <MessageSquareIcon aria-hidden />
-              Finish review
+              <T>
+                <MessageSquareIcon aria-hidden />
+                Finish review
+              </T>
             </Button>
           ) : null}
         </footer>

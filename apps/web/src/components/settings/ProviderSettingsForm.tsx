@@ -29,6 +29,8 @@ export type SettingsFormDefinition = Pick<ProviderClientDefinition, "settingsSch
   readonly driverKind?: ProviderClientDefinition["driverKind"];
 };
 import { SettingsRow } from "./settingsLayout";
+import "./providerFieldMessages";
+import { T, useGT, useMessages } from "gt-react";
 
 export interface ProviderSettingsFieldModel {
   readonly key: string;
@@ -220,6 +222,7 @@ function ProviderCommandArguments({
 }: Pick<ProviderSettingsFormProps, "value" | "onChange"> & {
   readonly managedReason: string | undefined;
 }) {
+  const gt = useGT();
   const args = configuredCommandArgs(value);
   const [storedDraft, setDraft] = useState(() => seedRowsDraft(args, toCommandArgumentRows));
   const draft = reconcileRowsDraft(storedDraft, args, commandArgumentsEqual, toCommandArgumentRows);
@@ -236,8 +239,8 @@ function ProviderCommandArguments({
 
   return (
     <SettingsRow
-      title="Arguments"
-      description="One literal argument per row, in launch order."
+      title={gt("Arguments")}
+      description={gt("One literal argument per row, in launch order.")}
       managed={managedReason}
       control={
         <Button
@@ -246,8 +249,10 @@ function ProviderCommandArguments({
           variant="outline"
           onClick={() => updateArguments([...rows, makeCommandArgumentDraftRow("")])}
         >
-          <PlusIcon />
-          Add argument
+          <T>
+            <PlusIcon />
+            Add argument
+          </T>
         </Button>
       }
     >
@@ -365,6 +370,7 @@ function SecretSettingsControl({
   readonly environmentId: EnvironmentId;
   readonly onChange: ProviderSettingsFormProps["onChange"];
 }) {
+  const m = useMessages();
   const sources = useSecretSources(environmentId);
   const saved =
     value !== null && typeof value === "object"
@@ -377,7 +383,7 @@ function SecretSettingsControl({
       <SecretSourceInput
         id={inputId}
         aria-describedby={descriptionId}
-        aria-label={field.label}
+        aria-label={m(field.label)}
         size="sm"
         className="min-w-0 flex-1"
         value={reference ?? ""}
@@ -419,6 +425,7 @@ function ProviderSettingsSelect({
   readonly className?: string | undefined;
   readonly onChange: ProviderSettingsFormProps["onChange"];
 }) {
+  const m = useMessages();
   const options = field.options ?? [];
   const fallback = options[0]?.value ?? "";
   const current = readProviderConfigString(value, field.key) || fallback;
@@ -437,7 +444,7 @@ function ProviderSettingsSelect({
       <SelectPopup align="start" alignItemWithTrigger={false}>
         {options.map((option) => (
           <SelectItem key={option.value} value={option.value}>
-            {option.label}
+            {m(option.label)}
           </SelectItem>
         ))}
       </SelectPopup>
@@ -458,6 +465,7 @@ function ProviderSettingsTextInput({
   readonly descriptionId: string | undefined;
   readonly onChange: ProviderSettingsFormProps["onChange"];
 }) {
+  const m = useMessages();
   const [rejected, setRejected] = useState<string | null>(null);
   return (
     <div className="flex w-full min-w-0 flex-col gap-1 @min-[32rem]/settings-row:w-56">
@@ -469,7 +477,7 @@ function ProviderSettingsTextInput({
         type={field.control === "password" ? "password" : undefined}
         autoComplete={field.control === "password" ? "off" : undefined}
         value={rejected ?? readProviderConfigString(value, field.key)}
-        placeholder={field.placeholder}
+        placeholder={field.placeholder ? m(field.placeholder) : undefined}
         onCommit={(next) => {
           const clears = field.clearWhenEmpty === "omit" && next.trim().length === 0;
           if (!clears && field.accepts?.(next) === false) {
@@ -483,7 +491,9 @@ function ProviderSettingsTextInput({
         spellCheck={false}
       />
       {rejected !== null ? (
-        <p className="text-2xs text-destructive">Enter a valid value. It was not saved.</p>
+        <p className="text-2xs text-destructive">
+          <T>Enter a valid value. It was not saved.</T>
+        </p>
       ) : null}
     </div>
   );
@@ -518,6 +528,7 @@ function ProviderSettingsFieldRow({
   managedReason,
   environmentId,
 }: ProviderSettingsFieldRowProps) {
+  const m = useMessages();
   const inputId = `${idPrefix}-${field.key}`;
   const descriptionClassName =
     variant === "dialog"
@@ -560,7 +571,7 @@ function ProviderSettingsFieldRow({
           onChange={(event) =>
             onChange(nextProviderConfigWithFieldValue(value, field, event.target.value))
           }
-          placeholder={field.placeholder}
+          placeholder={field.placeholder ? m(field.placeholder) : undefined}
           spellCheck={false}
         />
       ) : field.acceptsSecretReference && environmentId !== undefined ? (
@@ -608,10 +619,14 @@ function ProviderSettingsFieldRow({
     return (
       <SettingsRow
         title={
-          field.control === "switch" ? field.label : <label htmlFor={inputId}>{field.label}</label>
+          field.control === "switch" ? (
+            m(field.label)
+          ) : (
+            <label htmlFor={inputId}>{m(field.label)}</label>
+          )
         }
         description={
-          field.description ? <span id={descriptionId}>{field.description}</span> : undefined
+          field.description ? <span id={descriptionId}>{m(field.description)}</span> : undefined
         }
         control={control}
         managed={managedReason}
@@ -670,7 +685,7 @@ function ProviderSettingsFieldRow({
             onChange={(event) =>
               onChange(nextProviderConfigWithFieldValue(value, field, event.target.value))
             }
-            placeholder={field.placeholder}
+            placeholder={field.placeholder ? m(field.placeholder) : undefined}
             spellCheck={false}
           />
           {description}
@@ -695,7 +710,7 @@ function ProviderSettingsFieldRow({
             autoComplete={!field.secret && field.control === "password" ? "off" : undefined}
             value={readProviderConfigString(value, field.key)}
             onCommit={(next) => onChange(nextProviderConfigWithFieldValue(value, field, next))}
-            placeholder={field.placeholder}
+            placeholder={field.placeholder ? m(field.placeholder) : undefined}
             spellCheck={false}
           />
         ) : (
@@ -707,7 +722,7 @@ function ProviderSettingsFieldRow({
             onChange={(event) =>
               onChange(nextProviderConfigWithFieldValue(value, field, event.target.value))
             }
-            placeholder={field.placeholder}
+            placeholder={field.placeholder ? m(field.placeholder) : undefined}
             spellCheck={false}
           />
         )}

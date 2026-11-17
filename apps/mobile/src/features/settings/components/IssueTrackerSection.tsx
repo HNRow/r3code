@@ -26,6 +26,7 @@ import type { SettingsTarget } from "../settings-environment-filter";
 import { SettingsProviderRow } from "./SettingsProviderRow";
 import { SettingsRow } from "./SettingsRow";
 import { SettingsSection } from "./SettingsSection";
+import { useGT } from "gt-react-native";
 
 const UNBOUND = "";
 const ThemedSvg = withUniwind(Svg);
@@ -65,6 +66,7 @@ function EnvironmentTrackers(props: {
   readonly environment: SettingsTarget;
   readonly title: string;
 }) {
+  const gt = useGT();
   const navigation = useNavigation();
   const { environmentId } = props.environment;
   const query = useEnvironmentQuery(
@@ -75,7 +77,7 @@ function EnvironmentTrackers(props: {
     return query.error ? (
       <SettingsSection title={props.title} footer={query.error}>
         <View className="p-4">
-          <Button label="Try again" tone="secondary" onPress={query.refresh} />
+          <Button label={gt("Try again")} tone="secondary" onPress={query.refresh} />
         </View>
       </SettingsSection>
     ) : null;
@@ -124,6 +126,7 @@ export function IssueTrackerCredentialForm(props: {
   readonly tracker: IssueTrackerConnection;
   readonly disabled: boolean;
 }) {
+  const gt = useGT();
   const { environmentId, tracker } = props;
   const connect = useAtomCommand(issueTrackerEnvironment.connect, { reportFailure: false });
   const [draft, setDraft] = useState("");
@@ -165,7 +168,7 @@ export function IssueTrackerCredentialForm(props: {
       <View className="flex-row flex-wrap justify-end gap-2">
         {helpUrl ? (
           <Button
-            label="Create one"
+            label={gt("Create one")}
             tone="text"
             size="compact"
             onPress={() => void Linking.openURL(helpUrl).catch(() => undefined)}
@@ -173,7 +176,7 @@ export function IssueTrackerCredentialForm(props: {
         ) : null}
         {tracker.connected ? (
           <Button
-            label="Disconnect"
+            label={gt("Disconnect")}
             tone="secondary"
             size="compact"
             disabled={locked}

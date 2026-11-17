@@ -36,6 +36,7 @@ import {
   type SettingInheritanceState,
   type SettingOverridingProject,
 } from "./SettingInheritance";
+import { useGT, useMessages } from "gt-react";
 
 const EMPTY_SETTING_KEYS: readonly (keyof ServerSettings)[] = [];
 const EMPTY_MANAGED_PATHS: readonly string[] = [];
@@ -189,12 +190,17 @@ export const SETTINGS_PICKER_TRIGGER_CLASSNAME =
   "min-w-0 max-w-none shrink-0 border-input bg-background font-normal text-foreground shadow-xs/5 hover:bg-accent/50 dark:bg-input/32 [&_svg[data-composer-control-chevron]]:stroke-[1.75] [&_svg[data-composer-control-chevron]]:opacity-70";
 
 export function PolicyTooltip({ children }: { readonly children: string }) {
+  const gt = useGT();
   return (
     <Tooltip>
       <TooltipTrigger
         delay={200}
         render={
-          <Button size="icon-micro" variant="ghost-muted" aria-label="Background policy details">
+          <Button
+            size="icon-micro"
+            variant="ghost-muted"
+            aria-label={gt("Background policy details")}
+          >
             <InfoIcon className="size-3.5" />
           </Button>
         }
@@ -223,7 +229,9 @@ export function SettingsSection({
   variant?: "grouped" | "plain";
   children: ReactNode;
 }) {
+  const m = useMessages();
   const targetRef = useSettingsSearchTarget<HTMLElement>(sectionProps.id);
+  const renderedTitle = typeof title === "string" ? m(title) : title;
 
   return (
     <section
@@ -233,7 +241,7 @@ export function SettingsSection({
       className={cn(!hideTitle && "space-y-2.5", className)}
     >
       {hideTitle ? (
-        <h2 className="sr-only">{title}</h2>
+        <h2 className="sr-only">{renderedTitle}</h2>
       ) : (
         <div
           data-settings-scroll-target
@@ -242,7 +250,7 @@ export function SettingsSection({
           <div className="flex min-w-0 items-center gap-1">
             <h2 className="flex min-h-7 items-center gap-2 text-base font-semibold text-foreground">
               {icon}
-              {title}
+              {renderedTitle}
             </h2>
             {titleAction}
           </div>
@@ -265,13 +273,14 @@ export function SettingsUnavailableGroup({
   children: ReactNode;
   message?: ReactNode;
 }) {
+  const m = useMessages();
   if (message === undefined) return children;
 
   return (
     <div className="border-border/60 bg-muted/20 py-1.5">
       <div className="flex items-start gap-2 px-3 py-2 text-xs leading-relaxed text-muted-foreground sm:px-4">
         <InfoIcon className="mt-0.5 size-3.5 shrink-0 text-warning" />
-        <p>{message}</p>
+        <p>{typeof message === "string" ? m(message) : message}</p>
       </div>
       <div className="[&_h3]:opacity-64 [&_p]:opacity-64">{children}</div>
     </div>
@@ -338,6 +347,10 @@ export function SettingsRow({
   managed?: string | undefined;
   children?: ReactNode;
 }) {
+  const gt = useGT();
+  const m = useMessages();
+  const renderedTitle = typeof title === "string" ? m(title) : title;
+  const renderedDescription = typeof description === "string" ? m(description) : description;
   const targetRef = useSettingsSearchTarget<HTMLDivElement>(rowProps.id);
   const primarySettingsAvailable = usePrimarySettingsAvailable();
   const context = useOptionalSettingsScope();
@@ -405,7 +418,7 @@ export function SettingsRow({
       source === "project" || source === "mixed" ? (
         <SettingResetButton
           label={typeof title === "string" ? title : "override"}
-          tooltip="Reset to inherited value"
+          tooltip={gt("Reset to inherited value")}
           onClick={() => (onResetOverride ? onResetOverride() : clearOverrides(scopedKeys))}
         />
       ) : null
@@ -513,7 +526,7 @@ export function SettingsRow({
       <div className="flex flex-col gap-3 @min-[32rem]/settings-row:grid @min-[32rem]/settings-row:grid-cols-[minmax(0,1fr)_auto] @min-[32rem]/settings-row:items-center @min-[32rem]/settings-row:gap-8">
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex min-h-5 items-center gap-1.5">
-            <h3 className="text-sm font-medium text-foreground">{title}</h3>
+            <h3 className="text-sm font-medium text-foreground">{renderedTitle}</h3>
             {renderedInheritance ? (
               <span
                 className={cn(
@@ -533,7 +546,7 @@ export function SettingsRow({
           </div>
           {description ? (
             <p className="max-w-2xl text-pretty text-xs leading-normal text-muted-foreground">
-              {description}
+              {renderedDescription}
             </p>
           ) : null}
           {renderedStatus ? (

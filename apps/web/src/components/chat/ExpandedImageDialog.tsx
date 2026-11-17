@@ -32,6 +32,7 @@ import { expandedImageKey } from "./ExpandedImagePreview";
 import { registerThreadOverlay } from "./threadOverlayRetention";
 import { mediaReferenceFileName } from "@t3tools/client-runtime/media-reference";
 import { mediaMimeType, mediaMimeTypeFromExtension } from "@t3tools/shared/mediaPreview";
+import { Var, T, useGT } from "gt-react";
 
 interface ExpandedImageDialogProps {
   preview: ExpandedImagePreview;
@@ -88,6 +89,7 @@ export const ExpandedImageDialog = memo(function ExpandedImageDialog({
   preview,
   onClose,
 }: ExpandedImageDialogProps) {
+  const gt = useGT();
   const [imageOffset, setImageOffset] = useState(0);
   const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null);
   const [accessibilityDetailsSrc, setAccessibilityDetailsSrc] = useState<string | null>(null);
@@ -192,7 +194,11 @@ export const ExpandedImageDialog = memo(function ExpandedImageDialog({
           if (event.target === event.currentTarget) close();
         }}
       >
-        <DialogTitle className="sr-only">Expanded {mediaLabel} preview</DialogTitle>
+        <DialogTitle className="sr-only">
+          <T>
+            Expanded <Var>{mediaLabel}</Var> preview
+          </T>
+        </DialogTitle>
         <Button
           type="button"
           ref={closeButtonRef}
@@ -202,8 +208,10 @@ export const ExpandedImageDialog = memo(function ExpandedImageDialog({
           onClick={close}
           aria-label={`Back, close ${mediaLabel} preview`}
         >
-          <ArrowLeftIcon aria-hidden="true" />
-          Back
+          <T>
+            <ArrowLeftIcon aria-hidden="true" />
+            Back
+          </T>
         </Button>
         {preview.images.length > 1 && (
           <Button
@@ -211,7 +219,7 @@ export const ExpandedImageDialog = memo(function ExpandedImageDialog({
             size="icon"
             variant="media-navigation"
             className="left-0 top-auto bottom-0 translate-y-0 sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2"
-            aria-label="Previous media"
+            aria-label={gt("Previous media")}
             onClick={() => navigateImage(-1)}
           >
             <ChevronLeftIcon className="size-5" />
@@ -292,7 +300,7 @@ export const ExpandedImageDialog = memo(function ExpandedImageDialog({
             size="icon"
             variant="media-navigation"
             className="right-0 top-auto bottom-0 translate-y-0 sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2"
-            aria-label="Next media"
+            aria-label={gt("Next media")}
             onClick={() => navigateImage(1)}
           >
             <ChevronRightIcon className="size-5" />

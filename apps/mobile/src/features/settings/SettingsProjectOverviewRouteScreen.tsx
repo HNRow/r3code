@@ -44,8 +44,10 @@ import { leaveSettingsPage } from "./settings-navigation";
 import { workspaceHasColumns } from "../layout/workspace/workspace-selection-store";
 import { DEFAULT_SETTINGS_PAGE } from "../layout/workspace/workspace-tab-navigation";
 import { readUnloadedThreadCount } from "../../state/olderSettledShelf";
+import { useGT, T } from "gt-react-native";
 
 export function SettingsProjectOverviewRouteScreen() {
+  const gt = useGT();
   const environmentMenu = useSettingsEnvironmentMenu();
   const insets = useSafeAreaInsets();
   const [isRemoving, setIsRemoving] = useState(false);
@@ -84,7 +86,7 @@ export function SettingsProjectOverviewRouteScreen() {
       .filter((project) => selectedEnvironmentIds.has(project.environmentId)) ?? [];
 
   return (
-    <SettingsScreen title="Projects" menus={[environmentMenu]}>
+    <SettingsScreen title={gt("Projects")} menus={[environmentMenu]}>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
@@ -94,12 +96,14 @@ export function SettingsProjectOverviewRouteScreen() {
       >
         {selectedProjectKey === null ? (
           <Text className="px-2 text-base text-foreground-muted">
-            Choose a project with the filter above to manage its name, checkouts and removal.
+            <T>Choose a project with the filter above to manage its name, checkouts and removal.</T>
           </Text>
         ) : !group || members.length === 0 ? (
           <Text className="px-2 text-base text-foreground-muted">
-            This project has no checkout on the selected connected environments. Change the filter
-            above.
+            <T>
+              This project has no checkout on the selected connected environments. Change the filter
+              above.
+            </T>
           </Text>
         ) : (
           <ProjectOverviewContent
@@ -136,6 +140,7 @@ function ProjectOverviewContent(props: {
   readonly projectKey: string | null;
   readonly onProjectRemoved: (projectKey: string | null) => void;
 }) {
+  const gt = useGT();
   const { isRemoving, setIsRemoving, startRemoval, finishRemoval } = props;
   const representative = props.members[0]!;
   const displayName = deriveProjectGroupLabel({
@@ -323,12 +328,14 @@ function ProjectOverviewContent(props: {
         </View>
       </View>
 
-      <SettingsSection title="Project">
+      <SettingsSection title={gt("Project")}>
         <View className="gap-3 p-4">
-          <Text className="text-sm font-t3-medium text-foreground-muted">Name</Text>
+          <Text className="text-sm font-t3-medium text-foreground-muted">
+            <T>Name</T>
+          </Text>
           <View className="flex-row items-center gap-3">
             <AppTextInput
-              accessibilityLabel="Project name"
+              accessibilityLabel={gt("Project name")}
               className="min-h-11 min-w-0 flex-1 rounded-xl border-continuous bg-card px-3 text-base text-foreground"
               value={draftName ?? displayName}
               onChangeText={setDraftName}
@@ -338,8 +345,8 @@ function ProjectOverviewContent(props: {
             />
             {canSave ? (
               <Button
-                label="Save"
-                accessibilityHint="Save project name"
+                label={gt("Save")}
+                accessibilityHint={gt("Save project name")}
                 tone="secondary"
                 onPress={saveName}
               />
@@ -349,10 +356,10 @@ function ProjectOverviewContent(props: {
       </SettingsSection>
 
       {canOrganize ? (
-        <SettingsSection title="Organize">
+        <SettingsSection title={gt("Organize")}>
           <SettingsSwitchRow
             icon="pin"
-            label="Pin"
+            label={gt("Pin")}
             subtitle={
               offline
                 ? "Connect every machine with this project to change this."
@@ -376,7 +383,7 @@ function ProjectOverviewContent(props: {
         </SettingsSection>
       ) : null}
 
-      <SettingsSection title="Checkouts">
+      <SettingsSection title={gt("Checkouts")}>
         {props.members.map((member, index) => {
           const environment = props.environments.find(
             (entry) => entry.environmentId === member.environmentId,
@@ -414,7 +421,7 @@ function ProjectOverviewContent(props: {
           );
         })}
       </SettingsSection>
-      <SettingsSection title="Danger">
+      <SettingsSection title={gt("Danger")}>
         <SettingsActionRow
           icon="trash"
           label={
@@ -455,7 +462,9 @@ function RemoveCheckoutAction(props: {
       onPress={props.onPress}
       className="self-start rounded-full border border-border bg-card px-3 py-1.5 disabled:opacity-40"
     >
-      <Text className="font-t3-medium text-xs text-danger-foreground">Remove checkout</Text>
+      <Text className="font-t3-medium text-xs text-danger-foreground">
+        <T>Remove checkout</T>
+      </Text>
     </Pressable>
   );
 }

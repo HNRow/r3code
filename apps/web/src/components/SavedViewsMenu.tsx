@@ -23,6 +23,7 @@ import { Label } from "./ui/label";
 import { Menu, MenuItem, MenuItemLabel, MenuPopup, MenuSeparator, MenuTrigger } from "./ui/menu";
 import { toastManager } from "./ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
+import { useGT, T } from "gt-react";
 
 export interface SavedView<Preferences> {
   readonly id: string;
@@ -57,6 +58,7 @@ export function SavedViewsMenu<Preferences extends Stored, Stored, Encoded>({
   preferences: Preferences;
   onApply: (preferences: Preferences) => void;
 }) {
+  const gt = useGT();
   const [views, setViews] = useLocalStorage(kind.storageKey, kind.empty, kind.schema);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editor, setEditor] = useState<{ id?: string; name: string } | null>(null);
@@ -141,7 +143,7 @@ export function SavedViewsMenu<Preferences extends Stored, Stored, Encoded>({
           >
             <BookmarkIcon aria-hidden className="size-4" />
             <span className="max-w-40 truncate">{selectedView?.name ?? "Views"}</span>
-            {modified ? <span aria-label="Modified view">*</span> : null}
+            {modified ? <span aria-label={gt("Modified view")}>*</span> : null}
             <ChevronDownIcon aria-hidden className="size-3 shrink-0" />
           </TooltipTrigger>
           <TooltipPopup>{selectedView?.name ?? `Saved ${kind.noun} views`}</TooltipPopup>
@@ -171,8 +173,10 @@ export function SavedViewsMenu<Preferences extends Stored, Stored, Encoded>({
           ))}
           {views.length > 0 ? <MenuSeparator /> : null}
           <MenuItem onClick={() => setEditor({ name: kind.suggestedName(preferences) })}>
-            <PlusIcon aria-hidden />
-            Save current view…
+            <T>
+              <PlusIcon aria-hidden />
+              Save current view…
+            </T>
           </MenuItem>
           {selectedView ? (
             <>
@@ -188,11 +192,11 @@ export function SavedViewsMenu<Preferences extends Stored, Stored, Encoded>({
                     )
                   }
                 >
-                  Update saved view
+                  <T>Update saved view</T>
                 </MenuItem>
               ) : null}
               <MenuItem onClick={() => setEditor({ id: selectedView.id, name: selectedView.name })}>
-                Rename view…
+                <T>Rename view…</T>
               </MenuItem>
               <MenuItem
                 variant="destructive"
@@ -201,7 +205,7 @@ export function SavedViewsMenu<Preferences extends Stored, Stored, Encoded>({
                     setSelectedId(null);
                 }}
               >
-                Delete view
+                <T>Delete view</T>
               </MenuItem>
             </>
           ) : null}
@@ -226,12 +230,14 @@ export function SavedViewsMenu<Preferences extends Stored, Stored, Encoded>({
                 {editor?.id ? `Rename ${kind.shortNoun} view` : `Save ${kind.shortNoun} view`}
               </DialogTitle>
               <DialogDescription>
-                Save your search, filters, and sort order on this device.
+                <T>Save your search, filters, and sort order on this device.</T>
               </DialogDescription>
             </DialogHeader>
             <DialogPanel>
               <div className="flex flex-col gap-2">
-                <Label htmlFor={inputId}>View name</Label>
+                <Label htmlFor={inputId}>
+                  <T>View name</T>
+                </Label>
                 <Input
                   id={inputId}
                   autoFocus
@@ -255,10 +261,10 @@ export function SavedViewsMenu<Preferences extends Stored, Stored, Encoded>({
             </DialogPanel>
             <DialogFooter>
               <Button variant="outline" onClick={() => setEditor(null)}>
-                Cancel
+                <T>Cancel</T>
               </Button>
               <Button type="submit" disabled={nameError !== null}>
-                Save
+                <T>Save</T>
               </Button>
             </DialogFooter>
           </form>

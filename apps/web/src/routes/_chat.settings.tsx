@@ -26,6 +26,7 @@ import {
   isSettingsSearchScopeAvailable,
   movedSettingsPath,
 } from "../components/settings/settingsSearch";
+import { T, Var, useGT } from "gt-react";
 
 function RestoreDeviceDefaultsButton({ onRestored }: { onRestored: () => void }) {
   const { changedSettingLabels, restoreDefaults } = useSettingsRestore(onRestored);
@@ -37,7 +38,9 @@ function RestoreDeviceDefaultsButton({ onRestored }: { onRestored: () => void })
       onClick={() => void restoreDefaults()}
     >
       <RotateCcwIcon className="mx-1 size-3.5" />
-      <span className="max-sm:sr-only">Restore device defaults</span>
+      <span className="max-sm:sr-only">
+        <T>Restore device defaults</T>
+      </span>
     </Button>
   );
 }
@@ -98,7 +101,9 @@ function SettingsScopeBoundary({ pathname, children }: { pathname: string; child
     return (
       <SettingsPageContainer>
         <p className="text-sm text-muted-foreground">
-          Reconnect {scope.label} to change its settings.
+          <T>
+            Reconnect <Var>{scope.label}</Var> to change its settings.
+          </T>
         </p>
       </SettingsPageContainer>
     );
@@ -107,6 +112,7 @@ function SettingsScopeBoundary({ pathname, children }: { pathname: string; child
 }
 
 function SettingsContentLayout() {
+  const gt = useGT();
   const contentArea = workspaceAreaProps("settings", 1, "Settings content");
   const location = useLocation();
   const { search, environment } = useSettingsScope();
@@ -117,7 +123,7 @@ function SettingsContentLayout() {
   const [restoreSignal, setRestoreSignal] = useState(0);
 
   return (
-    <AppRouteModal label="Settings">
+    <AppRouteModal label={gt("Settings")}>
       <div className="relative flex min-h-0 flex-1">
         <SettingsSidebarNav pathname={location.pathname} />
         <div {...contentArea} className="flex min-h-0 min-w-0 flex-1 flex-col">

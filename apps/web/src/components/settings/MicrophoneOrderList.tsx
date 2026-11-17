@@ -21,12 +21,14 @@ import {
   preferredMicrophone,
 } from "../../speech/microphoneOrder";
 import { Button } from "../ui/button";
+import { useGT, T } from "gt-react";
 
 /** The saved microphone order. Keyboard users reorder with the step buttons. */
 export function MicrophoneOrderList(props: {
   readonly order: ReadonlyArray<MicrophoneEntry>;
   readonly devices: ReadonlyArray<BrowserMicrophone>;
 }) {
+  const gt = useGT();
   const { order, devices } = props;
   const keys = order.map(microphoneEntryKey);
   const inUse = microphoneEntryKey(preferredMicrophone(order, devices));
@@ -51,7 +53,7 @@ export function MicrophoneOrderList(props: {
     >
       <SortableContext items={keys} strategy={verticalListSortingStrategy}>
         <ol
-          aria-label="Microphones, preferred first"
+          aria-label={gt("Microphones, preferred first")}
           className="divide-y divide-border/60 rounded-lg border border-border/60"
         >
           {order.map((entry, index) => {
@@ -118,10 +120,12 @@ function MicrophoneRow(props: {
       <span className="col-start-2 flex @min-[32rem]/settings-row:col-start-auto">
         {props.inUse ? (
           <span className="rounded-sm bg-success/12 px-1 text-2xs text-success-foreground">
-            In use
+            <T>In use</T>
           </span>
         ) : props.notConnected ? (
-          <span className="text-2xs text-muted-foreground">Not connected</span>
+          <span className="text-2xs text-muted-foreground">
+            <T>Not connected</T>
+          </span>
         ) : null}
       </span>
       <span

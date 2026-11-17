@@ -11,6 +11,7 @@ import { RedactedSensitiveText } from "../settings/RedactedSensitiveText";
 import { LimitWindows, ResetCredits } from "../usage/UsageLimits";
 import { ComposerBanner } from "./ComposerBanner";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
+import { useGT, Var, T } from "gt-react";
 
 function accountLabel(account: UsageLimitsReport["accounts"][number]): string {
   if (!account.instanceId) return account.label;
@@ -24,6 +25,7 @@ function accountLabel(account: UsageLimitsReport["accounts"][number]): string {
 }
 
 function AccountSummary({ account }: { readonly account: UsageLimitsReport["accounts"][number] }) {
+  const gt = useGT();
   const label = accountLabel(account);
   return (
     <>
@@ -31,9 +33,9 @@ function AccountSummary({ account }: { readonly account: UsageLimitsReport["acco
         <RedactedSensitiveText
           key={label}
           value={label}
-          ariaLabel="Toggle account label visibility"
-          revealTooltip="Click to reveal account"
-          hideTooltip="Click to hide account"
+          ariaLabel={gt("Toggle account label visibility")}
+          revealTooltip={gt("Click to reveal account")}
+          hideTooltip={gt("Click to hide account")}
           className="max-w-full truncate align-bottom font-sans text-xs leading-normal"
         />
       ) : (
@@ -94,7 +96,9 @@ export function modelFallbackBannerItem({
     description: `${defaultProviderName} is out of usage${resetsAt ? ` · resets ${formatUpcomingTimestamp(resetsAt, timestampFormat)}` : ""}`,
     actions: (
       <Button size="xs" variant="ghost" onClick={onUseDefault}>
-        Use {defaultModelName}
+        <T>
+          Use <Var>{defaultModelName}</Var>
+        </T>
       </Button>
     ),
     dismissLabel: "Dismiss fallback model notice",
@@ -144,7 +148,7 @@ function UsageLimitsBannerBody({
                   className="self-start"
                   onClick={() => void ensureLocalApi().shell.openExternal(externalUsage.url)}
                 >
-                  Manage usage
+                  <T>Manage usage</T>
                 </Button>
               ) : null}
               {resetCreditInput && account.limits.resetCredits ? (

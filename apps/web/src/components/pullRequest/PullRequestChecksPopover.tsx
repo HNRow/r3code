@@ -25,6 +25,7 @@ import {
   pullRequestChecksStatePresentation,
   summarizePullRequestChecks,
 } from "./pullRequestPresentation";
+import { T, Var } from "gt-react";
 
 // Fetch only on open to avoid per-row requests.
 function LazyChecksBody({
@@ -66,7 +67,11 @@ function ChecksBody({
   const visibleChecks = [...attention, ...running, ...(showAll || !canCollapse ? completed : [])];
   const hasDetails = visibleChecks.some((check) => check.url !== null);
   if (checks.length === 0) {
-    return <p className="text-muted-foreground text-xs">No checks reported</p>;
+    return (
+      <p className="text-muted-foreground text-xs">
+        <T>No checks reported</T>
+      </p>
+    );
   }
   return (
     <>
@@ -105,7 +110,7 @@ function ChecksBody({
                       });
                     }}
                   >
-                    Details
+                    <T>Details</T>
                   </button>
                 )}
               </li>
@@ -184,13 +189,20 @@ export function PullRequestChecksPopover({
             {checks !== undefined && incompleteCount > 0 ? (
               // Clip the second line so "checks" disappears whole when the count must shrink.
               <span className="h-lh min-w-0 overflow-hidden text-left whitespace-normal tabular-nums">
-                <span className="whitespace-nowrap">
-                  {checks.length - incompleteCount}/{checks.length}
-                </span>{" "}
-                checks
+                <T>
+                  <span className="whitespace-nowrap">
+                    <Var>{checks.length - incompleteCount}</Var>/<Var>{checks.length}</Var>
+                  </span>
+                  <Var> </Var>
+                  checks
+                </T>
               </span>
             ) : failedCount > 0 ? (
-              <span className="min-w-0 truncate tabular-nums">{failedCount} failed</span>
+              <span className="min-w-0 truncate tabular-nums">
+                <T>
+                  <Var>{failedCount}</Var> failed
+                </T>
+              </span>
             ) : null}
           </>
         ) : null}
@@ -200,7 +212,7 @@ export function PullRequestChecksPopover({
         {summary === null ? null : <p className="mb-2 text-muted-foreground text-xs">{summary}</p>}
         {stale ? (
           <p className="text-muted-foreground text-xs">
-            Check details are out of date. Refresh the pull request to update them.
+            <T>Check details are out of date. Refresh the pull request to update them.</T>
           </p>
         ) : checks !== undefined ? (
           <ChecksBody checks={checks} threadRef={threadRef} />

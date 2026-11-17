@@ -20,6 +20,7 @@ import { useNowSecond } from "../../hooks/useNowSecond";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
+import { Var, T } from "gt-react";
 
 /**
  * What failed on the way to an environment, or null while it is connected, off,
@@ -93,7 +94,13 @@ export function ConnectionDiagnosisSummary({
       <p className="flex flex-wrap items-center gap-1 text-muted-foreground">
         {retryAt !== null ? <RetryCountdown retryAt={retryAt} /> : null}
         {retryAt !== null && attempt > 0 ? <span aria-hidden>·</span> : null}
-        {attempt > 0 ? <span>attempt {attempt}</span> : null}
+        {attempt > 0 ? (
+          <span>
+            <T>
+              attempt <Var>{attempt}</Var>
+            </T>
+          </span>
+        ) : null}
         {retryAt !== null || attempt > 0 ? <span aria-hidden>·</span> : null}
         <button
           type="button"
@@ -101,14 +108,16 @@ export function ConnectionDiagnosisSummary({
           onClick={onToggle}
           className="inline-flex items-center gap-0.5 rounded-sm outline-none hover:text-foreground focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
         >
-          Details
-          <ChevronRightIcon
-            aria-hidden
-            className={cn(
-              "size-3 transition-transform duration-150 motion-reduce:transition-none",
-              expanded && "rotate-90",
-            )}
-          />
+          <T>
+            Details
+            <ChevronRightIcon
+              aria-hidden
+              className={cn(
+                "size-3 transition-transform duration-150 motion-reduce:transition-none",
+                expanded && "rotate-90",
+              )}
+            />
+          </T>
         </button>
       </p>
     </div>
@@ -158,7 +167,9 @@ export function ConnectionDiagnosisPanel({
         ))}
       </ol>
       <div>
-        <p className="font-medium text-foreground">What to try</p>
+        <p className="font-medium text-foreground">
+          <T>What to try</T>
+        </p>
         <ol className="list-decimal pl-4 text-muted-foreground">
           {diagnosis.steps.map((step) => (
             <li key={step}>{step}</li>
@@ -171,7 +182,7 @@ export function ConnectionDiagnosisPanel({
             rel="noreferrer"
             className="text-muted-foreground underline underline-offset-2 hover:text-foreground"
           >
-            More info
+            <T>More info</T>
           </a>
         ) : null}
       </div>
@@ -185,7 +196,7 @@ export function ConnectionDiagnosisPanel({
       </dl>
       <div className="flex flex-wrap gap-2">
         <Button type="button" size="xs" variant="outline" onClick={onRetry}>
-          Retry now
+          <T>Retry now</T>
         </Button>
         <Button
           type="button"
@@ -196,11 +207,11 @@ export function ConnectionDiagnosisPanel({
             copyToClipboard(text, undefined);
           }}
         >
-          Copy diagnostics
+          <T>Copy diagnostics</T>
         </Button>
         {onAddRoute ? (
           <Button type="button" size="xs" variant="outline" onClick={onAddRoute}>
-            Add direct route
+            <T>Add direct route</T>
           </Button>
         ) : null}
       </div>

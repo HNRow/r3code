@@ -24,6 +24,7 @@ import { BrowserPreviewButton } from "../browser/browser-preview-button";
 import { DevicePreviewButton } from "../devices/device-preview-button";
 import type { FloatingWorkingStatus } from "./floating-working-status";
 import { ShimmeringWorkContent } from "./thread-work-log";
+import { useGT, Var, T } from "gt-react-native";
 
 const CONTROL_HEIGHT = 38.5;
 const CONTROL_GAP = 8;
@@ -72,6 +73,7 @@ export function FloatingWorkingControl(props: {
   readonly onOpenQueue: () => void;
   readonly lift?: SharedValue<number>;
 }) {
+  const gt = useGT();
   const { width: windowWidth } = useWindowDimensions();
   const reducedMotion = useReducedMotion();
   const [overlayWidth, setOverlayWidth] = useState(windowWidth);
@@ -201,7 +203,7 @@ export function FloatingWorkingControl(props: {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={extensionStatus.label}
-          accessibilityHint="Shows the full Pi status"
+          accessibilityHint={gt("Shows the full Pi status")}
           onPress={extensionStatus.onPress}
           onLayout={(event) => setExtensionWidth(settleWidth(event.nativeEvent.layout.width))}
           style={{ maxWidth: availableLabelWidth * 0.5 }}
@@ -251,7 +253,7 @@ export function FloatingWorkingControl(props: {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`Open agents, ${agents.accessibilityLabel}`}
-          accessibilityHint="Opens this turn's subagents"
+          accessibilityHint={gt("Opens this turn's subagents")}
           onPress={props.onOpenAgents}
           onLayout={(event) => setAgentsWidth(settleWidth(event.nativeEvent.layout.width))}
           className="h-11 flex-row items-center gap-1.5 px-3 active:opacity-70"
@@ -267,7 +269,7 @@ export function FloatingWorkingControl(props: {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`Open queue, ${props.queuedCount} messages`}
-          accessibilityHint="Opens queued messages to send now, edit, or remove"
+          accessibilityHint={gt("Opens queued messages to send now, edit, or remove")}
           onPress={props.onOpenQueue}
           onLayout={(event) => setQueueWidth(settleWidth(event.nativeEvent.layout.width))}
           style={{ maxWidth: Math.min(overlayWidth, windowWidth) * 0.45 }}
@@ -278,7 +280,9 @@ export function FloatingWorkingControl(props: {
           ) : null}
           <SymbolView name="list.number" size={13} tintColorClassName="accent-foreground" />
           <Text className="shrink font-t3-medium text-xs tabular-nums" numberOfLines={1}>
-            {props.queuedCount} queued
+            <T>
+              <Var>{props.queuedCount}</Var> queued
+            </T>
           </Text>
         </Pressable>
       ) : null}
@@ -343,7 +347,7 @@ export function FloatingWorkingControl(props: {
             style={[arrowTransformStyle, arrowContentStyle]}
           >
             <ControlPill
-              accessibilityLabel="Scroll to end"
+              accessibilityLabel={gt("Scroll to end")}
               activateOnPressIn
               className="h-11 w-11 border border-border bg-glass-fallback shadow-md shadow-black/10"
               disabled={!props.showScrollToEnd}
@@ -363,7 +367,7 @@ export function FloatingWorkingControl(props: {
         </UniwindGlassView>
       ) : (
         <ControlPill
-          accessibilityLabel="Scroll to end"
+          accessibilityLabel={gt("Scroll to end")}
           activateOnPressIn
           className="h-11 w-11 border border-border bg-glass-fallback shadow-md shadow-black/10"
           icon={{ ios: "chevron.down", android: "keyboard_arrow_down" }}
@@ -539,9 +543,10 @@ function StatusLabelRow(props: {
 }
 
 function ScrollToEndButton(props: { readonly disabled?: boolean; readonly onPress: () => void }) {
+  const gt = useGT();
   return (
     <ControlPill
-      accessibilityLabel="Scroll to end"
+      accessibilityLabel={gt("Scroll to end")}
       activateOnPressIn
       className="h-11 w-11 bg-transparent"
       disabled={props.disabled}

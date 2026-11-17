@@ -18,6 +18,7 @@ import { dismissProjectFileCopy, useProjectFileCopy } from "../../lib/addProject
 import { type ComposerBannerStackItem } from "./ComposerBannerStack";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { Button } from "../ui/button";
+import { T } from "gt-react";
 /**
  * A project still being cloned or copied into place: the composer banner with its cancel,
  * retry, and remove actions, and the reason sending waits until it is done.
@@ -90,7 +91,7 @@ export function useProjectCloneBanner(activeProjectRef: ScopedProjectRef | null)
               )
             }
           >
-            Cancel
+            <T>Cancel</T>
           </Button>
         ),
       };
@@ -109,7 +110,7 @@ export function useProjectCloneBanner(activeProjectRef: ScopedProjectRef | null)
             variant="ghost"
             onClick={() => void removeClonedProject({ environmentId, projectId })}
           >
-            Remove project
+            <T>Remove project</T>
           </Button>
           <Button
             size="xs"
@@ -120,7 +121,7 @@ export function useProjectCloneBanner(activeProjectRef: ScopedProjectRef | null)
               )
             }
           >
-            Retry
+            <T>Retry</T>
           </Button>
         </>
       ),

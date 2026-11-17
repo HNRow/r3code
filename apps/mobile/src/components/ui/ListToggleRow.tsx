@@ -3,6 +3,7 @@ import { Pressable } from "react-native";
 import { AppText } from "./AppText";
 import { ListRowLayout, type ListRowContentProps } from "./ListRowLayout";
 import { ThemedSwitch } from "./ThemedSwitch";
+import { T } from "gt-react-native";
 
 export function ListToggleRow(
   props: Omit<ListRowContentProps, "detail"> & {
@@ -27,7 +28,9 @@ export function ListToggleRow(
             className="rounded-full bg-subtle px-3 py-2 active:opacity-70"
             onPress={() => props.onValueChange(true)}
           >
-            <AppText className="text-sm font-t3-medium text-foreground">Mixed · Set on</AppText>
+            <AppText className="text-sm font-t3-medium text-foreground">
+              <T>Mixed · Set on</T>
+            </AppText>
           </Pressable>
         ) : (
           <ThemedSwitch

@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import { ComposerBanner, type ComposerBannerVariant } from "./ComposerBanner";
 import { observeResize } from "~/lib/observeResize";
+import { useGT } from "gt-react";
 
 /**
  * Where a notice sits in the stack. The machine comes first, then what needs you; the
@@ -70,6 +71,7 @@ export function NoticeText({
   readonly className: string;
   readonly detailsLabel: string;
 }) {
+  const gt = useGT();
   const textRef = useRef<HTMLSpanElement>(null);
   const detailsRef = useRef<HTMLButtonElement>(null);
   const [detailsAtWidth, setDetailsAtWidth] = useState<number | null>(null);
@@ -150,7 +152,7 @@ export function NoticeText({
             <InfoIcon />
           </PopoverTrigger>
           <PopoverPopup
-            aria-label="Notice details"
+            aria-label={gt("Notice details")}
             tooltipStyle
             side="top"
             className="max-w-[min(30rem,calc(100vw-2rem))] whitespace-normal wrap-anywhere [--inline-button-text-align:start] [--inline-button-white-space:normal] [&_[data-slot=inline-button]]:max-w-full"

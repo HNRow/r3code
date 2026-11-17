@@ -11,10 +11,11 @@ import {
   ClerkUserProfileRow,
 } from "./ClerkUserProfilePage";
 import { useT3ChatLink } from "./useT3ChatLink";
+import { T, Var, useGT } from "gt-react";
 
 const upgradeLink = (
   <a className="underline" href={T3CHAT_SUBSCRIPTION_URL} target="_blank" rel="noopener noreferrer">
-    Upgrade on T3 Chat
+    <T>Upgrade on T3 Chat</T>
   </a>
 );
 
@@ -25,17 +26,27 @@ function planLabel(link: RelayT3ChatLink): ReactNode {
     case "pro":
       return (
         <>
-          Pro · up to {T3CHAT_PLAN_TUNNEL_LIMITS.pro} tunnels. {upgradeLink} to Premier for{" "}
-          {T3CHAT_PLAN_TUNNEL_LIMITS.premier}.
+          <T>
+            Pro · up to <Var>{T3CHAT_PLAN_TUNNEL_LIMITS.pro}</Var> tunnels. <Var>{upgradeLink}</Var>{" "}
+            to Premier for<Var> </Var>
+            <Var>{T3CHAT_PLAN_TUNNEL_LIMITS.premier}</Var>.
+          </T>
         </>
       );
     case "free":
-      return <>{upgradeLink} for more tunnels</>;
+      return (
+        <>
+          <T>
+            <Var>{upgradeLink}</Var> for more tunnels
+          </T>
+        </>
+      );
   }
 }
 
 /** Links a T3 Chat account so paid subscribers get more tunnels. */
 export function T3ChatUserProfilePage() {
+  const gt = useGT();
   const { linkState, pending, linkUrl, link: handleLink, unlink: handleUnlink } = useT3ChatLink();
   const usage = useManagedTunnelUsage();
 
@@ -44,8 +55,8 @@ export function T3ChatUserProfilePage() {
 
   return (
     <ClerkUserProfilePage
-      title="T3 Chat"
-      description={`Link a paid T3 Chat account for more T3 Connect tunnels: up to ${T3CHAT_PLAN_TUNNEL_LIMITS.pro} with Pro, ${T3CHAT_PLAN_TUNNEL_LIMITS.premier} with Premier.`}
+      title={gt("T3 Chat")}
+      description={`Link a paid T3 Chat account for more R3 Connect tunnels: up to ${T3CHAT_PLAN_TUNNEL_LIMITS.pro} with Pro, ${T3CHAT_PLAN_TUNNEL_LIMITS.premier} with Premier.`}
       action={
         <ClerkUserProfileRefreshButton
           disabled={pending !== null}
@@ -56,12 +67,14 @@ export function T3ChatUserProfilePage() {
     >
       {linkState.error ? (
         <div className="border-t py-3 text-xs" role="alert">
-          <p className="font-medium text-destructive-foreground">Could not load T3 Chat link</p>
+          <p className="font-medium text-destructive-foreground">
+            <T>Could not load T3 Chat link</T>
+          </p>
           <p className="mt-0.5 text-muted-foreground">{linkState.error}</p>
         </div>
       ) : data === null ? null : !data.available ? (
         <p className="border-t py-4 text-xs text-muted-foreground">
-          This T3 Connect server does not support T3 Chat linking.
+          <T>This R3 Connect server does not support T3 Chat linking.</T>
         </p>
       ) : (
         <ul className="border-t">
@@ -76,16 +89,18 @@ export function T3ChatUserProfilePage() {
                     planLabel(link)
                   ) : linkUrl ? (
                     <>
-                      Confirm on{" "}
-                      <a
-                        className="underline"
-                        href={linkUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        t3.chat
-                      </a>
-                      , then select Refresh.
+                      <T>
+                        Confirm on<Var> </Var>
+                        <a
+                          className="underline"
+                          href={linkUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          t3.chat
+                        </a>
+                        , then select Refresh.
+                      </T>
                     </>
                   ) : (
                     "You confirm the link on t3.chat."

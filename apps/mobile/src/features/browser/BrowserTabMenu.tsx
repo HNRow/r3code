@@ -16,6 +16,7 @@ import { ControlPill } from "../../components/ui/ControlPill";
 import { Menu } from "../../components/ui/Menu";
 import { previewEnvironment } from "../../state/preview";
 import { useAtomCommand } from "../../state/use-atom-command";
+import { useGT } from "gt-react-native";
 
 const APPEARANCES = [
   { id: "system", title: "System" },
@@ -49,6 +50,7 @@ export function BrowserTabMenu({
   readonly streaming: boolean;
   readonly onPaste?: () => void;
 }) {
+  const gt = useGT();
   const adjust = useAtomCommand(previewEnvironment.adjust, "browser tab change");
   const resize = useAtomCommand(previewEnvironment.resize, "browser viewport change");
   const close = useAtomCommand(previewEnvironment.close, "browser tab close");
@@ -160,12 +162,12 @@ export function BrowserTabMenu({
       // the other state's actions.
       key={streaming ? "streaming" : "idle"}
       accessible
-      accessibilityLabel="Browser tab options"
+      accessibilityLabel={gt("Browser tab options")}
       accessibilityRole="button"
       actions={streaming ? actions : [closeAction]}
       onPressAction={({ nativeEvent }) => onAction(nativeEvent.event)}
     >
-      <ControlPill icon="ellipsis" accessibilityLabel="Browser tab options" />
+      <ControlPill icon="ellipsis" accessibilityLabel={gt("Browser tab options")} />
     </Menu>
   );
 }

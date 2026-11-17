@@ -231,6 +231,7 @@ import {
   nodeToPlainText,
 } from "./chat/MarkdownCodeBlock.logic";
 import { reportMarkdownActionFailure } from "./chat/markdownActionFailure";
+import { T, useGT } from "gt-react";
 
 const isAssetNotFoundError = Schema.is(AssetWorkspaceAssetNotFoundError);
 
@@ -330,7 +331,7 @@ function CodexArtifactTemplateCard(props: {
           className="shrink-0"
           onClick={() => props.onUse?.(props.template)}
         >
-          Use template
+          <T>Use template</T>
         </Button>
       ) : null}
     </div>
@@ -1124,6 +1125,7 @@ const CHAT_MARKDOWN_COMPONENTS = {
     );
   },
   input: function MarkdownInput({ node: _node, type, checked, disabled: _disabled, ...props }) {
+    const gt = useGT();
     const { onTaskListChange } = use(ChatMarkdownRendererContext);
     const text = use(ChatMarkdownTextContext);
     if (type !== "checkbox" || !onTaskListChange) {
@@ -1142,7 +1144,7 @@ const CHAT_MARKDOWN_COMPONENTS = {
         {...props}
         type="checkbox"
         name="markdown-task"
-        aria-label="Toggle task"
+        aria-label={gt("Toggle task")}
         checked={checked === true}
         onChange={(event) => {
           const listItemStart = Number(event.currentTarget.closest("li")?.dataset.listItemOffset);

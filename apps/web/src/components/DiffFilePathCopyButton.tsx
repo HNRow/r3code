@@ -5,6 +5,7 @@ import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
 import { ANCHORED_COPY_TOAST_TIMEOUT_MS, showAnchoredCopyErrorToast } from "./ui/anchoredCopyToast";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
+import { useGT } from "gt-react";
 
 export function DiffFilePathCopyButton({
   filePath,
@@ -13,6 +14,7 @@ export function DiffFilePathCopyButton({
   filePath: string;
   workspaceRoot: string | undefined;
 }) {
+  const gt = useGT();
   const ref = useRef<HTMLButtonElement>(null);
   const { copyToClipboard, isCopied } = useCopyToClipboard<void>({
     onError: (error) => showAnchoredCopyErrorToast(ref, error),
@@ -27,7 +29,7 @@ export function DiffFilePathCopyButton({
             ref={ref}
             size="icon-micro"
             variant="ghost-muted"
-            aria-label="Copy file path"
+            aria-label={gt("Copy file path")}
             onClick={() =>
               copyToClipboard(formatFilePathForClipboard(filePath, workspaceRoot), undefined)
             }

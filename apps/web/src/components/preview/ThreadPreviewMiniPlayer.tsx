@@ -72,6 +72,7 @@ import {
   resolveDeviceMiniPlayerSourceSize,
   resolvePreviewMiniPlayerSourceSize,
 } from "./previewMiniPlayerLayout";
+import { useGT, T } from "gt-react";
 
 interface Props {
   readonly threadRef: ScopedThreadRef;
@@ -217,6 +218,7 @@ export function ThreadPreviewMiniPlayer({ threadRef, miniPlayer }: Props) {
 }
 
 function BrowserMiniPlayer({ threadRef, tabId, miniPlayer }: Props & { readonly tabId: string }) {
+  const gt = useGT();
   const httpBaseUrl = useEnvironmentHttpBaseUrl(threadRef.environmentId);
   const { serverEpoch, snapshot, desktopOverlay, serverTab, sourceSize } =
     useBrowserMiniPlayerSource(threadRef, tabId);
@@ -279,7 +281,7 @@ function BrowserMiniPlayer({ threadRef, tabId, miniPlayer }: Props & { readonly 
       threadRef={threadRef}
       miniPlayer={miniPlayer}
       sourceSize={sourceSize}
-      label="Floating browser preview"
+      label={gt("Floating browser preview")}
       recording={recording}
       onOpenInPanel={openInPanel}
       pillActions={
@@ -360,7 +362,7 @@ function BrowserMiniPlayer({ threadRef, tabId, miniPlayer }: Props & { readonly 
               </div>
             ) : !desktopOverlay?.hasWebContents ? (
               <div className="pointer-events-none absolute inset-0 z-[49] flex items-center justify-center rounded-[inherit] bg-muted text-xs text-muted-foreground">
-                Reconnecting preview…
+                <T>Reconnecting preview…</T>
               </div>
             ) : null}
           </>
@@ -375,6 +377,7 @@ function DeviceMiniPlayer({
   source,
   miniPlayer,
 }: Props & { readonly source: Extract<PreviewMiniPlayerSource, { kind: "device" }> }) {
+  const gt = useGT();
   const { state: deviceState } = useDeviceState(threadRef.environmentId);
   const viewId = miniPlayerDeviceViewId(threadRef, source);
   const screen = useAtomValue(deviceStreamScreenAtom(viewId));
@@ -402,7 +405,7 @@ function DeviceMiniPlayer({
       threadRef={threadRef}
       miniPlayer={miniPlayer}
       sourceSize={sourceSize}
-      label="Floating device preview"
+      label={gt("Floating device preview")}
       onOpenInPanel={openInPanel}
       cornerRadius={cornerRadius}
     >
@@ -450,6 +453,7 @@ function MiniPlayerShell({
   readonly cornerRadius?: (frame: PreviewMiniPlayerSize) => number;
   readonly children: (frame: PreviewMiniPlayerFrame) => ReactNode;
 }) {
+  const gt = useGT();
   const canvas = useChatCanvas();
   const gestureRef = useRef<PreviewMiniPlayerGesture | null>(null);
   const captureRef = useRef<HTMLElement | null>(null);
@@ -642,7 +646,7 @@ function MiniPlayerShell({
                     <Button
                       variant="ghost"
                       size="icon-xs"
-                      aria-label="Open preview in right panel"
+                      aria-label={gt("Open preview in right panel")}
                       onPointerDown={(event) => event.stopPropagation()}
                       onClick={onOpenInPanel}
                     />
@@ -650,7 +654,9 @@ function MiniPlayerShell({
                 >
                   <PanelRightIcon />
                 </TooltipTrigger>
-                <TooltipPopup side="top">Open in right panel</TooltipPopup>
+                <TooltipPopup side="top">
+                  <T>Open in right panel</T>
+                </TooltipPopup>
               </Tooltip>
               {pillActions}
               <Tooltip>
@@ -659,7 +665,7 @@ function MiniPlayerShell({
                     <Button
                       variant="ghost"
                       size="icon-xs"
-                      aria-label="Close floating preview"
+                      aria-label={gt("Close floating preview")}
                       onPointerDown={(event) => event.stopPropagation()}
                       onClick={close}
                     />
@@ -667,7 +673,9 @@ function MiniPlayerShell({
                 >
                   <XIcon />
                 </TooltipTrigger>
-                <TooltipPopup side="top">Close floating preview</TooltipPopup>
+                <TooltipPopup side="top">
+                  <T>Close floating preview</T>
+                </TooltipPopup>
               </Tooltip>
             </div>
           </div>

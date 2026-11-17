@@ -9,6 +9,7 @@ import { SharedSlotTitle } from "./SharedSlotTitle";
 import { useWorkspaceTabs } from "./WorkspaceTabsContext";
 import type { PullRequestFilterMenu } from "../../pull-requests/PullRequestListFilters";
 import { openSettings } from "../../settings/settings-navigation";
+import { useGT } from "gt-react-native";
 
 const NOUNS = { pullRequests: "pull requests", issues: "issues" } as const;
 
@@ -18,6 +19,7 @@ export function ListSearchToolbar(props: {
   readonly filters?: PullRequestFilterMenu | null;
   readonly onRequestVisibility?: () => void;
 }) {
+  const gt = useGT();
   const navigation = useNavigation();
   const { filters, tab: section } = props;
   const noun = NOUNS[section];
@@ -59,7 +61,7 @@ export function ListSearchToolbar(props: {
   }, [searching, closeSearch, navigation, isTabActive, section]);
   return (
     <AppBar
-      title="T3 Code"
+      title={gt("R3 Code")}
       titleContent={
         <WorkspaceConnectionTitle
           grow

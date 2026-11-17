@@ -13,6 +13,7 @@ import {
   showAnchoredCopyErrorToast,
 } from "../ui/anchoredCopyToast";
 import { HighlightedTokens } from "./HighlightedTokens";
+import { useGT, T } from "gt-react";
 
 export const SNAP_SHOT_ATTACHMENT_FRAME_CLASS =
   "relative h-28 w-52 max-w-full overflow-hidden rounded-lg border border-border/80";
@@ -82,6 +83,7 @@ export function SnapShotCopyButton({
   onCopy: () => Promise<void>;
   side?: "top" | "right" | "bottom" | "left";
 }) {
+  const gt = useGT();
   const ref = useRef<HTMLButtonElement>(null);
   const [copied, setCopied] = useState(false);
 
@@ -91,7 +93,7 @@ export function SnapShotCopyButton({
         render={
           <Button
             ref={ref}
-            aria-label="Copy snapshot"
+            aria-label={gt("Copy snapshot")}
             disabled={copied}
             onClick={(event) => {
               event.stopPropagation();
@@ -118,7 +120,9 @@ export function SnapShotCopyButton({
           <CopyIcon className="size-3" aria-hidden="true" />
         )}
       </TooltipTrigger>
-      <TooltipPopup side={side}>Copy snapshot</TooltipPopup>
+      <TooltipPopup side={side}>
+        <T>Copy snapshot</T>
+      </TooltipPopup>
     </Tooltip>
   );
 }
@@ -166,7 +170,9 @@ export function SnapShotContentsButton({
       <PopoverPopup side={side} align="center" width="md">
         <div className="max-h-[min(28rem,70vh)] space-y-2 overflow-y-auto">
           <div className="flex items-center justify-between gap-2">
-            <PopoverTitle>Accessibility data</PopoverTitle>
+            <PopoverTitle>
+              <T>Accessibility data</T>
+            </PopoverTitle>
             {onCopySnapshot && (
               <div className="-my-1.5">
                 <SnapShotCopyButton onCopy={onCopySnapshot} side={side} />
@@ -180,12 +186,14 @@ export function SnapShotContentsButton({
             />
           ) : includesAccessibility ? (
             <div className="rounded-md border border-border/70 bg-muted/45 p-2.5 text-muted-foreground text-xs leading-4">
-              Structured accessibility elements were included, but they have no readable names or
-              values.
+              <T>
+                Structured accessibility elements were included, but they have no readable names or
+                values.
+              </T>
             </div>
           ) : (
             <div className="rounded-md border border-border/70 bg-muted/45 p-2.5 text-muted-foreground text-xs leading-4">
-              The app or capture backend did not provide verified accessibility data.
+              <T>The app or capture backend did not provide verified accessibility data.</T>
             </div>
           )}
         </div>

@@ -11,6 +11,7 @@ import { environmentThreadShells } from "../../state/threads";
 import { useMobileProjectGroupingSettings } from "../../state/project-grouping";
 import { buildHomeProjectScopes, sortHomeProjectScopes } from "../home/homeThreadList";
 import { DEFAULT_PR_LIST_CONTROLS, type PullRequestListControls } from "./pullRequestList";
+import { useGT } from "gt-react-native";
 
 const STATES = { open: "Open", closed: "Closed", merged: "Merged", all: "All states" } as const;
 const INVOLVEMENT = { all: "All PRs", reviewing: "Your review", authored: "By you" } as const;
@@ -364,6 +365,7 @@ export function PullRequestListFilters(props: {
   readonly filters: ReturnType<typeof usePullRequestListFilters>;
   readonly savedViewsMenu: ReactNode;
 }) {
+  const gt = useGT();
   const { count, more, reset, select, author, selectedLabelCount } = props.filters;
   return (
     <ScrollView
@@ -392,7 +394,7 @@ export function PullRequestListFilters(props: {
       {props.filters.environmentLabel !== null ? (
         <ListFilterMenu
           label={props.filters.environmentLabel}
-          accessibilityLabel="Choose pull request environment"
+          accessibilityLabel={gt("Choose pull request environment")}
           actions={props.filters.environmentActions}
           onSelect={select}
         />
@@ -400,28 +402,28 @@ export function PullRequestListFilters(props: {
       <ListFilterMenu
         label={STATES[props.filters.state]}
         active={props.filters.state !== "open"}
-        accessibilityLabel="Filter by state"
+        accessibilityLabel={gt("Filter by state")}
         actions={props.filters.stateActions}
         onSelect={select}
       />
       <ListFilterMenu
         label={INVOLVEMENT[props.filters.involvement]}
         active={props.filters.involvement !== "all"}
-        accessibilityLabel="Filter by involvement"
+        accessibilityLabel={gt("Filter by involvement")}
         actions={props.filters.involvementActions}
         onSelect={select}
       />
       <ListFilterMenu
         label={selectedLabelCount ? `Labels ${selectedLabelCount}` : "Labels"}
         active={selectedLabelCount > 0}
-        accessibilityLabel="Filter by label"
+        accessibilityLabel={gt("Filter by label")}
         actions={props.filters.labelActions}
         onSelect={select}
       />
       <ListFilterMenu
         label={author === "me" ? "By you" : (author ?? "Author")}
         active={Boolean(author)}
-        accessibilityLabel="Filter by author"
+        accessibilityLabel={gt("Filter by author")}
         actions={props.filters.authorActions}
         onSelect={select}
       />

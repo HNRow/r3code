@@ -4,12 +4,16 @@ import { WebView } from "react-native-webview";
 
 import { FilePreviewLoading, FilePreviewNotice } from "../features/files/FilePreviewFeedback";
 import { webViewDecelerationRate } from "../lib/webViewDecelerationRate";
+import { useGT } from "gt-react-native";
 
 export function PdfPreview(props: { readonly uri: string }) {
+  const gt = useGT();
   const [error, setError] = useState<string | null>(null);
   return (
     <View className="flex-1 bg-card">
-      {error ? <FilePreviewNotice title="Could not load PDF">{error}</FilePreviewNotice> : null}
+      {error ? (
+        <FilePreviewNotice title={gt("Could not load PDF")}>{error}</FilePreviewNotice>
+      ) : null}
       <WebView
         source={{ uri: props.uri }}
         originWhitelist={["*"]}
@@ -23,7 +27,9 @@ export function PdfPreview(props: { readonly uri: string }) {
         onHttpError={(event) =>
           setError(`The server returned HTTP ${event.nativeEvent.statusCode}.`)
         }
-        renderLoading={() => <FilePreviewLoading message="Loading PDF..." background="card" />}
+        renderLoading={() => (
+          <FilePreviewLoading message={gt("Loading PDF...")} background="card" />
+        )}
         style={{ flex: 1, backgroundColor: "transparent" }}
       />
     </View>

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { deviceEnvironment } from "~/state/device";
 import { useAtomCommand } from "~/state/use-atom-command";
+import { T } from "gt-react";
 
 export function DeviceHostUpdates({
   state,
@@ -38,8 +39,10 @@ export function DeviceHostUpdates({
               </p>
               {failed ? (
                 <p className="mt-1 text-muted-foreground">
-                  Check the host connection and network access, then retry. Your device settings are
-                  saved.
+                  <T>
+                    Check the host connection and network access, then retry. Your device settings
+                    are saved.
+                  </T>
                 </p>
               ) : null}
             </div>

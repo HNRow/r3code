@@ -18,6 +18,7 @@ import {
 } from "./ConnectionsSettings.logic";
 import { ITEM_ROW_CLASSNAME, ITEM_ROW_INNER_CLASSNAME } from "./itemRows";
 import { SettingsSection } from "./settingsLayout";
+import { useGT, Var, T } from "gt-react";
 
 function reportFailure(title: string, result: Parameters<typeof isAtomCommandInterrupted>[0]) {
   if (result._tag !== "Failure" || isAtomCommandInterrupted(result)) return;
@@ -45,6 +46,7 @@ export function ConnectDeviceApprovalSettings({
   /** Revokes now, or first asks to turn approval on when it is off. */
   readonly requestRevoke: (title: string, revoke: () => Promise<void>) => void;
 }) {
+  const gt = useGT();
   const approve = useAtomCommand(authEnvironment.approveConnectDevice, { reportFailure: false });
   const deny = useAtomCommand(authEnvironment.revokePairingLink, { reportFailure: false });
   const revoke = useAtomCommand(authEnvironment.revokeConnectDevice, { reportFailure: false });
@@ -57,7 +59,7 @@ export function ConnectDeviceApprovalSettings({
   };
 
   return (
-    <SettingsSection id="connect-devices" title="T3 Connect devices">
+    <SettingsSection id="connect-devices" title={gt("R3 Connect devices")}>
       {requests.map((request) => {
         const connectRequest = request.connectDeviceRequest;
         if (!connectRequest) return null;
@@ -67,12 +69,18 @@ export function ConnectDeviceApprovalSettings({
             <div className={ITEM_ROW_INNER_CLASSNAME}>
               <div className="min-w-0 flex-1 space-y-1">
                 <p className="text-sm font-medium text-foreground">
-                  Waiting for approval ·{" "}
-                  <span className="font-mono tabular-nums">{connectRequest.verificationCode}</span>
+                  <T>
+                    Waiting for approval ·<Var> </Var>
+                    <span className="font-mono tabular-nums">
+                      <Var>{connectRequest.verificationCode}</Var>
+                    </span>
+                  </T>
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {describeConnectDeviceClient(connectRequest)}. Approve only if the device in front
-                  of you shows this code.
+                  <T>
+                    <Var>{describeConnectDeviceClient(connectRequest)}</Var>. Approve only if the
+                    device in front of you shows this code.
+                  </T>
                 </p>
               </div>
               <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto sm:justify-end">
@@ -89,7 +97,7 @@ export function ConnectDeviceApprovalSettings({
                     )
                   }
                 >
-                  Deny
+                  <T>Deny</T>
                 </Button>
                 <Button
                   size="xs"
@@ -120,9 +128,14 @@ export function ConnectDeviceApprovalSettings({
                   {describeConnectDeviceClient(device)}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  <span className="font-mono tabular-nums">{device.verificationCode}</span>
-                  <span aria-hidden> · </span>
-                  Trusted since {formatAccessTimestamp(DateTime.formatIso(device.approvedAt))}
+                  <T>
+                    <span className="font-mono tabular-nums">
+                      <Var>{device.verificationCode}</Var>
+                    </span>
+                    <span aria-hidden> · </span>
+                    Trusted since{" "}
+                    <Var>{formatAccessTimestamp(DateTime.formatIso(device.approvedAt))}</Var>
+                  </T>
                 </p>
               </div>
               <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto sm:justify-end">
@@ -154,7 +167,7 @@ export function ConnectDeviceApprovalSettings({
       {devices.length === 0 && requests.length === 0 ? (
         <div className={ITEM_ROW_CLASSNAME}>
           <p className="text-xs text-muted-foreground/60">
-            No device has connected through T3 Connect yet.
+            <T>No device has connected through R3 Connect yet.</T>
           </p>
         </div>
       ) : null}

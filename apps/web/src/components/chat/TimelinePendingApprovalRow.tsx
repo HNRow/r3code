@@ -11,6 +11,7 @@ import { ComposerPendingApprovalActions } from "./ComposerPendingApprovalActions
 import { ToolActivityIconView, type WorkEntryIconName } from "./TimelineToolActivityIcon";
 import { TimelineRowCtx } from "./timelineRowContext";
 import { WorkLogRow } from "./WorkLog";
+import { T } from "gt-react";
 
 const APPROVAL_PRESENTATION = {
   command: { icon: "terminal", label: "Command approval", detailLabel: "Command" },
@@ -75,8 +76,10 @@ export const TimelinePendingApprovalRow = memo(function TimelinePendingApprovalR
           {canRespond ? (
             <>
               <span className="inline-flex items-center gap-1 text-warning">
-                <ShieldIcon aria-hidden className="size-3 shrink-0" />
-                Waiting for approval
+                <T>
+                  <ShieldIcon aria-hidden className="size-3 shrink-0" />
+                  Waiting for approval
+                </T>
               </span>
               {onRespondToApproval ? (
                 <>
@@ -97,7 +100,7 @@ export const TimelinePendingApprovalRow = memo(function TimelinePendingApprovalR
             </>
           ) : (
             <span className="text-warning">
-              Provider process is gone. Interrupt or restart the run to respond.
+              <T>Provider process is gone. Interrupt or restart the run to respond.</T>
             </span>
           )}
           {approval.fullAccessOverride ? (

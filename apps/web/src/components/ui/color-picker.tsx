@@ -9,6 +9,7 @@ import {
 
 import type { HsvColor } from "../../lib/color";
 import { cn } from "../../lib/utils";
+import { T } from "gt-react";
 
 function clamp(value: number) {
   return Math.min(1, Math.max(0, value));
@@ -122,8 +123,10 @@ export function ColorSaturationValuePlane({
       {...handlers}
     >
       <span id={instructionsId} className="sr-only">
-        Use arrow keys to adjust the focused value. Hold Shift for larger steps. Use Home and End
-        for the minimum and maximum. Press Tab to move between saturation and brightness.
+        <T>
+          Use arrow keys to adjust the focused value. Hold Shift for larger steps. Use Home and End
+          for the minimum and maximum. Press Tab to move between saturation and brightness.
+        </T>
       </span>
       {(
         [

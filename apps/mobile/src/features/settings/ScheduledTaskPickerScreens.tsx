@@ -27,11 +27,15 @@ import {
   useScheduledTaskEditor,
 } from "./scheduled-task-editor";
 import { moveDraftToThread, unbindDraftFromThread } from "./scheduledTaskDraft";
+import { useGT, T } from "gt-react-native";
 
 function MissingTaskDraft() {
+  const gt = useGT();
   return (
-    <SettingsScreen title="Scheduled task">
-      <Text className="p-5 text-base text-foreground-muted">Open a scheduled task form first.</Text>
+    <SettingsScreen title={gt("Scheduled task")}>
+      <Text className="p-5 text-base text-foreground-muted">
+        <T>Open a scheduled task form first.</T>
+      </Text>
     </SettingsScreen>
   );
 }
@@ -122,6 +126,7 @@ export function ScheduledTaskModelPickerRouteScreen() {
 }
 
 export function ScheduledTaskBranchPickerRouteScreen() {
+  const gt = useGT();
   const navigation = useNavigation();
   const { editor, setEditor } = useScheduledTaskEditor();
   const projects = useProjects();
@@ -145,7 +150,7 @@ export function ScheduledTaskBranchPickerRouteScreen() {
 
   return (
     <BranchPickerScreen
-      title="Base branch"
+      title={gt("Base branch")}
       project={project}
       branches={visibleBranches}
       selectedBranchName={editor.draft.baseRef}
@@ -185,6 +190,7 @@ export function ScheduledTaskBranchPickerRouteScreen() {
 const THREAD_SEARCH_PLACEHOLDER = "Search threads, including older ones";
 
 export function ScheduledTaskThreadPickerRouteScreen() {
+  const gt = useGT();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { editor, setEditor } = useScheduledTaskEditor();
@@ -239,7 +245,7 @@ export function ScheduledTaskThreadPickerRouteScreen() {
   const selectedKey = threadId ?? (editor.draft.threadMode === "new_thread" ? "new-thread" : null);
 
   return (
-    <SettingsScreen title="Destination" search={search}>
+    <SettingsScreen title={gt("Destination")} search={search}>
       <LegendList
         renderScrollComponent={NativeScrollView}
         data={rows}
@@ -261,7 +267,9 @@ export function ScheduledTaskThreadPickerRouteScreen() {
             : Math.max(insets.bottom, 16) + 16,
         }}
         ListEmptyComponent={
-          <Text className="p-5 text-center text-sm text-foreground-muted">No matching threads</Text>
+          <Text className="p-5 text-center text-sm text-foreground-muted">
+            <T>No matching threads</T>
+          </Text>
         }
         renderItem={({ item, index }) => (
           <SelectionRow

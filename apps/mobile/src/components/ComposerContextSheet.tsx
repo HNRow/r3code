@@ -30,6 +30,7 @@ import { AppText as Text } from "./ui/AppText";
 import { Sheet } from "./ui/Sheet";
 import { useAppearancePreferences } from "../features/settings/appearance/AppearancePreferencesProvider";
 import { getMobileTerminalTheme } from "../features/terminal/terminalTheme";
+import { useGT, Var, T } from "gt-react-native";
 
 function ContextField(props: { label: string; value: string | null | undefined; code?: boolean }) {
   if (!props.value) return null;
@@ -61,6 +62,7 @@ function ContextField(props: { label: string; value: string | null | undefined; 
 }
 
 function ContextSource(props: { source: ElementContextSource | null }) {
+  const gt = useGT();
   const source = props.source;
   if (!source) return null;
   const location = source.fileName
@@ -68,7 +70,7 @@ function ContextSource(props: { source: ElementContextSource | null }) {
     : null;
   return (
     <ContextField
-      label="Source"
+      label={gt("Source")}
       value={[source.functionName, location].filter(Boolean).join("\n")}
       code
     />
@@ -90,6 +92,7 @@ export function ComposerContextSheet(props: {
   readonly records?: ReadonlyArray<ComposerContextRecord>;
   readonly attachments?: ReadonlyArray<DraftComposerAttachment>;
 }) {
+  const gt = useGT();
   const openPullRequest = useOpenPullRequest({
     context:
       props.environmentId && props.projectId
@@ -203,18 +206,24 @@ export function ComposerContextSheet(props: {
       >
         {terminal ? (
           <Text className="text-sm text-foreground-muted">
-            Lines {terminal.lineStart}–{terminal.lineEnd}
+            <T>
+              Lines <Var>{terminal.lineStart}</Var>–<Var>{terminal.lineEnd}</Var>
+            </T>
           </Text>
         ) : null}
         {!record ? (
           <Text className="text-foreground">
-            Context unavailable. The reference was copied without its payload. Copy it again from
-            the original message or remove it.
+            <T>
+              Context unavailable. The reference was copied without its payload. Copy it again from
+              the original message or remove it.
+            </T>
           </Text>
         ) : "payload" in record ? (
           <Text className="text-foreground">
-            This context type is not supported by this version of the app. Its payload will be
-            preserved when sent.
+            <T>
+              This context type is not supported by this version of the app. Its payload will be
+              preserved when sent.
+            </T>
           </Text>
         ) : (
           <>
@@ -263,11 +272,14 @@ export function ComposerContextSheet(props: {
             ) : null}
             {record.kind === "preview-annotation" ? (
               <>
-                <ContextField label="Page" value={record.pageTitle ?? record.pageUrl} />
-                <ContextField label="URL" value={record.pageUrl} />
-                <ContextField label="Comment" value={record.comment} />
-                <ContextField label="Selection" value={record.targetSummary} />
-                <ContextField label="Requested changes" value={record.styleChanges.join("\n")} />
+                <ContextField label={gt("Page")} value={record.pageTitle ?? record.pageUrl} />
+                <ContextField label={gt("URL")} value={record.pageUrl} />
+                <ContextField label={gt("Comment")} value={record.comment} />
+                <ContextField label={gt("Selection")} value={record.targetSummary} />
+                <ContextField
+                  label={gt("Requested changes")}
+                  value={record.styleChanges.join("\n")}
+                />
                 {record.elements?.map(
                   (element, index) => (
                     /* oxlint-disable react/no-array-index-key -- Captured DOM elements are a fixed snapshot without persistent element IDs. */ <View
@@ -275,13 +287,13 @@ export function ComposerContextSheet(props: {
                       className="gap-3"
                     >
                       <ContextField
-                        label="Element"
+                        label={gt("Element")}
                         value={element.componentName ?? element.tagName}
                       />
-                      <ContextField label="Selector" value={element.selector} code />
+                      <ContextField label={gt("Selector")} value={element.selector} code />
                       <ContextSource source={element.source} />
-                      <ContextField label="HTML" value={element.htmlPreview} code />
-                      <ContextField label="Styles" value={element.styles} code />
+                      <ContextField label={gt("HTML")} value={element.htmlPreview} code />
+                      <ContextField label={gt("Styles")} value={element.styles} code />
                     </View>
                   ) /* oxlint-enable react/no-array-index-key */,
                 )}
@@ -289,29 +301,32 @@ export function ComposerContextSheet(props: {
             ) : null}
             {record.kind === "element" ? (
               <>
-                <ContextField label="Page" value={record.pageUrl} />
-                <ContextField label="Element" value={record.componentName ?? record.tagName} />
-                <ContextField label="Selector" value={record.selector} code />
+                <ContextField label={gt("Page")} value={record.pageUrl} />
+                <ContextField
+                  label={gt("Element")}
+                  value={record.componentName ?? record.tagName}
+                />
+                <ContextField label={gt("Selector")} value={record.selector} code />
                 <ContextSource source={record.source} />
-                <ContextField label="HTML" value={record.htmlPreview} code />
-                <ContextField label="Styles" value={record.styles} code />
+                <ContextField label={gt("HTML")} value={record.htmlPreview} code />
+                <ContextField label={gt("Styles")} value={record.styles} code />
               </>
             ) : null}
             {record.kind === "image" ? (
               <ContextField
-                label="File"
+                label={gt("File")}
                 value={`${record.mimeType} · ${formatAttachmentSize(record.sizeBytes)}`}
               />
             ) : null}
             {record.kind === "mention" ? (
-              <ContextField label="Path" value={record.path} code />
+              <ContextField label={gt("Path")} value={record.path} code />
             ) : null}
             {record.kind === "thread" ? (
               <View className="gap-3">
-                <ContextField label="Thread" value={record.title} />
+                <ContextField label={gt("Thread")} value={record.title} />
                 {props.onOpenThread ? (
                   <Button
-                    label="Open thread"
+                    label={gt("Open thread")}
                     tone="secondary"
                     onPress={() =>
                       props.onOpenThread?.({
@@ -325,18 +340,18 @@ export function ComposerContextSheet(props: {
               </View>
             ) : null}
             {record.kind === "environment" ? (
-              <ContextField label="Machine" value={record.label} />
+              <ContextField label={gt("Machine")} value={record.label} />
             ) : null}
             {record.kind === "skill" ? (
               <View className="gap-3">
-                <ContextField label="Skill" value={record.name} />
+                <ContextField label={gt("Skill")} value={record.name} />
                 <ContextField
-                  label="Description"
+                  label={gt("Description")}
                   value={props.skillDescription ?? "No description is available for this skill."}
                 />
                 {props.onOpenSkill ? (
                   <Button
-                    label="View instructions"
+                    label={gt("View instructions")}
                     tone="secondary"
                     onPress={props.onOpenSkill}
                     fullWidth
@@ -372,12 +387,16 @@ export function ComposerContextSheet(props: {
             }}
             className="rounded-xl bg-subtle p-4"
           >
-            <Text className="text-foreground">Open {changeRequestTerm}</Text>
+            <Text className="text-foreground">
+              <T>
+                Open <Var>{changeRequestTerm}</Var>
+              </T>
+            </Text>
           </Pressable>
         ) : null}
         {props.onOpenAttachment ? (
           <Button
-            label="Open attachment"
+            label={gt("Open attachment")}
             tone="secondary"
             onPress={props.onOpenAttachment}
             fullWidth
@@ -392,7 +411,12 @@ export function ComposerContextSheet(props: {
           />
         ) : null}
         {props.onRemove ? (
-          <Button label="Remove from draft" tone="secondary" onPress={props.onRemove} fullWidth />
+          <Button
+            label={gt("Remove from draft")}
+            tone="secondary"
+            onPress={props.onRemove}
+            fullWidth
+          />
         ) : null}
       </ScrollView>
     </Sheet>

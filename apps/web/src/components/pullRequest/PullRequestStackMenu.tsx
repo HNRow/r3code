@@ -28,6 +28,7 @@ import { PullRequestStackHeader } from "./PullRequestStackHeader";
 import { PullRequestStackLayerContent } from "./PullRequestStackLayerContent";
 import { PullRequestGlyph } from "./pullRequestIcons";
 import { readableFailure } from "./pullRequestDetail.logic";
+import { Var, T } from "gt-react";
 
 export function PullRequestStackMenu({
   hostLabel,
@@ -160,14 +161,21 @@ export function PullRequestStackMenu({
             }
           />
           <TooltipPopup>
-            View stack #{stack.number}, layer {position} of {stack.layers.length}
-            {notice ? ` · ${notice}` : null}
+            <T>
+              View stack #<Var>{stack.number}</Var>, layer <Var>{position}</Var> of{" "}
+              <Var>{stack.layers.length}</Var>
+              <Var>{notice ? ` · ${notice}` : null}</Var>
+            </T>
           </TooltipPopup>
         </Tooltip>
         <MenuPopup align="start">
           <MenuGroup>
             <PullRequestStackHeader number={stack.number} notice={notice} stale={!!onRetry} />
-            {onRetry ? <MenuItem onClick={onRetry}>Retry stack refresh</MenuItem> : null}
+            {onRetry ? (
+              <MenuItem onClick={onRetry}>
+                <T>Retry stack refresh</T>
+              </MenuItem>
+            ) : null}
             <PullRequestStackLayers
               stack={stack}
               reference={reference}
@@ -187,8 +195,10 @@ export function PullRequestStackMenu({
               <MenuSeparator />
               {canMerge ? (
                 <MenuItem disabled={mergeDisabled} onClick={() => setConfirmation("merge")}>
-                  <PullRequestGlyph.merged aria-hidden />
-                  Merge stack ({mergeLayers.length})
+                  <T>
+                    <PullRequestGlyph.merged aria-hidden />
+                    Merge stack (<Var>{mergeLayers.length}</Var>)
+                  </T>
                 </MenuItem>
               ) : null}
               {canRebase ? (
@@ -196,13 +206,15 @@ export function PullRequestStackMenu({
                   disabled={rebaseDisabled}
                   onClick={() => setConfirmation("update-branch")}
                 >
-                  <RefreshCwIcon aria-hidden />
-                  Rebase stack
+                  <T>
+                    <RefreshCwIcon aria-hidden />
+                    Rebase stack
+                  </T>
                 </MenuItem>
               ) : null}
               {mergeHasClosed || mergeLayers.some((layer) => layer.isDraft) ? (
                 <p className="px-2 py-1 text-xs text-muted-foreground">
-                  Every layer being merged must be open and ready for review.
+                  <T>Every layer being merged must be open and ready for review.</T>
                 </p>
               ) : null}
             </>
@@ -222,8 +234,10 @@ export function PullRequestStackMenu({
                   aria-description={stale ? staleReason : undefined}
                   onClick={mergeDisabled ? undefined : () => setConfirmation("merge")}
                 >
-                  <PullRequestGlyph.merged aria-hidden className="size-3.5" />
-                  Merge stack
+                  <T>
+                    <PullRequestGlyph.merged aria-hidden className="size-3.5" />
+                    Merge stack
+                  </T>
                 </Button>
               </span>
             }
@@ -268,7 +282,7 @@ export function PullRequestStackMenu({
           </DialogPanel>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmation(null)}>
-              Cancel
+              <T>Cancel</T>
             </Button>
             <Button onClick={() => void run()}>
               {confirmation === "merge" ? "Merge stack" : "Rebase stack"}

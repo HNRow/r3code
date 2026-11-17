@@ -4,6 +4,7 @@ import { ExternalLinkIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
 import { PullRequestGlyph } from "./pullRequestIcons";
+import { T } from "gt-react";
 
 export function PullRequestsUnavailableState({
   title = "Could not load pull requests",
@@ -37,8 +38,10 @@ export function PullRequestsUnavailableState({
               disabled={refreshing}
               aria-busy={refreshing}
             >
-              <RefreshIcon size="sm" refreshing={refreshing} />
-              Retry
+              <T>
+                <RefreshIcon size="sm" refreshing={refreshing} />
+                Retry
+              </T>
             </Button>
           ) : null}
           {host ? (

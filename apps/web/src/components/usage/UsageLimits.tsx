@@ -42,6 +42,7 @@ import { Button } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { UsageLimitsPooled } from "./UsageLimitsPooled";
 import { PROVIDER_PRESENTATION } from "./usageProviders";
+import { Var, T } from "gt-react";
 
 const PACE: Record<LimitPace, { readonly label: string; readonly icon: typeof GaugeIcon }> = {
   ahead: { label: "Ahead of pace: spending faster than the window elapses", icon: TrendingUpIcon },
@@ -169,15 +170,22 @@ function WindowBar({
       <TooltipPopup side="top">
         <div className="flex flex-col gap-0.5">
           <span className="text-foreground">
-            {remaining}% left{timeLeft !== null ? ` · ${timeLeft}% of the window left` : ""}
+            <T>
+              <Var>{remaining}</Var>% left
+              <Var>{timeLeft !== null ? ` · ${timeLeft}% of the window left` : ""}</Var>
+            </T>
           </span>
           {timeLeft !== null ? (
-            <span className="text-muted-foreground">The line is where even spending would be.</span>
+            <span className="text-muted-foreground">
+              <T>The line is where even spending would be.</T>
+            </span>
           ) : null}
           {resetsAt ? (
             <span className="text-muted-foreground">
-              Resets {resetsAt}
-              {resetsIn ? ` · ${resetsIn}` : ""}
+              <T>
+                Resets <Var>{resetsAt}</Var>
+                <Var>{resetsIn ? ` · ${resetsIn}` : ""}</Var>
+              </T>
             </span>
           ) : null}
         </div>
@@ -216,7 +224,9 @@ export function LimitWindows({
             <span className="flex min-w-0 items-center gap-2 text-xs">
               <span className="truncate text-muted-foreground">{window.label}</span>
               <span className="ms-auto shrink-0 font-medium text-foreground tabular-nums">
-                {remainingPercent(window)}% left
+                <T>
+                  <Var>{remainingPercent(window)}</Var>% left
+                </T>
               </span>
             </span>
             <WindowBar color={color} window={window} now={now} />
@@ -293,13 +303,17 @@ export function ResetCreditDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogPopup>
         <AlertDialogHeader>
-          <AlertDialogTitle>Use a reset credit?</AlertDialogTitle>
+          <AlertDialogTitle>
+            <T>Use a reset credit?</T>
+          </AlertDialogTitle>
           <AlertDialogDescription>{choice?.confirmDescription}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+          <AlertDialogClose render={<Button variant="outline" />}>
+            <T>Cancel</T>
+          </AlertDialogClose>
           <Button disabled={disabled} onClick={onConfirm}>
-            Use credit
+            <T>Use credit</T>
           </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>

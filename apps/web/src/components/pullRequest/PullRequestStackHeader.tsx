@@ -1,5 +1,6 @@
 import { MenuGroupLabel } from "../ui/menu";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import { Var, T } from "gt-react";
 
 export function PullRequestStackHeader({
   number,
@@ -13,7 +14,11 @@ export function PullRequestStackHeader({
   return (
     <MenuGroupLabel>
       <div className="flex items-center justify-between gap-2">
-        <span>Stack #{number}</span>
+        <span>
+          <T>
+            Stack #<Var>{number}</Var>
+          </T>
+        </span>
         {notice ? (
           <Tooltip>
             <TooltipTrigger render={<span role="status" className="text-xs font-normal" />}>

@@ -45,6 +45,7 @@ import { GuestMessageName } from "./guestMessageStyle";
 import { TimelineRowTimestamp } from "./TimelineRowParts";
 import { FoldedMessageHeader, useScheduledTaskTitle } from "./TimelineUserMessageRow";
 import { buildExpandedImagePreview, type ExpandedImagePreview } from "./ExpandedImagePreview";
+import { Var, T, useGT } from "gt-react";
 
 export interface EditQueuedRunRequest {
   readonly runId: RunId;
@@ -95,6 +96,7 @@ export function QueuedRunsControl({
   readonly onOpenThread: (threadId: ThreadId, environmentId?: EnvironmentId) => void;
   readonly onImageExpand: (preview: ExpandedImagePreview) => void;
 }) {
+  const gt = useGT();
   const projection = useQuietThreadProjection(
     scopeThreadRef(props.environmentId, props.threadId),
   )?.projection;
@@ -250,7 +252,9 @@ export function QueuedRunsControl({
       className="relative mx-auto flex w-full max-w-(--chat-content-max-width) flex-col gap-2 pb-4"
     >
       <span className="sr-only" aria-live="polite">
-        {items.length} queued
+        <T>
+          <Var>{items.length}</Var> queued
+        </T>
       </span>
       <ol className="flex flex-col items-end gap-3" id={queueListId}>
         {visibleItems.map((item, position) => {
@@ -293,8 +297,10 @@ export function QueuedRunsControl({
                             }
                           }}
                         >
-                          <ArrowUpIcon />
-                          Send now
+                          <T>
+                            <ArrowUpIcon />
+                            Send now
+                          </T>
                         </Button>
                       </TooltipTrigger>
                       <TooltipPopup>
@@ -305,20 +311,24 @@ export function QueuedRunsControl({
                 ) : null}
                 {item.pending ? (
                   <span className="flex items-center gap-1 px-1">
-                    <Clock3Icon aria-hidden className="size-3" />
-                    Saving
+                    <T>
+                      <Clock3Icon aria-hidden className="size-3" />
+                      Saving
+                    </T>
                   </span>
                 ) : null}
                 {isEditing ? (
                   <>
-                    <span className="px-1 text-foreground">Editing in the composer</span>
+                    <span className="px-1 text-foreground">
+                      <T>Editing in the composer</T>
+                    </span>
                     <Button
                       size="xs"
                       variant="ghost"
-                      aria-label="Cancel editing queued message"
+                      aria-label={gt("Cancel editing queued message")}
                       onClick={props.onCancelEdit}
                     >
-                      Cancel
+                      <T>Cancel</T>
                     </Button>
                   </>
                 ) : (
@@ -329,7 +339,7 @@ export function QueuedRunsControl({
                         <Button
                           size="icon-xs"
                           variant="ghost-muted"
-                          aria-label="Edit queued message"
+                          aria-label={gt("Edit queued message")}
                           disabled={
                             item.runId === null ||
                             !item.editable ||
@@ -361,7 +371,7 @@ export function QueuedRunsControl({
                           <Button
                             size="icon-xs"
                             variant="ghost-muted"
-                            aria-label="Remove queued message"
+                            aria-label={gt("Remove queued message")}
                             disabled={item.runId === null || busyRunId !== null}
                             onClick={() => {
                               if (item.runId !== null) void remove(item.runId);
@@ -371,7 +381,9 @@ export function QueuedRunsControl({
                       >
                         <XIcon />
                       </TooltipTrigger>
-                      <TooltipPopup>Remove from queue</TooltipPopup>
+                      <TooltipPopup>
+                        <T>Remove from queue</T>
+                      </TooltipPopup>
                     </Tooltip>
                   </>
                 )}
@@ -453,7 +465,9 @@ function QueuedMessage(props: {
   return (
     <>
       {attribution === "t3code" ? (
-        <p className="me-1 text-2xs text-muted-foreground/70">Sent by T3 Code</p>
+        <p className="me-1 text-2xs text-muted-foreground/70">
+          <T>Sent by R3 Code</T>
+        </p>
       ) : null}
       {presentation?.guestName === undefined ? null : (
         <GuestMessageName name={presentation.guestName} />
@@ -533,7 +547,7 @@ function QueuedMessage(props: {
                 tone="muted"
                 onClick={() => props.onOpenThread(senderRef.threadId, senderRef.environmentId)}
               >
-                Open thread
+                <T>Open thread</T>
               </InlineButton>
             ) : null}
             {scheduledTaskId ? (
@@ -546,7 +560,7 @@ function QueuedMessage(props: {
                   />
                 }
               >
-                Open automation
+                <T>Open automation</T>
               </InlineButton>
             ) : null}
             <TimelineRowTimestamp

@@ -21,6 +21,7 @@ import {
   deviceStreamMessage,
   type DeviceStreamConfiguration,
 } from "./device-stream-document";
+import { useGT } from "gt-react-native";
 
 export interface DeviceStreamRef {
   home: () => void;
@@ -94,6 +95,7 @@ function DeviceStreamDocumentView({
   readonly onStreaming: () => void;
   readonly onRecoverProcess: () => boolean;
 }) {
+  const gt = useGT();
   const webView = useRef<WebView<object>>(null);
   const active = useRef(false);
   const failed = useRef(false);
@@ -203,7 +205,7 @@ function DeviceStreamDocumentView({
           </AppText>
           {status === "error" ? (
             <View className="items-center">
-              <Button label="Reconnect" tone="secondary" onPress={onRetry} />
+              <Button label={gt("Reconnect")} tone="secondary" onPress={onRetry} />
             </View>
           ) : null}
         </View>

@@ -24,6 +24,7 @@ import { ConnectionDiagnosisDetails, useConnectionDiagnosis } from "./Connection
 import { ConnectionFormField } from "./ConnectionFormField";
 import { ConnectionStatusDot } from "./ConnectionStatusDot";
 import { environmentStatusText } from "./environmentStatusText";
+import { T, useGT } from "gt-react-native";
 
 function connectionStatusLabel(environment: ConnectedEnvironmentSummary): string | null {
   if (!environment.isEnabled && environment.connectionState !== "unsupported") {
@@ -49,6 +50,7 @@ export function ConnectionEnvironmentRow(props: {
     updates: { readonly label: string; readonly displayUrl: string },
   ) => Promise<AtomCommandResult<unknown, unknown>>;
 }) {
+  const gt = useGT();
   const [label, setLabel] = useState(props.environment.environmentLabel);
   const [url, setUrl] = useState(props.environment.displayUrl);
   const serverConfig = useAtomValue(
@@ -210,21 +212,21 @@ export function ConnectionEnvironmentRow(props: {
           ) : null}
           {props.environment.isRelayManaged ? (
             <Text className="text-sm text-foreground-muted">
-              Managed by T3 Connect. Tunnel details update automatically.
+              <T>Managed by R3 Connect. Tunnel details update automatically.</T>
             </Text>
           ) : (
             <>
               <ConnectionFormField
-                label="Label"
+                label={gt("Label")}
                 autoCapitalize="words"
                 autoCorrect={false}
-                placeholder="My MacBook"
+                placeholder={gt("My MacBook")}
                 value={label}
                 onChangeText={setLabel}
               />
 
               <ConnectionFormField
-                label="URL"
+                label={gt("URL")}
                 autoCapitalize="none"
                 autoCorrect={false}
                 keyboardType="url"
@@ -240,7 +242,7 @@ export function ConnectionEnvironmentRow(props: {
               {props.environment.isRelayManaged ? null : (
                 <View className="flex-1">
                   <Button
-                    label="Save"
+                    label={gt("Save")}
                     tone="primary"
                     fullWidth
                     onPress={() => {
@@ -250,14 +252,14 @@ export function ConnectionEnvironmentRow(props: {
                 </View>
               )}
               <IconButton
-                accessibilityLabel="Reconnect environment"
+                accessibilityLabel={gt("Reconnect environment")}
                 icon="arrow.clockwise"
                 variant="tonal"
                 disabled={!enabled}
                 onPress={() => props.onReconnect(props.environment.environmentId)}
               />
               <IconButton
-                accessibilityLabel="Remove environment"
+                accessibilityLabel={gt("Remove environment")}
                 icon="trash"
                 variant="danger"
                 onPress={() => props.onRemove(props.environment.environmentId)}
@@ -277,14 +279,14 @@ export function ConnectionEnvironmentRow(props: {
                     type="monochrome"
                   />
                   <Text className="text-xs font-t3-bold tracking-[0.8px] uppercase text-primary-foreground">
-                    Save
+                    <T>Save</T>
                   </Text>
                 </Pressable>
               )}
 
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Reconnect environment"
+                accessibilityLabel={gt("Reconnect environment")}
                 accessibilityState={{ disabled: !enabled }}
                 className="h-[42px] w-[42px] items-center justify-center rounded-[14px] border border-input-border bg-input active:opacity-70 disabled:opacity-40"
                 disabled={!enabled}
@@ -300,7 +302,7 @@ export function ConnectionEnvironmentRow(props: {
 
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Remove environment"
+                accessibilityLabel={gt("Remove environment")}
                 className="h-[42px] w-[42px] items-center justify-center rounded-[14px] border border-danger-border bg-danger active:opacity-70"
                 onPress={() => props.onRemove(props.environment.environmentId)}
               >

@@ -36,6 +36,7 @@ import { usePreparedConnection } from "~/state/session";
 import { useAtomCommand } from "~/state/use-atom-command";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import { T } from "gt-react";
 
 export function EnvironmentRoutesList({
   environment,
@@ -118,8 +119,10 @@ export function EnvironmentRoutesList({
       </DndContext>
       <div className="-ml-1.5 pt-1">
         <Button size="xs" variant="ghost-muted" onClick={onAddRoute}>
-          <PlusIcon className="size-3" />
-          Add route
+          <T>
+            <PlusIcon className="size-3" />
+            Add route
+          </T>
         </Button>
       </div>
     </div>
@@ -168,12 +171,12 @@ function SortableRouteRow({
           {label}
           {inUse ? (
             <span className="rounded-sm bg-success/12 px-1 text-2xs font-normal text-success-foreground">
-              In use
+              <T>In use</T>
             </span>
           ) : null}
           {refused ? (
             <span className="rounded-sm bg-destructive/8 px-1 text-2xs font-normal text-destructive-foreground">
-              Sign-in refused
+              <T>Sign-in refused</T>
             </span>
           ) : null}
         </p>
@@ -185,7 +188,7 @@ function SortableRouteRow({
         ) : null}
         {refused && address !== null ? (
           <p className="text-2xs text-muted-foreground">
-            The host refused this device's sign-in. Pair this address again with Add route.
+            <T>The host refused this device's sign-in. Pair this address again with Add route.</T>
           </p>
         ) : null}
       </div>
@@ -214,7 +217,9 @@ function SortableRouteRow({
           >
             <XIcon className="size-3" />
           </TooltipTrigger>
-          <TooltipPopup side="top">Remove route</TooltipPopup>
+          <TooltipPopup side="top">
+            <T>Remove route</T>
+          </TooltipPopup>
         </Tooltip>
       ) : null}
     </li>

@@ -58,6 +58,7 @@ import { PullRequestGlyph } from "./pullRequestIcons";
 import type { PickableEnvironment } from "./pullRequestProjectAssignment.logic";
 import { PullRequestThreadLinks } from "./PullRequestThreadLinks";
 import { useInlineActionConfirm } from "./useInlineActionConfirm";
+import { T, useGT, Var } from "gt-react";
 
 /** Everything else the reader can do with the pull request, behind the header's overflow button. */
 export function PullRequestActionsMenu({
@@ -155,6 +156,7 @@ export function PullRequestActionsMenu({
   openOnHostText: string;
   copyReference: (value: string, label: string) => void;
 }) {
+  const gt = useGT();
   const keybindings = useAtomValue(primaryServerKeybindingsAtom);
   const inlineConfirm = useInlineActionConfirm(pullRequestKey);
   const actionPending = pendingAction !== null;
@@ -241,8 +243,10 @@ export function PullRequestActionsMenu({
           onPickerOpenChange={onThreadPickerOpenChange}
         />
         <MenuItem disabled={refreshing} onClick={() => void refreshFromHost()}>
-          <RefreshIcon size="sm" refreshing={refreshing} />
-          Refresh
+          <T>
+            <RefreshIcon size="sm" refreshing={refreshing} />
+            Refresh
+          </T>
         </MenuItem>
         <MenuItem disabled={handoff !== null} onClick={askAboutPullRequest}>
           <MessageCircleQuestionIcon className="mt-1 size-3.5 shrink-0 self-start" />
@@ -262,7 +266,7 @@ export function PullRequestActionsMenu({
               {handoff === "explain" ? "Opening..." : `Explain this ${terminology.shortLabel}`}
             </span>
             <span className="text-xs text-muted-foreground">
-              A walk through the diff and what to read closely.
+              <T>A walk through the diff and what to read closely.</T>
             </span>
           </span>
         </MenuItem>
@@ -292,19 +296,23 @@ export function PullRequestActionsMenu({
               checked={maintainerCanModify === true}
               disabled={!canSaveMaintainerEdits}
               closeOnClick={false}
-              aria-label="Allow edits from maintainers"
+              aria-label={gt("Allow edits from maintainers")}
               aria-describedby={maintainerEditsHintId}
               onCheckedChange={(value) => void saveMaintainerEdits(value)}
             >
               <span className="flex max-w-xs flex-col gap-0.5">
-                <span>Allow edits from maintainers</span>
+                <span>
+                  <T>Allow edits from maintainers</T>
+                </span>
                 <span id={maintainerEditsHintId} className="text-xs text-muted-foreground">
-                  Maintainers can push to this branch. If your fork has workflows, this can also
-                  give access to its secrets.
+                  <T>
+                    Maintainers can push to this branch. If your fork has workflows, this can also
+                    give access to its secrets.
+                  </T>
                 </span>
                 {maintainerEditsSaving ? (
                   <span role="status" className="text-xs text-muted-foreground">
-                    Saving…
+                    <T>Saving…</T>
                   </span>
                 ) : null}
               </span>
@@ -340,8 +348,10 @@ export function PullRequestActionsMenu({
             ) : null}
             {autoMergeArmed && can("disable-auto-merge") ? (
               <MenuItem disabled={actionPending} onClick={() => void perform("disable-auto-merge")}>
-                <PullRequestGlyph.merged className="size-3.5" />
-                Disable auto-merge
+                <T>
+                  <PullRequestGlyph.merged className="size-3.5" />
+                  Disable auto-merge
+                </T>
               </MenuItem>
             ) : showsAutoMerge ? (
               <MenuItem
@@ -400,20 +410,24 @@ export function PullRequestActionsMenu({
           {openOnHostText}
         </MenuItem>
         <MenuItem onClick={() => copyReference(detail.url, `${terminology.shortLabel} link`)}>
-          <LinkIcon className="size-3.5" />
-          Copy link
-          <MenuShortcut>
-            {shortcutLabelForCommand(keybindings, "thread.copyReference")}
-          </MenuShortcut>
+          <T>
+            <LinkIcon className="size-3.5" />
+            Copy link
+            <MenuShortcut>
+              <Var>{shortcutLabelForCommand(keybindings, "thread.copyReference")}</Var>
+            </MenuShortcut>
+          </T>
         </MenuItem>
         <MenuItem
           onClick={() => copyReference(`#${reference.number}`, `${terminology.shortLabel} number`)}
         >
-          <CopyIcon className="size-3.5" />
-          Copy {terminology.shortLabel} number
-          <MenuShortcut>
-            {shortcutLabelForCommand(keybindings, "pullRequest.copyNumber")}
-          </MenuShortcut>
+          <T>
+            <CopyIcon className="size-3.5" />
+            Copy <Var>{terminology.shortLabel}</Var> number
+            <MenuShortcut>
+              <Var>{shortcutLabelForCommand(keybindings, "pullRequest.copyNumber")}</Var>
+            </MenuShortcut>
+          </T>
         </MenuItem>
         {detail.state === "open" && can("close") ? (
           <>
@@ -435,8 +449,10 @@ export function PullRequestActionsMenu({
           <>
             <MenuSeparator />
             <MenuItem disabled={actionPending} onClick={() => void perform("reopen")}>
-              <PullRequestGlyph.reopen className="size-3.5" />
-              Reopen {terminology.singular}
+              <T>
+                <PullRequestGlyph.reopen className="size-3.5" />
+                Reopen <Var>{terminology.singular}</Var>
+              </T>
             </MenuItem>
           </>
         ) : detail.state === "merged" && can("revert") ? (

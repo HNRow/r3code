@@ -56,6 +56,7 @@ import { Label } from "./ui/label";
 import { MiddleTruncate } from "./ui/middle-truncate";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "./ui/select";
 import { Toggle, ToggleGroup } from "./ui/toggle-group";
+import { T, Var, useGT } from "gt-react";
 
 interface AddProjectToMachineRequest {
   readonly projectRef: ScopedProjectRef;
@@ -94,6 +95,7 @@ export function AddProjectToMachineDialogHost() {
 }
 
 function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRequest }) {
+  const gt = useGT();
   const id = useId();
   const project = useProject(request.projectRef);
   const handleNewThread = useNewThreadHandler();
@@ -254,10 +256,14 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
           }}
         >
           <DialogHeader>
-            <DialogTitle>Add to another machine</DialogTitle>
+            <DialogTitle>
+              <T>Add to another machine</T>
+            </DialogTitle>
             <DialogDescription>
-              Clone {project?.repositoryIdentity?.displayName ?? project?.title} and bring the local
-              files git does not track.
+              <T>
+                Clone <Var>{project?.repositoryIdentity?.displayName ?? project?.title}</Var> and
+                bring the local files git does not track.
+              </T>
             </DialogDescription>
           </DialogHeader>
           <DialogPanel>
@@ -275,7 +281,9 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
                 </span>
               </div>
               <div className="flex w-28 flex-col items-center gap-0.5 text-muted-foreground text-xs">
-                <span>git clone</span>
+                <span>
+                  <T>git clone</T>
+                </span>
                 <span className="flex w-full items-center">
                   <span className="h-px flex-1 bg-border" />
                   <ArrowRightIcon className="-ms-1 size-3.5" aria-hidden />
@@ -295,7 +303,7 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
                     }}
                     items={targets.map((t) => ({ value: t.environmentId, label: t.label }))}
                   >
-                    <SelectTrigger size="sm" aria-label="Machine to add the project to">
+                    <SelectTrigger size="sm" aria-label={gt("Machine to add the project to")}>
                       {target ? (
                         <EnvironmentMachineIcon kind={target.machine} className="size-3.5" />
                       ) : null}
@@ -327,25 +335,35 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label>Clone over</Label>
+              <Label>
+                <T>Clone over</T>
+              </Label>
               {sshUrl && httpsUrl ? (
                 <ToggleGroup
-                  aria-label="Clone protocol"
+                  aria-label={gt("Clone protocol")}
                   value={protocol ? [protocol] : []}
                   onValueChange={(next) => {
                     const value = next[0];
                     if (value === "ssh" || value === "https") setProtocol(value);
                   }}
                 >
-                  <Toggle value="ssh">SSH</Toggle>
-                  <Toggle value="https">HTTPS</Toggle>
+                  <Toggle value="ssh">
+                    <T>SSH</T>
+                  </Toggle>
+                  <Toggle value="https">
+                    <T>HTTPS</T>
+                  </Toggle>
                 </ToggleGroup>
               ) : null}
               <span className="truncate font-mono text-muted-foreground text-xs">{remoteUrl}</span>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor={`${id}-path`}>Folder on {target?.label ?? "the other machine"}</Label>
+              <Label htmlFor={`${id}-path`}>
+                <T>
+                  Folder on <Var>{target?.label ?? "the other machine"}</Var>
+                </T>
+              </Label>
               <Input
                 id={`${id}-path`}
                 value={destinationPath}
@@ -360,12 +378,17 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
             {canListFiles ? (
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-2">
-                  <Label className="flex-1">Copy ignored files</Label>
+                  <Label className="flex-1">
+                    <T>Copy ignored files</T>
+                  </Label>
                   {copyable.length > 0 ? (
                     <>
                       <span className="text-muted-foreground text-xs">
-                        {selectedFiles.size} of {allIgnoredFiles.data?.files.length ?? 0}
-                        {selectedBytes > 0 ? ` · ${formatBytes(selectedBytes)}` : ""}
+                        <T>
+                          <Var>{selectedFiles.size}</Var> of{" "}
+                          <Var>{allIgnoredFiles.data?.files.length ?? 0}</Var>
+                          <Var>{selectedBytes > 0 ? ` · ${formatBytes(selectedBytes)}` : ""}</Var>
+                        </T>
                       </span>
                       <Button type="button" variant="ghost" size="xs" onClick={toggleShownFiles}>
                         {allCopyableSelected ? "None" : "All"}
@@ -377,8 +400,8 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
                   <Input
                     size="sm"
                     type="search"
-                    aria-label="Search ignored files"
-                    placeholder="Search ignored files"
+                    aria-label={gt("Search ignored files")}
+                    placeholder={gt("Search ignored files")}
                     value={fileQuery}
                     maxLength={256}
                     onChange={(event) => setFileQuery(event.target.value)}
@@ -415,13 +438,17 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
                 )}
                 {ignoredFiles.data?.truncated ? (
                   <p className="text-muted-foreground text-xs">
-                    Showing the first {files.length} files.
-                    {canSearchFiles ? " Search to find the rest." : ""}
+                    <T>
+                      Showing the first <Var>{files.length}</Var> files.
+                      <Var>{canSearchFiles ? " Search to find the rest." : ""}</Var>
+                    </T>
                   </p>
                 ) : null}
                 <p className="text-muted-foreground text-xs">
-                  Files are copied after the clone finishes. Folders git ignores whole, like
-                  node_modules, are left out.
+                  <T>
+                    Files are copied after the clone finishes. Folders git ignores whole, like
+                    node_modules, are left out.
+                  </T>
                 </p>
               </div>
             ) : null}
@@ -430,7 +457,7 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
           </DialogPanel>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={close}>
-              Cancel
+              <T>Cancel</T>
             </Button>
             <Button type="submit" disabled={unavailable || submitting}>
               {submitting ? "Starting…" : `Clone to ${target?.label ?? "machine"}`}

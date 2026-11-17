@@ -10,6 +10,7 @@ import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 import { SettingsRow } from "./settingsLayout";
 import { searchableSetting } from "./settingsSearch";
+import { T, useGT } from "gt-react";
 
 const LOOPBACK_SECONDS = 10;
 const formatTime = (seconds: number) =>
@@ -38,6 +39,7 @@ export function MicrophoneTest({
   /** Labels and device ids become readable once the browser grants access. */
   onMicrophoneAccess: () => void;
 }) {
+  const gt = useGT();
   const [phase, setPhase] = useState<"idle" | "starting" | "recording" | "ready">("idle");
   const [recording, setRecording] = useState<{ url: string; duration: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -195,20 +197,22 @@ export function MicrophoneTest({
       <Button
         size="sm"
         variant="outline"
-        aria-label="Stop recording"
+        aria-label={gt("Stop recording")}
         disabled={phase !== "recording"}
         onClick={() => {
           const recorder = capture.current?.recorder;
           if (recorder && recorder.state !== "inactive") recorder.stop();
         }}
       >
-        <SquareIcon />
-        Stop
+        <T>
+          <SquareIcon />
+          Stop
+        </T>
       </Button>
     ) : (
       <Button size="sm" variant="outline" onClick={() => void start()}>
         {phase === "ready" ? <RotateCcwIcon /> : <MicIcon />}
-        {phase === "ready" ? "Record again" : "Record"}
+        {phase === "ready" ? <T>Record again</T> : <T>Record</T>}
       </Button>
     );
   const panel = error ? (
@@ -217,7 +221,7 @@ export function MicrophoneTest({
     </p>
   ) : phase === "starting" ? (
     <span role="status" className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
-      Opening microphone…
+      <T>Opening microphone…</T>
     </span>
   ) : phase === "recording" ? (
     <>
@@ -227,12 +231,12 @@ export function MicrophoneTest({
       </div>
       <span
         className="ms-auto shrink-0 text-xs tabular-nums text-muted-foreground"
-        aria-label="Recording time"
+        aria-label={gt("Recording time")}
       >
         {formatTime(elapsed)} / {formatTime(LOOPBACK_SECONDS)}
       </span>
       <meter
-        aria-label="Microphone input level"
+        aria-label={gt("Microphone input level")}
         min={0}
         max={1}
         value={level}
@@ -246,8 +250,8 @@ export function MicrophoneTest({
   return (
     <SettingsRow
       {...searchableSetting("microphone-test")}
-      title="Test microphone"
-      description="Record ten seconds and play it back. The audio stays on this device."
+      title={gt("Test microphone")}
+      description={gt("Record ten seconds and play it back. The audio stays on this device.")}
       control={control}
     >
       {panel ? (
@@ -273,6 +277,7 @@ export function MicrophoneTest({
 }
 
 function MicrophonePlayback({ src, duration }: { src: string; duration: number }) {
+  const gt = useGT();
   const audio = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
   const [position, setPosition] = useState(0);
@@ -317,12 +322,12 @@ function MicrophonePlayback({ src, duration }: { src: string; duration: number }
       </Button>
       {failed ? (
         <p role="alert" className="min-w-0 flex-1 text-xs text-destructive">
-          Could not play this recording. Try recording again.
+          <T>Could not play this recording. Try recording again.</T>
         </p>
       ) : (
         <input
           type="range"
-          aria-label="Recording playback position"
+          aria-label={gt("Recording playback position")}
           min={0}
           max={duration}
           step={0.01}

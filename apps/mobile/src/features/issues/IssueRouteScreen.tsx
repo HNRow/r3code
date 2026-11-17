@@ -58,6 +58,7 @@ import {
   issueStatus,
   useIssueAccess,
 } from "./issuePresentation";
+import { useGT, T, Var } from "gt-react-native";
 
 type IssueAccess = NonNullable<ReturnType<typeof useIssueAccess>>;
 
@@ -100,6 +101,7 @@ function IssueStateControl(props: {
   readonly busy: boolean;
   readonly onMove: (state: string) => void;
 }) {
+  const gt = useGT();
   const status = issueStatus(props.state);
   const moves = props.states;
   const trigger = (
@@ -121,7 +123,7 @@ function IssueStateControl(props: {
     // As wide as the trigger: iOS anchors the menu to this view, not to the text inside it.
     <View className="self-start">
       <Menu
-        title="Issue state"
+        title={gt("Issue state")}
         // The name is the id: unique within a workflow, and a NUL separator would end the native string.
         actions={moves.map((move) => ({ id: move.name, title: move.name }))}
         onPressAction={({ nativeEvent }) => {
@@ -143,6 +145,7 @@ function IssueIdentity(props: {
   readonly onEditLabels: () => void;
   readonly onEditAssignees: () => void;
 }) {
+  const gt = useGT();
   const { issue, access } = props;
   const canLabel = access?.labels === true;
   const canAssign = access?.assignees === true;
@@ -165,11 +168,15 @@ function IssueIdentity(props: {
         <Text className="shrink text-right text-2xs text-foreground-muted" numberOfLines={1}>
           {issue.closedAt ? (
             <>
-              Closed <RelativeTime timestamp={issue.closedAt} /> ago
+              <T>
+                Closed <RelativeTime timestamp={issue.closedAt} /> ago
+              </T>
             </>
           ) : (
             <>
-              Opened <RelativeTime timestamp={issue.createdAt} /> ago
+              <T>
+                Opened <RelativeTime timestamp={issue.createdAt} /> ago
+              </T>
             </>
           )}
         </Text>
@@ -184,16 +191,20 @@ function IssueIdentity(props: {
               label={issue.labels.length ? "Edit" : "Add labels"}
               icon="tag"
               size="small"
-              accessibilityLabel="Edit labels"
+              accessibilityLabel={gt("Edit labels")}
               onPress={props.onEditLabels}
             />
           ) : null}
         </View>
       ) : null}
       <View className="flex-row flex-wrap items-center gap-2">
-        <Text className="text-xs text-foreground-muted">Assignees</Text>
+        <Text className="text-xs text-foreground-muted">
+          <T>Assignees</T>
+        </Text>
         {issue.assignees.length === 0 ? (
-          <Text className="text-xs text-foreground-muted">none</Text>
+          <Text className="text-xs text-foreground-muted">
+            <T>none</T>
+          </Text>
         ) : null}
         {issue.assignees.map((actor) => (
           <View key={actor.login} className="flex-row items-center gap-1.5">
@@ -206,7 +217,7 @@ function IssueIdentity(props: {
             label={issue.assignees.length ? "Edit" : "Assign"}
             icon="person.badge.plus"
             size="small"
-            accessibilityLabel="Edit assignees"
+            accessibilityLabel={gt("Edit assignees")}
             onPress={props.onEditAssignees}
           />
         ) : null}
@@ -224,7 +235,9 @@ function LinkedPullRequests(props: {
   const sameHost = sourceControlClients.find(props.params.tracker) !== undefined;
   return (
     <View className="gap-2">
-      <PullRequestSectionHeading>Linked pull requests</PullRequestSectionHeading>
+      <PullRequestSectionHeading>
+        <T>Linked pull requests</T>
+      </PullRequestSectionHeading>
       {props.links.map((link) => {
         const status = pullRequestStatus(link);
         return (
@@ -307,10 +320,17 @@ function IssueEventRow({ event }: { readonly event: IssueEvent }) {
 }
 
 function IssueLoadingBody() {
+  const gt = useGT();
   return (
-    <View className="gap-5" accessibilityLabel="Loading issue" accessibilityState={{ busy: true }}>
+    <View
+      className="gap-5"
+      accessibilityLabel={gt("Loading issue")}
+      accessibilityState={{ busy: true }}
+    >
       <View className="gap-3">
-        <PullRequestSectionHeading>Description</PullRequestSectionHeading>
+        <PullRequestSectionHeading>
+          <T>Description</T>
+        </PullRequestSectionHeading>
         <View className="gap-3 py-1">
           <View className="h-4 w-full rounded bg-subtle-strong" />
           <View className="h-4 w-full rounded bg-subtle-strong" />
@@ -318,7 +338,9 @@ function IssueLoadingBody() {
         </View>
       </View>
       <View className="gap-3">
-        <PullRequestSectionHeading>Activity</PullRequestSectionHeading>
+        <PullRequestSectionHeading>
+          <T>Activity</T>
+        </PullRequestSectionHeading>
         <View className="h-20 rounded-2xl bg-subtle-strong" />
         <View className="h-20 rounded-2xl bg-subtle-strong" />
       </View>
@@ -332,6 +354,7 @@ export function IssueRouteScreen({ route }: StaticScreenProps<IssueParams>) {
 }
 
 function IssueRoute({ params }: { readonly params: IssueParams }) {
+  const gt = useGT();
   const identity = issueIdentity(params);
   const target = issueTarget(params);
   const navigation = useNavigation();
@@ -540,7 +563,7 @@ function IssueRoute({ params }: { readonly params: IssueParams }) {
           {!issue ? (
             detailQuery.error && !detailQuery.isPending ? (
               <EmptyState
-                title="Couldn't load this issue"
+                title={gt("Couldn't load this issue")}
                 detail={detailQuery.error}
                 variant="plain"
               />
@@ -565,7 +588,7 @@ function IssueRoute({ params }: { readonly params: IssueParams }) {
               {!detail ? (
                 detailQuery.error && !detailQuery.isPending ? (
                   <EmptyState
-                    title="Couldn't load this issue"
+                    title={gt("Couldn't load this issue")}
                     detail={detailQuery.error}
                     variant="plain"
                   />
@@ -591,10 +614,14 @@ function IssueRoute({ params }: { readonly params: IssueParams }) {
                   ) : null}
                   <View className="gap-3">
                     <PullRequestSectionHeading>
-                      Activity
-                      {detail.commentCount > 0
-                        ? ` · ${detail.commentCount} ${detail.commentCount === 1 ? "comment" : "comments"}`
-                        : ""}
+                      <T>
+                        Activity
+                        <Var>
+                          {detail.commentCount > 0
+                            ? ` · ${detail.commentCount} ${detail.commentCount === 1 ? "comment" : "comments"}`
+                            : ""}
+                        </Var>
+                      </T>
                     </PullRequestSectionHeading>
                     {nextCursor !== null ? (
                       <Button
@@ -605,7 +632,7 @@ function IssueRoute({ params }: { readonly params: IssueParams }) {
                     ) : null}
                     {timeline.length === 0 ? (
                       <Text className="text-sm text-foreground-muted">
-                        Nothing has happened here yet.
+                        <T>Nothing has happened here yet.</T>
                       </Text>
                     ) : null}
                     {timeline.map((item) => (

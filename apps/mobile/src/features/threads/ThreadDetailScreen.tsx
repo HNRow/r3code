@@ -208,6 +208,7 @@ import { resolveThreadFeedSubmissionAnchor } from "./thread-feed-scroll-position
 import { useOpenLinkedThread } from "./useOpenLinkedThread";
 import { useGlobalVoiceInput } from "../voice-input/VoiceInputProvider";
 import type { OrchestrationV2ProviderSession } from "@t3tools/contracts";
+import { useGT } from "gt-react-native";
 
 export interface ThreadDetailScreenProps {
   readonly header?: React.ReactNode;
@@ -399,6 +400,7 @@ function ThreadDetailBody(
     >;
   },
 ) {
+  const gt = useGT();
   const usesNativeWorkspaceColumns = useNativeWorkspaceColumnsSupported();
   const deviceType = useDeviceType();
   const workspace = useWorkspaceTabs();
@@ -1408,7 +1410,7 @@ function ThreadDetailBody(
             renderFallback={(fallback) => (
               <RenderFailureView
                 {...fallback}
-                title="The conversation couldn't be displayed"
+                title={gt("The conversation couldn't be displayed")}
                 bottomInset={estimatedOverlayHeight}
               />
             )}

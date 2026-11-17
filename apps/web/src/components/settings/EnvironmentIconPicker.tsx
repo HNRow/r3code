@@ -19,6 +19,7 @@ import {
   MenuSubPopup,
   MenuSubTrigger,
 } from "../ui/menu";
+import { T } from "gt-react";
 
 export function resolveEnvironmentIconPickerLock(input: {
   readonly serverConfig: Pick<ServerConfig, "environment"> | null;
@@ -51,8 +52,10 @@ export function EnvironmentIconMenu({
   return (
     <MenuSub>
       <MenuSubTrigger>
-        <EnvironmentMachineIcon kind={resolved} />
-        Icon
+        <T>
+          <EnvironmentMachineIcon kind={resolved} />
+          Icon
+        </T>
       </MenuSubTrigger>
       <MenuSubPopup>
         {lock !== null ? (

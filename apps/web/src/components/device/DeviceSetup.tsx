@@ -14,6 +14,7 @@ import { deviceEnvironment, deviceHostProbeAtom, NO_DEVICE_PROBE_ATOM } from "~/
 import { useAtomCommand } from "~/state/use-atom-command";
 import { readEnvironmentScope, useEnvironmentScope } from "~/state/session";
 import { cn } from "~/lib/utils";
+import { useGT, T } from "gt-react";
 
 const platformName = (platform: DevicePlatform) => (platform === "ios" ? "iOS" : "Android");
 
@@ -150,6 +151,7 @@ export function DeviceSetup(props: {
   readonly state: DeviceServiceState;
   readonly onComplete?: () => void;
 }) {
+  const gt = useGT();
   const canConfigure = useEnvironmentScope(props.environmentId, AuthSettingsWriteScope);
   const configure = useAtomCommand(deviceEnvironment.configure);
   const list = useAtomCommand(deviceEnvironment.list, { reportFailure: false });
@@ -177,8 +179,10 @@ export function DeviceSetup(props: {
   return (
     <>
       <WizardHeader
-        title="Set up devices"
-        description="Review what runs on this environment before using simulators and emulators."
+        title={gt("Set up devices")}
+        description={gt(
+          "Review what runs on this environment before using simulators and emulators.",
+        )}
       >
         <WizardSteps
           steps={["Device hub", "Simulators", "Agent access"]}
@@ -192,13 +196,15 @@ export function DeviceSetup(props: {
         <DeviceHostUpdates state={props.state} environmentId={props.environmentId} />
         {step === 0 ? (
           <section className="space-y-3 text-sm">
-            <h3 className="font-medium">Enable the device hub</h3>
+            <h3 className="font-medium">
+              <T>Enable the device hub</T>
+            </h3>
             <div className="flex items-start justify-between gap-4">
               <p className="text-muted-foreground">{deviceHubDescription}</p>
               <Switch
                 checked={enabled}
                 disabled={!canConfigure || busy || pending !== null}
-                aria-label="Enable device hub"
+                aria-label={gt("Enable device hub")}
                 onCheckedChange={(checked) =>
                   void update("hub", {
                     enabled: Boolean(checked),
@@ -216,7 +222,9 @@ export function DeviceSetup(props: {
 
         {step === 1 || (step === 0 && enabled && localPlatformsUnavailable) ? (
           <section className={cn("space-y-3 text-sm", step === 0 && "mt-4")}>
-            <h3 className="font-medium">Check simulator support</h3>
+            <h3 className="font-medium">
+              <T>Check simulator support</T>
+            </h3>
             <DevicePlatformSetup
               state={props.state}
               checking={pending === "check"}
@@ -233,13 +241,15 @@ export function DeviceSetup(props: {
 
         {step === 2 ? (
           <section className="space-y-3 text-sm">
-            <h3 className="font-medium">Allow agent control</h3>
+            <h3 className="font-medium">
+              <T>Allow agent control</T>
+            </h3>
             <div className="flex items-start justify-between gap-4">
               <p className="text-muted-foreground">{agentDeviceDescription}</p>
               <Switch
                 checked={props.state.agentAccessEnabled}
                 disabled={!canConfigure || !enabled || busy || pending !== null}
-                aria-label="Allow agents to control devices"
+                aria-label={gt("Allow agents to control devices")}
                 onCheckedChange={(checked) =>
                   void update("agent", { agentAccessEnabled: Boolean(checked) })
                 }
@@ -247,7 +257,7 @@ export function DeviceSetup(props: {
             </div>
             <AgentDeviceSetupStatus state={props.state} pending={pending === "agent"} />
             <p className="text-xs text-muted-foreground">
-              Leave this off to keep manual device controls without giving agents access.
+              <T>Leave this off to keep manual device controls without giving agents access.</T>
             </p>
           </section>
         ) : null}
@@ -260,19 +270,21 @@ export function DeviceSetup(props: {
 
       <WizardFooter>
         {step === 0 ? (
-          <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+          <DialogClose render={<Button variant="outline" />}>
+            <T>Cancel</T>
+          </DialogClose>
         ) : (
           <Button
             variant="outline"
             disabled={busy || pending !== null}
             onClick={() => setStep(step - 1)}
           >
-            Back
+            <T>Back</T>
           </Button>
         )}
         {step < 2 ? (
           <Button disabled={!ready || pending !== null} onClick={() => setStep(step + 1)}>
-            Continue
+            <T>Continue</T>
           </Button>
         ) : (
           <Button
@@ -329,7 +341,7 @@ function DevicePlatformSetup(props: {
       <PlatformStatus platform="Android" status={platformSetupStatus(props.state, "android")} />
       <DeviceHostDiagnostics hosts={props.state.hosts} hostStatuses={props.state.hostStatuses} />
       <p className="text-xs text-muted-foreground">
-        You can use either platform. Fixing a missing platform does not block the other one.
+        <T>You can use either platform. Fixing a missing platform does not block the other one.</T>
       </p>
       <Button size="compact" variant="outline" disabled={props.disabled} onClick={props.onCheck}>
         {props.checking ? <Spinner size="xs" /> : null}
@@ -371,8 +383,10 @@ export function AgentDeviceSetupStatus(props: {
   ) {
     return (
       <p role="status" className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Check className="size-3 text-success" />
-        Agent tools are ready.
+        <T>
+          <Check className="size-3 text-success" />
+          Agent tools are ready.
+        </T>
       </p>
     );
   }

@@ -16,6 +16,7 @@ import { PullRequestDetailTitleRow } from "./PullRequestDetailLayout";
 import { PullRequestEditButton } from "./PullRequestEditButton";
 import { readableFailure } from "./pullRequestDetail.logic";
 import { canEditPullRequestChangeRequest } from "@t3tools/client-runtime/pull-request-editing";
+import { useGT, T } from "gt-react";
 
 /** The pull request title, which the reader can rename in place when the host allows it. */
 export function PullRequestTitleEditor({
@@ -31,6 +32,7 @@ export function PullRequestTitleEditor({
   detail: PullRequestDetail;
   canWriteSourceControl: boolean;
 }) {
+  const gt = useGT();
   const update = useAtomCommand(pullRequestEnvironment.update, { reportFailure: false });
   const [titleScope, setTitleScope] = useState<{
     readonly pullRequestKey: string;
@@ -79,7 +81,7 @@ export function PullRequestTitleEditor({
         </Tooltip>
         {canEditPullRequestChangeRequest(detail) ? (
           <PullRequestEditButton
-            aria-label="Edit title"
+            aria-label={gt("Edit title")}
             onClick={() => setTitleScope({ pullRequestKey, text: detail.title })}
           />
         ) : null}
@@ -113,7 +115,7 @@ export function PullRequestTitleEditor({
           disabled={titleSaving}
           onClick={() => setTitleScope(null)}
         >
-          Cancel
+          <T>Cancel</T>
         </Button>
         <Button
           size="xs"

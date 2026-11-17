@@ -17,6 +17,7 @@ import { SearchField } from "./SearchField";
 import { findAppBarMenuItem, menuActionsFromAppBarItems } from "./menuActionItems";
 import type { AppBarMenuItem, AppBarProps, AppBarSearch } from "./AppBar.types";
 import { useHasWorkspaceAppBar, WorkspaceAppBar } from "./WorkspaceAppBar.android";
+import { useGT } from "gt-react-native";
 
 function selectMenuItem(items: ReadonlyArray<AppBarMenuItem>, id: string) {
   const action = findAppBarMenuItem(items, id);
@@ -76,6 +77,7 @@ function SearchableAppBar(props: AppBarProps & { readonly search: AppBarSearch }
 }
 
 function AppBarView(props: AppBarProps & { readonly searchState?: SearchState }) {
+  const gt = useGT();
   const { search, searchState } = props;
   const inFormSheet = use(RoutedFormSheetContext);
   const { paddingTop, paddingBottom } = useToolbarLayout(props.sheet || inFormSheet);
@@ -227,7 +229,7 @@ function AppBarView(props: AppBarProps & { readonly searchState?: SearchState })
             {confirmButton}
             {closeInspector ? (
               <AndroidHeaderIconButton
-                accessibilityLabel="Close inspector"
+                accessibilityLabel={gt("Close inspector")}
                 icon="xmark"
                 onPress={closeInspector}
               />
@@ -273,7 +275,7 @@ function AppBarView(props: AppBarProps & { readonly searchState?: SearchState })
                   />
                 ) : props.onBack ? (
                   <ScreenHeaderButton
-                    accessibilityLabel="Navigate up"
+                    accessibilityLabel={gt("Navigate up")}
                     icon="arrow.left"
                     onPress={props.onBack}
                   />

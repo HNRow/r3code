@@ -44,6 +44,7 @@ import {
 import { PullRequestGlyph } from "../pull-requests/pullRequestGlyphs";
 import { AutoSettleSettingsRows } from "./ThreadSettingsSections";
 import { supportsSharedSettingsSync } from "@t3tools/client-runtime/state/shared-settings";
+import { useGT, T, Var } from "gt-react-native";
 
 type SettingsPage = "threads" | "source-control" | "worktrees" | "maintenance";
 
@@ -175,6 +176,7 @@ export function SettingsEnvironmentMaintenanceRouteScreen() {
 }
 
 function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
+  const gt = useGT();
   const environmentMenu = useSettingsEnvironmentMenu();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -313,7 +315,7 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
             {props.page === "threads" ? (
               <>
                 <SettingsSection
-                  title="Default workspace"
+                  title={gt("Default workspace")}
                   footer={managed("defaultThreadEnvMode")}
                   trailing={
                     pendingWrites === 0 && isMixed("defaultThreadEnvMode") ? (
@@ -339,7 +341,7 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                   ))}
                 </SettingsSection>
                 <SettingsSection
-                  title="Default permissions"
+                  title={gt("Default permissions")}
                   footer={managed("defaultRuntimeMode")}
                   trailing={
                     pendingWrites === 0 && uniform("defaultRuntimeMode") === null ? (
@@ -362,7 +364,7 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                   ))}
                 </SettingsSection>
                 <SettingsSection
-                  title="Response streaming"
+                  title={gt("Response streaming")}
                   footer={managed("responseStreamingMode")}
                   trailing={
                     pendingWrites === 0 && uniform("responseStreamingMode") === null ? (
@@ -382,10 +384,10 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                     />
                   ))}
                 </SettingsSection>
-                <SettingsSection title="Preview browser">
+                <SettingsSection title={gt("Preview browser")}>
                   <SettingsSwitchRow
                     icon="globe"
-                    label="Agent browser access"
+                    label={gt("Agent browser access")}
                     subtitle={managedSubtitle(
                       "enableAgentBrowserAccess",
                       "Allow agents to use the in-app preview browser.",
@@ -408,10 +410,10 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                   />
                 )}
                 {projectSelected ? null : <IssueTrackerSection environments={selectedTargets} />}
-                <SettingsSection title="Pull requests">
+                <SettingsSection title={gt("Pull requests")}>
                   <SettingsSwitchRow
                     icon={PullRequestGlyph.merged}
-                    label="Remove agent credits when merging"
+                    label={gt("Remove agent credits when merging")}
                     subtitle={managedSubtitle(
                       "removeAgentCreditsOnMerge",
                       "Remove recognized agent credits from merge and squash messages on hosts that support it, keeping human co-authors. Includes auto-merge. Excludes merge queues, stack merges, and existing commits.",
@@ -421,10 +423,10 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                     onValueChange={(value) => write({ removeAgentCreditsOnMerge: value })}
                   />
                 </SettingsSection>
-                <SettingsSection title="Default branch">
+                <SettingsSection title={gt("Default branch")}>
                   <SettingsSwitchRow
                     icon="arrow.down.circle"
-                    label="Automatically pull"
+                    label={gt("Automatically pull")}
                     subtitle={managedSubtitle(
                       "defaultAutoPull",
                       "Keep the default branch current when there are no local changes.",
@@ -434,11 +436,13 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                     onValueChange={(value) => write({ defaultAutoPull: value })}
                   />
                 </SettingsSection>
-                <SettingsSection title="Clones">
+                <SettingsSection title={gt("Clones")}>
                   <SettingsSwitchRow
                     icon="folder"
-                    label="Clone into host folders"
-                    subtitle="Clones go to github.com/owner/repo under the Add project folder, like ghq."
+                    label={gt("Clone into host folders")}
+                    subtitle={gt(
+                      "Clones go to github.com/owner/repo under the Add project folder, like ghq.",
+                    )}
                     value={uniform("ghqCloneLayout")}
                     disabled={disabledFor("ghqCloneLayout")}
                     onValueChange={(value) => write({ ghqCloneLayout: value })}
@@ -449,10 +453,10 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
 
             {props.page === "worktrees" ? (
               <>
-                <SettingsSection title="New worktrees">
+                <SettingsSection title={gt("New worktrees")}>
                   <SettingsSwitchRow
                     icon="arrow.triangle.branch"
-                    label="Start from remote"
+                    label={gt("Start from remote")}
                     subtitle={managedSubtitle(
                       "newWorktreesStartFromOrigin",
                       "Uses the latest commit of the base branch’s tracked remote branch, even if its name differs. Otherwise uses the same-named branch on origin. Uses your local branch if that remote branch is missing.",
@@ -463,7 +467,7 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                   />
                 </SettingsSection>
                 <SettingsSection
-                  title="Worktree submodules"
+                  title={gt("Worktree submodules")}
                   footer={managed("worktreeSubmodules")}
                   trailing={
                     pendingWrites === 0 && isMixed("worktreeSubmodules") ? (
@@ -514,7 +518,7 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                   />
                 ) : null}
                 {!projectSelected ? (
-                  <SettingsSection title="Manage environments">
+                  <SettingsSection title={gt("Manage environments")}>
                     {selectedTargets.map((target) => (
                       <SettingsRow
                         key={target.environmentId}
@@ -530,10 +534,10 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                     ))}
                   </SettingsSection>
                 ) : null}
-                <SettingsSection title="Updates">
+                <SettingsSection title={gt("Updates")}>
                   <SettingsSwitchRow
                     icon="arrow.clockwise"
-                    label="Check provider updates"
+                    label={gt("Check provider updates")}
                     subtitle={managedSubtitle(
                       "enableProviderUpdateChecks",
                       projectSelected
@@ -547,7 +551,7 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                   <View className="border-t border-border-subtle">
                     <SettingsSwitchRow
                       icon="arrow.uturn.forward"
-                      label="Continue after restart"
+                      label={gt("Continue after restart")}
                       subtitle={managedSubtitle(
                         "continueThreadsAfterServerUpdate",
                         "Resume interrupted threads after an update or restart.",
@@ -560,7 +564,7 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                   <View className="border-t border-border-subtle">
                     <SettingsSwitchRow
                       icon="bolt.circle"
-                      label="Keep awake while agents work"
+                      label={gt("Keep awake while agents work")}
                       subtitle={managedSubtitle(
                         "keepAwakeWhileAgentsWork",
                         projectSelected
@@ -592,7 +596,7 @@ function MixedValuesLabel(props: { readonly projectSelected: boolean }) {
       }
       className="px-2 text-sm text-foreground-muted android:px-4"
     >
-      Mixed
+      <T>Mixed</T>
     </Text>
   );
 }
@@ -612,7 +616,10 @@ function ManagedPolicyNotice(props: { readonly targets: readonly ScopedMobileSet
   if (organizations.length === 0) return null;
   return (
     <Text className="px-2 text-sm text-foreground-muted android:px-4">
-      Some settings are managed by {organizations.join(", ")} and cannot be changed here.
+      <T>
+        Some settings are managed by <Var>{organizations.join(", ")}</Var> and cannot be changed
+        here.
+      </T>
     </Text>
   );
 }

@@ -31,6 +31,7 @@ import {
 import { usePullRequestFileFilter } from "./usePullRequestFileFilter";
 import { usePullRequestFilesViewed } from "./usePullRequestFilesViewed";
 import { pullRequestFileJumpScope, requestPullRequestFileJump } from "./pullRequestFileJump";
+import { Var, T, useGT, t } from "gt-react-native";
 
 const BREAKDOWN_LABELS = {
   code: "Code",
@@ -118,7 +119,9 @@ function FileRow(props: {
         ) : null}
         {file.previousPath ? (
           <Text textRole="caption" className="text-foreground-muted" numberOfLines={1}>
-            Renamed from {file.previousPath}
+            <T>
+              Renamed from <Var>{file.previousPath}</Var>
+            </T>
           </Text>
         ) : null}
       </View>
@@ -156,9 +159,10 @@ function FileRowSkeleton(props: { readonly index: number }) {
 }
 
 function FileFilterMenu({ filter }: { readonly filter: ChangedFiles["filter"] }) {
+  const gt = useGT();
   return (
     <Menu
-      title="Review files"
+      title={gt("Review files")}
       actions={[
         {
           id: "hide-tests",
@@ -172,7 +176,7 @@ function FileFilterMenu({ filter }: { readonly filter: ChangedFiles["filter"] })
       <View pointerEvents="none">
         <IconButton
           icon="line.3.horizontal.decrease"
-          accessibilityLabel="Filter review files"
+          accessibilityLabel={gt("Filter review files")}
           selected={filter.hideTestFiles}
         />
       </View>
@@ -181,20 +185,21 @@ function FileFilterMenu({ filter }: { readonly filter: ChangedFiles["filter"] })
 }
 
 function NoVisibleFiles({ files }: { readonly files: ChangedFiles }) {
+  const gt = useGT();
   const { diff, filter, parsed } = files;
   if (parsed.kind === "files") {
     return parsed.files.length === 0 && filter.hiddenCount > 0 ? (
       <EmptyState
         title={diff.nextCursor ? "No non-test files loaded yet" : "Only test files changed"}
-        detail="Test files are hidden from this review."
-        action={<Button label="Show test files" tone="contrast" onPress={filter.showAll} />}
+        detail={gt("Test files are hidden from this review.")}
+        action={<Button label={gt("Show test files")} tone="contrast" onPress={filter.showAll} />}
         variant="plain"
       />
     ) : null;
   }
   return !diff.isPending && !diff.error ? (
     <Text textRole="footnote" className="py-6 text-foreground-muted">
-      No text changes available.
+      <T>No text changes available.</T>
     </Text>
   ) : null;
 }
@@ -265,12 +270,14 @@ export function usePullRequestFilesSection(params: PullRequestParams) {
         <PullRequestReadStatus pending={false} error={diff.error} terminology={files.terminology} />
         {loading ? (
           <View
-            accessibilityLabel="Loading changed files"
+            accessibilityLabel={t("Loading changed files")}
             accessibilityState={{ busy: true }}
             className="min-h-17 flex-row items-center gap-2 py-3"
           >
             <View className="min-w-0 flex-1 gap-1">
-              <PullRequestSectionHeading>Changed files</PullRequestSectionHeading>
+              <PullRequestSectionHeading>
+                <T>Changed files</T>
+              </PullRequestSectionHeading>
               {pr ? (
                 <Text textRole="caption" className="text-foreground-muted">
                   {pr.changedFiles} {pr.changedFiles === 1 ? "file" : "files"}
@@ -297,7 +304,9 @@ export function usePullRequestFilesSection(params: PullRequestParams) {
         ) : parsed.kind === "files" ? (
           <View className="min-h-17 flex-row items-center gap-2 py-3">
             <View className="min-w-0 flex-1 gap-1">
-              <PullRequestSectionHeading>Changed files</PullRequestSectionHeading>
+              <PullRequestSectionHeading>
+                <T>Changed files</T>
+              </PullRequestSectionHeading>
               <Text textRole="caption" className="text-foreground-muted">
                 {describeFiles(parsed, files)}
               </Text>
@@ -396,6 +405,7 @@ function DirectoryRow(props: {
 
 /** The `PullRequestFiles` sheet: a changed-file picker presented over a file diff. */
 export function PullRequestFilesSheet({ route }: StaticScreenProps<PullRequestDiffParams>) {
+  const gt = useGT();
   const params = route.params;
   const navigation = useNavigation();
   const jumpScope = pullRequestFileJumpScope(params);
@@ -412,7 +422,7 @@ export function PullRequestFilesSheet({ route }: StaticScreenProps<PullRequestDi
   return (
     <View collapsable={false} className="flex-1 bg-sheet">
       <SheetHeader
-        title="Changed files"
+        title={gt("Changed files")}
         subtitle={`#${params.number} · ${params.commit?.slice(0, 7) ?? params.repository}`}
         onClose={() => navigation.goBack()}
         menus={[
@@ -498,7 +508,7 @@ export function PullRequestFilesSheet({ route }: StaticScreenProps<PullRequestDi
             loading ? (
               <View
                 accessible
-                accessibilityLabel="Loading changed files"
+                accessibilityLabel={gt("Loading changed files")}
                 accessibilityState={{ busy: true }}
               >
                 {Array.from({ length: loadingRowCount(files) }, (_, index) => (

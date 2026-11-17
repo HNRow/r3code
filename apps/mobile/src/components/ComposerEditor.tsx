@@ -38,6 +38,7 @@ import {
   composerMentionPath,
   type ComposerDocumentAttachment,
 } from "../lib/composerContext";
+import { T } from "gt-react-native";
 
 export type ComposerEditorProps = NativeComposerEditorProps & {
   readonly draftKey?: string | null;
@@ -224,7 +225,9 @@ export function ComposerEditor({
         }}
       />
       {importing ? (
-        <Text className="py-2 text-xs text-foreground-muted">Copying context…</Text>
+        <Text className="py-2 text-xs text-foreground-muted">
+          <T>Copying context…</T>
+        </Text>
       ) : null}
       {selected && (selectedReference || selectedSkill) ? (
         <ComposerContextSheet

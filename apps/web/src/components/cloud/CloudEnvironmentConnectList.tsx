@@ -39,6 +39,7 @@ import { Skeleton } from "../ui/skeleton";
 import { toastManager } from "../ui/toast";
 import { Tooltip, TooltipTrigger, TooltipPopup } from "../ui/tooltip";
 import { presentSavedCloudEnvironmentConnection } from "./cloudEnvironmentConnectionPresentation";
+import { T } from "gt-react";
 
 const EMPTY_DISCOVERY_REFRESH_INTERVAL_MS = 5_000;
 
@@ -162,11 +163,11 @@ export function CloudEnvironmentConnectRows({
       toastManager.add({
         type: "success",
         title: savedWithoutRelay.has(environment.environmentId)
-          ? "T3 Connect route added"
+          ? "R3 Connect route added"
           : "Environment added",
         description: savedWithoutRelay.has(environment.environmentId)
-          ? `${environment.label} falls back to T3 Connect when its other routes are unreachable.`
-          : `Connecting to ${environment.label} through T3 Connect.`,
+          ? `${environment.label} falls back to R3 Connect when its other routes are unreachable.`
+          : `Connecting to ${environment.label} through R3 Connect.`,
       });
       return true;
     }
@@ -175,7 +176,7 @@ export function CloudEnvironmentConnectRows({
     }
     const cause = squashAtomCommandFailure(result);
     const message =
-      cause instanceof Error ? cause.message : "Could not connect the T3 Connect environment.";
+      cause instanceof Error ? cause.message : "Could not connect the R3 Connect environment.";
     const traceId = findErrorTraceId(cause);
     console.error("[t3-connect] Could not connect environment", { message, traceId, cause });
     toastManager.add({
@@ -194,7 +195,7 @@ export function CloudEnvironmentConnectRows({
     return false;
   };
 
-  // Omit machines saved over other routes; onboarding selection must not add a T3 Connect route.
+  // Omit machines saved over other routes; onboarding selection must not add a R3 Connect route.
   const isVisibleEnvironment = (environmentId: EnvironmentId) =>
     environmentId !== primaryEnvironmentId &&
     !desktopLocalIds.has(environmentId) &&
@@ -298,7 +299,7 @@ export function CloudEnvironmentConnectRows({
       return (
         <div className={ITEM_ROW_CLASSNAME}>
           <p className="text-sm font-medium text-destructive">
-            Could not load T3 Connect environments
+            <T>Could not load R3 Connect environments</T>
           </p>
           <p className="mt-1 text-xs text-muted-foreground">{discoveryProblem}</p>
           <Button
@@ -307,7 +308,7 @@ export function CloudEnvironmentConnectRows({
             className="mt-3"
             onClick={() => void refreshRelayEnvironments()}
           >
-            Try again
+            <T>Try again</T>
           </Button>
         </div>
       );
@@ -357,23 +358,23 @@ export function CloudEnvironmentConnectRows({
             ? "bg-warning"
             : "bg-muted-foreground/35";
     const notAdded = savedWithoutRelay.has(environment.environmentId)
-      ? "Saved without T3 Connect"
+      ? "Saved without R3 Connect"
       : "Not added";
     const statusText =
       unsupported && !savedEnvironment
-        ? `T3 Connect · ${notAdded} · Client not supported`
+        ? `R3 Connect · ${notAdded} · Client not supported`
         : offlineReason !== null
           ? offlineReason
           : savedConnection
             ? savedConnection.statusText
             : availability === "online"
-              ? `T3 Connect · ${notAdded} · Relay online`
+              ? `R3 Connect · ${notAdded} · Relay online`
               : availability === "offline"
-                ? `T3 Connect · ${notAdded} · Relay offline`
+                ? `R3 Connect · ${notAdded} · Relay offline`
                 : availability === "checking"
-                  ? `T3 Connect · ${notAdded} · Checking relay status…`
+                  ? `R3 Connect · ${notAdded} · Checking relay status…`
                   : (Option.getOrNull(error)?.message ??
-                    `T3 Connect · ${notAdded} · Relay status unavailable`);
+                    `R3 Connect · ${notAdded} · Relay status unavailable`);
     if (selection) {
       return (
         <label
@@ -484,7 +485,7 @@ export function CloudEnvironmentConnectRows({
             <Tooltip>
               <TooltipTrigger render={<span className="inline-flex" tabIndex={0} />}>
                 <Button size="sm" disabled>
-                  Add
+                  <T>Add</T>
                 </Button>
               </TooltipTrigger>
               <TooltipPopup>{unsupportedDetail ?? "Client not supported"}</TooltipPopup>

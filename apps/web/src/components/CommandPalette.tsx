@@ -282,6 +282,7 @@ import { readIssueListPreferences } from "~/components/issue/issueListPreference
 import { IssueGlyph } from "~/components/issue/issuePresentation";
 import { useThreadRouteTarget } from "../hooks/useThreadRouteTarget";
 import { threadRecentUse } from "@t3tools/shared/paletteSearch";
+import { T, Var, useGT } from "gt-react";
 
 const EMPTY_BROWSE_ENTRIES: FilesystemBrowseResult["entries"] = [];
 const ADD_PROJECT_ENTRY_GROUP = "add-project";
@@ -417,6 +418,7 @@ function OpenCommandPaletteDialog(props: {
   ) => void;
   readonly initialContext: CommandPaletteReturnContext | undefined;
 }) {
+  const gt = useGT();
   const navigate = useNavigate();
   const pathname = useLocation({ select: (location) => location.pathname });
   const { openChildSearch, setOpen } = props;
@@ -1117,7 +1119,7 @@ function OpenCommandPaletteDialog(props: {
                     openSourceControlSettings();
                   }}
                 >
-                  Setup Required
+                  <T>Setup Required</T>
                 </Button>
               }
             />
@@ -1312,7 +1314,12 @@ function OpenCommandPaletteDialog(props: {
         searchTerms: ["new thread", "chat", "create", "draft"],
         title: (
           <>
-            New thread in <span className="font-semibold">{activeProjectTitle}</span>
+            <T>
+              New thread in{" "}
+              <span className="font-semibold">
+                <Var>{activeProjectTitle}</Var>
+              </span>
+            </T>
           </>
         ),
         searchTitle: `New thread in ${activeProjectTitle}`,
@@ -1358,7 +1365,7 @@ function OpenCommandPaletteDialog(props: {
       value: "action:triage",
       searchTerms: ["triage", "bug", "issue", "report", "broken", "debug", "help", "support"],
       title: "Triage an issue",
-      description: "An agent investigates a T3 Code problem and helps file an issue",
+      description: "An agent investigates a R3 Code problem and helps file an issue",
       icon: <BugIcon className={ITEM_ICON_CLASS} />,
       run: () => startTriage(triageEnvironmentId),
     });
@@ -1690,7 +1697,7 @@ function OpenCommandPaletteDialog(props: {
       "openclaw",
       "hermes",
     ],
-    title: "Use T3 Code in another app (MCP)",
+    title: "Use R3 Code in another app (MCP)",
     icon: <PlugIcon className={ITEM_ICON_CLASS} />,
     run: async () => {
       openUseInAnotherApp(
@@ -2990,13 +2997,15 @@ function OpenCommandPaletteDialog(props: {
   ) : isThreadSearchPending && !isLinkedThreadSearch && !isBrowsing ? (
     // In the footer, so the list keeps its height while message results may
     // still arrive below it.
-    <span className="text-muted-foreground text-xs">Searching messages…</span>
+    <span className="text-muted-foreground text-xs">
+      <T>Searching messages…</T>
+    </span>
   ) : null;
 
   return (
     <CommandPaletteContent
       key={`${viewStack.length}-${browseGeneration}-${isBrowsing}-${newProjectFlow ? "new-project" : (addProjectCloneFlow?.step ?? "none")}`}
-      aria-label="Command palette"
+      aria-label={gt("Command palette")}
       autoHighlight={autoHighlightsFirstRow ? "always" : false}
       footerActionLabel={footerActionLabel}
       footerTrailing={footerTrailing}
@@ -3020,7 +3029,7 @@ function OpenCommandPaletteDialog(props: {
                 <button
                   type="button"
                   className="flex cursor-pointer items-center"
-                  aria-label="Back"
+                  aria-label={gt("Back")}
                   onClick={popView}
                 >
                   <ArrowLeftIcon />
@@ -3076,7 +3085,7 @@ function OpenCommandPaletteDialog(props: {
         </div>
       ) : isBrowsePending && browseResult === null ? (
         <div role="status" className="px-4 py-3 text-sm text-muted-foreground">
-          Loading folders...
+          <T>Loading folders...</T>
         </div>
       ) : null}
       <CommandPaletteVirtualizedResults

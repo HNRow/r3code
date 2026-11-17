@@ -20,6 +20,7 @@ import { cn } from "../../lib/cn";
 import { useEnvironmentServerConfig, useProject, useThreadShell } from "../../state/entities";
 import { SUBAGENT_TONE_TEXT_CLASS, SubagentStatusDot } from "./SubagentStatusDot";
 import { resolveSubagentRowPresentation } from "./threadAgentsPresentation";
+import { Var, T } from "gt-react-native";
 
 type SubagentRowSubagent = Pick<
   OrchestrationV2Subagent,
@@ -77,7 +78,9 @@ export function SubagentRow(props: {
             </Text>
             {presentation.runsOn !== null ? (
               <Text numberOfLines={1} className="shrink text-xs text-foreground-muted">
-                on {presentation.runsOn}
+                <T>
+                  on <Var>{presentation.runsOn}</Var>
+                </T>
               </Text>
             ) : null}
           </View>

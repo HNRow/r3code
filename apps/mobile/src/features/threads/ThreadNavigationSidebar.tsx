@@ -80,6 +80,7 @@ import {
 } from "./threadListV2";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { NativeScrollView } from "../../native/NativeScrollViewMarker";
+import { useGT } from "gt-react-native";
 
 type SidebarListItem =
   | ThreadListV2ListItem
@@ -120,6 +121,7 @@ export function ThreadNavigationSidebar(props: ThreadNavigationSidebarProps) {
 }
 
 function ThreadNavigationSidebarPane(props: ThreadNavigationSidebarProps) {
+  const gt = useGT();
   const floatingTabsEnabled = useAndroidFloatingTabs();
   const { themeVariables: materialTheme } = useAppearancePreferences();
   const drawerColor = materialTheme["--color-drawer"];
@@ -530,7 +532,7 @@ function ThreadNavigationSidebarPane(props: ThreadNavigationSidebarProps) {
   };
   const header = (
     <WorkspaceListHeader
-      accessibilityLabel="T3 Code, Threads"
+      accessibilityLabel={gt("R3 Code, Threads")}
       onOpenEnvironments={props.onOpenEnvironmentSettings}
       onOpenSettings={props.onOpenSettings}
       search={{
@@ -588,7 +590,7 @@ function ThreadNavigationSidebarPane(props: ThreadNavigationSidebarProps) {
             tone="primary"
             size="compact"
             icon="plus"
-            label="Add environment"
+            label={gt("Add environment")}
             onPress={props.onOpenEnvironmentSettings}
           />
         </View>

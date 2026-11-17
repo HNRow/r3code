@@ -31,6 +31,7 @@ import { Button } from "../ui/button";
 import { toastManager } from "../ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { BackgroundThreadContext } from "./backgroundThread";
+import { T, useGT } from "gt-react";
 
 /** A side chat tab: its title, Bring back, Delete and Close, over the side chat's own chat. */
 export default function SideChatPane(props: {
@@ -39,6 +40,7 @@ export default function SideChatPane(props: {
   readonly parentPanel: SideChatParentPanel;
   readonly onClose: () => void;
 }) {
+  const gt = useGT();
   const { parentRef, threadId } = props;
   const threadRef = scopeThreadRef(parentRef.environmentId, threadId);
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- registers the parent panel as host in the panel store
@@ -141,7 +143,7 @@ export default function SideChatPane(props: {
                 aria-disabled={bringBackBlockedReason !== null || bringingBack || undefined}
                 onClick={() => void bringBack()}
               >
-                Bring back
+                <T>Bring back</T>
               </Button>
             }
           />
@@ -152,19 +154,26 @@ export default function SideChatPane(props: {
         <Button
           variant="ghost"
           size="icon-xs"
-          aria-label="Delete side chat"
+          aria-label={gt("Delete side chat")}
           disabled={!canOperate || shell === null || deleting}
           onClick={() => void deleteSideChat()}
         >
           <Trash2Icon />
         </Button>
-        <Button variant="ghost" size="icon-xs" aria-label="Close side chat" onClick={props.onClose}>
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          aria-label={gt("Close side chat")}
+          onClick={props.onClose}
+        >
           <XIcon />
         </Button>
       </div>
       {shell === null ? (
         snapshotLoaded ? (
-          <p className="p-3 text-xs text-muted-foreground">This side chat was deleted.</p>
+          <p className="p-3 text-xs text-muted-foreground">
+            <T>This side chat was deleted.</T>
+          </p>
         ) : null
       ) : (
         <BackgroundThreadContext value>

@@ -116,6 +116,7 @@ import { DiffFileStatus } from "./diffs/DiffFileStatus";
 import { useThreadRouteRef } from "../hooks/useThreadRouteTarget";
 import { projectCommitUrl } from "@t3tools/client-runtime/change-request-links";
 import { useOpenLink } from "../browser/useOpenLink";
+import { T, Var, useGT } from "gt-react";
 
 type DiffThemeType = "light" | "dark";
 const AUTOMATIC_BASE_REF = "__automatic_base_ref__";
@@ -215,6 +216,7 @@ export default function DiffPanel({
   workspaceMutationId,
   visible,
 }: DiffPanelProps) {
+  const gt = useGT();
   const resolvedTheme = useRenderedAppearance();
   const settings = useClientSettings((settings) => ({
     diffFilesCollapsed: settings.diffFilesCollapsed,
@@ -617,7 +619,7 @@ export default function DiffPanel({
   const refreshBranchDiffPreview = refreshPreviewQuery;
   const diffRefreshKey = `diff:${activeThreadRefreshKey ?? ""}`;
 
-  // The panel stays mounted while hidden, and edits made outside T3 Code bump no mutation id, so
+  // The panel stays mounted while hidden, and edits made outside R3 Code bump no mutation id, so
   // showing it revalidates the diff; that also stands in for focus events missed while hidden.
   // A git diff is too costly to repeat on a timer nobody asked for. A diff read within the floor,
   // such as a mutation's refetch while hidden, already counts as that revalidation.
@@ -871,17 +873,25 @@ export default function DiffPanel({
           <DropdownMenuContent align="start">
             <DropdownMenuRadioGroup value={selectedScopeValue} onValueChange={selectScopeValue}>
               <DropdownMenuRadioItem value="branch" closeOnClick>
-                <span>Changes</span>
+                <span>
+                  <T>Changes</T>
+                </span>
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="unstaged" closeOnClick>
-                <span>Uncommitted</span>
+                <span>
+                  <T>Uncommitted</T>
+                </span>
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="latest" closeOnClick>
-                <span>Latest turn</span>
+                <span>
+                  <T>Latest turn</T>
+                </span>
               </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
             <DropdownMenuSub>
-              <DropdownMenuSubTrigger>Turn</DropdownMenuSubTrigger>
+              <DropdownMenuSubTrigger>
+                <T>Turn</T>
+              </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
                 <DropdownMenuRadioGroup value={selectedTurnValue} onValueChange={selectScopeValue}>
                   {orderedTurnDiffSummaries.map((summary) => {
@@ -893,7 +903,11 @@ export default function DiffPanel({
                         closeOnClick
                       >
                         <span className="flex items-center gap-2">
-                          <span>Turn {turnCount}</span>
+                          <span>
+                            <T>
+                              Turn <Var>{turnCount}</Var>
+                            </T>
+                          </span>
                           <span className="ml-auto text-xs tabular-nums text-muted-foreground">
                             {formatShortTimestamp(summary.completedAt, settings.timestampFormat)}
                           </span>
@@ -912,7 +926,9 @@ export default function DiffPanel({
                 branchCommitsQuery.refresh();
               }}
             >
-              <DropdownMenuSubTrigger>Commits</DropdownMenuSubTrigger>
+              <DropdownMenuSubTrigger>
+                <T>Commits</T>
+              </DropdownMenuSubTrigger>
               <DropdownMenuSubContent className="max-h-80 max-w-96">
                 <DropdownMenuRadioGroup
                   value={selectedCommitValue}
@@ -987,9 +1003,13 @@ export default function DiffPanel({
                       : (fileAccess.error ?? "This connection cannot read local diffs.")}
                   </DropdownMenuItem>
                 ) : branchCommits === null ? (
-                  <DropdownMenuItem disabled>Loading commits...</DropdownMenuItem>
+                  <DropdownMenuItem disabled>
+                    <T>Loading commits...</T>
+                  </DropdownMenuItem>
                 ) : branchCommits.commits.length === 0 ? (
-                  <DropdownMenuItem disabled>No commits on this branch.</DropdownMenuItem>
+                  <DropdownMenuItem disabled>
+                    <T>No commits on this branch.</T>
+                  </DropdownMenuItem>
                 ) : branchCommits.truncated ? (
                   <DropdownMenuItem disabled>
                     {`Showing latest ${branchCommits.commits.length} commits`}
@@ -1023,7 +1043,7 @@ export default function DiffPanel({
               <TooltipTrigger
                 render={<span aria-hidden className="hidden @max-[20rem]/diff-refs:inline" />}
               >
-                vs
+                <T>vs</T>
               </TooltipTrigger>
               <TooltipPopup side="top">
                 {`${comparisonHeadRef} → ${comparisonBaseRef}`}
@@ -1054,24 +1074,32 @@ export default function DiffPanel({
                 className="w-72 min-w-0 max-w-[calc(100vw-1rem)] overflow-hidden"
               >
                 <ComboboxSearchInput
-                  placeholder="Search refs..."
+                  placeholder={gt("Search refs...")}
                   value={baseRefQuery}
                   onChange={(event) => setBaseRefQuery(event.target.value)}
                 />
                 <div className="grid shrink-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-2 border-b border-border/70 ps-3 pe-6.5 pt-2 pb-1.5 font-medium text-3xs text-muted-foreground uppercase tracking-wide">
                   <span aria-hidden="true" />
                   <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_2rem] items-center">
-                    <span>Branch</span>
-                    <span className="text-right">Remote</span>
+                    <span>
+                      <T>Branch</T>
+                    </span>
+                    <span className="text-right">
+                      <T>Remote</T>
+                    </span>
                   </div>
                 </div>
-                <ComboboxEmpty>No matching refs.</ComboboxEmpty>
+                <ComboboxEmpty>
+                  <T>No matching refs.</T>
+                </ComboboxEmpty>
                 <ComboboxList className="max-h-64 min-w-0 overflow-x-hidden">
                   <ComboboxItem
                     className="w-full min-w-0 grid-cols-[1rem_minmax(0,1fr)]"
                     value={AUTOMATIC_BASE_REF}
                   >
-                    <span className="block min-w-0 truncate">Automatic</span>
+                    <span className="block min-w-0 truncate">
+                      <T>Automatic</T>
+                    </span>
                   </ComboboxItem>
                   {baseRefChoices.map((choice) => {
                     const item = valueForBaseRefChoice(choice);
@@ -1110,13 +1138,15 @@ export default function DiffPanel({
                                   <span className="flex justify-end text-muted-foreground">
                                     <CheckIcon
                                       role="img"
-                                      aria-label="Remote only"
+                                      aria-label={gt("Remote only")}
                                       className="size-3"
                                     />
                                   </span>
                                 }
                               />
-                              <TooltipPopup side="top">Remote only</TooltipPopup>
+                              <TooltipPopup side="top">
+                                <T>Remote only</T>
+                              </TooltipPopup>
                             </Tooltip>
                           ) : null}
                         </div>
@@ -1188,7 +1218,7 @@ export default function DiffPanel({
           </Tooltip>
         )}
         <ToggleGroup
-          aria-label="Diff layout"
+          aria-label={gt("Diff layout")}
           className="shrink-0"
           variant="segmented"
           value={[diffLayout]}
@@ -1199,10 +1229,10 @@ export default function DiffPanel({
             }
           }}
         >
-          <Toggle aria-label="Stacked diff view" value="stacked">
+          <Toggle aria-label={gt("Stacked diff view")} value="stacked">
             <Rows3Icon className="size-3.5" />
           </Toggle>
-          <Toggle aria-label="Split diff view" value="split">
+          <Toggle aria-label={gt("Split diff view")} value="split">
             <Columns2Icon className="size-3.5" />
           </Toggle>
         </ToggleGroup>
@@ -1253,7 +1283,7 @@ export default function DiffPanel({
             <TooltipTrigger
               render={
                 <Toggle
-                  aria-label="Hide test files"
+                  aria-label={gt("Hide test files")}
                   variant="ghost"
                   size="sm"
                   pressed={hideTestFiles}
@@ -1298,19 +1328,19 @@ export default function DiffPanel({
     <DiffPanelShell mode={mode} header={headerRow}>
       {!activeThread ? (
         <div className="flex flex-1 items-center justify-center px-5 text-center text-xs text-muted-foreground/70">
-          Select a thread to inspect turn diffs.
+          <T>Select a thread to inspect turn diffs.</T>
         </div>
       ) : !isGitRepo && !toolCallSelection ? (
         <div className="flex flex-1 items-center justify-center px-5 text-center text-xs text-muted-foreground/70">
-          Turn diffs are unavailable because this project is not a git repository.
+          <T>Turn diffs are unavailable because this project is not a git repository.</T>
         </div>
       ) : selectedRunId !== null && orderedTurnDiffSummaries.length === 0 ? (
         <div className="flex flex-1 items-center justify-center px-5 text-center text-xs text-muted-foreground/70">
-          No completed turns yet.
+          <T>No completed turns yet.</T>
         </div>
       ) : isGitSelection && !canReadFiles ? (
         fileAccess.isPending ? (
-          <DiffPanelLoadingState label="Checking file access..." />
+          <DiffPanelLoadingState label={gt("Checking file access...")} />
         ) : (
           <div className="flex flex-1 items-center justify-center px-5 text-center text-xs text-muted-foreground/70">
             {fileAccess.error ?? "This connection cannot read local diffs."}
@@ -1328,16 +1358,23 @@ export default function DiffPanel({
             )}
             {isSelectedPatchTruncated && !lazySource && (
               <p className="shrink-0 border-b border-border/70 bg-muted/40 px-3 py-1.5 text-2xs text-muted-foreground">
-                This preview exceeds the size limit. Changes shown are incomplete.
-                {isGitSelection && selectedGitSource?.files && !preview?.incomplete
-                  ? " Totals include all changes."
-                  : ""}
+                <T>
+                  This preview exceeds the size limit. Changes shown are incomplete.
+                  <Var>
+                    {isGitSelection && selectedGitSource?.files && !preview?.incomplete
+                      ? " Totals include all changes."
+                      : ""}
+                  </Var>
+                </T>
               </p>
             )}
             {omittedToolCallFiles > 0 && (
               <p className="shrink-0 border-b border-border/70 bg-muted/40 px-3 py-1.5 text-2xs text-muted-foreground">
-                This tool call changed {recordedToolCallFileCount} files. The recorded patch omits{" "}
-                {omittedToolCallFiles} of them.
+                <T>
+                  This tool call changed <Var>{recordedToolCallFileCount}</Var> files. The recorded
+                  patch omits<Var> </Var>
+                  <Var>{omittedToolCallFiles}</Var> of them.
+                </T>
               </p>
             )}
             {selectedPatchError && !renderablePatch && (
@@ -1348,7 +1385,7 @@ export default function DiffPanel({
             {!renderablePatch && toolCallPreview && toolCallPreview.content.length > 0 ? (
               <div className="min-h-0 flex-1 space-y-3 overflow-auto p-3 text-xs">
                 <p className="text-muted-foreground">
-                  The provider recorded file content without a diff.
+                  <T>The provider recorded file content without a diff.</T>
                 </p>
                 {toolCallPreview.content.map(({ label, text }) => (
                   <div key={label} className="space-y-1">
@@ -1495,7 +1532,7 @@ export default function DiffPanel({
                     resizable
                     storageKey="t3code:diff-file-tree-width"
                     defaultWidthFraction={0.4}
-                    resizeLabel="Resize Changes files"
+                    resizeLabel={gt("Resize Changes files")}
                   >
                     <DiffFileTree
                       ariaLabel={`${reviewSectionTitle} files`}

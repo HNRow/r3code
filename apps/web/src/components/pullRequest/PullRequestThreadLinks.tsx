@@ -31,6 +31,7 @@ import { Dialog, DialogPopup, DialogTitle } from "../ui/dialog";
 import { MenuItem } from "../ui/menu";
 import { toastManager } from "../ui/toast";
 import { PullRequestGlyph } from "./pullRequestIcons";
+import { Var, T, useGT } from "gt-react";
 
 interface PullRequestThreadLinksProps {
   environmentId: EnvironmentId;
@@ -152,7 +153,11 @@ function EnabledPullRequestThreadLinks({
               </Button>
             }
           />
-          <TooltipPopup>{linkedThreadsLabel}. Search in the command palette.</TooltipPopup>
+          <TooltipPopup>
+            <T>
+              <Var>{linkedThreadsLabel}</Var>. Search in the command palette.
+            </T>
+          </TooltipPopup>
         </Tooltip>
       ) : null}
       {display === "menu-item" ? (
@@ -181,7 +186,11 @@ function EnabledPullRequestThreadLinks({
       {display === "picker" ? (
         <Dialog open onOpenChange={onPickerOpenChange}>
           <DialogPopup className="max-w-md" showCloseButton={false}>
-            <DialogTitle className="sr-only">Link {term} to a thread</DialogTitle>
+            <DialogTitle className="sr-only">
+              <T>
+                Link <Var>{term}</Var> to a thread
+              </T>
+            </DialogTitle>
             <ThreadPicker
               environmentId={environmentId}
               url={url}
@@ -206,6 +215,7 @@ function ThreadPicker({
   pending: boolean;
   onSelect: (threadId: ThreadId) => void;
 }) {
+  const gt = useGT();
   const threads = useVisibleThreadShells();
   const linking = usePullRequestLinking(environmentId);
   const projects = useProjects();
@@ -229,12 +239,12 @@ function ThreadPicker({
     )
     .toSorted((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   return (
-    <Command mode="none" value={query} onValueChange={setQuery} aria-label="Choose a thread">
-      <CommandInput placeholder="Search threads or projects..." disabled={pending} />
+    <Command mode="none" value={query} onValueChange={setQuery} aria-label={gt("Choose a thread")}>
+      <CommandInput placeholder={gt("Search threads or projects...")} disabled={pending} />
       <CommandList className="max-h-80 overflow-y-auto">
         {candidates.length === 0 ? (
           <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-            No active threads found.
+            <T>No active threads found.</T>
           </div>
         ) : (
           candidates.map((thread) => {
@@ -256,7 +266,9 @@ function ThreadPicker({
                 {linked ? (
                   <>
                     <CheckIcon aria-hidden className="size-3.5" />
-                    <span className="text-xs text-muted-foreground">Linked</span>
+                    <span className="text-xs text-muted-foreground">
+                      <T>Linked</T>
+                    </span>
                   </>
                 ) : null}
               </CommandItem>

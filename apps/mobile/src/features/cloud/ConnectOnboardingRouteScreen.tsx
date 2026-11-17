@@ -17,14 +17,16 @@ import { splitEnvironmentSections } from "../connection/environmentSections";
 import { useConnectionController } from "../connection/useConnectionController";
 import { optOutOfConnectOnboarding } from "./connectOnboardingOptOut";
 import { hasCloudPublicConfig } from "./publicConfig";
+import { useGT, T } from "gt-react-native";
 
-// Only reachable with cloud config: onboarding is requested after a T3 Connect
+// Only reachable with cloud config: onboarding is requested after a R3 Connect
 // sign-in, and appLinking drops the deep link otherwise.
 export function ConnectOnboardingRouteScreen() {
   return hasCloudPublicConfig() ? <ConfiguredConnectOnboardingRouteScreen /> : null;
 }
 
 function ConfiguredConnectOnboardingRouteScreen() {
+  const gt = useGT();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { isSignedIn, userId } = useAuth({ treatPendingAsSignedOut: false });
@@ -60,7 +62,7 @@ function ConfiguredConnectOnboardingRouteScreen() {
   return (
     <View collapsable={false} className="flex-1 bg-sheet">
       <AppBar
-        title="Set up T3 Connect"
+        title={gt("Set up R3 Connect")}
         onClose={handleClose}
         refresh={{
           accessibilityLabel: "Refresh environments",
@@ -92,13 +94,13 @@ function ConfiguredConnectOnboardingRouteScreen() {
         ) : (
           <View collapsable={false} className="rounded-[24px] bg-grouped-card p-5">
             <Text className="text-sm leading-normal text-foreground-muted">
-              Sign in to your T3 account to set up T3 Connect.
+              <T>Sign in to your T3 account to set up R3 Connect.</T>
             </Text>
           </View>
         )}
 
         {userId ? (
-          <Button label={"Don't show this again"} tone="text" onPress={handleDontShowAgain} />
+          <Button label={gt("Don't show this again")} tone="text" onPress={handleDontShowAgain} />
         ) : null}
       </ScrollView>
     </View>

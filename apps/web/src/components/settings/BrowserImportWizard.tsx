@@ -37,6 +37,7 @@ import {
   type WizardTargetSelection,
   type WizardStep,
 } from "./browserImportWizard.logic";
+import { Var, T, useGT } from "gt-react";
 
 export type { WizardTarget } from "./browserImportWizard.logic";
 
@@ -193,16 +194,25 @@ function QuitStep({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Quit {source.name} to import</DialogTitle>
+        <DialogTitle>
+          <T>
+            Quit <Var>{source.name}</Var> to import
+          </T>
+        </DialogTitle>
         <DialogDescription>
-          {source.name} is open, so its cookies can&rsquo;t be read yet. Quit it, then continue.
+          <T>
+            <Var>{source.name}</Var> is open, so its cookies can&rsquo;t be read yet. Quit it, then
+            continue.
+          </T>
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>
         <Button variant="outline" onClick={onCancel}>
-          Cancel
+          <T>Cancel</T>
         </Button>
-        <DialogAction onClick={onRechecked}>I&rsquo;ve quit it</DialogAction>
+        <DialogAction onClick={onRechecked}>
+          <T>I&rsquo;ve quit it</T>
+        </DialogAction>
       </DialogFooter>
     </>
   );
@@ -264,11 +274,17 @@ function FullDiskAccessStep({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Let T3 Code read {source.name}&rsquo;s cookies</DialogTitle>
+        <DialogTitle>
+          <T>
+            Let R3 Code read <Var>{source.name}</Var>&rsquo;s cookies
+          </T>
+        </DialogTitle>
         <DialogDescription>
-          To import cookies from {source.name}, T3 Code needs Full Disk Access. Turn it on in System
-          Settings, then come back to finish the import. You can revoke it again once the import is
-          done.
+          <T>
+            To import cookies from <Var>{source.name}</Var>, R3 Code needs Full Disk Access. Turn it
+            on in System Settings, then come back to finish the import. You can revoke it again once
+            the import is done.
+          </T>
         </DialogDescription>
       </DialogHeader>
       <DialogPanel>
@@ -298,21 +314,21 @@ function FullDiskAccessStep({
         {!permission.isReady(["fullDiskAccess"]) ? (
           <p className="mt-3 text-xs text-muted-foreground">
             {stillRequired
-              ? "Access is still required. Quit and reopen T3 Code if you just allowed it, then retry the import."
-              : "If access doesn't update after you allow it, quit and reopen T3 Code, then retry the import."}
+              ? "Access is still required. Quit and reopen R3 Code if you just allowed it, then retry the import."
+              : "If access doesn't update after you allow it, quit and reopen R3 Code, then retry the import."}
           </p>
         ) : null}
       </DialogPanel>
       <DialogFooter>
         <Button variant="outline" onClick={onCancel}>
-          Cancel
+          <T>Cancel</T>
         </Button>
         <PermissionContinueButton
           ready={permission.isReady(["fullDiskAccess"])}
           busy={opening}
           onClick={onGranted}
         >
-          Continue
+          <T>Continue</T>
         </PermissionContinueButton>
       </DialogFooter>
     </>
@@ -331,6 +347,7 @@ function ConfigureStep({
   onCancel,
   onImport,
 }: ConfigureStepProps) {
+  const gt = useGT();
   const targetMissing =
     target.kind === "existing" &&
     !targetProfiles.some((profile) => profile.id === target.profileId);
@@ -345,16 +362,22 @@ function ConfigureStep({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Import from {source.name}</DialogTitle>
+        <DialogTitle>
+          <T>
+            Import from <Var>{source.name}</Var>
+          </T>
+        </DialogTitle>
         <DialogDescription>
-          Choose which cookies to import for {destinationEnvironmentName}.
+          <T>
+            Choose which cookies to import for <Var>{destinationEnvironmentName}</Var>.
+          </T>
         </DialogDescription>
       </DialogHeader>
       <DialogPanel>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
           <section className="flex-1 space-y-2">
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              From
+              <T>From</T>
             </p>
             {source.profiles.map((profile) => (
               <SelectableTile
@@ -372,13 +395,13 @@ function ConfigureStep({
           </div>
           <section className="flex-1 space-y-2">
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Into
+              <T>Into</T>
             </p>
             {canCreateProfile ? (
               <SelectableTile
                 selected={target.kind === "new"}
-                title="New profile"
-                subtitle="Created for these cookies"
+                title={gt("New profile")}
+                subtitle={gt("Created for these cookies")}
                 onSelect={() => onTargetChange({ kind: "new" })}
               />
             ) : null}
@@ -387,7 +410,7 @@ function ConfigureStep({
                 key={profile.id}
                 selected={target.kind === "existing" && target.profileId === profile.id}
                 title={profile.name}
-                subtitle="Existing profile"
+                subtitle={gt("Existing profile")}
                 onSelect={() => onTargetChange({ kind: "existing", profileId: profile.id })}
               />
             ))}
@@ -401,13 +424,13 @@ function ConfigureStep({
       </DialogPanel>
       <DialogFooter>
         <Button variant="outline" onClick={onCancel}>
-          Cancel
+          <T>Cancel</T>
         </Button>
         <Button
           disabled={sourceProfileDirectory === "" || targetMissing || targetUncreatable}
           onClick={onImport}
         >
-          Import
+          <T>Import</T>
         </Button>
       </DialogFooter>
     </>
@@ -461,13 +484,19 @@ function ImportingStep() {
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Importing cookies</DialogTitle>
-        <DialogDescription>This may take a moment.</DialogDescription>
+        <DialogTitle>
+          <T>Importing cookies</T>
+        </DialogTitle>
+        <DialogDescription>
+          <T>This may take a moment.</T>
+        </DialogDescription>
       </DialogHeader>
       <DialogPanel>
         <div className="flex items-center gap-3 py-2">
           <Spinner size="md" tone="muted" />
-          <span className="text-sm text-muted-foreground">Importing…</span>
+          <span className="text-sm text-muted-foreground">
+            <T>Importing…</T>
+          </span>
         </div>
       </DialogPanel>
     </>
@@ -484,7 +513,11 @@ function CheckingStep({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Checking {sourceName}</DialogTitle>
+        <DialogTitle>
+          <T>
+            Checking <Var>{sourceName}</Var>
+          </T>
+        </DialogTitle>
         <DialogDescription>
           {check === "fullDiskAccess"
             ? "Checking Full Disk Access."
@@ -539,14 +572,14 @@ function DoneStep({
       {skippedDomains.length > 0 ? (
         <DialogPanel>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Skipped
+            <T>Skipped</T>
           </p>
           <p className="mt-1 text-sm text-foreground">{formatSkippedDomains(skippedDomains)}</p>
         </DialogPanel>
       ) : null}
       <DialogFooter>
         <DialogClose render={<Button />} onClick={onClose}>
-          Done
+          <T>Done</T>
         </DialogClose>
       </DialogFooter>
     </>
@@ -569,14 +602,22 @@ function BlockedStep({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Couldn&rsquo;t import from {source.name}</DialogTitle>
+        <DialogTitle>
+          <T>
+            Couldn&rsquo;t import from <Var>{source.name}</Var>
+          </T>
+        </DialogTitle>
         <DialogDescription>{message ?? BROWSER_IMPORT_FAILURE_COPY[reason]}</DialogDescription>
       </DialogHeader>
       <DialogFooter>
         <Button variant="outline" onClick={onClose}>
-          Close
+          <T>Close</T>
         </Button>
-        {onRetry ? <DialogAction onClick={onRetry}>Try again</DialogAction> : null}
+        {onRetry ? (
+          <DialogAction onClick={onRetry}>
+            <T>Try again</T>
+          </DialogAction>
+        ) : null}
       </DialogFooter>
     </>
   );

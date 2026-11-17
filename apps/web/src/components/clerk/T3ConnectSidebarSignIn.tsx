@@ -6,6 +6,7 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 import { retryClerkLoad, useClerkLoadFailed } from "./clerkLoadFailure";
 import { T3_CONNECT_ACCOUNT_PAGES } from "./T3ConnectAccountPages";
 import { useT3ConnectAuthPrompt } from "./useT3ConnectAuthPrompt";
+import { T } from "gt-react";
 
 export function T3ConnectSidebarSignIn() {
   if (!hasCloudPublicConfig()) return null;
@@ -59,7 +60,9 @@ function ConfiguredT3ConnectSidebarSignIn() {
         <SidebarMenuItem>
           <SidebarMenuButton onClick={retryClerkLoad}>
             <RotateCwIcon />
-            <span>Retry T3 Connect</span>
+            <span>
+              <T>Retry R3 Connect</T>
+            </span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
@@ -72,7 +75,9 @@ function ConfiguredT3ConnectSidebarSignIn() {
       <SidebarMenuItem>
         <SidebarMenuButton onClick={openAuthPrompt}>
           <LogInIcon />
-          <span>Sign in to T3 Connect</span>
+          <span>
+            <T>Sign in to R3 Connect</T>
+          </span>
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>

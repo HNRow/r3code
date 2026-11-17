@@ -49,6 +49,7 @@ import {
   type SimlockTokenEntry,
 } from "./simlockDeviceHostsSettings.logic";
 import { useHostConnectionChecks } from "./useHostConnectionChecks";
+import { msg, T, useGT, useMessages } from "gt-react";
 
 const deviceHostStatesAtom = environmentAtomList("web-device-host-states", (environmentId) =>
   deviceEnvironment.state({ environmentId, input: {} }),
@@ -143,6 +144,7 @@ export function DeviceSourcesSettings(props: {
   readonly supportsEas: boolean;
   readonly supportsSimlock: boolean;
 }) {
+  const gt = useGT();
   const { scope, environments, connectedEnvironments, environment: primary } = useSettingsScope();
   const projectScope = scope.kind === "project" || scope.kind === "checkout";
   const update = useAtomCommand(serverEnvironment.updateSettings, { reportFailure: false });
@@ -332,12 +334,17 @@ export function DeviceSourcesSettings(props: {
   const rowActions = (onEdit: () => void, onRemove: () => void, extra?: ReactNode) => (
     <>
       <Button size="sm" variant="outline" disabled={disabled} onClick={onEdit}>
-        Edit
+        <T>Edit</T>
       </Button>
       <Menu>
         <MenuTrigger
           render={
-            <Button size="icon-sm" variant="ghost-muted" disabled={disabled} aria-label="More" />
+            <Button
+              size="icon-sm"
+              variant="ghost-muted"
+              disabled={disabled}
+              aria-label={gt("More")}
+            />
           }
         >
           <MoreVertical />
@@ -345,7 +352,7 @@ export function DeviceSourcesSettings(props: {
         <MenuPopup align="end">
           {extra}
           <MenuItem variant="destructive" onClick={onRemove}>
-            Remove
+            <T>Remove</T>
           </MenuItem>
         </MenuPopup>
       </Menu>
@@ -357,11 +364,11 @@ export function DeviceSourcesSettings(props: {
   rows.push({
     key: "local",
     shared: false,
-    title: "Local simulators",
+    title: msg("Local simulators"),
     description:
       members.length > 1
-        ? "Simulators and emulators installed on each environment's own machine."
-        : "Simulators and emulators installed on this environment's machine.",
+        ? msg("Simulators and emulators installed on each environment's own machine.")
+        : msg("Simulators and emulators installed on this environment's machine."),
     environments: active.map((member) => {
       const local = member.state?.hosts.find((host) => host.kind === "local");
       const status = local ? hostStatus(member.state, local.id) : hostStatus(member.state, "");
@@ -437,7 +444,9 @@ export function DeviceSourcesSettings(props: {
         () =>
           setEditing({ kind: "ssh", host, original: host, ...(grouped ? {} : { only: holders }) }),
         () => void saveSsh(host, true, host, holders),
-        <MenuItem onClick={() => void testSsh(host)}>Test connection</MenuItem>,
+        <MenuItem onClick={() => void testSsh(host)}>
+          <T>Test connection</T>
+        </MenuItem>,
       ),
     });
   }
@@ -524,8 +533,10 @@ export function DeviceSourcesSettings(props: {
       <MenuTrigger
         render={<Button size="sm" variant="outline" disabled={disabled || editing !== null} />}
       >
-        <PlusIcon className="size-3.5" /> Add source
-        <ChevronDownIcon className="size-3.5" />
+        <T>
+          <PlusIcon className="size-3.5" /> Add source
+          <ChevronDownIcon className="size-3.5" />
+        </T>
       </MenuTrigger>
       <MenuPopup align="end">
         <MenuItem
@@ -537,7 +548,7 @@ export function DeviceSourcesSettings(props: {
             })
           }
         >
-          Machine over SSH
+          <T>Machine over SSH</T>
         </MenuItem>
         {props.supportsEas ? (
           <MenuItem
@@ -551,7 +562,7 @@ export function DeviceSourcesSettings(props: {
               })
             }
           >
-            Expo Simulators
+            <T>Expo Simulators</T>
           </MenuItem>
         ) : null}
         {props.supportsSimlock && simlockEnabled ? (
@@ -560,7 +571,7 @@ export function DeviceSourcesSettings(props: {
               setEditing({ kind: "simlock", host: newSimlockDeviceHost(randomUUID()), isNew: true })
             }
           >
-            Simlock pool (alpha)
+            <T>Simlock pool (alpha)</T>
           </MenuItem>
         ) : null}
       </MenuPopup>
@@ -568,7 +579,7 @@ export function DeviceSourcesSettings(props: {
   );
 
   return (
-    <SettingsSection id="device-sources" title="Device sources" headerAction={addMenu}>
+    <SettingsSection id="device-sources" title={gt("Device sources")} headerAction={addMenu}>
       {rows.map((row) => (
         <DeviceSourceRow key={row.key} row={row} />
       ))}
@@ -743,6 +754,7 @@ function PlatformIcon(props: {
 }
 
 function DeviceSourceRow(props: { row: SourceRow }) {
+  const m = useMessages();
   const { row } = props;
   const several = row.environments.length > 1;
   const issues = row.environments.filter(
@@ -755,14 +767,16 @@ function DeviceSourceRow(props: { row: SourceRow }) {
     <div className="flex items-center gap-3 border-t border-border/60 px-3 py-3 first:border-t-0 sm:px-4">
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 items-center gap-1.5">
-          <p className="truncate text-sm font-medium">{row.title}</p>
+          <p className="truncate text-sm font-medium">{m(row.title)}</p>
           {row.kind ? (
             <span className="shrink-0 rounded border border-border px-1 text-3xs uppercase tracking-wide text-muted-foreground">
               {row.kind}
             </span>
           ) : null}
         </div>
-        <p className="truncate text-xs text-muted-foreground">{row.description}</p>
+        <p className="truncate text-xs text-muted-foreground">
+          {typeof row.description === "string" ? m(row.description) : row.description}
+        </p>
         {problems.map((environment) => (
           <p
             key={environment.environmentId}
@@ -780,7 +794,9 @@ function DeviceSourceRow(props: { row: SourceRow }) {
             </span>
             {environment.status.tone === "warning" && environment.status.detail ? (
               <Popover>
-                <PopoverTrigger render={<InlineButton />}>Details</PopoverTrigger>
+                <PopoverTrigger render={<InlineButton />}>
+                  <T>Details</T>
+                </PopoverTrigger>
                 <PopoverPopup side="bottom" align="start" width="lg" padding="compact">
                   <p className="whitespace-pre-wrap break-words font-mono text-xs text-muted-foreground">
                     {environment.status.detail}

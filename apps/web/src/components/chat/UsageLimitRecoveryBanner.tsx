@@ -20,6 +20,7 @@ import { formatUpcomingTimestamp } from "../../timestampFormat";
 import { toastManager } from "../ui/toast";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
 import { copyAdminRequest } from "./ThreadErrorBanner";
+import { T } from "gt-react";
 
 type RecoveryProps = {
   runId: RunId;
@@ -89,7 +90,7 @@ export function usageLimitRecoveryBannerItem(props: RecoveryProps): ComposerBann
         {recoveryActions}
         {workspaceLimit ? (
           <Button size="xs" variant="ghost" onClick={copyAdminRequest}>
-            Copy request for admin
+            <T>Copy request for admin</T>
           </Button>
         ) : (
           <ChatGptUsageButton size="xs" variant="ghost" />

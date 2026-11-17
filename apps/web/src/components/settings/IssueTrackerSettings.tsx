@@ -25,6 +25,7 @@ import { Skeleton } from "../ui/skeleton";
 import { SecretInput } from "./SecretInput";
 import { SettingsRow, SettingsSection } from "./settingsLayout";
 import { searchableSetting } from "./settingsSearch";
+import { useGT, T, Var } from "gt-react";
 
 type TrackerIcon = ElementType<{ className?: string }>;
 
@@ -41,13 +42,14 @@ const UNBOUND = "";
  * host's. Generic over the trackers the server reports; nothing here names Linear but its icon.
  */
 export function IssueTrackerSettings({ environmentId }: { readonly environmentId: EnvironmentId }) {
+  const gt = useGT();
   const query = useEnvironmentQuery(
     issueTrackerEnvironment.connections({ environmentId, input: {} }),
   );
   const trackers = query.data?.trackers ?? [];
   if (query.data === null && query.isPending) {
     return (
-      <SettingsSection id={searchableSetting("issue-trackers").id} title="Issue trackers">
+      <SettingsSection id={searchableSetting("issue-trackers").id} title={gt("Issue trackers")}>
         <div className="grid gap-3 px-4 py-3">
           <Skeleton className="h-4 w-40" />
           <Skeleton className="h-8 w-full" />
@@ -57,13 +59,13 @@ export function IssueTrackerSettings({ environmentId }: { readonly environmentId
   }
   if (query.data === null && query.error !== null) {
     return (
-      <SettingsSection id={searchableSetting("issue-trackers").id} title="Issue trackers">
+      <SettingsSection id={searchableSetting("issue-trackers").id} title={gt("Issue trackers")}>
         <SettingsRow
-          title="Could not load issue trackers"
+          title={gt("Could not load issue trackers")}
           description={query.error}
           control={
             <Button size="xs" variant="outline" onClick={query.refresh}>
-              Retry
+              <T>Retry</T>
             </Button>
           }
         />
@@ -72,7 +74,7 @@ export function IssueTrackerSettings({ environmentId }: { readonly environmentId
   }
   if (trackers.length === 0) return null;
   return (
-    <SettingsSection id={searchableSetting("issue-trackers").id} title="Issue trackers">
+    <SettingsSection id={searchableSetting("issue-trackers").id} title={gt("Issue trackers")}>
       {trackers.map((tracker) => (
         <TrackerRow
           // Drafts belong to one environment; switching must not carry them over.
@@ -141,7 +143,7 @@ function TrackerRow({
             </span>
             {tracker.connected && tracker.account === null ? (
               <Badge variant="destructive" size="sm">
-                Credential rejected
+                <T>Credential rejected</T>
               </Badge>
             ) : null}
           </div>
@@ -168,25 +170,31 @@ function TrackerRow({
                 title={<label htmlFor={inputId}>{tracker.credential.label}</label>}
                 description={
                   <>
-                    Stored on the server.
-                    {tracker.credential.helpUrl ? (
-                      <>
-                        {" "}
-                        <InlineButton
-                          render={
-                            <a
-                              href={tracker.credential.helpUrl}
-                              target="_blank"
-                              rel="noreferrer noopener"
-                            />
-                          }
-                        >
-                          Create one
-                          <ExternalLinkIcon aria-hidden className="size-3" />
-                        </InlineButton>
-                      </>
-                    ) : null}
-                    {failure ? <span className="block text-destructive">{failure}</span> : null}
+                    <T>
+                      Stored on the server.
+                      <Var>
+                        {tracker.credential.helpUrl ? (
+                          <>
+                            {" "}
+                            <InlineButton
+                              render={
+                                <a
+                                  href={tracker.credential.helpUrl}
+                                  target="_blank"
+                                  rel="noreferrer noopener"
+                                />
+                              }
+                            >
+                              Create one
+                              <ExternalLinkIcon aria-hidden className="size-3" />
+                            </InlineButton>
+                          </>
+                        ) : null}
+                      </Var>
+                      <Var>
+                        {failure ? <span className="block text-destructive">{failure}</span> : null}
+                      </Var>
+                    </T>
                   </>
                 }
                 control={
@@ -240,6 +248,7 @@ function ProjectBindings({
   readonly tracker: IssueTrackerConnection;
   readonly bindings: IssueTrackerConnectionList["bindings"];
 }) {
+  const gt = useGT();
   const projects = useProjects().filter((project) => project.environmentId === environmentId);
   const bind = useAtomCommand(issueTrackerEnvironment.bindProject, {
     label: `bind project to ${tracker.displayName}`,
@@ -262,7 +271,7 @@ function ProjectBindings({
   return (
     <>
       <SettingsRow
-        title="Projects"
+        title={gt("Projects")}
         description={`Pick the ${tracker.displayName} ${tracker.scopeNoun} whose issues each project lists beside its repository's own.`}
       />
       {projects.map((project) => {
@@ -293,7 +302,9 @@ function ProjectBindings({
                   </SelectValue>
                 </SelectTrigger>
                 <SelectPopup>
-                  <SelectItem value={UNBOUND}>Not bound</SelectItem>
+                  <SelectItem value={UNBOUND}>
+                    <T>Not bound</T>
+                  </SelectItem>
                   {tracker.scopes.map((scope) => (
                     <SelectItem key={scope.key} value={scope.key}>
                       {scope.name} ({scope.key})

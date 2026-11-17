@@ -23,6 +23,7 @@ import {
   tokenTypeSegments,
 } from "./usageBreakdown";
 import { PROVIDER_PRESENTATION } from "./usageProviders";
+import { useGT, Var, T } from "gt-react";
 
 export interface UsageChartWindow {
   readonly days: readonly string[];
@@ -48,6 +49,7 @@ export function UsageModelDialog({
   readonly onSetPrice: () => void;
   readonly onClose: () => void;
 }) {
+  const gt = useGT();
   const usage = mergeAnsweredUsage(
     environments,
     (bucket) => bucket.provider === model.provider && bucket.model === model.model,
@@ -114,19 +116,19 @@ export function UsageModelDialog({
             <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
               {costUnknown ? null : (
                 <UsageShareBar
-                  label="Cost by type"
+                  label={gt("Cost by type")}
                   segments={costTypeSegments(usage.categoryCost)}
                   format={formatUsd}
                 />
               )}
               <UsageShareBar
-                label="Tokens by type"
+                label={gt("Tokens by type")}
                 segments={tokenTypeSegments(model.tokens)}
                 format={formatTokens}
               />
               {usage.speedCost.fast + usage.speedCost.ultrafast > 0 ? (
                 <UsageShareBar
-                  label="Cost by speed"
+                  label={gt("Cost by speed")}
                   segments={speedCostSegments(usage.speedCost)}
                   format={formatUsd}
                   aside={<SpeedPremium premiumUsd={usage.speedCost.premium} />}
@@ -138,9 +140,13 @@ export function UsageModelDialog({
         {model.unpricedTokens > 0 ? (
           <DialogFooter variant="bare" className="items-center sm:justify-between">
             <span className="text-xs text-muted-foreground">
-              {formatTokens(model.unpricedTokens)} tokens have no known price
+              <T>
+                <Var>{formatTokens(model.unpricedTokens)}</Var> tokens have no known price
+              </T>
             </span>
-            <Button onClick={onSetPrice}>Set price</Button>
+            <Button onClick={onSetPrice}>
+              <T>Set price</T>
+            </Button>
           </DialogFooter>
         ) : null}
       </DialogPopup>
@@ -151,7 +157,12 @@ export function UsageModelDialog({
 export function SpeedPremium({ premiumUsd }: { readonly premiumUsd: number }) {
   return (
     <span className="text-xs text-muted-foreground">
-      Premium <span className="text-foreground tabular-nums">{formatUsd(premiumUsd)}</span>
+      <T>
+        Premium{" "}
+        <span className="text-foreground tabular-nums">
+          <Var>{formatUsd(premiumUsd)}</Var>
+        </span>
+      </T>
     </span>
   );
 }

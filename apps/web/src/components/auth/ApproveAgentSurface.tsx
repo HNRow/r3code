@@ -23,6 +23,7 @@ import {
   McpConsent,
   readAuthorizationRequest,
 } from "./ConnectAgentSurface";
+import { useGT, T } from "gt-react";
 
 const isUnavailable = Schema.is(ConnectMcpApprovalUnavailableError);
 
@@ -31,7 +32,7 @@ function readEnvironmentId(): EnvironmentId | null {
   return value ? EnvironmentId.make(value) : null;
 }
 
-/** Sends each call with the owner's T3 Connect session and remembers where the environment is. */
+/** Sends each call with the owner's R3 Connect session and remembers where the environment is. */
 function connectTransport(
   environmentId: EnvironmentId,
   onEnvironment: (environment: { readonly url: string; readonly label: string }) => void,
@@ -70,10 +71,11 @@ function connectTransport(
 }
 
 /**
- * The consent screen for an agent sign-in on a T3 Connect environment: the owner signs in to
- * T3 Connect here and approves with that session, so no sign-in code is needed.
+ * The consent screen for an agent sign-in on a R3 Connect environment: the owner signs in to
+ * R3 Connect here and approves with that session, so no sign-in code is needed.
  */
 export function ApproveAgentSurface() {
+  const gt = useGT();
   const [environmentId] = useState(readEnvironmentId);
   const [authorization] = useState(readAuthorizationRequest);
   // Another site could frame this page and steer a click onto Approve.
@@ -105,8 +107,8 @@ export function ApproveAgentSurface() {
   if (environmentId === null || transport === null) {
     return (
       <Message
-        title="This sign-in link is incomplete"
-        description="Close this page and start the sign-in again from your agent."
+        title={gt("This sign-in link is incomplete")}
+        description={gt("Close this page and start the sign-in again from your agent.")}
       />
     );
   }
@@ -114,8 +116,8 @@ export function ApproveAgentSurface() {
   if (framed) {
     return (
       <Message
-        title="Open this page in its own window"
-        description="For your safety, agent sign-ins cannot be approved inside another site."
+        title={gt("Open this page in its own window")}
+        description={gt("For your safety, agent sign-ins cannot be approved inside another site.")}
       />
     );
   }
@@ -123,12 +125,12 @@ export function ApproveAgentSurface() {
   if (loadFailed) {
     return (
       <Message
-        title="Could not load sign-in"
-        description="T3 Connect sign-in did not load. Check your connection, then try again."
+        title={gt("Could not load sign-in")}
+        description={gt("R3 Connect sign-in did not load. Check your connection, then try again.")}
       >
         <div className="mt-6">
           <Button type="button" onClick={retryClerkLoad}>
-            Retry sign-in
+            <T>Retry sign-in</T>
           </Button>
         </div>
       </Message>
@@ -140,8 +142,8 @@ export function ApproveAgentSurface() {
       <StandalonePage>
         <StandalonePageHeader
           context="Agent sign-in"
-          title="Connecting to T3 Connect"
-          description="One moment while your account loads."
+          title={gt("Connecting to R3 Connect")}
+          description={gt("One moment while your account loads.")}
         />
         <Spinner className="mt-6" size="lg" tone="muted" />
       </StandalonePage>
@@ -151,12 +153,12 @@ export function ApproveAgentSurface() {
   if (!isSignedIn) {
     return (
       <Message
-        title="Sign in to approve"
-        description="Sign in to T3 Connect with the account this environment is linked to."
+        title={gt("Sign in to approve")}
+        description={gt("Sign in to R3 Connect with the account this environment is linked to.")}
       >
         <div className="mt-6">
           <Button type="button" onClick={openSignIn}>
-            Sign in
+            <T>Sign in</T>
           </Button>
         </div>
       </Message>
@@ -181,7 +183,7 @@ export function ApproveAgentSurface() {
                 <a href={`${new URL("/connect-agent", environment.url).toString()}?${search}`} />
               }
             >
-              Use a sign-in code instead
+              <T>Use a sign-in code instead</T>
             </Button>
           ) : null}
           <Button
@@ -190,7 +192,7 @@ export function ApproveAgentSurface() {
             onClick={() => void clerk.signOut({ redirectUrl: window.location.href })}
             type="button"
           >
-            Use another account
+            <T>Use another account</T>
           </Button>
         </div>
       }

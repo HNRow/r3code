@@ -8,6 +8,7 @@ import { AppText as Text } from "../../components/ui/AppText";
 import { useServerConfigs } from "../../state/entities";
 import { orchestrationEnvironment } from "../../state/orchestration";
 import { useEnvironmentQuery } from "../../state/query";
+import { T } from "gt-react-native";
 
 const FOLLOW_SLACK = 8;
 
@@ -71,7 +72,9 @@ export function ThreadCommandOutput(props: {
         }}
       >
         {data?.output.truncated ? (
-          <Text className="pb-0.5 text-3xs text-foreground-subtle">Earlier output not shown</Text>
+          <Text className="pb-0.5 text-3xs text-foreground-subtle">
+            <T>Earlier output not shown</T>
+          </Text>
         ) : null}
         <Text selectable className="font-mono text-2xs leading-normal text-foreground-muted">
           {spans.map((span, index) =>

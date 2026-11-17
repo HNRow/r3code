@@ -21,8 +21,10 @@ import { IssueCandidatesSheet } from "./IssueCandidatesSheet";
 import { issueParamsKey, issueTarget, type IssueParams } from "./issueParams";
 import { issueAssigneePicksFamily } from "./issuePicks";
 import { issueCommandError, useIssueAccess } from "./issuePresentation";
+import { useGT } from "gt-react-native";
 
 export function IssueAssigneesScreen({ route }: StaticScreenProps<IssueParams>) {
+  const gt = useGT();
   const navigation = useNavigation();
   const target = issueTarget(route.params);
   const detail = useEnvironmentQuery(issueEnvironment.detail(target)).data;
@@ -73,7 +75,7 @@ export function IssueAssigneesScreen({ route }: StaticScreenProps<IssueParams>) 
   );
   return (
     <IssueCandidatesSheet
-      title="Assignees"
+      title={gt("Assignees")}
       noun="people"
       query={query}
       onQueryChange={setQuery}

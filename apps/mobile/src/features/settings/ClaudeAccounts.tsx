@@ -26,6 +26,7 @@ import {
   type ClaudeAccountDraft,
 } from "./claude-accounts";
 import type { SettingsTarget } from "./settings-environment-filter";
+import { useGT } from "gt-react-native";
 
 function useProviderInstanceMutation(environment: SettingsTarget) {
   const mutate = useAtomCommand(serverEnvironment.mutateProviderInstance, {
@@ -161,6 +162,7 @@ export function ClaudeAccount({
 }
 
 export function AddClaudeAccount({ environment }: { readonly environment: SettingsTarget }) {
+  const gt = useGT();
   const [adding, setAdding] = useState(false);
   return (
     <View className="border-t border-border-subtle">
@@ -174,8 +176,8 @@ export function AddClaudeAccount({ environment }: { readonly environment: Settin
       ) : (
         <ListActionRow
           icon="plus"
-          label="Add Claude account"
-          description="Use a Claude config folder that is already signed in on this server."
+          label={gt("Add Claude account")}
+          description={gt("Use a Claude config folder that is already signed in on this server.")}
           onPress={() => setAdding(true)}
         />
       )}
@@ -194,6 +196,7 @@ function ClaudeAccountForm({
   readonly initial: ClaudeAccountDraft;
   readonly onDone: () => void;
 }) {
+  const gt = useGT();
   const [draft, setDraft] = useState(initial);
   const { run, pending, error, setError } = useProviderInstanceMutation(environment);
   function save() {
@@ -239,7 +242,7 @@ function ClaudeAccountForm({
         </Text>
       ) : null}
       <View className="flex-row justify-end gap-2">
-        <ControlPill variant="pill" label="Cancel" disabled={pending} onPress={onDone} />
+        <ControlPill variant="pill" label={gt("Cancel")} disabled={pending} onPress={onDone} />
         <ControlPill
           variant="primary"
           label={instanceId === null ? "Add" : "Save"}

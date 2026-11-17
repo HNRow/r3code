@@ -6,6 +6,7 @@ import type {
   HomeListFilterMenuEnvironment,
   HomeListFilterMenuProject,
 } from "./home-list-filter-menu";
+import { useGT } from "gt-react-native";
 
 export function ThreadListFilters(props: {
   readonly environments: ReadonlyArray<HomeListFilterMenuEnvironment>;
@@ -17,6 +18,7 @@ export function ThreadListFilters(props: {
   /** List padding the scroller bleeds through so pills start where row content does. */
   readonly gutter: number;
 }) {
+  const gt = useGT();
   const selectedEnvironment = props.environments.find(
     (environment) => environment.environmentId === props.selectedEnvironmentId,
   );
@@ -32,7 +34,7 @@ export function ThreadListFilters(props: {
     >
       <ListFilterMenu
         label={selectedEnvironment?.label ?? "All environments"}
-        accessibilityLabel="Filter threads by environment"
+        accessibilityLabel={gt("Filter threads by environment")}
         active={selectedEnvironment !== undefined}
         actions={[
           {
@@ -61,7 +63,7 @@ export function ThreadListFilters(props: {
       />
       <ListFilterMenu
         label={selectedProject?.label ?? "All projects"}
-        accessibilityLabel="Filter threads by project"
+        accessibilityLabel={gt("Filter threads by project")}
         active={selectedProject !== undefined}
         actions={[
           {
@@ -88,7 +90,7 @@ export function ThreadListFilters(props: {
       {props.selectedEnvironmentId !== null || props.selectedProjectKey !== null ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Reset thread filters"
+          accessibilityLabel={gt("Reset thread filters")}
           className="h-8 w-8 items-center justify-center"
           onPress={() => {
             props.onEnvironmentChange(null);

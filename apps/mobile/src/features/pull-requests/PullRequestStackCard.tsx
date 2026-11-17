@@ -9,11 +9,13 @@ import type { PullRequestParams } from "./usePullRequestDiff";
 import type { PullRequestStackState } from "./usePullRequestStack";
 import { PullRequestGlyph } from "./pullRequestGlyphs";
 import { withKnownPullRequestSummary } from "../../state/use-thread-pr";
+import { useGT, Var, T } from "gt-react-native";
 
 export function PullRequestStackCard(props: {
   readonly params: PullRequestParams;
   readonly state: PullRequestStackState;
 }) {
+  const gt = useGT();
   const navigation = useNavigation();
   const [expanded, setExpanded] = useState(false);
   const stack = props.state.stack;
@@ -26,7 +28,7 @@ export function PullRequestStackCard(props: {
     return (
       <PullRequestCardGroup>
         <PullRequestCardRow
-          title="Stack"
+          title={gt("Stack")}
           icon={PullRequestGlyph.stack}
           value={`${summary.position} of ${summary.size}`}
           last
@@ -38,7 +40,7 @@ export function PullRequestStackCard(props: {
   return (
     <PullRequestCardGroup>
       <PullRequestCardRow
-        title="Stack"
+        title={gt("Stack")}
         icon={PullRequestGlyph.stack}
         value={`${position} of ${stack.layers.length}`}
         accessibilityLabel={`Stack, ${position} of ${stack.layers.length}${props.state.isFresh ? "" : ", showing saved stack"}`}
@@ -81,7 +83,10 @@ export function PullRequestStackCard(props: {
             );
           })}
           <Text className="px-4 py-3 text-xs text-foreground-muted">
-            Base: {stack.base}. Open a layer to review it or merge the stack through that layer.
+            <T>
+              Base: <Var>{stack.base}</Var>. Open a layer to review it or merge the stack through
+              that layer.
+            </T>
           </Text>
         </View>
       ) : null}

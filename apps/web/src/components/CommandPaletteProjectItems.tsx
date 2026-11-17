@@ -12,6 +12,7 @@ import {
 import { EnvironmentMachineIcon } from "./EnvironmentMachineIcon";
 import { ProjectFavicon } from "./ProjectFavicon";
 import { COMMAND_PALETTE_META_ICON_CLASS, CommandPaletteMetaDot } from "./ThreadCommandSubtitle";
+import { T } from "gt-react";
 
 export interface CommandPaletteProjectLocation {
   readonly kind: "local" | "remote";
@@ -110,7 +111,9 @@ function ProjectLocationDescription(props: {
     <span className="flex min-w-0 items-center gap-1">
       {props.current ? (
         <>
-          <span className="shrink-0">Current</span>
+          <span className="shrink-0">
+            <T>Current</T>
+          </span>
           <CommandPaletteMetaDot />
         </>
       ) : null}

@@ -21,6 +21,7 @@ import {
   postponeUpdateRestart,
   retryFailedUpdateRunServers,
 } from "./updateEverythingRun";
+import { T } from "gt-react";
 
 function useNow(intervalMs: number | null): number {
   const step = intervalMs ?? 60_000;
@@ -130,16 +131,20 @@ export function SidebarUpdateCapsule({
         <div className="flex flex-col gap-1 text-xs">
           {run.localVersion !== null ? (
             <div className="flex items-center justify-between gap-3">
-              <span>This app</span>
+              <span>
+                <T>This app</T>
+              </span>
               <span className="text-muted-foreground tabular-nums">
                 {localStatusLabel(run, local, now)}
               </span>
             </div>
           ) : onRestart ? (
             <div className="flex items-center justify-between gap-3">
-              <span>This app</span>
+              <span>
+                <T>This app</T>
+              </span>
               <Button size="xs" variant="outline" onClick={() => void onRestart()}>
-                Restart to update
+                <T>Restart to update</T>
               </Button>
             </div>
           ) : null}
@@ -168,11 +173,11 @@ export function SidebarUpdateCapsule({
             <div className="mt-1 flex justify-end gap-1">
               {view.action === "retry" ? (
                 <Button size="xs" variant="outline" onClick={runAction}>
-                  Retry
+                  <T>Retry</T>
                 </Button>
               ) : null}
               <Button size="xs" variant="ghost" onClick={dismissSettledUpdateRunMachines}>
-                Dismiss
+                <T>Dismiss</T>
               </Button>
             </div>
           ) : null}

@@ -62,6 +62,7 @@ import {
   workEntryIconName,
 } from "./TimelineWorkEntryRow.logic";
 import { formatWorkingTimerNow } from "./TimelineWorkGroupRows.logic";
+import { useGT, T } from "gt-react";
 
 export const WorkGroupSection = memo(function WorkGroupSection({
   anchorKey,
@@ -76,6 +77,7 @@ export const WorkGroupSection = memo(function WorkGroupSection({
   isExpandedToolGroup: boolean;
   displayLabel?: string | undefined;
 }) {
+  const gt = useGT();
   const {
     workspaceRoot,
     routeThreadKey,
@@ -109,7 +111,7 @@ export const WorkGroupSection = memo(function WorkGroupSection({
   }
 
   return (
-    <section aria-label="Activity">
+    <section aria-label={gt("Activity")}>
       {nonEmptyEntries.map((workEntry) => (
         <SimpleWorkEntryRow
           key={workEntry.id}
@@ -194,6 +196,7 @@ function ExpandedWorkGroupEntries({
   groupedEntries: ReadonlyArray<TimelineWorkEntry>;
   workspaceRoot: string | undefined;
 }) {
+  const gt = useGT();
   const {
     workGroupViewState: viewState,
     onToggleWorkEntry,
@@ -329,7 +332,7 @@ function ExpandedWorkGroupEntries({
           onItemSizeChanged={updateExpandedContentHeight}
           tabIndex={0}
           role="region"
-          aria-label="Tool calls"
+          aria-label={gt("Tool calls")}
           data-tool-group-scroll
           style={{ maxHeight: `calc(min(18rem, 50dvh) + ${expandedContentHeight}px)` }}
           className={cn(
@@ -355,7 +358,9 @@ export function WorkingTimelineRow({ row }: { row: Extract<TimelineRow, { kind: 
     <CompactingLabel createdAt={row.createdAt} />
   ) : row.createdAt ? (
     <>
-      Working for <WorkingTimer createdAt={row.createdAt} />
+      <T>
+        Working for <WorkingTimer createdAt={row.createdAt} />
+      </T>
     </>
   ) : (
     "Working..."
@@ -397,7 +402,9 @@ function BackgroundWorktreeSetupChip({ snapshot }: { snapshot: WorktreeSetupSnap
         }
       >
         <Spinner className="size-3 shrink-0" />
-        <span className="truncate">Background setup</span>
+        <span className="truncate">
+          <T>Background setup</T>
+        </span>
       </PopoverTrigger>
       <PopoverPopup side="bottom" align="end" width="lg" padding="compact">
         <WorktreeSetupCard
@@ -418,7 +425,9 @@ function CompactingLabel({ createdAt }: { createdAt: string | null }) {
       <Minimize2Icon aria-hidden="true" className="size-3" />
       {createdAt ? (
         <span>
-          Compacting for <WorkingTimer createdAt={createdAt} />
+          <T>
+            Compacting for <WorkingTimer createdAt={createdAt} />
+          </T>
         </span>
       ) : (
         "Compacting…"

@@ -67,6 +67,7 @@ import {
 } from "../../providerInstances";
 import { providerModelKey, sortProviderModelItems } from "../../modelOrdering";
 import { hasRuntimeModelCatalog } from "../../providerModels";
+import { T, useGT } from "gt-react";
 
 type ModelPickerItem = {
   slug: string;
@@ -245,7 +246,7 @@ function ModelPickerProviderNotices({
               void navigate({ to: "/settings/providers" });
             }}
           >
-            Provider settings
+            <T>Provider settings</T>
           </InlineButton>
         </p>
       ))}
@@ -350,6 +351,7 @@ export const ModelPickerContent = memo(function ModelPickerContent(props: {
   /** Closes the list column, inside the popup's fixed height. */
   listFooter?: ReactNode;
 }) {
+  const gt = useGT();
   const {
     searchInputRef,
     keybindings: providedKeybindings,
@@ -930,7 +932,7 @@ export const ModelPickerContent = memo(function ModelPickerContent(props: {
           >
             <ComboboxSearchInput
               ref={searchInputRef}
-              placeholder="Search models..."
+              placeholder={gt("Search models...")}
               value={searchQuery}
               onChange={(e) => {
                 if (!isSearching) setSearchHeight(pickerContentRef.current?.offsetHeight ?? 0);

@@ -8,6 +8,7 @@ import { useServerConfigs } from "../../state/entities";
 import { orchestrationEnvironment } from "../../state/orchestration";
 import { useEnvironmentQuery } from "../../state/query";
 import { useInitialOutputReady, type TurnItemSource } from "./timelineRowContext";
+import { Var, T } from "gt-react";
 
 const FOLLOW_SLACK_PX = 8;
 
@@ -49,9 +50,25 @@ export function CommandOutputPanel(props: {
   });
 
   if (text.length === 0) {
-    if (error) return <div className="text-destructive">Couldn&apos;t load output: {error}</div>;
-    if (data === null) return <div className="text-muted-foreground italic">Loading output…</div>;
-    return data.running ? null : <div className="text-muted-foreground italic">No output.</div>;
+    if (error)
+      return (
+        <div className="text-destructive">
+          <T>
+            Couldn&apos;t load output: <Var>{error}</Var>
+          </T>
+        </div>
+      );
+    if (data === null)
+      return (
+        <div className="text-muted-foreground italic">
+          <T>Loading output…</T>
+        </div>
+      );
+    return data.running ? null : (
+      <div className="text-muted-foreground italic">
+        <T>No output.</T>
+      </div>
+    );
   }
   // Parse after all hooks to preserve the text/theme compiler cache.
   const spans = terminalOutputSpans(text, TERMINAL_PALETTES[resolvedTheme]);
@@ -65,7 +82,11 @@ export function CommandOutputPanel(props: {
       }}
       className="max-h-80 overflow-auto text-muted-foreground"
     >
-      {data?.output.truncated ? <div className="italic">Earlier output not shown</div> : null}
+      {data?.output.truncated ? (
+        <div className="italic">
+          <T>Earlier output not shown</T>
+        </div>
+      ) : null}
       {spans.map((span, index) =>
         span.style === null ? (
           span.text

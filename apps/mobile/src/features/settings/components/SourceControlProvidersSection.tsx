@@ -30,6 +30,7 @@ import { SourceControlIcon } from "../../projects/SourceControlIcon";
 import type { SettingsTarget } from "../settings-environment-filter";
 import { SettingsProviderRow } from "./SettingsProviderRow";
 import { SettingsSection } from "./SettingsSection";
+import { useGT } from "gt-react-native";
 
 const saveFailure = (result: Parameters<typeof squashAtomCommandFailure>[0]) => {
   const error = squashAtomCommandFailure(result);
@@ -93,6 +94,7 @@ function EnvironmentProviders(props: {
   readonly title: string;
   readonly disabled: boolean;
 }) {
+  const gt = useGT();
   const { environment } = props;
   const { environmentId } = environment;
   const discovery = useEnvironmentQuery(
@@ -110,7 +112,7 @@ function EnvironmentProviders(props: {
     return discovery.error ? (
       <SettingsSection title={props.title} footer={discovery.error}>
         <View className="p-4">
-          <Button label="Scan again" tone="secondary" onPress={discovery.refresh} />
+          <Button label={gt("Scan again")} tone="secondary" onPress={discovery.refresh} />
         </View>
       </SettingsSection>
     ) : null;
@@ -167,6 +169,7 @@ export function SourceControlTokenForm(props: {
   readonly disabled: boolean;
   readonly onSaved: () => void;
 }) {
+  const gt = useGT();
   const { definition, credentials } = props;
   const { environmentId } = props.environment;
   const { tokens } = readHostCredentialSettings(
@@ -215,7 +218,7 @@ export function SourceControlTokenForm(props: {
         {`A token saved here is used before ${credentials.tokenEnvVar} and the ${credentials.cliName} login, so ${definition.label} works without the ${credentials.cliLabel}. Give it ${credentials.tokenAccess}.`}
       </Text>
       <ConnectionFormField
-        label="Host"
+        label={gt("Host")}
         autoCapitalize="none"
         autoCorrect={false}
         keyboardType="url"
@@ -247,7 +250,7 @@ export function SourceControlTokenForm(props: {
       <View className="flex-row flex-wrap justify-end gap-2">
         {target || defaultHost ? (
           <Button
-            label="Create a token"
+            label={gt("Create a token")}
             tone="text"
             size="compact"
             onPress={() =>
@@ -259,7 +262,7 @@ export function SourceControlTokenForm(props: {
         ) : null}
         {saved ? (
           <Button
-            label="Remove"
+            label={gt("Remove")}
             tone="secondary"
             size="compact"
             disabled={locked}
@@ -267,7 +270,7 @@ export function SourceControlTokenForm(props: {
           />
         ) : null}
         <Button
-          label="Save"
+          label={gt("Save")}
           tone="primary"
           size="compact"
           loading={saving}
@@ -313,6 +316,7 @@ export function SourceControlHostFieldsForm(props: {
   readonly disabled: boolean;
   readonly onSaved: () => void;
 }) {
+  const gt = useGT();
   const { definition } = props;
   const { environmentId } = props.environment;
   const saved: Readonly<Record<string, unknown>> =
@@ -399,7 +403,7 @@ export function SourceControlHostFieldsForm(props: {
       <View className="flex-row flex-wrap justify-end gap-2">
         {fields.some((field) => isSet(field.key)) ? (
           <Button
-            label="Remove"
+            label={gt("Remove")}
             tone="secondary"
             size="compact"
             disabled={locked}
@@ -407,7 +411,7 @@ export function SourceControlHostFieldsForm(props: {
           />
         ) : null}
         <Button
-          label="Save"
+          label={gt("Save")}
           tone="primary"
           size="compact"
           loading={saving}

@@ -32,6 +32,7 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { tryOpenExternalUrl } from "../../lib/openExternalUrl";
 import { Button } from "../../components/ui/Button";
 import { Chip } from "../../components/ui/Chip";
+import { useGT } from "gt-react-native";
 
 const LOCK_SYMBOL: AppSymbolName = { ios: "lock", android: "lock" };
 const PRIVATE_SYMBOL: AppSymbolName = { ios: "checkmark.shield", android: "lock" };
@@ -74,6 +75,7 @@ function PendingSecretRequestForm(props: {
   readonly item: SecretRequestItem;
   readonly iconColor: ColorValue;
 }) {
+  const gt = useGT();
   const { item } = props;
   const answer = useAtomCommand(serverEnvironment.answerSecretRequest, {
     label: "answer secret request",
@@ -152,7 +154,7 @@ function PendingSecretRequestForm(props: {
       {sources.length > 0 ? (
         <View className="flex-row flex-wrap gap-2">
           <Chip
-            label="Value"
+            label={gt("Value")}
             size="small"
             selected={source === null}
             disabled={submitting}
@@ -216,7 +218,7 @@ function PendingSecretRequestForm(props: {
         </Text>
       ) : null}
       <Button
-        label="Save securely"
+        label={gt("Save securely")}
         tone="primary"
         fullWidth
         disabled={submitting || draft.trim().length === 0}
@@ -235,7 +237,7 @@ function PendingSecretRequestForm(props: {
           </Text>
         </View>
         <Button
-          label="Decline"
+          label={gt("Decline")}
           tone="text"
           disabled={submitting}
           onPress={() => void send({ type: "decline" })}

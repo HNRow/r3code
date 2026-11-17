@@ -8,12 +8,14 @@ import { PresentationSource } from "../../components/ui/NativePresentation";
 import { useMediaActions } from "../../state/mediaActions";
 import { type MediaActionsSource } from "../../lib/mediaActionsSource";
 import { MediaActionsMenu } from "../../components/MediaActionsMenu";
+import { useGT } from "gt-react-native";
 
 function ResolvedWorkspaceFileImagePreview(props: {
   readonly accessibilityLabel: string;
   readonly uri: string;
   readonly actionsSource?: MediaActionsSource;
 }) {
+  const gt = useGT();
   const [loadError, setLoadError] = useState<string | null>(null);
   const [preview, setPreview] = useState<FilePreviewSource | null>(null);
   const sourceIdentifier = useId();
@@ -60,7 +62,7 @@ function ResolvedWorkspaceFileImagePreview(props: {
           pointerEvents="none"
           className="absolute inset-0 items-center justify-center bg-card px-6"
         >
-          <EmptyState title="Image unavailable" detail={loadError} />
+          <EmptyState title={gt("Image unavailable")} detail={loadError} />
         </View>
       ) : null}
       <FilePreviewModal source={preview} onRequestClose={() => setPreview(null)} />
@@ -73,8 +75,9 @@ export function WorkspaceFileImagePreview(props: {
   readonly uri: string | null;
   readonly actionsSource?: MediaActionsSource;
 }) {
+  const gt = useGT();
   if (props.uri === null) {
-    return <FilePreviewLoading message="Preparing image preview..." background="card" />;
+    return <FilePreviewLoading message={gt("Preparing image preview...")} background="card" />;
   }
 
   return (

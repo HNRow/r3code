@@ -75,6 +75,7 @@ import { PullRequestGlyph } from "../pull-requests/pullRequestGlyphs";
 import { openSettings } from "../settings/settings-navigation";
 import { useSelectWorkspaceTab } from "../layout/workspace/useSelectWorkspaceTab";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
+import { useGT, T } from "gt-react-native";
 
 const PALETTE_COMMANDS: ReadonlyArray<HardwareKeyboardCommand> = [
   "commandPalette",
@@ -222,6 +223,7 @@ export function CommandPalette(props: {
   readonly onClose: () => void;
   readonly onCommand: (command: HardwareKeyboardCommand) => void;
 }) {
+  const gt = useGT();
   const navigation = useNavigation();
   const selectTab = useSelectWorkspaceTab();
   const { themeVariables } = useAppearancePreferences();
@@ -627,7 +629,7 @@ export function CommandPalette(props: {
           >
             <Pressable
               className="absolute inset-0 bg-backdrop"
-              accessibilityLabel="Close command palette"
+              accessibilityLabel={gt("Close command palette")}
               onPress={() => close()}
             />
             <GlassSurface
@@ -651,8 +653,8 @@ export function CommandPalette(props: {
                   />
                   <TextInput
                     ref={inputRef}
-                    accessibilityLabel="Search commands, projects, and threads"
-                    placeholder="Search commands, projects, and threads…"
+                    accessibilityLabel={gt("Search commands, projects, and threads")}
+                    placeholder={gt("Search commands, projects, and threads…")}
                     placeholderTextColorClassName="accent-placeholder"
                     autoCorrect={false}
                     autoCapitalize="none"
@@ -701,7 +703,7 @@ export function CommandPalette(props: {
                 ListFooterComponent={
                   results.length > 0 && search.isPending && !query.startsWith(">") ? (
                     <Text className="px-5 pt-2 text-xs text-foreground-muted">
-                      Searching messages…
+                      <T>Searching messages…</T>
                     </Text>
                   ) : undefined
                 }
@@ -712,7 +714,7 @@ export function CommandPalette(props: {
                         className="px-5 pt-2 text-xs text-foreground-muted"
                         style={{ height: SECTION_LABEL_HEIGHT }}
                       >
-                        In messages
+                        <T>In messages</T>
                       </Text>
                     ) : null}
                     <PaletteRow

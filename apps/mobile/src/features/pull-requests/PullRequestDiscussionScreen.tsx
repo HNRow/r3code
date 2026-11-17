@@ -33,6 +33,7 @@ import { usePullRequestPermissions } from "./usePullRequestPermissions";
 import { pullRequestReviewKey } from "./pullRequestReviewDrafts";
 import { PullRequestCompletionSuggestions } from "./PullRequestCompletionSuggestions";
 import { usePullRequestCompletions } from "./usePullRequestCompletions";
+import { useGT, T } from "gt-react-native";
 
 export function PullRequestDiscussionScreen({
   route,
@@ -46,6 +47,7 @@ export function PullRequestDiscussionScreen({
 }
 
 function Discussion({ params }: { params: PullRequestParams & { readonly discussionId: string } }) {
+  const gt = useGT();
   const target = pullRequestTarget(params);
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
@@ -170,7 +172,7 @@ function Discussion({ params }: { params: PullRequestParams & { readonly discuss
         }}
       >
         <AppBar
-          title="Discussion"
+          title={gt("Discussion")}
           subtitle={`#${params.number}`}
           onBack={() => navigation.goBack()}
           actions={
@@ -217,7 +219,7 @@ function Discussion({ params }: { params: PullRequestParams & { readonly discuss
                 </Text>
                 {filePath === null ? null : (
                   <Button
-                    label="View file diff"
+                    label={gt("View file diff")}
                     onPress={() =>
                       navigation.navigate("PullRequestFile", { ...params, path: filePath })
                     }
@@ -225,7 +227,9 @@ function Discussion({ params }: { params: PullRequestParams & { readonly discuss
                 )}
               </View>
             ) : !activity.isPending ? (
-              <Text>This discussion is no longer available.</Text>
+              <Text>
+                <T>This discussion is no longer available.</T>
+              </Text>
             ) : null}
             {comments.map((comment) => (
               <View
@@ -296,13 +300,13 @@ function Discussion({ params }: { params: PullRequestParams & { readonly discuss
               className="flex-row items-end gap-1 p-1"
             >
               <TextInput
-                accessibilityLabel="Discussion reply"
+                accessibilityLabel={gt("Discussion reply")}
                 selection={completions.selection}
                 onSelectionChange={completions.onSelectionChange}
                 onBlur={completions.onBlur}
                 multiline
                 maxLength={65536}
-                placeholder="Reply…"
+                placeholder={gt("Reply…")}
                 placeholderTextColorClassName="accent-foreground-muted"
                 value={body}
                 onChangeText={setBody}

@@ -6,6 +6,7 @@ import { AppText as Text } from "../../components/ui/AppText";
 import { useFullscreenVideoOpen, useMediaAudioSessionHold } from "../../lib/videoAudioSession";
 import { createAudioPlaybackSession } from "../../lib/audioSession";
 import { usePlaybackAudioPlayer } from "../voice-input/usePlaybackAudioPlayer";
+import { useGT, T } from "gt-react-native";
 
 function timestamp(seconds: number) {
   const value = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
@@ -13,6 +14,7 @@ function timestamp(seconds: number) {
 }
 
 export function AudioFilePreview(props: { uri: string; onRetry: () => void }) {
+  const gt = useGT();
   const player = usePlaybackAudioPlayer(props.uri);
   const status = useAudioPlayerStatus(player);
   const [playbackRequested, setPlaybackRequested] = useState(false);
@@ -47,9 +49,9 @@ export function AudioFilePreview(props: { uri: string; onRetry: () => void }) {
       </Text>
       <View className="flex-row items-center gap-4">
         <Button
-          label="−15s"
+          label={gt("−15s")}
           tone="text"
-          accessibilityLabel="Back 15 seconds"
+          accessibilityLabel={gt("Back 15 seconds")}
           disabled={!status.isLoaded}
           onPress={() => seek(Math.max(0, status.currentTime - 15))}
         />
@@ -74,9 +76,9 @@ export function AudioFilePreview(props: { uri: string; onRetry: () => void }) {
           }}
         />
         <Button
-          label="+15s"
+          label={gt("+15s")}
           tone="text"
-          accessibilityLabel="Forward 15 seconds"
+          accessibilityLabel={gt("Forward 15 seconds")}
           disabled={!status.isLoaded}
           onPress={() => seek(Math.min(status.duration, status.currentTime + 15))}
         />
@@ -84,10 +86,10 @@ export function AudioFilePreview(props: { uri: string; onRetry: () => void }) {
       {status.error || seekError ? (
         <View className="items-center gap-3">
           <Text className="text-center text-foreground">
-            This audio could not be played. Try again or save it to open in another app.
+            <T>This audio could not be played. Try again or save it to open in another app.</T>
           </Text>
           <View className="items-center">
-            <Button label="Try again" tone="secondary" onPress={props.onRetry} />
+            <Button label={gt("Try again")} tone="secondary" onPress={props.onRetry} />
           </View>
         </View>
       ) : null}

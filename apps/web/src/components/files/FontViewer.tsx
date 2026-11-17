@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "~/hooks/useTheme";
 
 import { FileSurfaceLoading } from "./fileSurfaceChrome";
+import { T, Var } from "gt-react";
 
 const MAX_FONT_BYTES = 10 * 1024 * 1024;
 
@@ -69,9 +70,13 @@ export default function FontViewer(props: { readonly src: string; readonly name:
         role="alert"
         className="flex min-h-0 flex-1 flex-col items-center justify-center gap-1 px-6 text-center"
       >
-        <p className="text-sm font-medium">No preview for this file</p>
+        <p className="text-sm font-medium">
+          <T>No preview for this file</T>
+        </p>
         <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">
-          {error} Save it to open in another app.
+          <T>
+            <Var>{error}</Var> Save it to open in another app.
+          </T>
         </p>
       </div>
     );

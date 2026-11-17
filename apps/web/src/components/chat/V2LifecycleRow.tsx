@@ -68,6 +68,7 @@ import { TimelineSystemDivider } from "./TimelineSystemDivider";
 import { subagentResumedSince } from "./V2LifecycleRow.logic";
 import { Button, InlineButton } from "../ui/button";
 import { T3Wordmark } from "../T3Wordmark";
+import { useGT, T, Var } from "gt-react";
 
 export type { HandoffTimelineRun } from "@t3tools/client-runtime/handoff";
 
@@ -78,11 +79,12 @@ export function V2LifecycleRow(props: {
   readonly runs: ReadonlyArray<HandoffTimelineRun>;
   readonly onOpenThread: (threadId: ThreadId) => void;
 }) {
+  const gt = useGT();
   const { item } = props;
   if (item.type === "run_interrupt_result") {
     return (
       <TimelineSystemDivider
-        label="Run interrupted"
+        label={gt("Run interrupted")}
         detail={item.message}
         icon={CircleStopIcon}
         wrapDetail
@@ -128,7 +130,7 @@ export function V2LifecycleRow(props: {
             aria-label={`Open ${item.title ?? "created thread"}`}
             onClick={() => props.onOpenThread(item.targetThreadId)}
           >
-            Open chat
+            <T>Open chat</T>
           </Button>
         </div>
       );
@@ -137,13 +139,19 @@ export function V2LifecycleRow(props: {
       <WorkLogRow
         data-v2-item-type={item.type}
         icon={<T3Wordmark className="size-4 text-icon-muted" aria-hidden />}
-        label={<>Created thread{item.title ? ` · ${item.title}` : ""}</>}
+        label={
+          <>
+            <T>
+              Created thread<Var>{item.title ? ` · ${item.title}` : ""}</Var>
+            </T>
+          </>
+        }
         trailing={
           <InlineButton
             aria-label={`Open ${item.title ?? "created thread"}`}
             onClick={() => props.onOpenThread(item.targetThreadId)}
           >
-            Open chat
+            <T>Open chat</T>
           </InlineButton>
         }
       />
@@ -463,7 +471,11 @@ function SubagentTimelineLink(props: {
             {props.title}
           </span>
           {remote !== undefined ? (
-            <span className="shrink-0 text-xs text-muted-foreground">on {remote.label}</span>
+            <span className="shrink-0 text-xs text-muted-foreground">
+              <T>
+                on <Var>{remote.label}</Var>
+              </T>
+            </span>
           ) : null}
         </span>
         <span
@@ -598,7 +610,8 @@ function EnvironmentHandoffRow({
 
 /** Marks where `/clear` or an automation started a new provider session in this thread. */
 export function FreshSessionRow() {
-  return <TimelineSystemDivider label="New session" icon={EraserIcon} />;
+  const gt = useGT();
+  return <TimelineSystemDivider label={gt("New session")} icon={EraserIcon} />;
 }
 
 /** A same-harness model or effort change. Shows only what changed. */

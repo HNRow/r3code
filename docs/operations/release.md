@@ -1,6 +1,6 @@
 # Release Checklist
 
-> For maintainers. Using T3 Code? See [docs/user](../user/).
+> For maintainers. Using R3 Code? See [docs/user](../user/).
 
 This document covers the unified release workflow for stable and nightly desktop releases.
 
@@ -29,7 +29,7 @@ the version.
   - Pushing a `vX.Y.Z` tag by hand still works and builds exactly the tagged commit. Use it when
     the commit to ship is not the latest nightly, such as a cherry-picked fix on a release branch.
 - Runs lint, typecheck, and tests alongside artifact builds. Publishing waits for every check.
-- Reads the shared production T3 Connect relay URL and Clerk client configuration before packaging clients.
+- Reads the shared production R3 Connect relay URL and Clerk client configuration before packaging clients.
 - Builds the platform-independent JS (server bundle, web client, Electron main) once in the `build_bundle` job and hands it to every platform job as the `js-bundle` artifact; the platform jobs only package it, so no runner rebuilds it.
 - Builds six desktop artifacts in parallel for both channels, each as its own job (`desktop_<platform>_<arch>`, one call of `release-desktop.yml`), gated only on the bundle. macOS and Linux targets build on hardware of their own architecture. Both Windows targets build and sign (with jsign) on a Linux runner, which packages faster than Windows runners, and a Windows job of the target's architecture (`windows-2025` or `windows-11-arm`, the `verify_runner`) runs the packaged natives and the CLI archive. The Windows jobs embed the same-arch Linux CLI archive as the WSL runtime and wait for that artifact partway through, not for the whole Linux job:
   - macOS `arm64` DMG
@@ -45,7 +45,7 @@ the version.
   - The release job's **Write release notes** step (`scripts/generate-release-notes.ts`) builds the body: a computed header line, a short summary from `gpt-6.1-terra`, and GitHub's generated list folded under `<details>`. It needs the `OPENAI_API_KEY` secret. The desktop update popover shows up to seven highlights and the number of other fixes and performance improvements. Mobile-only commits count toward release totals but cannot be highlights. The offered release's age comes from the update feed's `releaseDate`. The nightly Discord post shows the part above `<details>`. If summary generation fails, the release uses GitHub's generated notes.
 - Includes Electron auto-update metadata (for example `latest*.yml`, `nightly*.yml`, and `*.blockmap`) in release assets.
 - Builds a self-contained CLI archive per platform (`t3-<version>-<platform>-<arch>.tar.gz`, `.zip` on Windows) in the same job as that target's desktop artifact and attaches them to the GitHub Release with a `SHA256SUMS` file, on every channel, for five targets: macOS arm64, Linux x64 and arm64, Windows x64 and arm64. Every archive is smoke-tested on hardware of its own architecture, and every one but the Windows archives is also built and signed there. There is no macOS x64 archive: Node single-executables are unsupported on x64 macOS (the SEA docs list macOS as arm64 only) and the binary segfaults on start; the x64 desktop app is Electron and unaffected.
-  - The archive holds the server as a Node single-executable (`scripts/build-cli-archive.ts`), so unpacking it needs neither Node, npm, nor a compiler. It is the only form in which T3 Code manages a runtime: the desktop's SSH environments, the boot service, `t3 update`, and the install scripts all download and verify this archive against `SHA256SUMS`. The `t3` npm package exists for people who run `npx t3` or `npm install -g t3` themselves, and it downloads this same archive too; nothing in the product installs from npm. The `curl | sh` installers are `scripts/install.sh` and `scripts/install.ps1`; the marketing site copies them into its `public/` at build time (`apps/marketing/scripts/stage-install-scripts.mjs`) and serves them at `t3.codes/install.sh` and `/install.ps1`.
+  - The archive holds the server as a Node single-executable (`scripts/build-cli-archive.ts`), so unpacking it needs neither Node, npm, nor a compiler. It is the only form in which R3 Code manages a runtime: the desktop's SSH environments, the boot service, `t3 update`, and the install scripts all download and verify this archive against `SHA256SUMS`. The `t3` npm package exists for people who run `npx t3` or `npm install -g t3` themselves, and it downloads this same archive too; nothing in the product installs from npm. The `curl | sh` installers are `scripts/install.sh` and `scripts/install.ps1`; the marketing site copies them into its `public/` at build time (`apps/marketing/scripts/stage-install-scripts.mjs`) and serves them at `t3.codes/install.sh` and `/install.ps1`.
   - The root `package.json` pins `engines.node` to the exact Node version used by development, CI and standalone executables. Keep it exact: cross-target builds download that version, and native executable builds reject a different host Node version. TEMPORARY: Linux arm64 executables build only on a Linux arm64 host and are injected with postject, because Node's `--build-sea` output cannot load on 16 or 64 KiB page kernels. Revert when [nodejs/node#67048](https://github.com/nodejs/node/issues/67048) is fixed. Runtime changes need a new T3 release version because installed runtimes are cached by that version.
   - macOS archives are signed with the Developer ID certificate and notarized when the Apple secrets are present (ad hoc otherwise, which still runs from `curl`/`tar` installs). Windows executables use the same Azure Trusted Signing setup as the installer. Every native addon in the macOS archive is signed too, since the hardened runtime refuses unsigned libraries.
   - Each archive is extracted and executed (`scripts/smoke-cli-archive.ts`) on its build runner, or on the `verify_runner` for Windows.
@@ -61,7 +61,7 @@ the version.
 
 ## Pull request macOS previews
 
-Labeling a PR `preview:mac` publishes a signed, notarized Apple Silicon DMG with T3 Connect enabled
+Labeling a PR `preview:mac` publishes a signed, notarized Apple Silicon DMG with R3 Connect enabled
 to the rolling `desktop-preview` prerelease, and works for fork PRs. The label is a one-shot request
 for the commit it is applied to: the trusted workflow removes it once the build is in hand, and later
 pushes do not build until a maintainer applies it again. Every signed preview is therefore a
@@ -76,7 +76,7 @@ split so the Developer ID certificate never shares a job with PR code:
   bot, a collaborator, or listed in `.github/VOUCHED.td` (read from the default branch, so a PR cannot vouch
   for itself). It then packages and signs the bundle through `release-desktop.yml` checked out at
   `main`, so packaging, native helpers, and the Electron/desktop dependencies come from `main`, not
-  the PR. Only the version and the public T3 Connect identifiers in `.env.example` are read from the
+  the PR. Only the version and the public R3 Connect identifiers in `.env.example` are read from the
   PR commit, as data, so the signed app's passkey entitlement matches the bundle. A PR that changes
   packaging must use the `channel=preview` release train above instead.
 
@@ -100,7 +100,7 @@ The finalize job uses them to commit and push aligned package versions to `main`
 GitHub Release publication uses the repository-scoped workflow token so it has a rate-limit quota
 independent from the shared Release App installation.
 
-## T3 Connect relay deployment
+## R3 Connect relay deployment
 
 The relay is a shared control plane versioned separately from client releases. Stable and nightly
 client builds must point at the same relay so users see the same linked environments when switching
@@ -158,7 +158,7 @@ Optional `production` environment secrets:
 - `T3CHAT_LINK_SECRET` for the T3 Chat account link. It must match
   `T3CODE_LINK_SECRET` on T3 Chat.
 
-After changing a variable or secret, run the **Deploy T3 Connect relay** workflow manually from
+After changing a variable or secret, run the **Deploy R3 Connect relay** workflow manually from
 `main` with **force** unchecked. Alchemy compares the values the Worker reads and redeploys it when
 one changed. Check **force** only to redeploy resources with no detected change.
 
@@ -219,7 +219,7 @@ A deleted legacy tunnel keeps its allocation, so its hostname is kept. When the 
 - On a build with recovery, the connector is rejected and the host requests a replacement tunnel at
   the same hostname.
 - On an older build with a CLI link, startup provisions a new tunnel.
-- On an older build linked from web or mobile, the host stays offline until T3 Code on that computer
+- On an older build linked from web or mobile, the host stays offline until R3 Code on that computer
   is updated.
 
 Ship the web and mobile builds that show the offline reason before enabling legacy cleanup, so a
@@ -236,7 +236,7 @@ column in its first deploy with this change; the legacy switch stays `off` until
    They include ones the reaper skips, so they are an upper bound on the backlog. The share of `wouldDeleteLegacy` in each sweep's `scanned` estimates how
    much of that total is eligible.
 3. Run the legacy steps of the disposable-host canary below.
-4. Before enabling, confirm the web and mobile builds that show the "update T3 Code on that computer"
+4. Before enabling, confirm the web and mobile builds that show the "update R3 Code on that computer"
    message are live. Without them, a user whose older host lost its tunnel only sees it as offline.
 5. Set the legacy mode to `enabled`. One sweep deletes at most 100 tunnels, four at a time, and
    stops starting new deletions after 90 seconds. A backlog of 20,000 takes about 17 hours if each
@@ -251,7 +251,7 @@ chart the `attributes.custom.relay.managed_endpoint_reaper.*` fields over time.
 Set the legacy mode back to `off` and deploy if any of these happen:
 
 - `failed` stays above a few per sweep. Read the warning log for the Cloudflare error.
-- Users report an environment that is offline with the update message after they have updated T3
+- Users report an environment that is offline with the update message after they have updated R3
   Code on that computer and restarted it.
 - Relay request errors rise while sweeps run. Deletions share the Postgres connection pool with
   request handlers.
@@ -644,7 +644,7 @@ Checklist:
    - `APPLE_API_KEY`: contents of the downloaded `.p8`
    - `APPLE_API_KEY_ID`: Key ID
    - `APPLE_API_ISSUER`: Issuer ID
-10. Complete the Clerk Native API and AASA setup in [T3 Connect setup](./connect-setup.md#desktop-passkeys).
+10. Complete the Clerk Native API and AASA setup in [R3 Connect setup](./connect-setup.md#desktop-passkeys).
 11. Re-run a tag release and confirm macOS artifacts are signed/notarized and contain the expected
     `com.apple.developer.associated-domains` entitlement.
 

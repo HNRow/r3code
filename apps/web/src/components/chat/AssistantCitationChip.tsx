@@ -31,6 +31,7 @@ import { resolveAssistantCitationCommentDismissal } from "./assistantCitationCom
 import { observeAssistantCitationCommentSource } from "./AssistantCitationSource";
 import { composerFloatingLayerProps } from "./composerEventScope";
 import { textDirection } from "~/textDirection";
+import { useGT } from "gt-react";
 
 function useCitationSourceLinkProps(citation: AssistantCitation) {
   const navigate = useNavigate();
@@ -192,6 +193,7 @@ export function AssistantCitationChip({
     onRestoreFocus?: () => void;
   };
 }) {
+  const gt = useGT();
   const sourceLinkProps = useCitationSourceLinkProps(citation);
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
   const commentPopupRef = useRef<HTMLDivElement>(null);
@@ -323,7 +325,7 @@ export function AssistantCitationChip({
                   : undefined
               }
               ref={commentPopupRef}
-              aria-label="Edit citation comment"
+              aria-label={gt("Edit citation comment")}
               width="md"
               padding="compact"
               onPointerDown={(event) => event.stopPropagation()}

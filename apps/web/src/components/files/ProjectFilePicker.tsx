@@ -15,6 +15,7 @@ import {
   PROJECT_FILE_PICKER_RESULT_LIMIT,
 } from "./ProjectFilePicker.logic";
 import { useProjectFilePickerQuery } from "./projectFilesQueryState";
+import { useGT, T } from "gt-react";
 
 interface ProjectFilePickerProps {
   readonly setOpen: (open: boolean) => void;
@@ -51,24 +52,26 @@ function getEmptyStateMessage(query: string, error: string | null, isPending: bo
 }
 
 function EmptyProjectFilePicker() {
+  const gt = useGT();
   return (
     <CommandPaletteContent
-      aria-label="File picker"
-      escapeLabel="Back"
-      footerActionLabel="Open file"
+      aria-label={gt("File picker")}
+      escapeLabel={gt("Back")}
+      footerActionLabel={gt("Open file")}
       inputProps={{ disabled: true, placeholder: "Search files…" }}
       mode="none"
       testId="project-file-picker"
       value=""
     >
       <div className="py-10 text-center text-sm text-muted-foreground">
-        Open a project to search its files.
+        <T>Open a project to search its files.</T>
       </div>
     </CommandPaletteContent>
   );
 }
 
 function OpenProjectFilePicker(props: ProjectFilePickerProps & { target: ActiveProjectTarget }) {
+  const gt = useGT();
   const { target } = props;
   const [query, setQuery] = useState("");
   const [highlightedItemValue, setHighlightedItemValue] = useState<string | null>(null);
@@ -110,10 +113,10 @@ function OpenProjectFilePicker(props: ProjectFilePickerProps & { target: ActiveP
 
   return (
     <CommandPaletteContent
-      aria-label="File picker"
+      aria-label={gt("File picker")}
       autoHighlight="always"
-      escapeLabel="Back"
-      footerActionLabel="Open file"
+      escapeLabel={gt("Back")}
+      footerActionLabel={gt("Open file")}
       inputProps={{ placeholder: "Search files…" }}
       mode="none"
       onItemHighlighted={(value) => {

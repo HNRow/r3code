@@ -17,6 +17,7 @@ import { Input } from "../ui/input";
 import { Switch } from "../ui/switch";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { CustomModelEditor } from "./CustomModelEditor";
+import { useGT, Var, T } from "gt-react";
 
 const CUSTOM_MODEL_PLACEHOLDER_BY_KIND: Partial<Record<ProviderDriverKind, string>> = {
   [ProviderDriverKind.make("codex")]: "gpt-6.7-codex-ultra-preview",
@@ -136,6 +137,7 @@ export function ProviderModelsSection({
   onToggleFavorite,
   onModelOrderChange,
 }: ProviderModelsSectionProps) {
+  const gt = useGT();
   const [input, setInput] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -336,11 +338,11 @@ export function ProviderModelsSection({
           <Input
             value={filter}
             onChange={(event) => setFilter(event.target.value)}
-            placeholder="Filter models"
+            placeholder={gt("Filter models")}
             size="sm"
             className="w-56 max-w-full"
             spellCheck={false}
-            aria-label="Filter models"
+            aria-label={gt("Filter models")}
           />
         ) : null}
         <div className="flex items-center gap-2">
@@ -360,11 +362,15 @@ export function ProviderModelsSection({
             </Button>
           ) : null}
           <span className="text-xs text-muted-foreground">
-            {models.length} model{models.length === 1 ? "" : "s"}
-            {favoriteCount > 0
-              ? ` · ${favoriteCount} favorite${favoriteCount === 1 ? "" : "s"}`
-              : ""}
-            {hiddenCount > 0 ? ` · ${hiddenCount} hidden` : ""}
+            <T>
+              <Var>{models.length}</Var> model<Var>{models.length === 1 ? "" : "s"}</Var>
+              <Var>
+                {favoriteCount > 0
+                  ? ` · ${favoriteCount} favorite${favoriteCount === 1 ? "" : "s"}`
+                  : ""}
+              </Var>
+              <Var>{hiddenCount > 0 ? ` · ${hiddenCount} hidden` : ""}</Var>
+            </T>
           </span>
         </div>
         {driverKind !== "antigravity" && !isAdding ? (
@@ -376,8 +382,10 @@ export function ProviderModelsSection({
             className="-me-2 ml-auto"
             onClick={() => setIsAdding(true)}
           >
-            <PlusIcon className="size-3" />
-            Add custom model
+            <T>
+              <PlusIcon className="size-3" />
+              Add custom model
+            </T>
           </Button>
         ) : null}
       </div>
@@ -459,10 +467,10 @@ export function ProviderModelsSection({
           />
           <div className="flex shrink-0 gap-2">
             <Button size="sm" variant="outline" disabled={isSaving} onClick={handleAdd}>
-              Add
+              <T>Add</T>
             </Button>
             <Button size="sm" variant="ghost" onClick={cancelAdd}>
-              Cancel
+              <T>Cancel</T>
             </Button>
           </div>
         </div>
@@ -564,7 +572,9 @@ const ProviderModelRow = memo(function ProviderModelRow({
           </TooltipPopup>
         </Tooltip>
         {model.isCustom ? (
-          <span className="shrink-0 text-2xs text-muted-foreground/70">custom</span>
+          <span className="shrink-0 text-2xs text-muted-foreground/70">
+            <T>custom</T>
+          </span>
         ) : null}
       </span>
       <span className="text-2xs text-muted-foreground/70">
@@ -589,7 +599,9 @@ const ProviderModelRow = memo(function ProviderModelRow({
               >
                 <ArrowUpIcon className="size-3" />
               </TooltipTrigger>
-              <TooltipPopup side="top">Move up</TooltipPopup>
+              <TooltipPopup side="top">
+                <T>Move up</T>
+              </TooltipPopup>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger
@@ -605,7 +617,9 @@ const ProviderModelRow = memo(function ProviderModelRow({
               >
                 <ArrowDownIcon className="size-3" />
               </TooltipTrigger>
-              <TooltipPopup side="top">Move down</TooltipPopup>
+              <TooltipPopup side="top">
+                <T>Move down</T>
+              </TooltipPopup>
             </Tooltip>
           </>
         ) : null}
@@ -625,7 +639,9 @@ const ProviderModelRow = memo(function ProviderModelRow({
               >
                 <PencilIcon className="size-3" />
               </TooltipTrigger>
-              <TooltipPopup side="top">Edit name and options</TooltipPopup>
+              <TooltipPopup side="top">
+                <T>Edit name and options</T>
+              </TooltipPopup>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger
@@ -641,7 +657,9 @@ const ProviderModelRow = memo(function ProviderModelRow({
               >
                 <XIcon className="size-3" />
               </TooltipTrigger>
-              <TooltipPopup side="top">Remove custom model</TooltipPopup>
+              <TooltipPopup side="top">
+                <T>Remove custom model</T>
+              </TooltipPopup>
             </Tooltip>
           </>
         ) : null}

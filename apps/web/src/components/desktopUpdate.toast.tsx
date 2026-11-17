@@ -6,6 +6,7 @@ import {
   getDesktopUpdateReleaseUrl,
 } from "./desktopUpdate.logic";
 import { toastManager } from "./ui/toast";
+import { T, Var } from "gt-react";
 
 type DesktopUpdateShell = Pick<DesktopBridge, "openExternal">;
 
@@ -34,12 +35,14 @@ function ReleaseNotesLink({
       }}
       type="button"
     >
-      Read more
-      <ArrowRightIcon
-        aria-hidden
-        className="ml-1 inline size-3 -rotate-45 align-[-0.125em]"
-        strokeWidth={2.25}
-      />
+      <T>
+        Read more
+        <ArrowRightIcon
+          aria-hidden
+          className="ml-1 inline size-3 -rotate-45 align-[-0.125em]"
+          strokeWidth={2.25}
+        />
+      </T>
     </button>
   );
 }
@@ -54,8 +57,12 @@ export function showDesktopUpdateDownloadedToast(
     title: "Update downloaded",
     description: (
       <>
-        Restart the app from the update button to install it.
-        {releaseUrl ? <ReleaseNotesLink releaseUrl={releaseUrl} shell={shell} /> : null}
+        <T>
+          Restart the app from the update button to install it.
+          <Var>
+            {releaseUrl ? <ReleaseNotesLink releaseUrl={releaseUrl} shell={shell} /> : null}
+          </Var>
+        </T>
       </>
     ),
   });

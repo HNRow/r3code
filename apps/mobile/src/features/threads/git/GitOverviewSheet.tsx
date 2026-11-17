@@ -40,6 +40,7 @@ import {
   useLinkedPullRequestLines,
 } from "../LinkedPullRequestList";
 import { useLinkedPullRequestActions } from "../useLinkedPullRequestActions";
+import { useGT } from "gt-react-native";
 
 type GitOverviewSheetProps = StaticScreenProps<{
   readonly environmentId: string;
@@ -61,6 +62,7 @@ export function GitOverviewSheet(props: GitOverviewSheetProps) {
 }
 
 function GitOverviewSheetContent(props: GitOverviewSheetProps) {
+  const gt = useGT();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const presentation = props.presentation ?? "sheet";
@@ -255,7 +257,7 @@ function GitOverviewSheetContent(props: GitOverviewSheetProps) {
         {behindCount > 0 ? (
           <ListRow
             icon="arrow.down.circle"
-            label="Pull latest"
+            label={gt("Pull latest")}
             description={
               canWriteSourceControl
                 ? `${behindCount} commit${behindCount === 1 ? "" : "s"} behind upstream`
@@ -267,8 +269,8 @@ function GitOverviewSheetContent(props: GitOverviewSheetProps) {
         ) : null}
         <ListRow
           icon="text.bubble"
-          label="Review changes"
-          description="Inspect changes, uncommitted edits, and turn diffs"
+          label={gt("Review changes")}
+          description={gt("Inspect changes, uncommitted edits, and turn diffs")}
           disabled={busy || !isRepo}
           onPress={() => {
             const params = { environmentId, threadId };
@@ -283,7 +285,7 @@ function GitOverviewSheetContent(props: GitOverviewSheetProps) {
         />
         <ListRow
           icon="point.topleft.down.curvedto.point.bottomright.up"
-          label="Branches & worktrees"
+          label={gt("Branches & worktrees")}
           description={
             canChangeThreadBranch
               ? "Switch branch, create branch, or move to a worktree"
@@ -325,7 +327,7 @@ function GitOverviewSheetContent(props: GitOverviewSheetProps) {
       ) : null}
 
       {currentWorktreePath ? (
-        <ListSection title="Worktree">
+        <ListSection title={gt("Worktree")}>
           <Text selectable textRole="footnote" className="p-4 text-foreground-muted">
             {currentWorktreePath}
           </Text>

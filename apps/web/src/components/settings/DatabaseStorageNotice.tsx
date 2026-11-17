@@ -28,6 +28,7 @@ import {
 import { Button } from "../ui/button";
 import { toastManager } from "../ui/toast";
 import { SettingsRow, SettingsSection } from "./settingsLayout";
+import { useGT, T, Var } from "gt-react";
 
 const DismissedEnvironmentIds = Schema.Array(Schema.String);
 const reclaimPermissionsAtom = environmentAtomList(
@@ -43,6 +44,7 @@ export function DatabaseStorageNotice({
 }: {
   environments: ReadonlyArray<{ readonly environmentId: EnvironmentId; readonly label: string }>;
 }) {
+  const gt = useGT();
   const environmentIds = environments.map((environment) => environment.environmentId);
   const recommendations = useAtomValue(
     serverEnvironment.databaseCompactionRecommendations(JSON.stringify(environmentIds)),
@@ -68,9 +70,9 @@ export function DatabaseStorageNotice({
     }));
   if (visible.length === 0) return null;
   return (
-    <SettingsSection id="storage-database" title="Database">
+    <SettingsSection id="storage-database" title={gt("Database")}>
       <SettingsRow
-        title="Reclaim freed database space"
+        title={gt("Reclaim freed database space")}
         description={`These databases still hold space freed by history cleanup.${
           visible.every((recommendation) => recommendation.reclaimable)
             ? ""
@@ -84,7 +86,7 @@ export function DatabaseStorageNotice({
             size="xs"
             onClick={() => setDismissed((current) => [...current, environmentId])}
           >
-            Dismiss
+            <T>Dismiss</T>
           </Button>
         );
         return reclaimable ? (
@@ -107,7 +109,7 @@ export function DatabaseStorageNotice({
                   size="xs"
                   onClick={() => copyToClipboard(status.compactCommand, undefined)}
                 >
-                  Copy command
+                  <T>Copy command</T>
                 </Button>
                 {dismiss}
               </div>
@@ -145,7 +147,7 @@ function ReclaimRow({
       toastManager.add({
         type: "success",
         title: `Reclaiming ${amount} on ${label}`,
-        description: `T3 Code there restarts and is back in about ${minutes} min.`,
+        description: `R3 Code there restarts and is back in about ${minutes} min.`,
       });
       return;
     }
@@ -163,7 +165,7 @@ function ReclaimRow({
       title={`${amount} on ${label}`}
       description={
         status.reclaimFailure === undefined
-          ? `Restarts T3 Code there. It will be offline for about ${minutes} min.`
+          ? `Restarts R3 Code there. It will be offline for about ${minutes} min.`
           : `The last attempt failed: ${status.reclaimFailure}`
       }
       control={
@@ -181,16 +183,25 @@ function ReclaimRow({
             <AlertDialogPopup>
               <AlertDialogHeader>
                 <AlertDialogTitle>
-                  Reclaim {amount} on {label}?
+                  <T>
+                    Reclaim <Var>{amount}</Var> on <Var>{label}</Var>?
+                  </T>
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  T3 Code on {label} stops, rebuilds its database, and starts again. It will be
-                  offline for about {minutes} min. Running agents stop when it restarts.
+                  <T>
+                    R3 Code on <Var>{label}</Var> stops, rebuilds its database, and starts again. It
+                    will be offline for about <Var>{minutes}</Var> min. Running agents stop when it
+                    restarts.
+                  </T>
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
-                <Button onClick={() => void start()}>Restart and reclaim</Button>
+                <AlertDialogClose render={<Button variant="outline" />}>
+                  <T>Cancel</T>
+                </AlertDialogClose>
+                <Button onClick={() => void start()}>
+                  <T>Restart and reclaim</T>
+                </Button>
               </AlertDialogFooter>
             </AlertDialogPopup>
           </AlertDialog>

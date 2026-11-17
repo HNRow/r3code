@@ -11,6 +11,7 @@ import { LoadingStrip } from "../../../components/ui/LoadingStrip";
 import { SymbolView } from "../../../components/ui/AppSymbol";
 import { isLegalDocumentUrl, LEGAL_URL } from "../lib/legal-document-url";
 import { webViewDecelerationRate } from "../../../lib/webViewDecelerationRate";
+import { useGT, Var, T } from "gt-react-native";
 
 interface SettingsLegalDocumentRouteScreenProps {
   readonly documentName: string;
@@ -21,6 +22,7 @@ export function SettingsLegalDocumentRouteScreen({
   documentName,
   documentUrl,
 }: SettingsLegalDocumentRouteScreenProps) {
+  const gt = useGT();
   const [reloadKey, setReloadKey] = useState(0);
   const [loadProgress, setLoadProgress] = useState(0);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -30,7 +32,7 @@ export function SettingsLegalDocumentRouteScreen({
   const headerOptions = (
     <SheetHeader
       title={documentName}
-      accessibilityLabel="Close legal document"
+      accessibilityLabel={gt("Close legal document")}
       onClose={() => navigation.goBack()}
       actions={[
         {
@@ -59,7 +61,9 @@ export function SettingsLegalDocumentRouteScreen({
           />
           <View className="items-center gap-2">
             <Text className="text-center font-t3-bold text-lg text-foreground">
-              Couldn&apos;t load the {documentName.toLowerCase()}
+              <T>
+                Couldn&apos;t load the <Var>{documentName.toLowerCase()}</Var>
+              </T>
             </Text>
             <Text selectable className="text-center text-sm leading-normal text-foreground-muted">
               {loadError}
@@ -67,7 +71,7 @@ export function SettingsLegalDocumentRouteScreen({
           </View>
           <View className="w-full max-w-[320px] gap-2">
             <Button
-              label="Try Again"
+              label={gt("Try Again")}
               tone="contrast"
               fullWidth
               onPress={() => {
@@ -81,7 +85,7 @@ export function SettingsLegalDocumentRouteScreen({
               className="items-center rounded-xl px-4 py-3 active:bg-foreground/5"
             >
               <Text className="font-t3-medium text-base text-foreground-muted">
-                Open in Browser
+                <T>Open in Browser</T>
               </Text>
             </Pressable>
           </View>

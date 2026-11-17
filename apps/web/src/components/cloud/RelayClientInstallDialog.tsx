@@ -19,6 +19,7 @@ import {
   DialogPopup,
   DialogTitle,
 } from "../ui/dialog";
+import { Var, T, useGT } from "gt-react";
 const installSteps: ReadonlyArray<{
   readonly stage: RelayClientInstallProgressStage;
   readonly label: string;
@@ -33,6 +34,7 @@ const installSteps: ReadonlyArray<{
 ];
 
 export function RelayClientInstallDialog() {
+  const gt = useGT();
   const state = useSyncExternalStore(
     subscribeRelayClientInstallDialog,
     readRelayClientInstallDialogState,
@@ -70,8 +72,8 @@ export function RelayClientInstallDialog() {
           </DialogTitle>
           <DialogDescription>
             {isInstalling
-              ? "T3 Code is preparing this environment for secure access through T3 Connect."
-              : "T3 Code needs the relay client to make this environment available through T3 Connect."}
+              ? "R3 Code is preparing this environment for secure access through R3 Connect."
+              : "R3 Code needs the relay client to make this environment available through R3 Connect."}
           </DialogDescription>
         </DialogHeader>
         <DialogPanel scrollFade={false}>
@@ -82,25 +84,31 @@ export function RelayClientInstallDialog() {
                   {activeStep?.label}
                 </p>
                 <p className="shrink-0 tabular-nums text-muted-foreground">
-                  {activeStepIndex + 1} of {installSteps.length}
+                  <T>
+                    <Var>{activeStepIndex + 1}</Var> of <Var>{installSteps.length}</Var>
+                  </T>
                 </p>
               </div>
               <progress
-                aria-label="Relay client installation progress"
+                aria-label={gt("Relay client installation progress")}
                 className="h-2 w-full appearance-none overflow-hidden rounded-full bg-muted [&::-moz-progress-bar]:rounded-full [&::-moz-progress-bar]:bg-primary [&::-webkit-progress-bar]:rounded-full [&::-webkit-progress-bar]:bg-muted [&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:bg-primary"
                 max={installSteps.length}
                 value={activeStepIndex + 1}
               />
               <p className="text-xs leading-relaxed text-muted-foreground">
-                Keep T3 Code open while the relay client is installed.
+                <T>Keep R3 Code open while the relay client is installed.</T>
               </p>
             </div>
           ) : (
             <div className="rounded-xl border border-border/70 bg-muted/35 p-3">
-              <p className="text-sm font-medium text-foreground">Managed relay client</p>
+              <p className="text-sm font-medium text-foreground">
+                <T>Managed relay client</T>
+              </p>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                T3 Code will download and install version{" "}
-                {view.status === "confirming" ? view.version : ""} locally.
+                <T>
+                  R3 Code will download and install version<Var> </Var>
+                  <Var>{view.status === "confirming" ? view.version : ""}</Var> locally.
+                </T>
               </p>
             </div>
           )}
@@ -111,10 +119,10 @@ export function RelayClientInstallDialog() {
               variant="outline"
               onClick={() => respondToRelayClientInstallConfirmation(false)}
             >
-              Cancel
+              <T>Cancel</T>
             </Button>
             <DialogAction onClick={() => respondToRelayClientInstallConfirmation(true)}>
-              Download and install
+              <T>Download and install</T>
             </DialogAction>
           </DialogFooter>
         ) : null}

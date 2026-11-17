@@ -18,6 +18,7 @@ import { Button } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { MiddleTruncate } from "../ui/middle-truncate";
 import { observeResize } from "~/lib/observeResize";
+import { Var, T, useGT } from "gt-react";
 
 const EMPTY_DIRECTORY_OVERRIDES: Record<string, boolean> = {};
 const VIRTUALIZE_AFTER_ROWS = 250;
@@ -41,6 +42,7 @@ export const ChangedFilesCard = memo(function ChangedFilesCard(props: {
   onOpenTurnDiff: (runId: RunId, filePath?: string) => void;
   onFileContextMenu?: ChangedFileContextMenuHandler | undefined;
 }) {
+  const gt = useGT();
   const {
     runId,
     files,
@@ -66,7 +68,10 @@ export const ChangedFilesCard = memo(function ChangedFilesCard(props: {
       >
         <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-foreground">
           <span>
-            {totals.count.toLocaleString()} changed file{totals.count === 1 ? "" : "s"}
+            <T>
+              <Var>{totals.count.toLocaleString()}</Var> changed file
+              <Var>{totals.count === 1 ? "" : "s"}</Var>
+            </T>
           </span>
           {hasNonZeroStat(totals) && (
             <DiffStatLabel
@@ -115,15 +120,19 @@ export const ChangedFilesCard = memo(function ChangedFilesCard(props: {
                   type="button"
                   size="xs"
                   variant="ghost-muted"
-                  aria-label="Open diff"
+                  aria-label={gt("Open diff")}
                   onClick={() => onOpenTurnDiff(runId, files[0]?.path)}
                 />
               }
             >
               <FileDiffIcon className="size-3" />
-              <span className="hidden @[24rem]/changed-files:inline">Open diff</span>
+              <span className="hidden @[24rem]/changed-files:inline">
+                <T>Open diff</T>
+              </span>
             </TooltipTrigger>
-            <TooltipPopup side="top">Open the full diff</TooltipPopup>
+            <TooltipPopup side="top">
+              <T>Open the full diff</T>
+            </TooltipPopup>
           </Tooltip>
         </div>
       </div>
@@ -144,8 +153,10 @@ export const ChangedFilesCard = memo(function ChangedFilesCard(props: {
             variant="ghost-muted"
             onClick={() => onOpenTurnDiff(runId, files[0]?.path)}
           >
-            {hiddenFileCount.toLocaleString()} more file{hiddenFileCount === 1 ? "" : "s"} in the
-            full diff
+            <T>
+              <Var>{hiddenFileCount.toLocaleString()}</Var> more file
+              <Var>{hiddenFileCount === 1 ? "" : "s"}</Var> in the full diff
+            </T>
           </Button>
         </div>
       )}

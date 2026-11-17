@@ -49,6 +49,7 @@ import {
   useUpdateEverythingRun,
 } from "./updateEverythingRun";
 import { type ReportLocalUpdateError, useUpdateEverything } from "./useUpdateEverything";
+import { T, useGT } from "gt-react";
 
 type SidebarUpdatePopoverChangeDetails = Parameters<
   NonNullable<ComponentProps<typeof Popover>["onOpenChange"]>
@@ -130,7 +131,9 @@ function SidebarUpdateArchitectureWarningContent() {
   return (
     <Alert variant="warning">
       <TriangleAlertIcon />
-      <AlertTitle>Intel build on Apple Silicon</AlertTitle>
+      <AlertTitle>
+        <T>Intel build on Apple Silicon</T>
+      </AlertTitle>
       <AlertDescription>{description}</AlertDescription>
     </Alert>
   );
@@ -197,6 +200,7 @@ export function SidebarUpdatePill() {
 }
 
 function SidebarUpdateControl() {
+  const gt = useGT();
   const state = useDesktopUpdateState();
   // The desktop updates this machine, whose policy the primary environment reports.
   const updatesDenial = managedUpdatesDenial(usePrimaryManagedPolicy());
@@ -562,7 +566,7 @@ function SidebarUpdateControl() {
         {showReleaseNotesPopover && state ? (
           <PopoverPopup
             align="center"
-            aria-label="Update release notes"
+            aria-label={gt("Update release notes")}
             initialFocus={false}
             onKeyDownCapture={(event) => {
               if (

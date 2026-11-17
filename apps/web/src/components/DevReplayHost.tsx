@@ -15,6 +15,7 @@ import { buildThreadRouteParams, resolveThreadRouteTarget } from "../threadRoute
 import { Button } from "./ui/button";
 import { Dialog, DialogHeader, DialogPanel, DialogPopup, DialogTitle } from "./ui/dialog";
 import { toastManager } from "./ui/toast";
+import { T } from "gt-react";
 
 // Dev servers register this free ACP agent; see ProviderInstanceRegistryHydration.ts.
 const DEV_REPLAY_INSTANCE_ID = ProviderInstanceId.make("devReplay");
@@ -130,7 +131,7 @@ export function DevReplayHost() {
         <DialogPanel>
           {scenarios.length === 0 || project === undefined ? (
             <p className="text-sm text-muted-foreground">
-              Needs a project and the Replay (dev) provider, which dev servers start.
+              <T>Needs a project and the Replay (dev) provider, which dev servers start.</T>
             </p>
           ) : (
             <div className="flex flex-col items-start gap-1">

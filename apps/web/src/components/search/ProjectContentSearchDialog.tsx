@@ -16,6 +16,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Toggle } from "../ui/toggle";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { HighlightedSearchLine } from "./HighlightedSearchLine";
+import { useGT, T } from "gt-react";
 
 interface ProjectContentSearchDialogProps {
   readonly onOpenChange: (open: boolean) => void;
@@ -79,11 +80,12 @@ function SearchOptionButton(props: {
 }
 
 function EmptyContentSearchDialog() {
+  const gt = useGT();
   return (
     <CommandPaletteContent
-      aria-label="Search project contents"
-      escapeLabel="Back"
-      footerActionLabel="Open file"
+      aria-label={gt("Search project contents")}
+      escapeLabel={gt("Back")}
+      footerActionLabel={gt("Open file")}
       inputProps={{ disabled: true, placeholder: "Search project contents…" }}
       mode="none"
       panelSize="fill"
@@ -91,7 +93,7 @@ function EmptyContentSearchDialog() {
       value=""
     >
       <p className="m-auto px-6 text-center text-muted-foreground text-sm">
-        Open a project to search its files.
+        <T>Open a project to search its files.</T>
       </p>
     </CommandPaletteContent>
   );
@@ -105,6 +107,7 @@ function OpenContentSearchDialog(props: {
   readonly onOpenChange: (open: boolean) => void;
   readonly target: ActiveProjectTarget;
 }) {
+  const gt = useGT();
   const { target } = props;
   const { resolvedTheme } = useTheme();
   const renderedAppearance = useRenderedAppearance();
@@ -164,30 +167,32 @@ function OpenContentSearchDialog(props: {
   return (
     <CommandPaletteContent
       aria-label={`Search file contents in ${target.projectName}`}
-      escapeLabel="Back"
-      footerActionLabel="Open file"
+      escapeLabel={gt("Back")}
+      footerActionLabel={gt("Open file")}
       inputAccessory={
         <div className="absolute inset-e-2.5 top-1/2 flex shrink-0 -translate-y-1/2 items-center gap-0.5 rounded-lg border bg-muted/30 p-0.5">
           <SearchOptionButton
             active={caseSensitive}
             disabled={!search.canReadFiles}
-            label="Match case"
+            label={gt("Match case")}
             onClick={() => setCaseSensitive((current) => !current)}
           >
-            Aa
+            <T>Aa</T>
           </SearchOptionButton>
           <SearchOptionButton
             active={wholeWord}
             disabled={!search.canReadFiles}
-            label="Match whole word"
+            label={gt("Match whole word")}
             onClick={() => setWholeWord((current) => !current)}
           >
-            <span className="underline decoration-2 underline-offset-2">ab</span>
+            <span className="underline decoration-2 underline-offset-2">
+              <T>ab</T>
+            </span>
           </SearchOptionButton>
           <SearchOptionButton
             active={useRegex}
             disabled={!search.canReadFiles}
-            label="Use regular expression"
+            label={gt("Use regular expression")}
             onClick={() => setUseRegex((current) => !current)}
           >
             .*
@@ -229,12 +234,16 @@ function OpenContentSearchDialog(props: {
         <div className="flex h-9 shrink-0 items-center border-b px-3 text-xs text-muted-foreground">
           {search.isPending ? (
             <span className="flex items-center gap-2">
-              <Spinner size="sm" /> Searching…
+              <T>
+                <Spinner size="sm" /> Searching…
+              </T>
             </span>
           ) : search.error ? (
             <span className="text-destructive">{search.error}</span>
           ) : search.invalidRegex ? (
-            <span className="text-destructive">Invalid regular expression</span>
+            <span className="text-destructive">
+              <T>Invalid regular expression</T>
+            </span>
           ) : (
             `${matches.length.toLocaleString()}${search.truncated ? "+" : ""} results in ${fileCount.toLocaleString()} files`
           )}

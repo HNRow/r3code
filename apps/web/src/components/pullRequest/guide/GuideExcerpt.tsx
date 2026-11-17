@@ -37,6 +37,7 @@ import type { PullRequestCompletionScope } from "../PullRequestMarkdownTextarea"
 import { excerptLoader } from "./GuideExcerpt.logic";
 import { GuideNoteMarker } from "./GuideNotes";
 import { GuideProse } from "./GuideProse";
+import { Var, T } from "gt-react";
 
 const EXCERPT_UNSAFE_CSS = `${DIFF_VIEW_UNSAFE_CSS}
 [data-code]::-webkit-scrollbar-thumb {
@@ -140,16 +141,22 @@ export function GuideExcerpt({
         />
       ) : loading ? (
         <p className="rounded-lg border border-border/60 px-3 py-2 text-xs text-muted-foreground">
-          Loading {excerpt.path}...
+          <T>
+            Loading <Var>{excerpt.path}</Var>...
+          </T>
         </p>
       ) : (
         <div className="flex items-center justify-between gap-3 rounded-lg border border-border/60 px-3 py-2 text-xs text-muted-foreground">
           <span className="min-w-0 truncate">
-            <span className="font-mono text-foreground">{excerpt.path}</span> lines {excerpt.start}-
-            {excerpt.end} are not in the loaded diff.
+            <T>
+              <span className="font-mono text-foreground">
+                <Var>{excerpt.path}</Var>
+              </span>{" "}
+              lines <Var>{excerpt.start}</Var>-<Var>{excerpt.end}</Var> are not in the loaded diff.
+            </T>
           </span>
           <Button size="xs" variant="outline" onClick={() => onOpenFile(excerpt.path)}>
-            Open in Code
+            <T>Open in Code</T>
           </Button>
         </div>
       )}
@@ -333,8 +340,12 @@ function ExcerptDiff({
         renderHeaderMetadata={() => (
           <span className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="tabular-nums">
-              {excerpt.side === "old" ? "removed code, " : ""}showing {slice.shown} of {slice.total}{" "}
-              diff lines
+              <T>
+                <Var>{excerpt.side === "old" ? "removed code, " : ""}</Var>showing{" "}
+                <Var>{slice.shown}</Var> of <Var>{slice.total}</Var>
+                <Var> </Var>
+                diff lines
+              </T>
             </span>
             <Button
               size="icon-xs"

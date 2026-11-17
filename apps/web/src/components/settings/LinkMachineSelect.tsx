@@ -9,6 +9,7 @@ import { EnvironmentMachineIcon } from "../EnvironmentMachineIcon";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Badge } from "../ui/badge";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
+import { T, Var } from "gt-react";
 
 /**
  * Shown wherever a link goes to an address this app does not already have for a
@@ -17,11 +18,17 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../
 export function LinkAddressWarning({ address }: { readonly address: string }) {
   return (
     <Alert variant="warning">
-      <AlertTitle>Check this address</AlertTitle>
+      <AlertTitle>
+        <T>Check this address</T>
+      </AlertTitle>
       <AlertDescription>
-        This app cannot confirm it is one of your machines. The pairing code you paste is sent
-        there.
-        <span className="block break-all">{linkDestination(address)}</span>
+        <T>
+          This app cannot confirm it is one of your machines. The pairing code you paste is sent
+          there.
+          <span className="block break-all">
+            <Var>{linkDestination(address)}</Var>
+          </span>
+        </T>
       </AlertDescription>
     </Alert>
   );
@@ -32,14 +39,14 @@ export function LinkMachineBadge({ machine }: { readonly machine: LinkableMachin
   if (machine.linked) {
     return (
       <Badge variant="success" size="sm">
-        Linked
+        <T>Linked</T>
       </Badge>
     );
   }
   if (machine.connected) return null;
   return (
     <Badge variant="outline" size="sm">
-      {machine.connectOnly ? "T3 Connect" : "Not connected"}
+      {machine.connectOnly ? "R3 Connect" : "Not connected"}
     </Badge>
   );
 }
@@ -53,7 +60,7 @@ function MachineName({ machine }: { readonly machine: LinkableMachine }) {
   );
 }
 
-/** The user's other machines, including those on their T3 Connect account, then an address. */
+/** The user's other machines, including those on their R3 Connect account, then an address. */
 export function LinkMachineSelect({
   machines,
   value,
@@ -69,7 +76,7 @@ export function LinkMachineSelect({
   return (
     <div className="space-y-1.5">
       <span id={labelId} className="block text-xs font-medium text-foreground">
-        Machine
+        <T>Machine</T>
       </span>
       <Select
         value={value}
@@ -97,7 +104,7 @@ export function LinkMachineSelect({
             </SelectItem>
           ))}
           <SelectItem value={ANOTHER_ADDRESS} hideIndicator>
-            Another address…
+            <T>Another address…</T>
           </SelectItem>
         </SelectPopup>
       </Select>

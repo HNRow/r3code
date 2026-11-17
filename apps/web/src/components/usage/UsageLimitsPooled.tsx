@@ -42,6 +42,7 @@ import { OpenAI } from "../Icons";
 import { Alert, AlertTitle } from "../ui/alert";
 import { Popover, PopoverCreateHandle, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import { PaceIcon, ResetCreditDialog, barColor, usePaceMark, useResetCredit } from "./UsageLimits";
+import { useGT, Var, T } from "gt-react";
 
 function accountInitials(email: string): string {
   const [local = "", domain = ""] = email.split("@");
@@ -143,6 +144,7 @@ function SegmentPopover({
   readonly redeem: ReturnType<typeof useResetCredit> | null;
   readonly onRedeem: (choice: ResetCreditChoice) => void;
 }) {
+  const gt = useGT();
   const timestampFormat = usePrimarySettings((settings) => settings.timestampFormat);
   const remaining = remainingPercent(window);
   const timeLeft = paceRemainingPercent(window, now);
@@ -167,30 +169,40 @@ function SegmentPopover({
         {account.email ? (
           <RedactedSensitiveText
             value={account.email}
-            ariaLabel="Toggle account email visibility"
-            revealTooltip="Click to reveal email"
-            hideTooltip="Click to hide email"
+            ariaLabel={gt("Toggle account email visibility")}
+            revealTooltip={gt("Click to reveal email")}
+            hideTooltip={gt("Click to hide email")}
             className="w-fit"
           />
         ) : null}
       </div>
       <div className="flex flex-col gap-1 border-t border-border/60 pt-2.5">
-        {account.plan ? <Row label="Plan">{account.plan}</Row> : null}
+        {account.plan ? <Row label={gt("Plan")}>{account.plan}</Row> : null}
         {where ? (
           <Row label={account.environments.length > 0 ? "Signed in" : "Via"}>{where}</Row>
         ) : null}
       </div>
       <div className="flex flex-col gap-1 border-t border-border/60 pt-2.5">
-        <Row label="Left">{remaining}%</Row>
+        <Row label={gt("Left")}>{remaining}%</Row>
         {window.resetsAt ? (
-          <Row label="Resets">
+          <Row label={gt("Resets")}>
             {formatUpcomingTimestamp(window.resetsAt, timestampFormat, now)}
             {resetsIn ? ` · ${resetsIn.replace("resets in ", "in ")}` : ""}
           </Row>
         ) : null}
-        {timeLeft !== null ? <Row label="Even pace">{timeLeft}% left by now</Row> : null}
+        {timeLeft !== null ? (
+          <Row label={gt("Even pace")}>
+            <T>
+              <Var>{timeLeft}</Var>% left by now
+            </T>
+          </Row>
+        ) : null}
         {reset && reset.restoresPercent > 0 ? (
-          <Row label="Restores">+{reset.restoresPercent}% of pool</Row>
+          <Row label={gt("Restores")}>
+            <T>
+              +<Var>{reset.restoresPercent}</Var>% of pool
+            </T>
+          </Row>
         ) : null}
       </div>
       {choices.length > 0 && redeem ? (
@@ -467,7 +479,9 @@ function LegendRow({
           className="absolute inset-0 rounded-sm opacity-35"
           style={{ backgroundColor: color }}
         />
-        <span className="sr-only">Segment </span>
+        <span className="sr-only">
+          <T>Segment </T>
+        </span>
         <span className="relative">{index}</span>
       </span>
       <AccountName account={account} className="min-w-0 truncate font-medium text-foreground" />
@@ -485,7 +499,9 @@ function LegendRow({
               {credits}
             </span>
             <span className="sr-only">
-              {credits} reset {credits === 1 ? "credit" : "credits"} banked
+              <T>
+                <Var>{credits}</Var> reset <Var>{credits === 1 ? "credit" : "credits"}</Var> banked
+              </T>
             </span>
           </>
         ) : null}
@@ -529,11 +545,13 @@ function PoolBar({
               style={{ gridColumn: position + 1, gridRow: 1 }}
               className="flex h-5 min-w-0 items-center justify-center gap-1.5 overflow-hidden rounded-md border border-dashed border-border text-3xs whitespace-nowrap text-muted-foreground @2xl/pool:h-8 @2xl/pool:justify-start @2xl/pool:px-2 @2xl/pool:text-xs"
             >
-              <AccountName
-                account={member.account}
-                className="hidden min-w-0 truncate @2xl/pool:inline-flex"
-              />
-              $0 cap
+              <T>
+                <AccountName
+                  account={member.account}
+                  className="hidden min-w-0 truncate @2xl/pool:inline-flex"
+                />
+                $0 cap
+              </T>
             </div>
           ) : null,
         )}
@@ -567,7 +585,9 @@ function PoolWindowCard({
             {pool.remainingPercent}%
           </span>
           <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-            <span>left</span>
+            <span>
+              <T>left</T>
+            </span>
             {pool.pace ? <PaceIcon pace={pool.pace} /> : null}
           </span>
         </span>
@@ -635,7 +655,7 @@ export function UsageLimitsPooled({
     <div className="flex flex-col gap-8">
       {pools.length === 0 && notices.length === 0 && externalLinks.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          No provider on the selected environments reports subscription limits.
+          <T>No provider on the selected environments reports subscription limits.</T>
         </p>
       ) : null}
       <SegmentPopoverContext value={segmentPopover}>
@@ -674,7 +694,7 @@ export function UsageLimitsPooled({
               </p>
               {link.url === CHATGPT_USAGE_URL ? (
                 <p className="text-xs text-muted-foreground">
-                  View usage in ChatGPT with your connected account.
+                  <T>View usage in ChatGPT with your connected account.</T>
                 </p>
               ) : link.message ? (
                 <p className="max-w-xl text-xs text-muted-foreground">{link.message}</p>
@@ -686,8 +706,10 @@ export function UsageLimitsPooled({
             size="xs"
             onClick={() => void ensureLocalApi().shell.openExternal(link.url)}
           >
-            Manage usage
-            <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
+            <T>
+              Manage usage
+              <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
+            </T>
           </Button>
         </section>
       ))}

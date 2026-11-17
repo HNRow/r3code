@@ -1,3 +1,4 @@
+import { msg } from "gt-react";
 import type {
   ServerProvider,
   ServerProviderVersionAdvisory,
@@ -55,7 +56,7 @@ export function getProviderSummary(provider: ServerProvider | undefined) {
     return {
       headline: "Disabled",
       detail:
-        provider.message ?? "This provider is installed but disabled for new sessions in T3 Code.",
+        provider.message ?? "This provider is installed but disabled for new sessions in R3 Code.",
     };
   }
   if (!provider.installed) {
@@ -93,7 +94,7 @@ export function getProviderSummary(provider: ServerProvider | undefined) {
   if (provider.auth.status === "authenticated") {
     const authLabel = provider.auth.label ?? provider.auth.type;
     return {
-      headline: authLabel ? `Authenticated · ${authLabel}` : "Authenticated",
+      headline: authLabel ? `Authenticated · ${authLabel}` : msg("Authenticated"),
       detail: provider.message ?? null,
     };
   }

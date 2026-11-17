@@ -68,6 +68,7 @@ import { ComposerSurface } from "./chat/ComposerSurface";
 import { useComposerMenuProps } from "./chat/composerEventScope";
 import { cn } from "~/lib/utils";
 import { observeResize } from "~/lib/observeResize";
+import { T } from "gt-react";
 
 export interface BranchToolbarHandle {
   openBranchPicker: () => void;
@@ -314,7 +315,9 @@ const RunContextSelector = memo(function RunContextSelector({
         ((showEnvironmentPicker && onEnvironmentChange) || addTargets.length > 0) ? (
           <>
             <MenuGroup>
-              <MenuGroupLabel>Run on</MenuGroupLabel>
+              <MenuGroupLabel>
+                <T>Run on</T>
+              </MenuGroupLabel>
               <MenuRadioGroup
                 value={autoEnvironmentLabel ? "auto" : environmentId}
                 onValueChange={(value) =>
@@ -361,7 +364,9 @@ const RunContextSelector = memo(function RunContextSelector({
                   <MenuSubTrigger>
                     <span className={ADD_TO_MACHINE_LABEL_CLASS}>
                       <PlusIcon className="size-3" />
-                      <span className="min-w-0 truncate">Add to another machine</span>
+                      <span className="min-w-0 truncate">
+                        <T>Add to another machine</T>
+                      </span>
                     </span>
                   </MenuSubTrigger>
                   <MenuSubPopup {...(!isPanel ? composerFloatingLayerProps : {})}>
@@ -384,7 +389,9 @@ const RunContextSelector = memo(function RunContextSelector({
           </>
         ) : null}
         <MenuGroup>
-          <MenuGroupLabel>Workspace</MenuGroupLabel>
+          <MenuGroupLabel>
+            <T>Workspace</T>
+          </MenuGroupLabel>
           <MenuRadioGroup
             value={effectiveEnvMode}
             onValueChange={(value) => {

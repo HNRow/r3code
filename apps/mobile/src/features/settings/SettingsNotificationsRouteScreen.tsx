@@ -50,6 +50,7 @@ import { SettingsSection } from "./components/SettingsSection";
 import { SettingsSwitchRow } from "./components/SettingsSwitchRow";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { resolveAgentAwarenessPlatformPresentation } from "./SettingsRouteScreen.logic";
+import { useGT, T } from "gt-react-native";
 
 /**
  * A policy that turns Connect off refuses relay links and preferences, which would fail the
@@ -118,15 +119,16 @@ function useNotificationsReady(): boolean {
 }
 
 export function SettingsNotificationsRouteScreen() {
+  const gt = useGT();
   if (!hasCloudPublicConfig()) {
     return (
-      <SettingsScreen title="Notifications">
+      <SettingsScreen title={gt("Notifications")}>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           contentContainerClassName="px-5 pt-4"
         >
           <Text className="text-base text-foreground-muted">
-            Notifications require T3 Connect in this app build.
+            <T>Notifications require R3 Connect in this app build.</T>
           </Text>
         </ScrollView>
       </SettingsScreen>
@@ -137,6 +139,7 @@ export function SettingsNotificationsRouteScreen() {
 }
 
 function ConfiguredSettingsNotificationsRouteScreen() {
+  const gt = useGT();
   const preferencesResult = useAtomValue(mobilePreferencesAtom);
   const savePreferences = useAtomSet(updateMobilePreferencesAtom);
   const agentAwarenessPushAvailable = supportsAgentAwarenessPush();
@@ -205,7 +208,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       if (!agentAwarenessNotificationsReady()) {
         Dialog.alert(
           "Couldn't finish enabling notifications",
-          "Notification access was granted, but this device could not be registered with T3 Connect. Notifications will start once registration succeeds.",
+          "Notification access was granted, but this device could not be registered with R3 Connect. Notifications will start once registration succeeds.",
         );
       }
       return;
@@ -235,8 +238,8 @@ function ConfiguredSettingsNotificationsRouteScreen() {
 
   const promptSignIn = () => {
     Dialog.alert(
-      "Sign in to T3 Connect",
-      "Live Activity updates require T3 Connect so relay can deliver updates to this device.",
+      "Sign in to R3 Connect",
+      "Live Activity updates require R3 Connect so relay can deliver updates to this device.",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -336,7 +339,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
     } else {
       Dialog.alert(
         "Couldn't finish enabling activity updates",
-        "This device could not be registered with T3 Connect, so activity updates won't appear yet. They'll start once registration succeeds.",
+        "This device could not be registered with R3 Connect, so activity updates won't appear yet. They'll start once registration succeeds.",
       );
     }
   };
@@ -353,7 +356,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
 
     Dialog.alert(
       "Disable notifications",
-      "Open system Settings to disable notifications for T3 Code.",
+      "Open system Settings to disable notifications for R3 Code.",
       [
         { text: "Cancel", style: "cancel" },
         { text: "Open Settings", onPress: () => void Linking.openSettings() },
@@ -420,7 +423,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
   };
 
   return (
-    <SettingsScreen title="Notifications">
+    <SettingsScreen title={gt("Notifications")}>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
@@ -430,10 +433,10 @@ function ConfiguredSettingsNotificationsRouteScreen() {
           paddingBottom: Math.max(insets.bottom, 18) + 18,
         }}
       >
-        <SettingsSection title="Agent activity">
+        <SettingsSection title={gt("Agent activity")}>
           <SettingsSwitchRow
             icon="bell.badge"
-            label="Device Notifications"
+            label={gt("Device Notifications")}
             disabled={
               !agentAwarenessPlatform.supported ||
               !agentAwarenessPushAvailable ||
@@ -473,19 +476,19 @@ function ConfiguredSettingsNotificationsRouteScreen() {
           {liveActivityStatus === "signed-out" && canClearLiveActivitiesPreference ? (
             <SettingsRow
               icon="bolt.circle"
-              label="Turn off Live Activity preference"
+              label={gt("Turn off Live Activity preference")}
               onPress={() => void handleLiveActivitiesChange(false)}
             />
           ) : null}
           {supportsAndroidLiveUpdateSettings() ? (
             <SettingsRow
               icon="bolt.circle"
-              label="Live Update Settings"
+              label={gt("Live Update Settings")}
               onPress={() => {
                 void openAndroidLiveUpdateSettings().catch(() => {
                   Dialog.alert(
                     "Couldn't open Settings",
-                    "Open Android Settings, select T3 Code, then enable Live Updates in Notifications.",
+                    "Open Android Settings, select R3 Code, then enable Live Updates in Notifications.",
                   );
                 });
               }}

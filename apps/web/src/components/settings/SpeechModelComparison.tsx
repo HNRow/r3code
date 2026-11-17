@@ -1,6 +1,7 @@
 import type { EnvironmentSpeechModel, SpeechBenchmarkTier } from "@t3tools/contracts";
 
 import { languageLabel } from "./SpeechLanguageSelect";
+import { Var, T } from "gt-react";
 
 const commonLanguages = [
   "en",
@@ -73,8 +74,12 @@ export function ModelBenchmarks({
             {languageLabel(code)}:{" "}
             {score ? (
               <>
-                <strong className="font-medium text-foreground">{score.grade}</strong> (
-                {score.errorPercent}% error)
+                <T>
+                  <strong className="font-medium text-foreground">
+                    <Var>{score.grade}</Var>
+                  </strong>{" "}
+                  (<Var>{score.errorPercent}</Var>% error)
+                </T>
               </>
             ) : (
               "not benchmarked"
@@ -83,16 +88,20 @@ export function ModelBenchmarks({
         );
       })}
       <span>
-        Speed:{" "}
-        {tier === "cpu" && data && data.secondsPer30s.cpu === undefined ? (
-          "update server"
-        ) : seconds == null ? (
-          "not benchmarked"
-        ) : (
-          <>
-            <strong className="font-medium text-foreground">{seconds} s</strong> / 30 s
-          </>
-        )}
+        <T>
+          Speed:<Var> </Var>
+          <Var>
+            {tier === "cpu" && data && data.secondsPer30s.cpu === undefined ? (
+              "update server"
+            ) : seconds == null ? (
+              "not benchmarked"
+            ) : (
+              <>
+                <strong className="font-medium text-foreground">{seconds} s</strong> / 30 s
+              </>
+            )}
+          </Var>
+        </T>
       </span>
       {facts.map((fact) => (
         <span key={fact}>{fact}</span>

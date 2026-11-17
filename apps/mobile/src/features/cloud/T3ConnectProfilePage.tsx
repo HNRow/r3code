@@ -21,6 +21,7 @@ import {
   deregisterManagedRelayEnvironmentCommand,
   useManagedRelayEnvironments,
 } from "./managedRelayState";
+import { T, useGT } from "gt-react-native";
 
 const linkedAtFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" });
 
@@ -39,11 +40,12 @@ function endpointLabel(environment: RelayClientEnvironmentRecord): string {
 
 function confirmDeregister(environment: RelayClientEnvironmentRecord, onConfirm: () => void) {
   const title = "Deregister server?";
-  const message = `“${environment.label}” will be removed from this account. T3 Connect access will be revoked, any managed tunnel will be removed, and a host space will become available. Local connections on your devices are not changed.`;
+  const message = `“${environment.label}” will be removed from this account. R3 Connect access will be revoked, any managed tunnel will be removed, and a host space will become available. Local connections on your devices are not changed.`;
   Dialog.confirm({ title, message, confirmText: "Deregister", destructive: true, onConfirm });
 }
 
 export function T3ConnectProfilePage() {
+  const gt = useGT();
   const environmentsState = useManagedRelayEnvironments();
   const deregisterEnvironment = useAtomCommand(deregisterManagedRelayEnvironmentCommand, {
     reportFailure: false,
@@ -133,17 +135,19 @@ export function T3ConnectProfilePage() {
         />
       }
     >
-      <ClerkSectionHeader>Registered servers</ClerkSectionHeader>
+      <ClerkSectionHeader>
+        <T>Registered servers</T>
+      </ClerkSectionHeader>
 
       {environmentsState.error ? (
         <>
           <ClerkRow
-            title="Could not load T3 Connect environments"
+            title={gt("Could not load R3 Connect environments")}
             subtitle={environmentsState.error}
           />
           {errorTraceId ? (
             <ClerkButtonRow
-              label="Copy trace ID"
+              label={gt("Copy trace ID")}
               onPress={() => {
                 copyTextWithHaptic(errorTraceId, { target: "connection-trace-id" });
               }}
@@ -153,7 +157,9 @@ export function T3ConnectProfilePage() {
       ) : isInitialLoad ? (
         <View className="flex-row items-center gap-3 px-6 py-4">
           <AppActivityIndicator colorClassName={"accent-clerk-foreground-muted"} size="small" />
-          <Text className="text-base text-clerk-foreground-muted">Loading environments</Text>
+          <Text className="text-base text-clerk-foreground-muted">
+            <T>Loading environments</T>
+          </Text>
         </View>
       ) : environments.length > 0 ? (
         environments.map((environment) => (
@@ -197,13 +203,13 @@ export function T3ConnectProfilePage() {
         ))
       ) : (
         <ClerkRow
-          title="No servers registered"
-          subtitle="Link a server from its local Settings to reach it through T3 Connect."
+          title={gt("No servers registered")}
+          subtitle={gt("Link a server from its local Settings to reach it through R3 Connect.")}
         />
       )}
 
       <Text className="px-6 pt-6 text-xs leading-normal text-clerk-foreground-muted">
-        Connections on this device are managed in Settings.
+        <T>Connections on this device are managed in Settings.</T>
       </Text>
     </ScrollView>
   );

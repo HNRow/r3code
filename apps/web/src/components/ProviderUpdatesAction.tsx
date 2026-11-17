@@ -4,6 +4,7 @@ import {
   settlePromise,
   squashAtomCommandFailure,
 } from "@t3tools/client-runtime/state/runtime";
+import { T } from "gt-react";
 import { useRef, useState } from "react";
 
 import { useEnvironmentProviders, useEnvironments } from "~/state/environments";
@@ -147,7 +148,7 @@ export function ProviderUpdatesAction() {
             disabled={isPending}
             onClick={() => void handleUpdate()}
           >
-            {isPending ? "Updating…" : "Update all"}
+            {isPending ? <T>Updating…</T> : <T>Update all</T>}
           </Button>
         }
       />

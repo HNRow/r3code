@@ -12,6 +12,7 @@ import { useAppearancePreferences } from "../settings/appearance/AppearancePrefe
 import { FileTreeBrowser } from "./FileTreeBrowser";
 import { useFileTreeEntries } from "./useFileTreeEntries";
 import { preloadWorkspaceFileContents } from "./preload-workspace-file";
+import { useGT } from "gt-react-native";
 
 export function ThreadFileNavigatorPane(props: {
   readonly cwd: string;
@@ -20,6 +21,7 @@ export function ThreadFileNavigatorPane(props: {
   readonly selectedPath: string | null;
   readonly onSelectFile: (path: string) => void;
 }) {
+  const gt = useGT();
   const workspaceKey = JSON.stringify([props.environmentId, props.cwd]);
   // The pane stays mounted across thread switches; a query only filters the workspace it was typed in.
   const [search, setSearch] = useState({ workspaceKey, query: "" });
@@ -84,7 +86,7 @@ export function ThreadFileNavigatorPane(props: {
   return (
     <SheetPane>
       <AppBar
-        title="Files"
+        title={gt("Files")}
         subtitle={props.projectName}
         search={{
           value: searchQuery,

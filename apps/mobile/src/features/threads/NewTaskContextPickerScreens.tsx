@@ -49,6 +49,7 @@ import {
   useConnectionDiagnosis,
 } from "../connection/ConnectionDiagnosisDetails";
 import { environmentStatusText } from "../connection/environmentStatusText";
+import { Var, T, useGT } from "gt-react-native";
 
 const BRANCH_SEARCH_DEBOUNCE_MS = 150;
 
@@ -60,6 +61,7 @@ function EnvironmentPickerRow(props: {
   isLast: boolean;
   onPress: () => void;
 }) {
+  const gt = useGT();
   const [expanded, setExpanded] = useState(false);
   const { presentation } = useEnvironmentPresentation(props.environmentId);
   const { diagnosis, state } = useConnectionDiagnosis(props.environmentId, presentation);
@@ -122,12 +124,14 @@ function EnvironmentPickerRow(props: {
           )}
           {state.retryAt ? (
             <Text className="text-sm text-foreground-muted">
-              Next reconnect at {new Date(state.retryAt).toLocaleTimeString()}
+              <T>
+                Next reconnect at <Var>{new Date(state.retryAt).toLocaleTimeString()}</Var>
+              </T>
             </Text>
           ) : null}
           {connection?.phase !== "connected" ? (
             <Button
-              label="Reconnect now"
+              label={gt("Reconnect now")}
               onPress={() => onReconnectEnvironment(props.environmentId)}
             />
           ) : null}
@@ -177,12 +181,13 @@ function PickerSurface(props: { readonly children: ReactNode }) {
 }
 
 export function NewTaskEnvironmentPickerRouteScreen() {
+  const gt = useGT();
   const flow = useNewTaskFlow();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   return (
     <View className="flex-1 bg-sheet" collapsable={false}>
-      <AppBar title="Environment" hideBottomBorder onBack={() => navigation.goBack()} />
+      <AppBar title={gt("Environment")} hideBottomBorder onBack={() => navigation.goBack()} />
       <ScreenContent>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
@@ -351,6 +356,7 @@ export function BranchPickerScreen(props: {
     readonly onChangeStartFromOrigin: (value: boolean) => void;
   };
 }) {
+  const gt = useGT();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const search: AppBarSearch = {
@@ -399,7 +405,7 @@ export function BranchPickerScreen(props: {
     >
       <ToggleRow
         onValueChange={props.worktree.onChangeStartFromOrigin}
-        title="Start from remote"
+        title={gt("Start from remote")}
         value={props.worktree.startFromOrigin}
       />
     </View>
@@ -433,7 +439,7 @@ export function BranchPickerScreen(props: {
           </Text>
           {!props.loading && props.error ? (
             <View className="self-center">
-              <Button label="Try again" tone="secondary" onPress={props.onRefresh} />
+              <Button label={gt("Try again")} tone="secondary" onPress={props.onRefresh} />
             </View>
           ) : null}
         </View>

@@ -35,6 +35,7 @@ import { useDebouncedValue } from "../../state/queries";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { PullRequestAvatar } from "./PullRequestPresentation";
 import { pullRequestTarget, type PullRequestParams } from "./usePullRequestDiff";
+import { useGT, T, Var } from "gt-react-native";
 
 const TRUNCATED_LABELS: Record<ReviewerTruncation, (error: string | null) => string> = {
   unsearchable: () =>
@@ -47,6 +48,7 @@ const TRUNCATED_LABELS: Record<ReviewerTruncation, (error: string | null) => str
 };
 
 export function PullRequestReviewersScreen({ route }: StaticScreenProps<PullRequestParams>) {
+  const gt = useGT();
   const navigation = useNavigation();
   const contentTopInset = useContentTopInset();
   const listRef = useRef<LegendListRef>(null);
@@ -201,7 +203,7 @@ export function PullRequestReviewersScreen({ route }: StaticScreenProps<PullRequ
   return (
     <View className="flex-1 bg-sheet">
       <AppBar
-        title="Request review"
+        title={gt("Request review")}
         subtitle={`#${route.params.number} · ${route.params.repository}`}
         onClose={() => navigation.goBack()}
         closeAccessibilityLabel="Close request review"
@@ -224,12 +226,16 @@ export function PullRequestReviewersScreen({ route }: StaticScreenProps<PullRequ
           ListHeaderComponent={
             <View className="gap-3 px-4 py-4">
               <Text className="text-xs text-foreground-muted">
-                Tap someone to request a review. Tap a requested reviewer to remove the request.
-                Changes are sent when you close this sheet.
+                <T>
+                  Tap someone to request a review. Tap a requested reviewer to remove the request.
+                  Changes are sent when you close this sheet.
+                </T>
               </Text>
               {!allowed ? (
                 <Text className="text-xs text-foreground-muted">
-                  Requesting reviews requires write access and an open {singular}.
+                  <T>
+                    Requesting reviews requires write access and an open <Var>{singular}</Var>.
+                  </T>
                 </Text>
               ) : null}
             </View>
@@ -260,7 +266,9 @@ export function PullRequestReviewersScreen({ route }: StaticScreenProps<PullRequ
                 </View>
                 {requested ? (
                   <View className="flex-row items-center gap-1.5">
-                    <Text className="text-xs text-foreground-muted">Requested</Text>
+                    <Text className="text-xs text-foreground-muted">
+                      <T>Requested</T>
+                    </Text>
                     <SymbolView name="checkmark" size={14} tintColorClassName="accent-icon" />
                   </View>
                 ) : (
@@ -287,7 +295,7 @@ export function PullRequestReviewersScreen({ route }: StaticScreenProps<PullRequ
                 />
                 {queryError ? (
                   <Button
-                    label="Retry"
+                    label={gt("Retry")}
                     onPress={result.error ? result.refresh : searchResult.refresh}
                   />
                 ) : null}
@@ -320,11 +328,11 @@ export function PullRequestReviewersScreen({ route }: StaticScreenProps<PullRequ
           ) : (
             <>
               <Text className="text-sm text-foreground-muted">
-                This provider accepts a reviewer ID but cannot list candidates.
+                <T>This provider accepts a reviewer ID but cannot list candidates.</T>
               </Text>
               <TextInput
-                accessibilityLabel="Reviewer ID"
-                placeholder="Reviewer login or ID"
+                accessibilityLabel={gt("Reviewer ID")}
+                placeholder={gt("Reviewer login or ID")}
                 placeholderTextColorClassName="accent-foreground-muted"
                 value={query}
                 onChangeText={search}
@@ -333,13 +341,13 @@ export function PullRequestReviewersScreen({ route }: StaticScreenProps<PullRequ
                 className="min-h-12 rounded-xl bg-grouped-card px-3 text-base"
               />
               <Button
-                label="Request review"
+                label={gt("Request review")}
                 fullWidth
                 disabled={!allowed || !query.trim() || pending !== null}
                 onPress={() => void update({ id: query.trim(), kind: "user", isRequested: false })}
               />
               <Button
-                label="Remove review request"
+                label={gt("Remove review request")}
                 fullWidth
                 tone="text"
                 disabled={!allowed || !query.trim() || pending !== null}

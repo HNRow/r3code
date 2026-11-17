@@ -29,6 +29,7 @@ import {
   voiceSpeechModelsAtom,
   voiceSpeechStatusAtom,
 } from "../voice-input/voiceDestination";
+import { Var, T, useGT } from "gt-react-native";
 
 const isDownloading = (model: EnvironmentSpeechModel) =>
   model.state === "downloading" || model.state === "verifying";
@@ -135,9 +136,14 @@ function ModelStats(props: { readonly model: EnvironmentSpeechModel; readonly la
           [
             "score",
             <>
-              {languageLabel(code)}{" "}
-              <Text className="font-t3-medium text-foreground">{score.grade}</Text> (
-              {score.errorPercent}% error)
+              <T>
+                <Var>{languageLabel(code)}</Var>
+                <Var> </Var>
+                <Text className="font-t3-medium text-foreground">
+                  <Var>{score.grade}</Var>
+                </Text>{" "}
+                (<Var>{score.errorPercent}</Var>% error)
+              </T>
             </>,
           ],
         ] as const)
@@ -148,7 +154,9 @@ function ModelStats(props: { readonly model: EnvironmentSpeechModel; readonly la
             "speed",
             <>
               <Text className="font-t3-medium text-foreground">
-                {data.secondsPer30s.accelerated} s
+                <T>
+                  <Var>{data.secondsPer30s.accelerated}</Var> s
+                </T>
               </Text>{" "}
               / 30 s
             </>,
@@ -278,6 +286,7 @@ export function LocalModelChoice(props: {
   readonly selected: boolean;
   readonly onSelect: () => void;
 }) {
+  const gt = useGT();
   const navigation = useNavigation();
   const voice = useVoiceModels(props.environmentId, props.label);
   const { status } = voice;
@@ -286,7 +295,7 @@ export function LocalModelChoice(props: {
   if (!voice.connection || !status || !status.supported)
     return (
       <ListChoiceRow
-        label="Local model"
+        label={gt("Local model")}
         description={
           !voice.connection
             ? "Not available on this environment"
@@ -316,7 +325,7 @@ export function LocalModelChoice(props: {
             ? `Local model · ${formatBytes(active.size)}`
             : voice.canManage
               ? "No model installed · Choose one to download"
-              : `No model installed · Add one using T3 Code on ${props.label}`
+              : `No model installed · Add one using R3 Code on ${props.label}`
       }
       selected={props.selected}
       onPress={() => {

@@ -45,6 +45,7 @@ import {
   buildCancelQueuedRunCommand,
   resolveThreadQueueRowControls,
 } from "./threadQueueControlPresentation";
+import { T, useGT } from "gt-react-native";
 
 const REMOVE_ACTION_WIDTH = 76;
 const THUMBNAIL_LIMIT = 3;
@@ -99,7 +100,7 @@ function QueuedRunSender(props: {
             label: senderShell?.title.trim() || linkedSender?.title.trim() || "Agent",
           }
         : attribution === "t3code"
-          ? { icon: null, label: "Sent by T3 Code" }
+          ? { icon: null, label: "Sent by R3 Code" }
           : null;
   if (sender === null) return null;
   return (
@@ -124,6 +125,7 @@ function QueuedRunSender(props: {
 }
 
 export function ThreadQueueSheet({ route }: StaticScreenProps<QueueTarget>) {
+  const gt = useGT();
   const theme = useUniwindTheme();
   const target = route.params;
   const navigation = useNavigation();
@@ -228,9 +230,11 @@ export function ThreadQueueSheet({ route }: StaticScreenProps<QueueTarget>) {
     >
       {workflow?.isHeld && queuedRuns.length > 0 ? (
         <View className="gap-2 py-3">
-          <Text className="text-sm text-foreground-muted">Queue paused</Text>
+          <Text className="text-sm text-foreground-muted">
+            <T>Queue paused</T>
+          </Text>
           <Button
-            label="Resume queue"
+            label={gt("Resume queue")}
             disabled={resuming || busyRunId !== null}
             onPress={async () => {
               if (busyRef.current) return;
@@ -259,7 +263,7 @@ export function ThreadQueueSheet({ route }: StaticScreenProps<QueueTarget>) {
       ) : null}
       {queuedRuns.length === 0 ? (
         <Text className="pt-6 text-center text-sm text-foreground-muted">
-          No messages waiting in this queue.
+          <T>No messages waiting in this queue.</T>
         </Text>
       ) : null}
       {queuedRuns.map(({ run, text, attachments, context, message }, index) => {
@@ -355,7 +359,7 @@ export function ThreadQueueSheet({ route }: StaticScreenProps<QueueTarget>) {
                     </View>
                     {controls.isEditing ? (
                       <Text className="shrink-0 text-2xs uppercase tracking-wide text-primary">
-                        Editing
+                        <T>Editing</T>
                       </Text>
                     ) : null}
                   </Pressable>
@@ -376,7 +380,7 @@ export function ThreadQueueSheet({ route }: StaticScreenProps<QueueTarget>) {
                         tintColorClassName="accent-primary-foreground"
                       />
                       <Text className="font-t3-medium text-sm text-primary-foreground">
-                        Send now
+                        <T>Send now</T>
                       </Text>
                     </View>
                   </Pressable>
@@ -392,7 +396,7 @@ export function ThreadQueueSheet({ route }: StaticScreenProps<QueueTarget>) {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View collapsable={false} className="flex-1 bg-sheet">
-        <SheetHeader title="Queued" onClose={() => navigation.goBack()} />
+        <SheetHeader title={gt("Queued")} onClose={() => navigation.goBack()} />
         <ScreenContent>{content}</ScreenContent>
       </View>
       <FilePreviewModal source={previewFile} onRequestClose={() => setPreviewFile(null)} />
@@ -436,7 +440,9 @@ function QueueRowSwipeable(props: {
           style={{ width: REMOVE_ACTION_WIDTH }}
         >
           <SymbolView name="trash" size={16} tintColorClassName="accent-danger-foreground" />
-          <Text className="pt-1 text-2xs font-t3-medium text-danger-foreground">Remove</Text>
+          <Text className="pt-1 text-2xs font-t3-medium text-danger-foreground">
+            <T>Remove</T>
+          </Text>
         </Pressable>
       )}
     >

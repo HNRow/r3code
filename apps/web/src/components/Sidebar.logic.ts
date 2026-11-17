@@ -633,16 +633,7 @@ export function buildBulkUnpinContextMenuItem(input: {
 }
 
 export interface ThreadStatusPill {
-  label:
-    | "Working"
-    | "Connecting"
-    | "Completed"
-    | "Failed"
-    | "Pending Approval"
-    | "Awaiting Input"
-    | "Guest Request"
-    | "Waiting"
-    | "Plan Ready";
+  label: string;
   colorClass: string;
   dotClass: string;
   pulse: boolean;

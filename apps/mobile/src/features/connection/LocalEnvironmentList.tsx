@@ -5,6 +5,7 @@ import { View } from "react-native";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { AppText as Text } from "../../components/ui/AppText";
 import { ConnectionEnvironmentRow } from "./ConnectionEnvironmentRow";
+import { Var, T } from "gt-react-native";
 
 type EnvironmentRowProps = ComponentProps<typeof ConnectionEnvironmentRow>;
 
@@ -36,8 +37,10 @@ export function LocalEnvironmentList({
           />
         </View>
         <Text className="text-center text-sm leading-normal text-foreground-muted">
-          No environments connected yet.{"\n"}Tap{" "}
-          <Text className="font-t3-bold text-foreground">+</Text> to add one.
+          <T>
+            No environments connected yet.<Var>{"\n"}</Var>Tap<Var> </Var>
+            <Text className="font-t3-bold text-foreground">+</Text> to add one.
+          </T>
         </Text>
       </View>
     );

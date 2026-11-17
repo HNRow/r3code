@@ -166,6 +166,7 @@ import {
 import { PullRequestGuideTab } from "./PullRequestGuideTab";
 import { guideRunKey, useGuideRunStore } from "./guide/guideRunStore";
 import { useReviewGuideWriter } from "./guide/useReviewGuideWriter";
+import { T, useGT } from "gt-react";
 
 const actionFailureLabels = (term: string): Record<PullRequestAction, string> => ({
   merge: `Could not merge this ${term}`,
@@ -330,6 +331,7 @@ export function PullRequestDetailPanel({
   initialTab?: PullRequestDetailTab;
   onTabChange?: ((tab: PullRequestDetailTab) => void) | undefined;
 }) {
+  const gt = useGT();
   const environmentConfigs = useServerConfigs();
   const projects = useProjects();
   const project = projects.find(
@@ -1450,7 +1452,7 @@ export function PullRequestDetailPanel({
               ) : null}
               {!nativeStack && supportsStackActions && nativeStackQuery.error ? (
                 <Button variant="ghost" size="xs" onClick={nativeStackQuery.refresh}>
-                  Retry stack lookup
+                  <T>Retry stack lookup</T>
                 </Button>
               ) : null}
               {nativeStack ? (
@@ -1591,7 +1593,7 @@ export function PullRequestDetailPanel({
                       iconClassName="size-3"
                     />
                     <ArrowLeftIcon
-                      aria-label="receives changes from"
+                      aria-label={gt("receives changes from")}
                       className="size-3 shrink-0 opacity-60"
                     />
                     <Tooltip>
@@ -1664,7 +1666,9 @@ export function PullRequestDetailPanel({
                 }
                 updated={
                   <span>
-                    updated <RelativeTime timestamp={detail.updatedAt} />
+                    <T>
+                      updated <RelativeTime timestamp={detail.updatedAt} />
+                    </T>
                   </span>
                 }
                 checkout={
@@ -1673,8 +1677,8 @@ export function PullRequestDetailPanel({
                       key={checkoutCommand}
                       value={checkoutCommand}
                       target={`${terminology.singular} checkout command`}
-                      copyLabel="Copy checkout command"
-                      copiedLabel="Checkout command copied"
+                      copyLabel={gt("Copy checkout command")}
+                      copiedLabel={gt("Checkout command copied")}
                       className="ml-auto font-mono"
                       tooltipSide="bottom"
                       onError={reportCheckoutCommandError}
@@ -1696,7 +1700,7 @@ export function PullRequestDetailPanel({
                     value={detail.headBranch}
                     target="branch name"
                     copyLabel={`Copy ${terminology.singular} branch`}
-                    copiedLabel="Branch name copied"
+                    copiedLabel={gt("Branch name copied")}
                   />
                 }
                 files={`${detail.changedFiles.toLocaleString()} ${detail.changedFiles === 1 ? "file" : "files"}`}

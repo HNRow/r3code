@@ -17,6 +17,7 @@ import { AppText as Text } from "../../components/ui/AppText";
 import { useDeadlinePassed } from "../../lib/clock";
 import { threadEnvironment } from "../../state/threads";
 import { useAtomCommand } from "../../state/use-atom-command";
+import { T } from "gt-react-native";
 
 export function UsageLimitRecoveryCard({
   thread,
@@ -137,7 +138,7 @@ export function UsageLimitRecoveryCard({
       <View className="min-w-0 flex-1 gap-1">
         {chatGptLimit ? (
           <Text className="text-sm font-t3-medium text-foreground">
-            ChatGPT usage limit reached
+            <T>ChatGPT usage limit reached</T>
           </Text>
         ) : null}
         <Text

@@ -56,6 +56,7 @@ import { resolveSelectedReviewFileId } from "./reviewPaneSelection";
 import { buildReviewSectionMenu } from "./review-section-menu";
 import { reportShowcaseSceneRendered } from "../showcase/showcaseRenderSignal";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
+import { T, useGT } from "gt-react-native";
 
 function ReviewHeader(
   props: Parameters<typeof useReviewHeaderPresentation>[0] & {
@@ -146,7 +147,9 @@ const SHOWCASE_ENABLED = process.env.EXPO_PUBLIC_SHOWCASE === "1";
 const ReviewNotice = function ReviewNotice(props: { readonly notice: string }) {
   return (
     <ContentBand tone="warning">
-      <Text className="text-xs font-t3-bold uppercase text-warning-foreground">Partial diff</Text>
+      <Text className="text-xs font-t3-bold uppercase text-warning-foreground">
+        <T>Partial diff</T>
+      </Text>
       <Text className="text-xs leading-normal text-warning-foreground">{props.notice}</Text>
     </ContentBand>
   );
@@ -268,6 +271,7 @@ interface ReviewFileNavigatorProps {
 }
 
 function ReviewFileNavigator({ files, sectionId, onSelectFile, ref }: ReviewFileNavigatorProps) {
+  const gt = useGT();
   const [fileSelection, setFileSelection] = useState<{
     readonly sectionId: string | null;
     readonly fileId: string | null;
@@ -313,7 +317,7 @@ function ReviewFileNavigator({ files, sectionId, onSelectFile, ref }: ReviewFile
   return (
     <SheetPane>
       <AppBar
-        title="Changed files"
+        title={gt("Changed files")}
         subtitle={`${files.length} ${files.length === 1 ? "file" : "files"}`}
         hideBottomBorder
       />
@@ -341,6 +345,7 @@ type ReviewSheetProps = StaticScreenProps<{
 }>;
 
 export function ReviewSheet(props: ReviewSheetProps) {
+  const gt = useGT();
   const reduceMotion = useReduceMotionEnabled();
   const { nativeReviewDiffStyle } = useAppearanceCodeSurface();
   const { panes } = useWorkspacePaneState();
@@ -552,7 +557,9 @@ export function ReviewSheet(props: ReviewSheetProps) {
     if (error) {
       children.push(
         <ContentBand key="review-error">
-          <Text className="text-sm font-t3-bold text-foreground">Review unavailable</Text>
+          <Text className="text-sm font-t3-bold text-foreground">
+            <T>Review unavailable</T>
+          </Text>
           <Text className="text-xs leading-normal text-foreground-muted">{error}</Text>
         </ContentBand>,
       );
@@ -695,15 +702,17 @@ export function ReviewSheet(props: ReviewSheetProps) {
               {!selectedSection ? (
                 error ? null : (
                   <ContentStatus
-                    title="No review diffs"
-                    detail="This thread has no ready turn diffs and the worktree diff is empty."
+                    title={gt("No review diffs")}
+                    detail={gt(
+                      "This thread has no ready turn diffs and the worktree diff is empty.",
+                    )}
                   />
                 )
               ) : selectedSection.isLoading && selectedSection.diff === null ? (
-                <ContentStatus loading detail="Loading diff…" />
+                <ContentStatus loading detail={gt("Loading diff…")} />
               ) : parsedDiff.kind === "empty" ? (
                 <ContentStatus
-                  title="No changes"
+                  title={gt("No changes")}
                   detail={selectedSection.subtitle ?? "This diff is empty."}
                 />
               ) : parsedDiff.kind === "raw" ? (
@@ -720,7 +729,7 @@ export function ReviewSheet(props: ReviewSheetProps) {
               ) : parsedDiff.kind === "files" ? (
                 <ContentBand spacing="roomy">
                   <Text className="text-xs leading-normal text-foreground-muted">
-                    Native diff view unavailable. Showing the raw patch.
+                    <T>Native diff view unavailable. Showing the raw patch.</T>
                   </Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} bounces={false}>
                     <Text selectable className="font-mono text-xs leading-relaxed text-foreground">

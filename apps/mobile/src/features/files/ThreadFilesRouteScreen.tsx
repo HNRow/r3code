@@ -73,6 +73,7 @@ import {
   needsWorkspaceFileContents,
 } from "./filePath";
 import { useWorkspaceFileAssetUrlState } from "./workspaceFileAssetUrl";
+import { useGT, T } from "gt-react-native";
 
 function FilesBrowserHeader(props: {
   readonly projectName: string;
@@ -81,9 +82,10 @@ function FilesBrowserHeader(props: {
   readonly onRefresh: () => void;
   readonly onBack: () => void;
 }) {
+  const gt = useGT();
   return (
     <AppBar
-      title="Files"
+      title={gt("Files")}
       subtitle={props.projectName}
       onBack={props.onBack}
       hideBottomBorder
@@ -253,6 +255,7 @@ function FileContent(props: {
   readonly selectable: boolean;
   readonly onRefresh?: () => Promise<void> | void;
 }) {
+  const gt = useGT();
   // Reopening a mutable host file must not reuse a poster from an earlier visit.
   const thumbnailInstanceId = useId();
   const barOverlap = useContentTopInset();
@@ -292,7 +295,7 @@ function FileContent(props: {
 
   if (isAudioFile) {
     return props.previewUri === null ? (
-      <FilePreviewLoading message="Loading file..." />
+      <FilePreviewLoading message={gt("Loading file...")} />
     ) : (
       <AudioFilePreview uri={props.previewUri} onRetry={props.onRetryPreview} />
     );
@@ -318,20 +321,20 @@ function FileContent(props: {
   if (props.fileError && props.fileContents === null) {
     return (
       <View className="flex-1 items-center justify-center bg-sheet px-6">
-        <EmptyState title="File unavailable" detail={props.fileError} />
+        <EmptyState title={gt("File unavailable")} detail={props.fileError} />
       </View>
     );
   }
 
   if (props.fileContents === null) {
-    return <FilePreviewLoading message="Loading file..." />;
+    return <FilePreviewLoading message={gt("Loading file...")} />;
   }
 
   return (
     <View className="flex-1 bg-sheet" style={{ paddingTop: reservedHeaderInset }}>
       {props.truncated ? (
-        <FilePreviewNotice title="Partial file">
-          Preview limited to the first 1 MB of a truncated file.
+        <FilePreviewNotice title={gt("Partial file")}>
+          <T>Preview limited to the first 1 MB of a truncated file.</T>
         </FilePreviewNotice>
       ) : null}
       {props.activeMode === "preview" && delimiter ? (
@@ -418,9 +421,10 @@ function FilesUnavailable({
   detail?: string;
   onBack: () => void;
 }) {
+  const gt = useGT();
   return (
     <View className="flex-1 bg-sheet">
-      <AppBar title="Files" onBack={onBack} onBackToList={onBack} hideBottomBorder />
+      <AppBar title={gt("Files")} onBack={onBack} onBackToList={onBack} hideBottomBorder />
       <ScreenContent>
         <View className="flex-1 items-center justify-center px-6">
           <EmptyState title={title} detail={detail} />
@@ -459,6 +463,7 @@ function FilesToolbarBottomFade() {
 }
 
 export function ThreadFilesTreeScreen(props: ThreadFilesRouteScreenProps) {
+  const gt = useGT();
   const navigation = useNavigation();
   const { fileInspector } = useWorkspacePaneState();
   const [searchQuery, setSearchQuery] = useState("");
@@ -548,12 +553,14 @@ export function ThreadFilesTreeScreen(props: ThreadFilesRouteScreenProps) {
         />
       );
     }
-    return <LoadingScreen message="Opening files..." messagePlacement="above-spinner" />;
+    return <LoadingScreen message={gt("Opening files...")} messagePlacement="above-spinner" />;
   }
 
   if (!canReadFiles) {
     if (fileAccess.isPending) {
-      return <LoadingScreen message="Checking file access..." messagePlacement="above-spinner" />;
+      return (
+        <LoadingScreen message={gt("Checking file access...")} messagePlacement="above-spinner" />
+      );
     }
     return (
       <FilesUnavailable
@@ -615,6 +622,7 @@ export function ThreadFilesTreeScreen(props: ThreadFilesRouteScreenProps) {
 }
 
 export function ThreadFileScreen(props: ThreadFileRouteScreenProps) {
+  const gt = useGT();
   const navigation = useNavigation();
   const { fileInspector } = useWorkspacePaneState();
   const { appearance, setCodeWordBreak } = useAppearancePreferences();
@@ -957,14 +965,14 @@ export function ThreadFileScreen(props: ThreadFileRouteScreenProps) {
 
   if (environmentId === null || (threadId !== null && selectedThread === null)) {
     return withInspector(
-      <LoadingScreen message="Opening file..." messagePlacement="above-spinner" />,
+      <LoadingScreen message={gt("Opening file...")} messagePlacement="above-spinner" />,
     );
   }
 
   if (!canReadFiles) {
     if (fileAccess.isPending) {
       return withInspector(
-        <LoadingScreen message="Checking file access..." messagePlacement="above-spinner" />,
+        <LoadingScreen message={gt("Checking file access...")} messagePlacement="above-spinner" />,
       );
     }
     return withInspector(
@@ -981,8 +989,8 @@ export function ThreadFileScreen(props: ThreadFileRouteScreenProps) {
   if (relativePath === null) {
     return withInspector(
       <FilesUnavailable
-        title="File unavailable"
-        detail="This file path is invalid."
+        title={gt("File unavailable")}
+        detail={gt("This file path is invalid.")}
         onBack={handleBack}
       />,
     );
@@ -990,7 +998,7 @@ export function ThreadFileScreen(props: ThreadFileRouteScreenProps) {
 
   if (metadataPending) {
     return withInspector(
-      <LoadingScreen message="Opening file..." messagePlacement="above-spinner" />,
+      <LoadingScreen message={gt("Opening file...")} messagePlacement="above-spinner" />,
     );
   }
   if (directoryPath !== null) {

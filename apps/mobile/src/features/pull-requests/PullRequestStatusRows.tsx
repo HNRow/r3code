@@ -36,6 +36,7 @@ import {
 import { pullRequestTarget, type PullRequestParams } from "./usePullRequestDiff";
 import { usePullRequestAction } from "./usePullRequestAction";
 import { usePullRequestAgentActions } from "./usePullRequestAgentActions";
+import { useGT, T } from "gt-react-native";
 
 type RowProps = { readonly pr: PullRequestDetail; readonly params: PullRequestParams };
 const STATUS_ACTIONS: readonly PullRequestAction[] = [
@@ -104,6 +105,7 @@ export function PullRequestStatusMenu(props: RowProps) {
 }
 
 export function PullRequestChecksRow(props: RowProps) {
+  const gt = useGT();
   const linked = parsePullRequestAnchor(props.params.navigationUrl)?.kind === "checks";
   const [expanded, setExpanded] = useState(linked);
   const [seenNavigation, setSeenNavigation] = useState(props.params.navigationId);
@@ -134,11 +136,11 @@ export function PullRequestChecksRow(props: RowProps) {
           className="pl-8"
         >
           {props.pr.state === "open" && props.pr.checks.some(isFailingCheck) ? (
-            <PullRequestAgentRow {...props} task="feedback" title="Fix failing checks" />
+            <PullRequestAgentRow {...props} task="feedback" title={gt("Fix failing checks")} />
           ) : null}
           {action.available("approve-workflows") ? (
             <PullRequestCardRow
-              title="Approve workflows"
+              title={gt("Approve workflows")}
               icon="checkmark"
               detail={`${props.pr.workflowApprovalsRequired} waiting for approval`}
               onPress={() =>
@@ -168,10 +170,12 @@ export function PullRequestChecksRow(props: RowProps) {
               );
             })}
           {!props.pr.checks.length ? (
-            <Text className="px-4 py-3 text-xs text-foreground-muted">No checks reported.</Text>
+            <Text className="px-4 py-3 text-xs text-foreground-muted">
+              <T>No checks reported.</T>
+            </Text>
           ) : null}
           <PullRequestCardRow
-            title="Open checks on provider"
+            title={gt("Open checks on provider")}
             icon="arrow.up.right"
             onPress={() =>
               void Linking.openURL(
@@ -186,6 +190,7 @@ export function PullRequestChecksRow(props: RowProps) {
 }
 
 export function PullRequestBranchRow(props: RowProps) {
+  const gt = useGT();
   const action = usePullRequestAction(props.params, props.pr);
   const agent = usePullRequestAgentActions(props.params, props.pr);
   const methods = action.available("update-branch") ? allowedUpdateMethods(props.pr) : [];
@@ -226,7 +231,7 @@ export function PullRequestBranchRow(props: RowProps) {
   if (!methods.length && !canResolve) return row;
   return (
     <Menu
-      title="Branch"
+      title={gt("Branch")}
       actions={[
         ...(canResolve ? [agent.menuAction("conflicts")] : []),
         ...methods.map((id) => ({ id, title: `Update with ${id}`, image: "arrow.up.circle" })),
@@ -243,6 +248,7 @@ export function PullRequestBranchRow(props: RowProps) {
 }
 
 export function PullRequestReviewersRow(props: RowProps) {
+  const gt = useGT();
   const [expanded, setExpanded] = useState(false);
   const navigation = useNavigation();
   const activity = useEnvironmentQuery(
@@ -328,13 +334,13 @@ export function PullRequestReviewersRow(props: RowProps) {
             ))}
           {canRequest ? (
             <PullRequestCardRow
-              title="Request review"
+              title={gt("Request review")}
               icon="person.badge.plus"
               onPress={() => navigation.navigate("PullRequestReviewers", props.params)}
             />
           ) : (
             <PullRequestCardRow
-              title="View reviewers on provider"
+              title={gt("View reviewers on provider")}
               icon="arrow.up.right"
               onPress={() => void Linking.openURL(props.pr.url)}
             />

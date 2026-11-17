@@ -22,8 +22,10 @@ import { ListActionRow as SettingsActionRow } from "../../components/ui/ListActi
 import { SettingsSection } from "./components/SettingsSection";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { formatBytes } from "../../lib/formatBytes";
+import { useGT, T } from "gt-react-native";
 
 export function SettingsClientStorageRouteScreen() {
+  const gt = useGT();
   const insets = useSafeAreaInsets();
   const summaryResult = useAtomValue(clientCacheSummaryAtom);
   const clearResult = useAtomValue(clearClientCacheAtom);
@@ -69,7 +71,7 @@ export function SettingsClientStorageRouteScreen() {
   };
 
   return (
-    <SettingsScreen title="Client Storage">
+    <SettingsScreen title={gt("Client Storage")}>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
@@ -77,7 +79,7 @@ export function SettingsClientStorageRouteScreen() {
         contentContainerClassName="gap-6 px-5 pt-4"
         contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 18) + 18 }}
       >
-        <SettingsSection title="Environment caches">
+        <SettingsSection title={gt("Environment caches")}>
           {AsyncResult.isFailure(summaryResult) ? (
             <View className="items-center gap-2 px-6 py-8">
               <SymbolView
@@ -87,16 +89,18 @@ export function SettingsClientStorageRouteScreen() {
                 type="monochrome"
                 weight="regular"
               />
-              <Text className="text-center text-base text-foreground">Storage unavailable</Text>
+              <Text className="text-center text-base text-foreground">
+                <T>Storage unavailable</T>
+              </Text>
               <Text className="text-center text-sm text-foreground-muted">
-                Restart the app and try again.
+                <T>Restart the app and try again.</T>
               </Text>
             </View>
           ) : !summary ? (
             <View className="items-center gap-3 px-6 py-8">
               <AppActivityIndicator />
               <Text className="text-center text-sm text-foreground-muted">
-                Inspecting cached data…
+                <T>Inspecting cached data…</T>
               </Text>
             </View>
           ) : environmentSummaries.length > 0 ? (
@@ -125,16 +129,18 @@ export function SettingsClientStorageRouteScreen() {
                 type="monochrome"
                 weight="regular"
               />
-              <Text className="text-center text-base text-foreground">No cached data</Text>
+              <Text className="text-center text-base text-foreground">
+                <T>No cached data</T>
+              </Text>
               <Text className="text-center text-sm text-foreground-muted">
-                Offline cache records will appear here after environments are used.
+                <T>Offline cache records will appear here after environments are used.</T>
               </Text>
             </View>
           )}
         </SettingsSection>
 
         <View className="gap-3">
-          <SettingsSection title="Actions">
+          <SettingsSection title={gt("Actions")}>
             <SettingsActionRow
               icon="trash"
               label={summary ? `Clear ${formatBytes(summary.payloadBytes)}` : "Clear caches"}
@@ -145,12 +151,14 @@ export function SettingsClientStorageRouteScreen() {
             />
           </SettingsSection>
           <Text className="px-2 text-sm leading-normal text-foreground-muted">
-            Clearing caches never removes environment connections, credentials, account data, or
-            appearance preferences.
+            <T>
+              Clearing caches never removes environment connections, credentials, account data, or
+              appearance preferences.
+            </T>
           </Text>
           {AsyncResult.isFailure(summaryResult) || AsyncResult.isFailure(clearResult) ? (
             <Text selectable className="px-2 text-sm text-danger-foreground">
-              Client storage is temporarily unavailable. Try again after restarting the app.
+              <T>Client storage is temporarily unavailable. Try again after restarting the app.</T>
             </Text>
           ) : null}
         </View>

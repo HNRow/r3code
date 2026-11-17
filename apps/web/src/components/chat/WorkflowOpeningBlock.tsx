@@ -26,6 +26,7 @@ import { findRevealRef } from "./markdownFindContext";
 import { useTallEnoughToFold } from "./useTallEnoughToFold";
 import { SubagentTooltipContent } from "./SubagentTooltipContent";
 import { EnvironmentSubagentAvatar } from "./V2LifecycleRow";
+import { T } from "gt-react";
 
 const FOLDED_SCRIPT_MASK = "linear-gradient(to bottom, black calc(100% - 1.75rem), transparent)";
 
@@ -65,7 +66,9 @@ export function WorkflowOpeningBlock(props: {
       <header className="flex min-w-0 items-start gap-2">
         <WorkflowIcon aria-hidden className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <p className="text-2xs font-medium text-muted-foreground">Workflow started</p>
+          <p className="text-2xs font-medium text-muted-foreground">
+            <T>Workflow started</T>
+          </p>
           <h3 className="truncate text-sm font-medium text-foreground" data-thread-find-text="true">
             {headline.title}
           </h3>

@@ -14,6 +14,7 @@ import {
 } from "../ui/alert-dialog";
 import { Button, InlineButton } from "../ui/button";
 import { useT3ConnectAccountPage } from "./T3ConnectAccountPages";
+import { T, Var } from "gt-react";
 
 export function RemoveT3ConnectEnvironmentDialog({
   environmentLabel,
@@ -46,10 +47,10 @@ export function RemoveT3ConnectEnvironmentDialog({
         openAccountPage();
       }}
     >
-      T3 Connect settings
+      <T>R3 Connect settings</T>
     </InlineButton>
   ) : (
-    "T3 Connect settings"
+    "R3 Connect settings"
   );
 
   return (
@@ -62,30 +63,42 @@ export function RemoveT3ConnectEnvironmentDialog({
       >
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove {shown.label} from this device?</AlertDialogTitle>
+            <AlertDialogTitle>
+              <T>
+                Remove <Var>{shown.label}</Var> from this device?
+              </T>
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              This forgets its pairing, credentials, and cached threads here.
+              <T>This forgets its pairing, credentials, and cached threads here.</T>
             </AlertDialogDescription>
             <AlertDialogDescription>
               {shown.registration === "registered" ? (
                 <>
-                  It stays on your T3 Connect account and keeps its host space. Deregister it in{" "}
-                  {accountPageLink} to free it.
+                  <T>
+                    It stays on your R3 Connect account and keeps its host space. Deregister it in
+                    <Var> </Var>
+                    <Var>{accountPageLink}</Var> to free it.
+                  </T>
                 </>
               ) : shown.registration === "unregistered" ? (
-                "It's no longer on your T3 Connect account."
+                "It's no longer on your R3 Connect account."
               ) : (
                 <>
-                  This doesn't change your T3 Connect account. To deregister it there, use{" "}
-                  {accountPageLink}.
+                  <T>
+                    This doesn't change your R3 Connect account. To deregister it there, use
+                    <Var> </Var>
+                    <Var>{accountPageLink}</Var>.
+                  </T>
                 </>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+            <AlertDialogClose render={<Button variant="outline" />}>
+              <T>Cancel</T>
+            </AlertDialogClose>
             <Button variant="destructive" onClick={onConfirm}>
-              Remove from this device
+              <T>Remove from this device</T>
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>

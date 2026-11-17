@@ -40,6 +40,7 @@ import { Badge } from "../ui/badge";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { ComposerControl, ComposerControlIcon, type ComposerControlSize } from "./ComposerControl";
 import { useComposerMenuState } from "./useComposerMenuState";
+import { T } from "gt-react";
 
 type ProviderOptions = ReadonlyArray<ProviderOptionSelection>;
 
@@ -106,7 +107,7 @@ type TraitsPersistence =
 function DefaultBadge() {
   return (
     <Badge variant="outline" size="sm" className="min-w-0">
-      Default
+      <T>Default</T>
     </Badge>
   );
 }

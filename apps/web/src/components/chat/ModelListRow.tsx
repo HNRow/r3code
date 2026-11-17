@@ -10,6 +10,7 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "~/lib/utils";
 import { modelPickerModelKey } from "./modelPickerKeys";
 import { ProviderInstanceIcon } from "./ProviderInstanceIcon";
+import { T, useGT } from "gt-react";
 
 export const ModelListRow = memo(function ModelListRow(props: {
   index: number;
@@ -34,6 +35,7 @@ export const ModelListRow = memo(function ModelListRow(props: {
   disabledReason?: string | null;
   onToggleFavorite: (instanceId: ProviderInstanceId, slug: string) => void;
 }) {
+  const gt = useGT();
   const model = {
     slug: props.slug,
     name: props.name,
@@ -88,14 +90,14 @@ export const ModelListRow = memo(function ModelListRow(props: {
         {props.showNewBadge ? (
           <span
             className="shrink-0 rounded border border-update/35 bg-update/15 px-0.5 py-px text-3xs font-bold uppercase leading-none tracking-wide text-update-foreground"
-            aria-label="New model"
+            aria-label={gt("New model")}
           >
-            New
+            <T>New</T>
           </span>
         ) : null}
         {props.unavailable ? (
           <Badge variant="outline" size="sm">
-            Unavailable
+            <T>Unavailable</T>
           </Badge>
         ) : null}
       </div>

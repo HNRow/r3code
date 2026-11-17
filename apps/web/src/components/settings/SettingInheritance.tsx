@@ -22,6 +22,7 @@ import { useOptionalSettingsScope } from "./SettingsScopeContext";
 import type { ProjectOverrideEntry, ScopedSettingsTarget } from "./scopedSettings";
 import { isProjectScopedSettingKey } from "./scopedSettings";
 import { settingsScopeEnvironmentLabels } from "./settingsScopeAxis";
+import { msg, T, useMessages, Var } from "gt-react";
 
 interface InheritanceLayer {
   readonly key: "project" | "environment" | "t3.json" | "built-in";
@@ -32,22 +33,22 @@ interface InheritanceLayer {
 }
 
 const WRITING_STYLE_LABELS: Record<string, string> = {
-  repo_conventions: "Repository conventions",
-  conventional_commits: "Conventional Commits",
-  custom: "Custom instructions",
+  repo_conventions: msg("Repository conventions"),
+  conventional_commits: msg("Conventional Commits"),
+  custom: msg("Custom instructions"),
 };
 
 const BACKGROUND_ACTIVITY_PROFILE_LABELS: Record<string, string> = {
-  balanced: "Balanced",
-  performance: "Performance",
-  "battery-saver": "Battery saver",
-  custom: "Advanced",
+  balanced: msg("Balanced"),
+  performance: msg("Performance"),
+  "battery-saver": msg("Battery saver"),
+  custom: msg("Advanced"),
 };
 
 function formatValue(key: keyof ServerSettings, value: unknown): string {
   if (value === null || value === undefined) {
     return key === "pullRequestMergeMethod"
-      ? "Last selected"
+      ? msg("Last selected")
       : key === "sidebarAutoSettleAfterDays"
         ? "Never"
         : key === "defaultModelSelection"
@@ -184,6 +185,7 @@ export function SettingInheritance({
   overridingProjects?: readonly SettingOverridingProject[];
   onClearOverrides?: (entries: readonly ProjectOverrideEntry[]) => void;
 }) {
+  const m = useMessages();
   const scopeContext = useOptionalSettingsScope();
   const key = keys[0];
   if (!key || targets.length === 0) return null;
@@ -302,7 +304,7 @@ export function SettingInheritance({
                             : "text-muted-foreground/60",
                       )}
                     >
-                      <span className="max-w-32 truncate">{layer.value}</span>
+                      <span className="max-w-32 truncate">{m(layer.value)}</span>
                       {layer.effective ? (
                         <CheckIcon aria-hidden className="size-3.5 shrink-0 text-primary" />
                       ) : (
@@ -339,7 +341,7 @@ export function SettingInheritance({
                       <span className="flex w-full min-w-0 flex-col">
                         <span className="flex min-w-0 items-center gap-2">
                           <span className="min-w-0 flex-1 truncate text-sm text-foreground tabular-nums">
-                            {winningLayer?.value}
+                            {winningLayer ? m(winningLayer.value) : null}
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {winningLayer?.key === "environment"
@@ -377,7 +379,7 @@ export function SettingInheritance({
                     {chain}
                     {hasMultipleEnvironments ? (
                       <p className="px-2 pt-1.5 text-xs text-muted-foreground">
-                        Same on all machines
+                        <T>Same on all machines</T>
                       </p>
                     ) : null}
                   </>
@@ -392,18 +394,24 @@ export function SettingInheritance({
                     <div className="flex items-center justify-between gap-3 px-2 text-xs text-muted-foreground">
                       {foldOverrides ? (
                         <CollapsibleTrigger render={<InlineButton tone="muted" />}>
-                          <ChevronRightIcon
-                            aria-hidden
-                            className="size-3 [[data-panel-open]_&]:rotate-90"
-                          />
-                          Overridden by
+                          <T>
+                            <ChevronRightIcon
+                              aria-hidden
+                              className="size-3 [[data-panel-open]_&]:rotate-90"
+                            />
+                            Overridden by
+                          </T>
                         </CollapsibleTrigger>
                       ) : (
-                        <span>Overridden by</span>
+                        <span>
+                          <T>Overridden by</T>
+                        </span>
                       )}
                       {onClearOverrides ? (
                         <InlineButton onClick={() => onClearOverrides(overriding)}>
-                          Reset {overriding.length === 1 ? "it" : "all"}
+                          <T>
+                            Reset <Var>{overriding.length === 1 ? "it" : "all"}</Var>
+                          </T>
                         </InlineButton>
                       ) : null}
                     </div>

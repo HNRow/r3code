@@ -152,6 +152,7 @@ import {
   usePullRequestReviewStore,
   type PendingReviewComment,
 } from "./pullRequestReviewStore";
+import { T, Var, useGT } from "gt-react";
 
 interface ReviewAnnotationGroup {
   readonly threads: ReadonlyArray<PullRequestReviewThread>;
@@ -339,14 +340,16 @@ function FileViewedToggle({
         {stale ? (
           <Tooltip>
             <TooltipTrigger render={<span className="text-warning-foreground" />}>
-              Changed
+              <T>Changed</T>
             </TooltipTrigger>
             <TooltipPopup side="bottom">
-              This file has been pushed to since you marked it viewed.
+              <T>This file has been pushed to since you marked it viewed.</T>
             </TooltipPopup>
           </Tooltip>
         ) : (
-          <span className="@max-xs:hidden">Viewed</span>
+          <span className="@max-xs:hidden">
+            <T>Viewed</T>
+          </span>
         )}
       </label>
     </span>
@@ -426,6 +429,7 @@ function PullRequestCodeTab({
   onRevealSettled?: ((revealUrl: string) => void) | undefined;
   revealRequest?: { readonly path: string; readonly nonce: number } | null;
 }) {
+  const gt = useGT();
   const resolvedTheme = useRenderedAppearance();
   // Initialize the shared tokenizer and workers while the diff request is still pending.
   useDiffWorkerPool();
@@ -1095,9 +1099,11 @@ function PullRequestCodeTab({
       >
         {diffQuery.error !== null ? (
           <>
-            <span>The rest of this diff could not be loaded.</span>
+            <span>
+              <T>The rest of this diff could not be loaded.</T>
+            </span>
             <Button size="xs" variant="outline" onClick={() => diffQuery.refresh()}>
-              Retry
+              <T>Retry</T>
             </Button>
           </>
         ) : diffQuery.isPending ? (
@@ -1379,7 +1385,9 @@ function PullRequestCodeTab({
                 onValueChange={(value) => onSelectedCommitChange(value === "all" ? null : value)}
               >
                 <DropdownMenuRadioItem value="all" closeOnClick>
-                  <span>All commits</span>
+                  <span>
+                    <T>All commits</T>
+                  </span>
                 </DropdownMenuRadioItem>
                 {orderedCommits.slice(0, visibleCommitCount).map((entry) => (
                   <DropdownMenuRadioItem key={entry.oid} value={entry.oid} closeOnClick>
@@ -1403,7 +1411,9 @@ function PullRequestCodeTab({
                   onClick={() => setVisibleCommitCount((count) => count + COMMIT_PAGE_SIZE)}
                 >
                   <span className="text-muted-foreground">
-                    Show more ({orderedCommits.length - visibleCommitCount} left)
+                    <T>
+                      Show more (<Var>{orderedCommits.length - visibleCommitCount}</Var> left)
+                    </T>
                   </span>
                 </DropdownMenuItem>
               ) : null}
@@ -1417,7 +1427,10 @@ function PullRequestCodeTab({
           </span>
           {hiddenTestFileCount > 0 ? (
             <Button type="button" size="xs" variant="link" onClick={() => setHideTestFiles(false)}>
-              {hiddenTestFileCount} test {hiddenTestFileCount === 1 ? "file" : "files"} hidden
+              <T>
+                <Var>{hiddenTestFileCount}</Var> test{" "}
+                <Var>{hiddenTestFileCount === 1 ? "file" : "files"}</Var> hidden
+              </T>
             </Button>
           ) : null}
           {filesViewed.enabled && files.length > 0 ? (
@@ -1432,14 +1445,16 @@ function PullRequestCodeTab({
                 <Tooltip>
                   <TooltipTrigger render={<span className="flex shrink-0 items-center" />}>
                     <InfoIcon
-                      aria-label="These ticks are kept here, not on the host"
+                      aria-label={gt("These ticks are kept here, not on the host")}
                       className="text-muted-foreground size-3.5"
                     />
                   </TooltipTrigger>
                   <TooltipPopup side="bottom">
-                    This host keeps no shared record of which files you have read, so these ticks
-                    are kept by this environment. They follow you between the apps connected to it,
-                    but the host's own web UI will not show them.
+                    <T>
+                      This host keeps no shared record of which files you have read, so these ticks
+                      are kept by this environment. They follow you between the apps connected to
+                      it, but the host's own web UI will not show them.
+                    </T>
                   </TooltipPopup>
                 </Tooltip>
               ) : null}
@@ -1447,13 +1462,15 @@ function PullRequestCodeTab({
                 <Tooltip>
                   <TooltipTrigger render={<span className="flex shrink-0 items-center" />}>
                     <TriangleAlertIcon
-                      aria-label="Your ticks could not be read"
+                      aria-label={gt("Your ticks could not be read")}
                       className="size-3.5 text-warning-foreground"
                     />
                   </TooltipTrigger>
                   <TooltipPopup side="bottom">
-                    The boxes below are whatever was last read, and empty if nothing has been read
-                    yet. {filesViewed.error}
+                    <T>
+                      The boxes below are whatever was last read, and empty if nothing has been read
+                      yet. <Var>{filesViewed.error}</Var>
+                    </T>
                   </TooltipPopup>
                 </Tooltip>
               ) : null}
@@ -1461,13 +1478,15 @@ function PullRequestCodeTab({
                 <Tooltip>
                   <TooltipTrigger render={<span className="flex shrink-0 items-center" />}>
                     <TriangleAlertIcon
-                      aria-label="This count covers only part of the change"
+                      aria-label={gt("This count covers only part of the change")}
                       className="size-3.5 text-warning-foreground"
                     />
                   </TooltipTrigger>
                   <TooltipPopup side="bottom">
-                    This change has more files than the host will report ticks for in one read, so
-                    the count is short and some boxes below start empty.
+                    <T>
+                      This change has more files than the host will report ticks for in one read, so
+                      the count is short and some boxes below start empty.
+                    </T>
                   </TooltipPopup>
                 </Tooltip>
               ) : null}
@@ -1477,12 +1496,15 @@ function PullRequestCodeTab({
             <Tooltip>
               <TooltipTrigger render={<span className="flex shrink-0 items-center" />}>
                 <TriangleAlertIcon
-                  aria-label="Some of this diff was not shown"
+                  aria-label={gt("Some of this diff was not shown")}
                   className="size-3.5 text-warning-foreground"
                 />
               </TooltipTrigger>
               <TooltipPopup side="bottom">
-                The host withheld part of this diff: a binary file, or a change too large to inline.
+                <T>
+                  The host withheld part of this diff: a binary file, or a change too large to
+                  inline.
+                </T>
               </TooltipPopup>
             </Tooltip>
           ) : null}
@@ -1490,12 +1512,14 @@ function PullRequestCodeTab({
             <Tooltip>
               <TooltipTrigger render={<span className="flex shrink-0 items-center" />}>
                 <MessageSquareOffIcon
-                  aria-label="Line comments are written from the whole change"
+                  aria-label={gt("Line comments are written from the whole change")}
                   className="size-3.5"
                 />
               </TooltipTrigger>
               <TooltipPopup side="bottom">
-                A comment is anchored to the whole change, so switch to All commits to write one.
+                <T>
+                  A comment is anchored to the whole change, so switch to All commits to write one.
+                </T>
               </TooltipPopup>
             </Tooltip>
           ) : null}
@@ -1509,26 +1533,28 @@ function PullRequestCodeTab({
                 <DropdownMenuTrigger
                   render={<Button size="icon-sm" variant="ghost" />}
                   className="@lg:hidden"
-                  aria-label="Diff options"
+                  aria-label={gt("Diff options")}
                 />
               }
             >
               <Settings2Icon className="size-3.5" />
             </TooltipTrigger>
-            <TooltipPopup side="top">Diff options</TooltipPopup>
+            <TooltipPopup side="top">
+              <T>Diff options</T>
+            </TooltipPopup>
           </Tooltip>
           <DropdownMenuContent align="end">
             <DropdownMenuCheckboxItem
               checked={ignoreWhitespace}
               onCheckedChange={(checked) => changeIgnoreWhitespace(checked)}
             >
-              Hide whitespace changes
+              <T>Hide whitespace changes</T>
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
               checked={wordWrap}
               onCheckedChange={(checked) => setWordWrapOverride(checked)}
             >
-              Wrap lines
+              <T>Wrap lines</T>
             </DropdownMenuCheckboxItem>
             <DropdownMenuSeparator />
             <DropdownMenuRadioGroup
@@ -1540,10 +1566,10 @@ function PullRequestCodeTab({
               }}
             >
               <DropdownMenuRadioItem value="stacked" closeOnClick>
-                Stacked
+                <T>Stacked</T>
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="split" closeOnClick>
-                Split
+                <T>Split</T>
               </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
@@ -1570,7 +1596,7 @@ function PullRequestCodeTab({
             </TooltipPopup>
           </Tooltip>
           <ToggleGroup
-            aria-label="Diff layout"
+            aria-label={gt("Diff layout")}
             className="shrink-0"
             variant="segmented"
             value={[diffLayout]}
@@ -1581,10 +1607,10 @@ function PullRequestCodeTab({
               }
             }}
           >
-            <Toggle aria-label="Stacked diff view" value="stacked">
+            <Toggle aria-label={gt("Stacked diff view")} value="stacked">
               <Rows3Icon className="size-3.5" />
             </Toggle>
-            <Toggle aria-label="Split diff view" value="split">
+            <Toggle aria-label={gt("Split diff view")} value="split">
               <Columns2Icon className="size-3.5" />
             </Toggle>
           </ToggleGroup>
@@ -1638,7 +1664,7 @@ function PullRequestCodeTab({
             <TooltipTrigger
               render={
                 <Toggle
-                  aria-label="Hide test files"
+                  aria-label={gt("Hide test files")}
                   variant="ghost"
                   size="sm"
                   pressed={hideTestFiles}
@@ -1833,7 +1859,11 @@ function PullRequestCodeTab({
                       {threads.map((thread) => (
                         <div key={thread.id}>
                           {thread.line === null ? null : (
-                            <p className="px-3 text-xs text-muted-foreground">Line {thread.line}</p>
+                            <p className="px-3 text-xs text-muted-foreground">
+                              <T>
+                                Line <Var>{thread.line}</Var>
+                              </T>
+                            </p>
                           )}
                           {renderThreadCard(thread)}
                         </div>
@@ -1899,7 +1929,7 @@ function PullRequestCodeTab({
             defaultWidth={320}
             defaultWidthFraction={0.4}
             minWidth={192}
-            resizeLabel="Resize PR Code files"
+            resizeLabel={gt("Resize PR Code files")}
           >
             <DiffFileTree
               ariaLabel={`${capitalizeTerm(term)} #${detail.number} files`}

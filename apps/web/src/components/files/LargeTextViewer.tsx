@@ -5,6 +5,7 @@ import { useClientSettings } from "~/hooks/useSettings";
 import { FileSurfaceFailure, FileSurfaceLoading, FileSurfaceNotice } from "./fileSurfaceChrome";
 import { PREVIEW_PAGE_ROWS, type TextPreviewResult } from "./largeTextProtocol";
 import VirtualTablePreview from "./VirtualTablePreview";
+import { T } from "gt-react";
 
 const FIRST_SCREEN_BYTES = 16 * 1024;
 
@@ -229,12 +230,14 @@ export default function LargeTextViewer(props: {
       </div>
       {!meta.complete ? (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20">
-          <FileSurfaceNotice>Loading the rest of the file…</FileSurfaceNotice>
+          <FileSurfaceNotice>
+            <T>Loading the rest of the file…</T>
+          </FileSurfaceNotice>
         </div>
       ) : null}
       {meta.columns === 1024 ? (
         <FileSurfaceNotice>
-          Showing the first 1,024 columns. Source and Save retain every column.
+          <T>Showing the first 1,024 columns. Source and Save retain every column.</T>
         </FileSurfaceNotice>
       ) : null}
       {meta.count > 0 ? (
@@ -256,7 +259,7 @@ export default function LargeTextViewer(props: {
         />
       ) : (
         <div className="flex flex-1 items-center justify-center p-6 text-xs text-muted-foreground">
-          This file is empty.
+          <T>This file is empty.</T>
         </div>
       )}
     </div>

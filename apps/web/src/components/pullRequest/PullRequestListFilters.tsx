@@ -57,6 +57,7 @@ import {
 } from "./pullRequestList.logic";
 import { PullRequestActorAvatar } from "./pullRequestPresentation";
 import { PullRequestGlyph } from "./pullRequestIcons";
+import { T, useGT, Var } from "gt-react";
 
 export interface PullRequestFilterOption<Value extends string> {
   readonly value: Value;
@@ -198,7 +199,11 @@ function PullRequestFilterRadioGroup<Value extends string>({
             <span className="flex min-w-0 items-center gap-2">
               <PullRequestFilterOptionIcon option={option} />
               <span className="min-w-0 flex-1 truncate">{option.label}</span>
-              {option.unavailable ? <span className="shrink-0">· Unavailable</span> : null}
+              {option.unavailable ? (
+                <span className="shrink-0">
+                  <T>· Unavailable</T>
+                </span>
+              ) : null}
               <MenuRadioItemIndicator />
             </span>
           </MenuRadioItem>
@@ -284,6 +289,7 @@ function PullRequestAuthorChoices({
   scope: ReadonlyArray<PullRequestFilterOptionScope>;
   onChange: (author: string | undefined) => void;
 }) {
+  const gt = useGT();
   const [query, setQuery] = useState("");
   const hosted = useHostedFilterOptions(scope, "authors", query);
   const login = value?.toLowerCase() ?? "";
@@ -302,14 +308,16 @@ function PullRequestAuthorChoices({
         busy={hosted.isPending}
         value={query}
         onChange={(event) => setQuery(event.currentTarget.value)}
-        placeholder="Search authors"
-        aria-label="Search authors"
+        placeholder={gt("Search authors")}
+        aria-label={gt("Search authors")}
       />
       <MenuRadioGroup value={selected?.actor.login ?? value ?? ""} onValueChange={select}>
         <MenuRadioItem value="">
           <span className="flex min-w-0 items-center gap-2">
-            <LayersIcon aria-hidden className="size-3.5" />
-            Anyone
+            <T>
+              <LayersIcon aria-hidden className="size-3.5" />
+              Anyone
+            </T>
           </span>
         </MenuRadioItem>
         {visible.map((option) => (
@@ -319,7 +327,10 @@ function PullRequestAuthorChoices({
               <span className="min-w-0 flex-1 truncate">{option.actor.login}</span>
               {option.mergedCount > 0 ? (
                 <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
-                  {option.mergedCount} {option.mergedCount === 1 ? "merge" : "merges"} loaded
+                  <T>
+                    <Var>{option.mergedCount}</Var>{" "}
+                    <Var>{option.mergedCount === 1 ? "merge" : "merges"}</Var> loaded
+                  </T>
                 </span>
               ) : null}
             </span>
@@ -350,7 +361,9 @@ function PullRequestAuthorFilter({
     <MenuSub>
       <MenuSubTrigger>
         <UserRoundIcon aria-hidden className="size-3.5" />
-        <span className="flex-1">Author</span>
+        <span className="flex-1">
+          <T>Author</T>
+        </span>
         <span className="min-w-0 max-w-32 truncate text-xs text-muted-foreground">
           {value ?? "Anyone"}
         </span>
@@ -378,6 +391,7 @@ function PullRequestLabelChoices({
   scope: ReadonlyArray<PullRequestFilterOptionScope>;
   onChange: (labels: ReadonlyArray<string>) => void;
 }) {
+  const gt = useGT();
   const [query, setQuery] = useState("");
   const hosted = useHostedFilterOptions(scope, "labels", query);
   const selected = new Set(value.map((name) => name.toLowerCase()));
@@ -395,8 +409,8 @@ function PullRequestLabelChoices({
         busy={hosted.isPending}
         value={query}
         onChange={(event) => setQuery(event.currentTarget.value)}
-        placeholder="Search labels"
-        aria-label="Search labels"
+        placeholder={gt("Search labels")}
+        aria-label={gt("Search labels")}
       />
       {visible.length === 0 && !hosted.isPending ? (
         <MenuItem disabled>
@@ -453,7 +467,9 @@ function PullRequestLabelFilter({
     <MenuSub>
       <MenuSubTrigger>
         <TagIcon aria-hidden className="size-3.5" />
-        <span className="flex-1">Labels</span>
+        <span className="flex-1">
+          <T>Labels</T>
+        </span>
         <span className="text-xs text-muted-foreground">
           {value.length === 0 ? "Any" : `${value.length} selected`}
         </span>
@@ -519,6 +535,7 @@ export function PullRequestFiltersMenu({
   unavailable: ReadonlyMap<string, string>;
   onProject: (projectId: ProjectId | undefined, environmentId: EnvironmentId | undefined) => void;
 }) {
+  const gt = useGT();
   const selectedLabels = (filters.labels ?? []).flatMap((group) => group);
   const filterCount = [
     state !== "open",
@@ -568,7 +585,9 @@ export function PullRequestFiltersMenu({
     <Menu onOpenChange={onOpenChange}>
       <MenuTrigger render={<Button variant="outline" />}>
         <ListFilterIcon className="size-4" />
-        <span>Filters</span>
+        <span>
+          <T>Filters</T>
+        </span>
         {filterCount > 0 ? (
           <span className="rounded-full bg-muted px-1.5 text-xs text-muted-foreground tabular-nums">
             {filterCount}
@@ -577,13 +596,13 @@ export function PullRequestFiltersMenu({
       </MenuTrigger>
       <MenuPopup align="end" side="bottom">
         <PullRequestFilterRadioSubmenu
-          label="State"
+          label={gt("State")}
           value={state}
           options={stateOptions}
           onChange={onState}
         />
         <PullRequestFilterRadioSubmenu
-          label="Involvement"
+          label={gt("Involvement")}
           value={involvement}
           options={involvementOptions}
           onChange={onInvolvement}
@@ -606,19 +625,19 @@ export function PullRequestFiltersMenu({
           }
         />
         <PullRequestFilterRadioSubmenu
-          label="Draft"
+          label={gt("Draft")}
           value={filters.draft ?? UNFILTERED_VALUE}
           options={DRAFT_OPTIONS}
           onChange={(draft) => updateFilter("draft", draft)}
         />
         <PullRequestFilterRadioSubmenu
-          label="Review"
+          label={gt("Review")}
           value={filters.review ?? UNFILTERED_VALUE}
           options={REVIEW_OPTIONS}
           onChange={(review) => updateFilter("review", review)}
         />
         <PullRequestFilterRadioSubmenu
-          label="Checks"
+          label={gt("Checks")}
           value={filters.checks ?? UNFILTERED_VALUE}
           options={CHECKS_OPTIONS}
           onChange={(checks) => updateFilter("checks", checks)}
@@ -627,7 +646,7 @@ export function PullRequestFiltersMenu({
           <>
             <MenuSeparator />
             <PullRequestFilterRadioSubmenu
-              label="Host"
+              label={gt("Host")}
               value={host ?? ALL_HOSTS_VALUE}
               options={hostOptions}
               onChange={(next) => onHost(next === ALL_HOSTS_VALUE ? undefined : next)}
@@ -638,7 +657,7 @@ export function PullRequestFiltersMenu({
           <>
             <MenuSeparator />
             <PullRequestFilterRadioSubmenu
-              label="Server"
+              label={gt("Server")}
               value={server ?? ALL_SERVERS_VALUE}
               options={serverOptions}
               onChange={(next) =>
@@ -649,7 +668,7 @@ export function PullRequestFiltersMenu({
         ) : null}
         <MenuSeparator />
         <PullRequestFilterRadioSubmenu
-          label="Project"
+          label={gt("Project")}
           value={projectValue}
           options={projectOptions}
           onChange={(next) => {

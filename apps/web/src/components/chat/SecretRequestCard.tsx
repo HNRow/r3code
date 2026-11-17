@@ -32,6 +32,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { SecretSourceSelect } from "../settings/SecretSourceInput";
 import { WorkLogRow } from "./WorkLog";
+import { Var, T } from "gt-react";
 
 export function SecretRequestCard(props: {
   readonly environmentId: EnvironmentId;
@@ -160,8 +161,10 @@ function PendingSecretRequestForm(props: {
             size="sm"
             render={<a href={link.href} target="_blank" rel="noopener noreferrer" />}
           >
-            Open {link.host}
-            <ExternalLinkIcon aria-hidden />
+            <T>
+              Open <Var>{link.host}</Var>
+              <ExternalLinkIcon aria-hidden />
+            </T>
           </Button>
           {/* A link found in the reason is already shown there. */}
           {item.url !== undefined ? (
@@ -223,7 +226,7 @@ function PendingSecretRequestForm(props: {
           )}
         </div>
         <Button type="submit" disabled={submitting || draft.trim().length === 0}>
-          Save securely
+          <T>Save securely</T>
         </Button>
       </div>
       {error !== null ? (
@@ -246,7 +249,7 @@ function PendingSecretRequestForm(props: {
           disabled={submitting}
           onClick={() => void send({ type: "decline" })}
         >
-          Decline
+          <T>Decline</T>
         </Button>
       </div>
     </form>

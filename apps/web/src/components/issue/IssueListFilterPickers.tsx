@@ -25,6 +25,7 @@ import {
   type PullRequestFilterOption,
 } from "../pullRequest/PullRequestListFilters";
 import { pullRequestLabelColor } from "../pullRequest/pullRequestList.logic";
+import { T, useGT } from "gt-react";
 
 const VISIBLE_CHOICES = 30;
 const matches = (needle: string, ...fields: ReadonlyArray<string | null | undefined>) =>
@@ -44,6 +45,7 @@ export function IssueFiltersMenu(props: {
   assignee: string | undefined;
   onAssignee: (assignee: string | undefined) => void;
 }) {
+  const gt = useGT();
   const [open, setOpen] = useState(false);
   const count = [
     props.state !== "open",
@@ -57,7 +59,9 @@ export function IssueFiltersMenu(props: {
     <Menu onOpenChange={setOpen}>
       <MenuTrigger render={<Button variant="outline" />}>
         <ListFilterIcon className="size-4" />
-        <span>Filters</span>
+        <span>
+          <T>Filters</T>
+        </span>
         {count > 0 ? (
           <span className="rounded-full bg-muted px-1.5 text-xs text-muted-foreground tabular-nums">
             {count}
@@ -66,13 +70,13 @@ export function IssueFiltersMenu(props: {
       </MenuTrigger>
       <MenuPopup align="end" side="bottom">
         <PullRequestFilterRadioSubmenu
-          label="State"
+          label={gt("State")}
           value={props.state}
           options={props.stateOptions}
           onChange={props.onState}
         />
         <PullRequestFilterRadioSubmenu
-          label="Involvement"
+          label={gt("Involvement")}
           value={props.involvement}
           options={props.involvementOptions}
           onChange={props.onInvolvement}
@@ -81,7 +85,9 @@ export function IssueFiltersMenu(props: {
         <MenuSub>
           <MenuSubTrigger>
             <TagIcon aria-hidden className="size-3.5" />
-            <span className="flex-1">Labels</span>
+            <span className="flex-1">
+              <T>Labels</T>
+            </span>
             <span className="min-w-0 max-w-32 truncate text-xs text-muted-foreground">
               {props.labels.length === 0
                 ? "Any"
@@ -97,7 +103,9 @@ export function IssueFiltersMenu(props: {
         <MenuSub>
           <MenuSubTrigger>
             <UserIcon aria-hidden className="size-3.5" />
-            <span className="flex-1">Assignee</span>
+            <span className="flex-1">
+              <T>Assignee</T>
+            </span>
             <span className="min-w-0 max-w-32 truncate text-xs text-muted-foreground">
               {props.assignee ?? "Anyone"}
             </span>
@@ -116,6 +124,7 @@ function LabelChoices(props: {
   value: ReadonlyArray<string>;
   onChange: (value: ReadonlyArray<string>) => void;
 }) {
+  const gt = useGT();
   const [query, setQuery] = useState("");
   const known = useIssueFilterCandidates(props.scopes);
   const needle = query.trim().toLowerCase();
@@ -134,8 +143,8 @@ function LabelChoices(props: {
         busy={known.isPending}
         value={query}
         onChange={(event) => setQuery(event.currentTarget.value)}
-        placeholder="Search labels"
-        aria-label="Search labels"
+        placeholder={gt("Search labels")}
+        aria-label={gt("Search labels")}
       />
       {visible.length === 0 && !known.isPending ? (
         <MenuItem disabled>
@@ -168,7 +177,9 @@ function LabelChoices(props: {
         );
       })}
       {known.truncated ? (
-        <MenuItem disabled>More labels exist than are listed here.</MenuItem>
+        <MenuItem disabled>
+          <T>More labels exist than are listed here.</T>
+        </MenuItem>
       ) : null}
     </>
   );
@@ -179,6 +190,7 @@ function AssigneeChoices(props: {
   value: string | undefined;
   onChange: (value: string | undefined) => void;
 }) {
+  const gt = useGT();
   const [query, setQuery] = useState("");
   const known = useIssueFilterCandidates(props.scopes);
   const needle = query.trim().toLowerCase();
@@ -196,8 +208,8 @@ function AssigneeChoices(props: {
         busy={known.isPending}
         value={query}
         onChange={(event) => setQuery(event.currentTarget.value)}
-        placeholder="Search people"
-        aria-label="Search people"
+        placeholder={gt("Search people")}
+        aria-label={gt("Search people")}
       />
       <MenuRadioGroup
         value={props.value ?? ""}
@@ -205,8 +217,10 @@ function AssigneeChoices(props: {
       >
         <MenuRadioItem value="">
           <span className="flex min-w-0 items-center gap-2">
-            <LayersIcon aria-hidden className="size-3.5" />
-            Anyone
+            <T>
+              <LayersIcon aria-hidden className="size-3.5" />
+              Anyone
+            </T>
           </span>
         </MenuRadioItem>
         {visible.map((actor) => (
@@ -219,10 +233,14 @@ function AssigneeChoices(props: {
         ))}
       </MenuRadioGroup>
       {visible.length === 0 && !known.isPending && known.error !== null ? (
-        <MenuItem disabled>The people could not be read</MenuItem>
+        <MenuItem disabled>
+          <T>The people could not be read</T>
+        </MenuItem>
       ) : null}
       {known.truncated ? (
-        <MenuItem disabled>More people exist than are listed here.</MenuItem>
+        <MenuItem disabled>
+          <T>More people exist than are listed here.</T>
+        </MenuItem>
       ) : null}
     </>
   );

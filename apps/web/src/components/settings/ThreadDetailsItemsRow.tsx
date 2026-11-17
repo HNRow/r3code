@@ -12,18 +12,22 @@ import { Button } from "../ui/button";
 import { Menu, MenuPopup, MenuTrigger } from "../ui/menu";
 import { SettingResetButton, SettingsRow } from "./settingsLayout";
 import { searchableSetting } from "./settingsSearch";
+import { useGT, Var, T } from "gt-react";
 
 export function ThreadDetailsItemsRow() {
+  const gt = useGT();
   const visibility = useClientSettings(resolveThreadDetailsVisibility);
   const enabled = THREAD_DETAILS_ITEMS.filter((item) => visibility[item.id]).length;
   return (
     <SettingsRow
       {...searchableSetting("thread-details-items")}
-      description="Choose what the thread details card shows. You can also right-click the card."
+      description={gt(
+        "Choose what the thread details card shows. You can also right-click the card.",
+      )}
       resetAction={
         isDefaultThreadDetailsVisibility(visibility) ? null : (
           <SettingResetButton
-            label="thread details"
+            label={gt("thread details")}
             onClick={() => updateClientSettings(RESET_THREAD_DETAILS_ITEMS)}
           />
         )
@@ -40,8 +44,10 @@ export function ThreadDetailsItemsRow() {
               />
             }
           >
-            {enabled} of {THREAD_DETAILS_ITEMS.length} on
-            <ChevronDownIcon aria-hidden />
+            <T>
+              <Var>{enabled}</Var> of <Var>{THREAD_DETAILS_ITEMS.length}</Var> on
+              <ChevronDownIcon aria-hidden />
+            </T>
           </MenuTrigger>
           <MenuPopup align="end">
             <ThreadDetailsItemsMenuItems />

@@ -1,6 +1,7 @@
 import { useId, useState, type KeyboardEvent } from "react";
 
 import { Button } from "../ui/button";
+import { useGT, T, Var } from "gt-react";
 
 export function ThemeCssEditor({
   value,
@@ -9,6 +10,7 @@ export function ThemeCssEditor({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const gt = useGT();
   const hintId = useId();
   const [position, setPosition] = useState({ line: 1, column: 1 });
   const [tabIndents, setTabIndents] = useState(true);
@@ -77,7 +79,7 @@ export function ThemeCssEditor({
     <div className="space-y-2">
       <div className="overflow-hidden rounded-lg border border-input bg-code text-foreground focus-within:border-ring focus-within:ring-3 focus-within:ring-inset focus-within:ring-ring/24">
         <textarea
-          aria-label="Custom CSS"
+          aria-label={gt("Custom CSS")}
           aria-describedby={hintId}
           autoCapitalize="off"
           autoComplete="off"
@@ -95,9 +97,13 @@ export function ThemeCssEditor({
           onKeyDown={handleKeyDown}
         />
         <div className="flex items-center justify-between border-t border-input px-3 py-1 font-mono text-xs">
-          <span>CSS</span>
           <span>
-            Ln {position.line}, Col {position.column}
+            <T>CSS</T>
+          </span>
+          <span>
+            <T>
+              Ln <Var>{position.line}</Var>, Col <Var>{position.column}</Var>
+            </T>
           </span>
         </div>
       </div>
@@ -116,7 +122,7 @@ export function ThemeCssEditor({
             setPosition({ line: 1, column: 1 });
           }}
         >
-          Clear CSS
+          <T>Clear CSS</T>
         </Button>
       </div>
     </div>

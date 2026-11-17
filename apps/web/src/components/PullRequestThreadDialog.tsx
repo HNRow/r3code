@@ -35,6 +35,7 @@ import {
 import { Input } from "./ui/input";
 import { Spinner } from "./ui/spinner";
 import { toastManager } from "./ui/toast";
+import { Var, T } from "gt-react";
 
 interface PullRequestThreadDialogProps {
   open: boolean;
@@ -209,12 +210,17 @@ export function PullRequestThreadDialog({
       >
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <SourceControlIcon className="me-2 size-4" />
-            Checkout {terminology.singular}
+            <T>
+              <SourceControlIcon className="me-2 size-4" />
+              Checkout <Var>{terminology.singular}</Var>
+            </T>
           </DialogTitle>
           <DialogDescription>
-            Resolve a {sourceControlPresentation.providerName} {terminology.singular}, then create
-            the draft thread in the main repo or in a dedicated worktree.
+            <T>
+              Resolve a <Var>{sourceControlPresentation.providerName}</Var>{" "}
+              <Var>{terminology.singular}</Var>, then create the draft thread in the main repo or in
+              a dedicated worktree.
+            </T>
           </DialogDescription>
         </DialogHeader>
         <DialogPanel>
@@ -251,8 +257,11 @@ export function PullRequestThreadDialog({
                 <div className="min-w-0">
                   <p className="truncate font-medium text-sm">{resolvedPullRequest.title}</p>
                   <p className="truncate text-muted-foreground text-xs">
-                    #{resolvedPullRequest.number} · {resolvedPullRequest.headBranch} to{" "}
-                    {resolvedPullRequest.baseBranch}
+                    <T>
+                      #<Var>{resolvedPullRequest.number}</Var> ·{" "}
+                      <Var>{resolvedPullRequest.headBranch}</Var> to<Var> </Var>
+                      <Var>{resolvedPullRequest.baseBranch}</Var>
+                    </T>
                   </p>
                 </div>
                 <span className={cn("shrink-0 text-xs capitalize", statusTone)}>
@@ -264,8 +273,10 @@ export function PullRequestThreadDialog({
 
           {isResolving ? (
             <div className="flex items-center gap-2 text-muted-foreground text-xs">
-              <Spinner size="sm" />
-              Resolving {terminology.singular}...
+              <T>
+                <Spinner size="sm" />
+                Resolving <Var>{terminology.singular}</Var>...
+              </T>
             </div>
           ) : null}
 
@@ -279,7 +290,7 @@ export function PullRequestThreadDialog({
             onClick={() => onOpenChange(false)}
             disabled={preparePullRequestThreadAction.isPending}
           >
-            Cancel
+            <T>Cancel</T>
           </Button>
           <Button
             type="button"

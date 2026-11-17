@@ -43,6 +43,7 @@ import { cn } from "~/lib/utils";
 import { textDirection } from "~/textDirection";
 import { useClientSettings } from "../../hooks/useSettings";
 import { GuestShareIndicator } from "./GuestShareControls";
+import { useGT, Var, T } from "gt-react";
 
 interface ChatHeaderProps {
   activeThreadEnvironmentId: EnvironmentId;
@@ -83,6 +84,7 @@ export const ChatHeader = memo(function ChatHeader({
   onOpenProjectSettings,
   onFindInThread,
 }: ChatHeaderProps) {
+  const gt = useGT();
   const activeProjectName = activeProject?.isScratch ? "No project" : activeProject?.title;
   const activeProjectCwd = activeProject?.workspaceRoot ?? null;
   const interfaceFont = useClientSettings((settings) => settings.fontFamilySans);
@@ -256,7 +258,7 @@ export const ChatHeader = memo(function ChatHeader({
       onContextMenu={handleHeaderContextMenu}
     >
       <WorkspaceBreadcrumb
-        ariaLabel="Thread breadcrumb"
+        ariaLabel={gt("Thread breadcrumb")}
         className="flex-1 overflow-clip [overflow-clip-margin:2px]"
       >
         {activeProject ? (
@@ -281,7 +283,11 @@ export const ChatHeader = memo(function ChatHeader({
                     variant="cap-aligned"
                   />
                 </TooltipTrigger>
-                <TooltipPopup side="top">New thread in {activeProjectName}</TooltipPopup>
+                <TooltipPopup side="top">
+                  <T>
+                    New thread in <Var>{activeProjectName}</Var>
+                  </T>
+                </TooltipPopup>
               </Tooltip>
             </WorkspaceBreadcrumbItem>
             <WorkspaceBreadcrumbSeparator>
@@ -328,7 +334,7 @@ export const ChatHeader = memo(function ChatHeader({
             <input
               autoFocus
               dir="auto"
-              aria-label="Thread title"
+              aria-label={gt("Thread title")}
               className="min-w-0 flex-1 rounded-sm bg-transparent text-sm font-medium text-foreground outline-none ring-1 ring-inset ring-ring/50 focus:ring-ring"
               defaultValue={renamingTitle}
               onBlur={(event) => {
@@ -389,10 +395,15 @@ export const ChatHeader = memo(function ChatHeader({
           {renamingTitle === null && activeThreadLinkOrigin ? (
             <Tooltip>
               <TooltipTrigger render={<Badge variant="info" size="sm" />}>
-                From {activeThreadLinkOrigin}
+                <T>
+                  From <Var>{activeThreadLinkOrigin}</Var>
+                </T>
               </TooltipTrigger>
               <TooltipPopup side="top">
-                Started by an agent on {activeThreadLinkOrigin} through a linked environment.
+                <T>
+                  Started by an agent on <Var>{activeThreadLinkOrigin}</Var> through a linked
+                  environment.
+                </T>
               </TooltipPopup>
             </Tooltip>
           ) : null}

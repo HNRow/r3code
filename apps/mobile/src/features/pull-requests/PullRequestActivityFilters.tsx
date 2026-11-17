@@ -3,6 +3,7 @@ import { AppText as Text } from "../../components/ui/AppText";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { Menu } from "../../components/ui/Menu";
 import type { ActivityFilter } from "./pullRequestActivityFilter";
+import { useGT, Var, T } from "gt-react-native";
 
 export function PullRequestActivityFilters({
   value,
@@ -13,6 +14,7 @@ export function PullRequestActivityFilters({
   readonly onChange: (value: ActivityFilter) => void;
   readonly hiddenCount: number;
 }) {
+  const gt = useGT();
   const kinds = [
     { id: "all", title: "All activity" },
     { id: "comments", title: "Comments" },
@@ -21,7 +23,7 @@ export function PullRequestActivityFilters({
   return (
     <View className="mb-4 flex-row items-center justify-between gap-3">
       <Menu
-        title="Activity"
+        title={gt("Activity")}
         actions={kinds.map((kind) => ({ ...kind, state: value.kind === kind.id ? "on" : "off" }))}
         onPressAction={({ nativeEvent }) => {
           const kind = kinds.find((item) => item.id === nativeEvent.event);
@@ -41,7 +43,7 @@ export function PullRequestActivityFilters({
       </Menu>
       <View className="flex-row items-center gap-3">
         <Menu
-          title="Show in activity"
+          title={gt("Show in activity")}
           actions={[
             { id: "bots", title: "Bot comments", state: value.bots ? "on" : "off" },
             {
@@ -61,7 +63,11 @@ export function PullRequestActivityFilters({
             className="min-h-11 flex-row items-center gap-1.5 active:opacity-60"
           >
             {hiddenCount > 0 ? (
-              <Text className="text-xs text-foreground-muted">{hiddenCount} hidden</Text>
+              <Text className="text-xs text-foreground-muted">
+                <T>
+                  <Var>{hiddenCount}</Var> hidden
+                </T>
+              </Text>
             ) : null}
             <SymbolView
               name="line.3.horizontal.decrease"

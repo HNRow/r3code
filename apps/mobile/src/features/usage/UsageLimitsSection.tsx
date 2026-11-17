@@ -37,6 +37,7 @@ import {
   refreshEnvironmentLimits,
 } from "./usageLimitsRefresh";
 import { usageProviderKind, useProviderColors } from "./usageProviders";
+import { Var, T } from "gt-react-native";
 
 const PACE_LABEL = { ahead: "ahead of pace", on: "on pace", under: "under pace" } as const;
 
@@ -89,7 +90,9 @@ function WindowRow(props: {
       <View className="flex-row items-baseline justify-between gap-3">
         <Text className="text-sm text-foreground">{window.label}</Text>
         <Text className="text-sm font-t3-medium tabular-nums text-foreground">
-          {remaining}% left
+          <T>
+            <Var>{remaining}</Var>% left
+          </T>
         </Text>
       </View>
       <View
@@ -213,7 +216,9 @@ export function AccountLimits(props: {
           className="min-h-11 justify-center"
           onPress={() => void Linking.openURL(externalUsage.url).catch(() => undefined)}
         >
-          <Text className="text-sm font-t3-medium text-primary">Manage usage</Text>
+          <Text className="text-sm font-t3-medium text-primary">
+            <T>Manage usage</T>
+          </Text>
         </Pressable>
       ) : null}
       {props.footer}
@@ -301,7 +306,7 @@ export function ResetCredits(props: {
       ))}
       {!canManageProviders ? (
         <Text className="text-xs text-foreground-tertiary">
-          This connection cannot manage provider accounts.
+          <T>This connection cannot manage provider accounts.</T>
         </Text>
       ) : null}
       {status ? <Text className="text-sm text-foreground">{status}</Text> : null}

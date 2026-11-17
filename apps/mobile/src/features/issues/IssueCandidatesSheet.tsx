@@ -9,6 +9,7 @@ import { EmptyState } from "../../components/ui/EmptyState";
 import { SelectionRow } from "../../components/ui/SelectionRow";
 import { NativeScrollView } from "../../native/NativeScrollViewMarker";
 import { PullRequestSearchSheet } from "../pull-requests/PullRequestSearchSheet";
+import { useGT, Var, T } from "gt-react-native";
 
 interface Candidate {
   readonly key: string;
@@ -33,13 +34,14 @@ export function IssueCandidatesSheet(props: {
   readonly truncated: boolean;
   readonly onToggle: (key: string) => void;
 }) {
+  const gt = useGT();
   const searching = props.query.trim().length > 0;
   return (
     <PullRequestSearchSheet
       title={props.title}
       placeholder={`Search ${props.noun}`}
       closeAccessibilityLabel={`Close ${props.title.toLowerCase()}`}
-      clearAccessibilityLabel="Clear search"
+      clearAccessibilityLabel={gt("Clear search")}
       query={props.query}
       onQueryChange={props.onQueryChange}
     >
@@ -63,7 +65,7 @@ export function IssueCandidatesSheet(props: {
               <View className="items-start gap-2 pb-3">
                 <Text className="text-xs text-foreground-muted">{props.notice}</Text>
                 {props.loadError && props.candidates.length > 0 ? (
-                  <Button label="Retry" size="compact" onPress={props.onRetry} />
+                  <Button label={gt("Retry")} size="compact" onPress={props.onRetry} />
                 ) : null}
               </View>
             ) : undefined
@@ -102,14 +104,16 @@ export function IssueCandidatesSheet(props: {
                   }
                   variant="plain"
                 />
-                {props.loadError ? <Button label="Retry" onPress={props.onRetry} /> : null}
+                {props.loadError ? <Button label={gt("Retry")} onPress={props.onRetry} /> : null}
               </View>
             )
           }
           ListFooterComponent={
             props.truncated ? (
               <Text className="py-4 text-xs text-foreground-muted">
-                More {props.noun} exist than are listed here.
+                <T>
+                  More <Var>{props.noun}</Var> exist than are listed here.
+                </T>
               </Text>
             ) : undefined
           }

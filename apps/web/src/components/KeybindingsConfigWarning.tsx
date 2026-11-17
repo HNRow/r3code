@@ -9,6 +9,7 @@ import { useOpenInPreferredEditor } from "../editorPreferences";
 import { useEnvironmentScope } from "../state/session";
 import { Button } from "./ui/button";
 import { stackedThreadToast, toastManager } from "./ui/toast";
+import { T } from "gt-react";
 
 export function KeybindingsConfigWarning({
   message,
@@ -46,7 +47,7 @@ export function KeybindingsConfigWarning({
             );
           }}
         >
-          Open keybindings.json
+          <T>Open keybindings.json</T>
         </Button>
       </span>
     </>

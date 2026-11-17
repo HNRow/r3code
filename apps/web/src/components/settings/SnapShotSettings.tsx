@@ -60,6 +60,7 @@ import {
   captureSetupShouldDisableOnClose,
   type CaptureSetupStep,
 } from "./SnapShotSetupDialog.logic";
+import { msg, T, useGT, useMessages } from "gt-react";
 
 const soundOptionRowClassName = "grid grid-cols-[1fr_auto]";
 
@@ -79,6 +80,8 @@ type ShortcutCheck =
     };
 
 export function SnapShotSettings() {
+  const gt = useGT();
+  const m = useMessages();
   const settings = useClientSettings((current) => ({
     snapShotAnimations: current.snapShotAnimations,
     snapShotEnabled: current.snapShotEnabled,
@@ -255,7 +258,7 @@ export function SnapShotSettings() {
   const shortcutStatus = recording
     ? "Press your shortcut. Esc cancels."
     : candidateConflict
-      ? `T3 Code already uses this for "${commandLabel(candidateConflict)}".`
+      ? `R3 Code already uses this for "${commandLabel(candidateConflict)}".`
       : shortcutCheck.status === "checking"
         ? "Checking shortcut…"
         : shortcutCheck.availability
@@ -350,7 +353,7 @@ export function SnapShotSettings() {
 
   return (
     <SettingsPageContainer>
-      <SettingsSection id="snap-shot" title="SnapShots">
+      <SettingsSection id="snap-shot" title={gt("SnapShots")}>
         <SettingsUnavailableGroup message={unavailableMessage}>
           <SettingsRow
             {...searchableSetting("snap-shot-enabled")}
@@ -358,7 +361,7 @@ export function SnapShotSettings() {
             status={
               bridge
                 ? setupBusy && !wizard
-                  ? "Updating capture settings…"
+                  ? m("Updating capture settings…")
                   : refreshError
                     ? `${refreshError.title}. ${refreshError.message}`
                     : snapShotStatus(state, settings.snapShotEnabled)
@@ -374,13 +377,13 @@ export function SnapShotSettings() {
                     disabled={setupBusy}
                     onClick={() => void openSetup()}
                   >
-                    {snapShotSetupButtonLabel(state)}
+                    {m(snapShotSetupButtonLabel(state))}
                   </Button>
                 ) : null}
                 <Switch
                   checked={settings.snapShotEnabled || Boolean(wizard)}
                   disabled={!captureAvailable || setupBusy}
-                  aria-label="Enable snapshots"
+                  aria-label={gt("Enable snapshots")}
                   onCheckedChange={(checked) => {
                     if (!checked) void save({ snapShotEnabled: false });
                     else if (state?.windows) void save({ snapShotEnabled: true });
@@ -394,7 +397,7 @@ export function SnapShotSettings() {
             <>
               <SettingsRow
                 {...searchableSetting("snap-shot-accessibility")}
-                description="Include text and controls when the app makes them available."
+                description={gt("Include text and controls when the app makes them available.")}
                 status={snapShotAccessibilityUnavailableMessage(state)}
                 control={
                   <Switch
@@ -405,7 +408,7 @@ export function SnapShotSettings() {
                     disabled={
                       !captureAvailable || Boolean(snapShotAccessibilityUnavailableMessage(state))
                     }
-                    aria-label="Include app text in snapshots"
+                    aria-label={gt("Include app text in snapshots")}
                     onCheckedChange={(checked) => void saveIncludeAccessibility(checked)}
                   />
                 }
@@ -414,8 +417,8 @@ export function SnapShotSettings() {
                 {...searchableSetting("snap-shot-shortcut")}
                 description={
                   state?.linuxBackend === "picker"
-                    ? "Choose a window to capture from any app."
-                    : "Capture the window you're using without switching apps."
+                    ? msg("Choose a window to capture from any app.")
+                    : msg("Capture the window you're using without switching apps.")
                 }
                 status={managedShortcut ? undefined : shortcutStatus}
                 control={
@@ -426,7 +429,7 @@ export function SnapShotSettings() {
                       disabled={setupBusy}
                       onClick={() => void openSetup("shortcut")}
                     >
-                      Change shortcut
+                      <T>Change shortcut</T>
                     </Button>
                   ) : (
                     <>
@@ -451,7 +454,7 @@ export function SnapShotSettings() {
                               setShortcutCheck({ status: "idle", availability: null });
                             }}
                           >
-                            Cancel
+                            <T>Cancel</T>
                           </Button>
                         </>
                       ) : state?.mode === "portal" &&
@@ -463,7 +466,7 @@ export function SnapShotSettings() {
                           disabled={setupBusy || state.shortcutPending}
                           onClick={() => void setup("retry-shortcut")}
                         >
-                          Shortcut permissions
+                          <T>Shortcut permissions</T>
                         </Button>
                       ) : null}
                     </>
@@ -472,7 +475,7 @@ export function SnapShotSettings() {
               />
               <SettingsRow
                 {...searchableSetting("snap-shot-sound")}
-                description="Choose the sound played when capture starts."
+                description={gt("Choose the sound played when capture starts.")}
                 control={
                   <Menu>
                     <MenuTrigger
@@ -485,7 +488,9 @@ export function SnapShotSettings() {
                         "Off"
                       ) : soundSelection === "soft-pop" ? (
                         <>
-                          Whoosh <span className="text-muted-foreground">(Default)</span>
+                          <T>
+                            Whoosh <span className="text-muted-foreground">(Default)</span>
+                          </T>
                         </>
                       ) : (
                         "Click"
@@ -499,14 +504,16 @@ export function SnapShotSettings() {
                         value={soundSelection}
                       >
                         <MenuRadioItem closeOnClick value="off">
-                          Off
+                          <T>Off</T>
                         </MenuRadioItem>
                         <div className={soundOptionRowClassName}>
                           <MenuRadioItem closeOnClick value="soft-pop">
-                            Whoosh <span className="text-muted-foreground">(Default)</span>
+                            <T>
+                              Whoosh <span className="text-muted-foreground">(Default)</span>
+                            </T>
                           </MenuRadioItem>
                           <MenuItem
-                            aria-label="Play Whoosh"
+                            aria-label={gt("Play Whoosh")}
                             closeOnClick={false}
                             onClick={() => playSnapShotSound("soft-pop")}
                           >
@@ -515,10 +522,10 @@ export function SnapShotSettings() {
                         </div>
                         <div className={soundOptionRowClassName}>
                           <MenuRadioItem closeOnClick value="camera-shutter">
-                            Click
+                            <T>Click</T>
                           </MenuRadioItem>
                           <MenuItem
-                            aria-label="Play Click"
+                            aria-label={gt("Play Click")}
                             closeOnClick={false}
                             onClick={() => playSnapShotSound("camera-shutter")}
                           >
@@ -532,26 +539,26 @@ export function SnapShotSettings() {
               />
               <SettingsRow
                 {...searchableSetting("snap-shot-flash")}
-                description="Show a gentle cue on the captured window."
+                description={gt("Show a gentle cue on the captured window.")}
                 status={feedbackUnavailable}
                 control={
                   <Switch
                     checked={!feedbackUnavailable && settings.snapShotFlash}
                     disabled={!captureAvailable || Boolean(feedbackUnavailable)}
-                    aria-label="Flash captured window"
+                    aria-label={gt("Flash captured window")}
                     onCheckedChange={(checked) => void save({ snapShotFlash: checked })}
                   />
                 }
               />
               <SettingsRow
                 {...searchableSetting("snap-shot-animations")}
-                description="Animate captured windows into your draft."
+                description={gt("Animate captured windows into your draft.")}
                 status={feedbackUnavailable}
                 control={
                   <Switch
                     checked={!feedbackUnavailable && settings.snapShotAnimations}
                     disabled={!captureAvailable || Boolean(feedbackUnavailable)}
-                    aria-label="Animate snapshots"
+                    aria-label={gt("Animate snapshots")}
                     onCheckedChange={(checked) => void save({ snapShotAnimations: checked })}
                   />
                 }

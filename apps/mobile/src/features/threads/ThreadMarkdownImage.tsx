@@ -29,6 +29,7 @@ import {
   resolveMarkdownImageDisplaySize,
   resolveSvgImageSize,
 } from "./markdownImageSize";
+import { T } from "gt-react-native";
 
 /** Use known feed width immediately; later image measurement would move already-positioned rows. */
 export const MarkdownImageAvailableWidthContext = createContext(0);
@@ -257,7 +258,9 @@ function ThreadMarkdownImageLoading() {
       pointerEvents="none"
       style={[StyleSheet.absoluteFill, { alignItems: "center", justifyContent: "center" }]}
     >
-      <Text className="text-xs text-foreground-muted">Loading image…</Text>
+      <Text className="text-xs text-foreground-muted">
+        <T>Loading image…</T>
+      </Text>
     </View>
   );
 }

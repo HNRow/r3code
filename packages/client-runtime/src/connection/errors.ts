@@ -114,7 +114,7 @@ function relayProtectedError(error: RelayProtectedError): ConnectionAttemptError
         reason: "endpoint-unavailable",
         detail,
         traceId,
-        // The tunnel carried the request when T3 Code is what failed to answer.
+        // The tunnel carried the request when R3 Code is what failed to answer.
         hop:
           endpointFailure === "origin_unreachable" || endpointFailure === "invalid_response"
             ? "server"
@@ -193,7 +193,7 @@ export function mapRemoteEnvironmentError(
   connectionMethod: ClientConnectionMethod = "direct",
 ): ConnectionAttemptError {
   const networkHint = connectionMethod === "relay" ? ` ${NETWORK_BLOCKING_HINT}` : "";
-  // Over T3 Connect the relay already reached the host, so a request that never
+  // Over R3 Connect the relay already reached the host, so a request that never
   // arrives was blocked between this device and the tunnel.
   const unreachableHop = connectionMethod === "relay" ? "tunnel" : "server";
   const via = connectionMethod === "relay" ? "relay" : "direct";

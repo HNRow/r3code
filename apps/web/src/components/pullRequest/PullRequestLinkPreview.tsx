@@ -25,6 +25,7 @@ import {
   PullRequestReviewOutcomeBadge,
   resolvePullRequestState,
 } from "./pullRequestPresentation";
+import { T } from "gt-react";
 
 interface PullRequestLinkPreviewTarget {
   readonly environmentId: EnvironmentId;
@@ -173,7 +174,9 @@ export function PullRequestLinkPreview({
                       <>
                         <span aria-hidden>·</span>
                         <span className="shrink-0">
-                          opened <RelativeTime timestamp={preview.createdAt} />
+                          <T>
+                            opened <RelativeTime timestamp={preview.createdAt} />
+                          </T>
                         </span>
                       </>
                     )}
@@ -206,7 +209,9 @@ function LinkedComment({
           {actorLabel(subject.author)}
         </span>
         {outcome === null ? (
-          <span className="shrink-0">commented</span>
+          <span className="shrink-0">
+            <T>commented</T>
+          </span>
         ) : (
           <PullRequestReviewOutcomeBadge outcome={outcome} className="shrink-0" />
         )}

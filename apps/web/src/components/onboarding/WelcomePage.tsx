@@ -115,6 +115,7 @@ import { toastManager } from "../ui/toast";
 import { WorkspacePageHeader } from "../WorkspacePageHeader";
 import { cn } from "../../lib/utils";
 import { formatRelativeTime } from "../../timestampFormat";
+import { T, Var, useGT } from "gt-react";
 
 const AGENT_ONBOARDING_THREAD_ID = ThreadId.make("onboarding-agent-setup");
 const SCAN_LIMIT_MESSAGE = "Scan limit reached. Some projects or conversations may be missing.";
@@ -273,10 +274,16 @@ export function WelcomePage({
         <div className="min-h-0 flex-1 overflow-y-auto scrollbar-gutter-both">
           <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col px-6 pt-12 pb-8 sm:pt-20">
             <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              Welcome to T3 Code
+              <T>Welcome to R3 Code</T>
             </h1>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              Setting up <span className="text-foreground">{label}</span>.
+              <T>
+                Setting up{" "}
+                <span className="text-foreground">
+                  <Var>{label}</Var>
+                </span>
+                .
+              </T>
             </p>
             <div className="mt-10 border-t border-border/60">
               <AgentsSection
@@ -297,12 +304,14 @@ export function WelcomePage({
                 <span />
               ) : (
                 <Button variant="ghost-muted" disabled={isImporting} onClick={start}>
-                  Start without an agent
+                  <T>Start without an agent</T>
                 </Button>
               )}
               <div className="flex items-center gap-3">
                 {agentReady ? null : (
-                  <span className="text-xs text-muted-foreground">Set up one agent to start.</span>
+                  <span className="text-xs text-muted-foreground">
+                    <T>Set up one agent to start.</T>
+                  </span>
                 )}
                 <Button disabled={!agentReady || isImporting} onClick={start}>
                   {isImporting
@@ -329,7 +338,7 @@ function TelemetryNotice({ environmentId }: { readonly environmentId: Environmen
   const telemetryOff = managedTelemetryOffMessage(useManagedPolicy(environmentId));
   return (
     <p className="mt-auto pt-12 text-2xs leading-relaxed text-muted-foreground/70">
-      {telemetryOff ?? "T3 Code collects anonymous usage data to improve the app."}{" "}
+      {telemetryOff ?? "R3 Code collects anonymous usage data to improve the app."}{" "}
       {telemetryOff === undefined ? "To opt out, see the" : "See the"}{" "}
       <a
         className="underline decoration-current/40 underline-offset-2 hover:text-muted-foreground"
@@ -337,7 +346,7 @@ function TelemetryNotice({ environmentId }: { readonly environmentId: Environmen
         target="_blank"
         rel="noreferrer noopener"
       >
-        privacy policy
+        <T>privacy policy</T>
       </a>
       .
     </p>
@@ -416,6 +425,7 @@ function AgentsSection({
   // The project scan only reads agents that are on, so turning one on can find more history.
   readonly onImportSourceEnabled: () => void;
 }) {
+  const gt = useGT();
   const { providers, serverConfig, checking, found, available } = useWelcomeAgents(environmentId);
   const refreshProviders = useAtomCommand(serverEnvironment.refreshProviders, {
     reportFailure: false,
@@ -557,7 +567,7 @@ function AgentsSection({
           disabled={!canManageProviders || serverConfig === null}
           onClick={() => void turnOn(provider)}
         >
-          Turn on
+          <T>Turn on</T>
         </Button>
       );
     }
@@ -573,7 +583,7 @@ function AgentsSection({
           aria-expanded={open}
           onClick={() => setCodexSetupId(open ? null : provider.instanceId)}
         >
-          Set up
+          <T>Set up</T>
         </Button>
       );
     }
@@ -615,7 +625,7 @@ function AgentsSection({
   ].filter((note) => note !== null);
 
   return (
-    <WelcomeSection title="Agents">
+    <WelcomeSection title={gt("Agents")}>
       {found.map((provider) => (
         <AgentRow
           key={provider.instanceId}
@@ -625,7 +635,11 @@ function AgentsSection({
         />
       ))}
       {checking && found.length === 0 ? (
-        <p className="text-sm leading-10 text-muted-foreground">Checking {label}…</p>
+        <p className="text-sm leading-10 text-muted-foreground">
+          <T>
+            Checking <Var>{label}</Var>…
+          </T>
+        </p>
       ) : null}
       {notes.map((note) => (
         <p key={note} className="pl-8 text-xs text-muted-foreground">
@@ -666,7 +680,7 @@ function AgentsSection({
                 <ACPRegistryIcon className="size-4" />
               </RowIcon>
               <span className="min-w-0 flex-1 text-sm text-muted-foreground">
-                More agents in the ACP Registry
+                <T>More agents in the ACP Registry</T>
               </span>
               <Button
                 size="xs"
@@ -674,7 +688,7 @@ function AgentsSection({
                 disabled={!canManageProviders}
                 onClick={() => setAddingProvider(true)}
               >
-                Browse
+                <T>Browse</T>
               </Button>
             </div>
           ) : null}
@@ -760,6 +774,7 @@ function ProjectsSection({
   readonly projectImport: ReturnType<typeof useProjectImport>;
   readonly isImporting: boolean;
 }) {
+  const gt = useGT();
   const [reviewing, setReviewing] = useState(false);
   const {
     canWrite,
@@ -774,26 +789,32 @@ function ProjectsSection({
   if (scan === undefined) return null;
   if (scan.isPending && candidates.length === 0) {
     return (
-      <WelcomeSection title="Projects">
+      <WelcomeSection title={gt("Projects")}>
         <p className="text-sm leading-10 text-muted-foreground">
-          Looking for projects in your {IMPORT_SOURCES_LABEL} history…
+          <T>
+            Looking for projects in your <Var>{IMPORT_SOURCES_LABEL}</Var> history…
+          </T>
         </p>
       </WelcomeSection>
     );
   }
   const retry = (
     <Button variant="ghost" size="sm" onClick={scan.refresh}>
-      Retry
+      <T>Retry</T>
     </Button>
   );
   if (scan.error !== null && candidates.length === 0) {
     return (
-      <WelcomeSection title="Projects">
+      <WelcomeSection title={gt("Projects")}>
         <div
           role="alert"
           className="flex min-h-10 items-center justify-between gap-3 text-sm text-muted-foreground"
         >
-          <span>Could not check projects. {scan.error}</span>
+          <span>
+            <T>
+              Could not check projects. <Var>{scan.error}</Var>
+            </T>
+          </span>
           {retry}
         </div>
       </WelcomeSection>
@@ -801,7 +822,7 @@ function ProjectsSection({
   }
   if (candidates.length === 0) {
     return scan.data?.truncated ? (
-      <WelcomeSection title="Projects">
+      <WelcomeSection title={gt("Projects")}>
         <p className="text-xs leading-10 text-muted-foreground" role="status">
           {SCAN_LIMIT_MESSAGE}
         </p>
@@ -820,7 +841,7 @@ function ProjectsSection({
     selected.length < candidates.length &&
     !(selected.length === defaultKeys.length && defaultKeys.every((key) => selectedKeys.has(key)));
   return (
-    <WelcomeSection title="Projects">
+    <WelcomeSection title={gt("Projects")}>
       <div className="flex min-h-10 items-center gap-3 py-1">
         <label className="flex min-w-0 flex-1 items-center gap-3">
           <RowIcon>
@@ -840,7 +861,9 @@ function ProjectsSection({
                 : "Import projects and their threads"}
             </span>
             <span className="block text-xs text-muted-foreground">
-              From your {IMPORT_SOURCES_LABEL} history
+              <T>
+                From your <Var>{IMPORT_SOURCES_LABEL}</Var> history
+              </T>
             </span>
           </span>
         </label>
@@ -861,7 +884,9 @@ function ProjectsSection({
         <fieldset className="-mx-1.5 mt-1 min-w-0" disabled={isImporting}>
           <div className="flex items-center justify-between gap-3 px-2 text-xs text-muted-foreground">
             <span role="status">
-              {selected.length} of {candidates.length} selected
+              <T>
+                <Var>{selected.length}</Var> of <Var>{candidates.length}</Var> selected
+              </T>
             </span>
             <div className="flex items-center gap-1">
               <Button
@@ -870,7 +895,7 @@ function ProjectsSection({
                 disabled={selected.length === candidates.length}
                 onClick={() => setSelectedKeys(new Set(allKeys))}
               >
-                Select all
+                <T>Select all</T>
               </Button>
               <Button
                 variant="ghost"
@@ -878,7 +903,7 @@ function ProjectsSection({
                 disabled={selected.length === 0}
                 onClick={() => setSelectedKeys(new Set())}
               >
-                Select none
+                <T>Select none</T>
               </Button>
             </div>
           </div>
@@ -903,7 +928,11 @@ function ProjectsSection({
           role="alert"
           className="flex items-center justify-between gap-3 pl-8 text-sm text-muted-foreground"
         >
-          <span>Could not check projects again. {scan.error}</span>
+          <span>
+            <T>
+              Could not check projects again. <Var>{scan.error}</Var>
+            </T>
+          </span>
           {retry}
         </div>
       ) : null}
@@ -915,16 +944,17 @@ function ProjectsSection({
 }
 
 function PhoneSection({ environmentId }: { readonly environmentId: EnvironmentId }) {
+  const gt = useGT();
   const [open, setOpen] = useState(false);
   return (
-    <WelcomeSection title="Phone">
+    <WelcomeSection title={gt("Phone")}>
       <Collapsible open={open} onOpenChange={setOpen}>
         <div className="flex min-h-10 items-center gap-3 py-1">
           <RowIcon>
             <SmartphoneIcon className="size-4" />
           </RowIcon>
           <span className="min-w-0 flex-1 text-sm font-medium text-foreground">
-            Use T3 Code on your phone
+            <T>Use R3 Code on your phone</T>
           </span>
           <CollapsibleTrigger render={<Button variant="ghost-muted" size="xs" />}>
             {open ? "Hide" : "Set up"}
@@ -935,7 +965,9 @@ function PhoneSection({ environmentId }: { readonly environmentId: EnvironmentId
           <div className="flex items-center gap-8 pt-2 pb-3 pl-8">
             <ol className="min-w-0 flex-1 space-y-5">
               <PhoneStep step={1}>
-                <p className="text-sm text-foreground">Scan with your phone to get the app.</p>
+                <p className="text-sm text-foreground">
+                  <T>Scan with your phone to get the app.</T>
+                </p>
               </PhoneStep>
               <PhoneStep step={2}>
                 <PhoneConnectLink environmentId={environmentId} />
@@ -948,7 +980,7 @@ function PhoneSection({ environmentId }: { readonly environmentId: EnvironmentId
                 size={124}
                 level="M"
                 marginSize={2}
-                title="T3 Code app for iPhone and Android"
+                title={gt("R3 Code app for iPhone and Android")}
               />
             </div>
           </div>
@@ -995,28 +1027,36 @@ function PhoneConnectLink({ environmentId }: { readonly environmentId: Environme
     </Button>
   );
   if (isSignedIn && link === null && linkState.isPending) {
-    return <p className="text-sm text-muted-foreground">Checking T3 Connect…</p>;
+    return (
+      <p className="text-sm text-muted-foreground">
+        <T>Checking R3 Connect…</T>
+      </p>
+    );
   }
   if (isSignedIn && linkState.error !== null) {
     return (
       <>
-        <p className="text-sm text-foreground">Could not check T3 Connect.</p>
-        {settingsLink("Check T3 Connect")}
+        <p className="text-sm text-foreground">
+          <T>Could not check R3 Connect.</T>
+        </p>
+        {settingsLink("Check R3 Connect")}
       </>
     );
   }
   if (isSignedIn && reachability === "reachable") {
     return (
       <p className="flex gap-1.5 text-sm text-foreground">
-        <CheckIcon className="mt-0.5 size-4 shrink-0 text-success-foreground" />
-        Your phone can reach this computer. Sign in to the app with the same account.
+        <T>
+          <CheckIcon className="mt-0.5 size-4 shrink-0 text-success-foreground" />
+          Your phone can reach this computer. Sign in to the app with the same account.
+        </T>
       </p>
     );
   }
   if (isSignedIn && shared && reachability === undefined) {
     return (
       <p className="text-sm text-foreground">
-        T3 Connect is on for this computer. Sign in to the app with the same account.
+        <T>R3 Connect is on for this computer. Sign in to the app with the same account.</T>
       </p>
     );
   }
@@ -1026,25 +1066,25 @@ function PhoneConnectLink({ environmentId }: { readonly environmentId: Environme
       <>
         <p className="text-sm text-foreground">
           {shared
-            ? "T3 Connect is on, but the app cannot reach this computer."
+            ? "R3 Connect is on, but the app cannot reach this computer."
             : "Signed in. Share this computer so the app can reach it."}
         </p>
-        {settingsLink(shared ? "Check T3 Connect" : "Set up T3 Connect")}
+        {settingsLink(shared ? "Check R3 Connect" : "Set up R3 Connect")}
       </>
     );
   }
   return (
     <>
       <p className="text-sm text-foreground">
-        Sign in to T3 Connect here, then in the app with the same account.
+        <T>Sign in to R3 Connect here, then in the app with the same account.</T>
       </p>
       {loadFailed ? (
         <Button variant="outline" size="xs" onClick={retryClerkLoad}>
-          Retry sign-in
+          <T>Retry sign-in</T>
         </Button>
       ) : (
         <Button variant="outline" size="xs" disabled={!isLoaded} onClick={openAuthPrompt}>
-          Sign in to T3 Connect
+          <T>Sign in to R3 Connect</T>
         </Button>
       )}
     </>
@@ -1193,11 +1233,15 @@ function AgentRow({
       <div className="shrink-0">
         {state === "ready" ? (
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success-foreground">
-            <CheckIcon className="size-3.5" />
-            Ready
+            <T>
+              <CheckIcon className="size-3.5" />
+              Ready
+            </T>
           </span>
         ) : state === "checking" ? (
-          <span className="text-xs text-muted-foreground">Checking…</span>
+          <span className="text-xs text-muted-foreground">
+            <T>Checking…</T>
+          </span>
         ) : (
           action
         )}
@@ -1333,8 +1377,13 @@ function AgentInstallTerminal({
             "This connection cannot control terminals."
           ) : setupState === "writeFailed" ? (
             <>
-              Run <code className="rounded bg-muted px-1 font-mono">{command}</code> in this
-              terminal.
+              <T>
+                Run{" "}
+                <code className="rounded bg-muted px-1 font-mono">
+                  <Var>{command}</Var>
+                </code>{" "}
+                in this terminal.
+              </T>
             </>
           ) : setupState === "ready" ? (
             "Review the command, then press Enter to run it."
@@ -1356,11 +1405,11 @@ function AgentInstallTerminal({
                 }
               }}
             >
-              Retry
+              <T>Retry</T>
             </Button>
           ) : null}
           <Button size="xs" variant="ghost-muted" onClick={onClose}>
-            Close
+            <T>Close</T>
           </Button>
         </div>
       </div>
@@ -1442,7 +1491,7 @@ function useProjectImport({
       })),
     ),
   );
-  // Projects already in T3 Code stay in the list, but reopening the page does not import their
+  // Projects already in R3 Code stay in the list, but reopening the page does not import their
   // history again unless the user picks them. The scan can be 30 s old, so the live list decides.
   const projects = useProjects();
   const isNewProject = isNewOnboardingProject(projects);
@@ -1699,7 +1748,9 @@ function ImportCandidateList({
             />
             <CollapsibleTrigger className="group flex min-w-0 flex-1 items-center gap-1.5 text-left">
               <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-panel-open:rotate-90" />
-              <span className="truncate text-sm text-muted-foreground">Other folders</span>
+              <span className="truncate text-sm text-muted-foreground">
+                <T>Other folders</T>
+              </span>
               <span className="ml-auto shrink-0 text-xs text-muted-foreground tabular-nums">
                 {other.length} {other.length === 1 ? "folder" : "folders"}
               </span>
@@ -1899,18 +1950,24 @@ function CliPathSetup() {
       <p className="min-w-0 flex-1 text-sm text-muted-foreground">
         {setup.added ? (
           <>
-            Added to {setup.file}. Open a new terminal to use <code className="font-mono">t3</code>.
+            <T>
+              Added to <Var>{setup.file}</Var>. Open a new terminal to use{" "}
+              <code className="font-mono">t3</code>.
+            </T>
           </>
         ) : (
           <>
-            Use <code className="font-mono">t3</code> from any terminal. Adds one line to{" "}
-            {setup.file}.
+            <T>
+              Use <code className="font-mono">t3</code> from any terminal. Adds one line to
+              <Var> </Var>
+              <Var>{setup.file}</Var>.
+            </T>
           </>
         )}
       </p>
       {setup.added ? null : (
         <Button size="xs" variant="outline" disabled={busy} onClick={() => run("addToPath")}>
-          Add to PATH
+          <T>Add to PATH</T>
         </Button>
       )}
     </div>

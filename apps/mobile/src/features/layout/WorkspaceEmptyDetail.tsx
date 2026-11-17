@@ -7,12 +7,14 @@ import { FloatingActionButton } from "../../components/ui/FloatingActionButton";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ScreenContent } from "../../components/ui/ScreenContent";
 import type { WorkspaceTab } from "./workspace/workspace-tabs-state";
+import { useGT, T } from "gt-react-native";
 
 export function WorkspaceEmptyDetail(props: {
   readonly tab?: WorkspaceTab | "settings";
   readonly onStartNewTask?: () => void;
   readonly onAddConnection?: () => void;
 }) {
+  const gt = useGT();
   const pullRequests = props.tab === "pullRequests";
   const issues = props.tab === "issues";
   const settings = props.tab === "settings";
@@ -29,12 +31,12 @@ export function WorkspaceEmptyDetail(props: {
         {props.onAddConnection ? (
           <View className="w-full max-w-[430px]">
             <EmptyState
-              title="No environments connected"
-              detail="Add an environment to load projects and start coding sessions."
+              title={gt("No environments connected")}
+              detail={gt("Add an environment to load projects and start coding sessions.")}
               variant="plain"
               action={
                 <FloatingActionButton
-                  label="Add environment"
+                  label={gt("Add environment")}
                   icon="plus"
                   variant="extended"
                   tone="primary"
@@ -80,7 +82,9 @@ export function WorkspaceEmptyDetail(props: {
                   className="mt-2 flex-row items-center gap-2 rounded-full bg-primary px-5 py-3 active:opacity-70"
                   onPress={props.onStartNewTask}
                 >
-                  <Text className="text-base font-t3-bold text-primary-foreground">New thread</Text>
+                  <Text className="text-base font-t3-bold text-primary-foreground">
+                    <T>New thread</T>
+                  </Text>
                 </Pressable>
               )
             ) : null}

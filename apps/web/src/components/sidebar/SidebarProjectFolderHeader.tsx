@@ -12,6 +12,7 @@ import { resolveSidebarFolderDot, resolveThreadLastVisitedAt } from "../Sidebar.
 import { ProjectFavicon } from "../ProjectFavicon";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import { Var, T } from "gt-react";
 
 const FOLDER_DOT_CLASS_NAME = {
   attention: "bg-warning",
@@ -123,7 +124,11 @@ export const SidebarProjectFolderHeader = memo(function SidebarProjectFolderHead
           >
             <SquarePenIcon aria-hidden />
           </TooltipTrigger>
-          <TooltipPopup>New thread in {group.displayName}</TooltipPopup>
+          <TooltipPopup>
+            <T>
+              New thread in <Var>{group.displayName}</Var>
+            </T>
+          </TooltipPopup>
         </Tooltip>
       </span>
     </li>

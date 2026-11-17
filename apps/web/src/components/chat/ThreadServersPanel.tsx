@@ -28,6 +28,7 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { ThreadDetailsControl } from "./ThreadDetailsControl";
 import { ThreadDetailsSection } from "./ThreadDetailsSection";
 import { THREAD_DETAILS_PANEL_ICON_CLASS } from "./threadDetailsPanelStyles";
+import { useGT, Var, T } from "gt-react";
 
 const SERVER_PAGE_COUNT = 4;
 
@@ -44,6 +45,7 @@ export function ThreadServersPanel(props: ThreadServersPanelProps) {
 }
 
 function ThreadServersList(props: ThreadServersPanelProps) {
+  const gt = useGT();
   const servers = useThreadDiscoveredPorts(props);
   const canOpen = useEnvironmentScope(props.environmentId, AuthPreviewOperateScope);
   const canStop = useAtomValue(
@@ -105,7 +107,7 @@ function ThreadServersList(props: ThreadServersPanelProps) {
   };
 
   return (
-    <ThreadDetailsSection headingId="thread-details-servers-heading" title="Servers">
+    <ThreadDetailsSection headingId="thread-details-servers-heading" title={gt("Servers")}>
       <ul className="m-0 list-none p-0">
         {servers.slice(0, visibleCount).map((server, index) => {
           const key = serverKey(server);
@@ -135,7 +137,9 @@ function ThreadServersList(props: ThreadServersPanelProps) {
                   {/* The end padding keeps text clear of the stop button. */}
                   <span className={cn("flex min-w-0 flex-1 flex-col gap-0.5", stoppable && "pe-6")}>
                     <span className="truncate text-sm font-medium leading-4 text-foreground/85">
-                      localhost:{server.port}
+                      <T>
+                        localhost:<Var>{server.port}</Var>
+                      </T>
                     </span>
                     <span className="truncate text-2xs font-normal leading-4 text-muted-foreground">
                       {[server.terminal === null ? "Agent" : "Terminal", server.processName]
@@ -145,7 +149,9 @@ function ThreadServersList(props: ThreadServersPanelProps) {
                   </span>
                 </TooltipTrigger>
                 <TooltipPopup side="left">
-                  Open in the browser panel. {externalClickLabel} for your browser.
+                  <T>
+                    Open in the browser panel. <Var>{externalClickLabel}</Var> for your browser.
+                  </T>
                 </TooltipPopup>
               </Tooltip>
               {stoppable ? (
@@ -170,7 +176,9 @@ function ThreadServersList(props: ThreadServersPanelProps) {
                         <SquareIcon aria-hidden className="size-3 fill-current" />
                       )}
                     </TooltipTrigger>
-                    <TooltipPopup side="left">Stop server</TooltipPopup>
+                    <TooltipPopup side="left">
+                      <T>Stop server</T>
+                    </TooltipPopup>
                   </Tooltip>
                 </div>
               ) : null}

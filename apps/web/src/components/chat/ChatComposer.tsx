@@ -290,6 +290,7 @@ import { ComposerControlsBar } from "./ComposerControlsBar";
 import { composerCommandKeyHandler } from "./composerCommandKey";
 import { usePromptSuggestion } from "./usePromptSuggestion";
 import { useFreshSessionArmed } from "./freshSessionArms";
+import { Var, T, useGT } from "gt-react";
 
 function consumePasteAsTextShortcut(deadline: { current: number }): boolean {
   const armed = Date.now() <= deadline.current;
@@ -491,6 +492,7 @@ const NO_PROVIDER_SKILLS: ServerProvider["skills"] = [];
 const NO_PROVIDER_SLASH_COMMANDS: ServerProvider["slashCommands"] = [];
 
 export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps) {
+  const gt = useGT();
   const {
     composerDraftTarget,
     environmentId,
@@ -2605,7 +2607,9 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                       variant="ghost"
                       onClick={() => handleRuntimeModeChange(runtimeModeCeilingFallback)}
                     >
-                      Switch to {runtimeModeConfig[runtimeModeCeilingFallback].label}
+                      <T>
+                        Switch to <Var>{runtimeModeConfig[runtimeModeCeilingFallback].label}</Var>
+                      </T>
                     </Button>
                   ),
                 }),
@@ -3515,7 +3519,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                   )}
                   onPointerDown={(event) => event.preventDefault()}
                   onClick={expandMobileComposerStable}
-                  aria-label="Expand composer"
+                  aria-label={gt("Expand composer")}
                 >
                   {prompt.trim() ? (
                     <CollapsedComposerPromptPreview
@@ -3716,7 +3720,9 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                     placeholderSuffix={
                       offeredPromptSuggestion !== null ? (
                         <span className="ml-2 inline-flex align-[1px]">
-                          <Kbd variant="outline">⇥ Tab</Kbd>
+                          <Kbd variant="outline">
+                            <T>⇥ Tab</T>
+                          </Kbd>
                         </span>
                       ) : undefined
                     }
@@ -3760,7 +3766,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
             {speechInput.preview ? (
               // column-reverse pins the scroll to the bottom; the single inner div keeps the text in normal order.
               <div
-                aria-label="Live transcription"
+                aria-label={gt("Live transcription")}
                 className="mx-3 mb-3 flex max-h-32 flex-col-reverse overflow-y-auto rounded-lg border border-border/60 bg-muted/30 px-3 py-2 text-sm leading-relaxed break-words whitespace-pre-wrap sm:mx-4"
               >
                 <div>

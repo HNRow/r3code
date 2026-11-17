@@ -8,6 +8,7 @@ import { cn } from "~/lib/utils";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import { useGT, T } from "gt-react";
 
 type DownloadProgress = { downloaded: number; total: number } | null;
 
@@ -142,6 +143,7 @@ export function ComposerSpeechRecordingPill(props: {
   onCancel(): void;
   onSkipPostProcessing(): void;
 }) {
+  const gt = useGT();
   const { phase } = props.state;
   const compact = props.size === "compact";
   if (phase === "error") {
@@ -164,12 +166,12 @@ export function ComposerSpeechRecordingPill(props: {
 
   return (
     <VoiceInputPill size={props.size}>
-      <ShortcutTooltip label="Cancel voice input" shortcut={props.cancelShortcutLabel}>
+      <ShortcutTooltip label={gt("Cancel voice input")} shortcut={props.cancelShortcutLabel}>
         <Button
           type="button"
           size={compact ? "icon-xs" : "icon-sm-pill"}
           variant="ghost"
-          aria-label="Cancel voice input"
+          aria-label={gt("Cancel voice input")}
           onPointerDown={keepFocus}
           onClick={props.onCancel}
           className="shrink-0"
@@ -210,14 +212,14 @@ export function ComposerSpeechRecordingPill(props: {
           onClick={props.onSkipPostProcessing}
           className="shrink-0"
         >
-          Skip
+          <T>Skip</T>
         </Button>
       ) : recording ? (
-        <ShortcutTooltip label="Finish voice input" shortcut={props.finishShortcutLabel}>
+        <ShortcutTooltip label={gt("Finish voice input")} shortcut={props.finishShortcutLabel}>
           <Button
             type="button"
             size={compact ? "icon-xs" : "icon-sm-pill"}
-            aria-label="Finish voice input"
+            aria-label={gt("Finish voice input")}
             onPointerDown={keepFocus}
             onClick={props.onStop}
             className="shrink-0"

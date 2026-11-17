@@ -19,6 +19,7 @@ import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../ui/collaps
 import { MiddleTruncate } from "../ui/middle-truncate";
 import { ScrollArea } from "../ui/scroll-area";
 import type { RestartingMachine, UpdateEverythingRow } from "./updateEverything.logic";
+import { Var, T, useMessages } from "gt-react";
 
 const isRunning = (status: string) =>
   status === "preparing" || status === "starting" || status === "running";
@@ -57,6 +58,10 @@ interface UpdateEverythingDialogProps {
   readonly busy?: boolean;
   /** Machines are still looking for provider updates, so more rows can appear. */
   readonly checking?: boolean;
+}
+
+function fill(template: string, vars: Readonly<Record<number, string>>): string {
+  return template.replace(/\{(\d+)\}/g, (match, index: string) => vars[Number(index)] ?? match);
 }
 
 type UpdateEverythingDialogContentProps = Omit<
@@ -100,12 +105,14 @@ function UpdateEverythingDialogContent({
   onConfirm,
   cancelRef,
   title,
-  confirmLabel = "Update",
+  confirmLabel,
   notes = [],
   disabledReason = null,
   busy = false,
   checking = false,
 }: UpdateEverythingDialogContentProps) {
+  const m = useMessages();
+  const resolvedConfirmLabel = confirmLabel ?? m("Update");
   const stopped = useAtomValue(
     runningThreadCountAtom(
       restarts
@@ -132,20 +139,32 @@ function UpdateEverythingDialogContent({
     <>
       <AlertDialogHeader className="shrink-0">
         <AlertDialogTitle>
-          {title ?? `Update ${updating.length} ${updating.length === 1 ? "machine" : "machines"}?`}
+          {title ??
+            fill(m("Update {1} {2}?"), {
+              1: String(updating.length),
+              2: m(updating.length === 1 ? "machine" : "machines"),
+            })}
         </AlertDialogTitle>
         <AlertDialogDescription>
           {version !== null ? (
             <>
-              T3 Code <span className="font-mono text-xs">{version}</span>
+              <T>
+                R3 Code{" "}
+                <span className="font-mono text-xs">
+                  <Var>{version}</Var>
+                </span>
+              </T>
             </>
           ) : null}
           {version !== null && providerCount > 0 ? " · " : null}
           {providerCount > 0
-            ? `${providerCount} provider ${providerCount === 1 ? "update" : "updates"}`
+            ? fill(m("{1} provider {2}"), {
+                1: String(providerCount),
+                2: m(providerCount === 1 ? "update" : "updates"),
+              })
             : null}
           {checking
-            ? `${version !== null || providerCount > 0 ? " · " : ""}Checking for more…`
+            ? `${version !== null || providerCount > 0 ? " · " : ""}${m("Checking for more…")}`
             : null}
         </AlertDialogDescription>
       </AlertDialogHeader>
@@ -165,9 +184,15 @@ function UpdateEverythingDialogContent({
               role="row"
               className="col-span-full grid grid-cols-subgrid border-b pb-1.5 text-muted-foreground text-xs"
             >
-              <span role="columnheader">Machine</span>
-              <span role="columnheader">T3 Code</span>
-              <span role="columnheader">Providers</span>
+              <span role="columnheader">
+                <T>Machine</T>
+              </span>
+              <span role="columnheader">
+                <T>R3 Code</T>
+              </span>
+              <span role="columnheader">
+                <T>Providers</T>
+              </span>
               <span role="columnheader" />
             </div>
             {updating.map((row) => (
@@ -183,10 +208,14 @@ function UpdateEverythingDialogContent({
                 <span role="cell">
                   {row.app !== null ? APP_LABELS[row.app] : null}
                   {row.app === null && row.skipped !== null ? (
-                    <span className="text-muted-foreground">Skipped</span>
+                    <span className="text-muted-foreground">
+                      <T>Skipped</T>
+                    </span>
                   ) : null}
                   {row.app === "this-app" ? (
-                    <span className="block text-muted-foreground text-xs">restarts last</span>
+                    <span className="block text-muted-foreground text-xs">
+                      <T>restarts last</T>
+                    </span>
                   ) : null}
                 </span>
                 <span role="cell">
@@ -208,8 +237,10 @@ function UpdateEverythingDialogContent({
           {skipped.length > 0 ? (
             <Collapsible>
               <CollapsibleTrigger className="flex items-center gap-1 text-muted-foreground text-xs hover:text-foreground data-panel-open:[&_svg]:rotate-90">
-                <ChevronRightIcon className="size-3.5 transition-transform" aria-hidden />
-                {skipped.length} skipped
+                <T>
+                  <ChevronRightIcon className="size-3.5 transition-transform" aria-hidden />
+                  <Var>{skipped.length}</Var> skipped
+                </T>
               </CollapsibleTrigger>
               <CollapsiblePanel>
                 <div className="grid grid-cols-[minmax(0,max-content)_1fr] gap-x-3 gap-y-0.5 pt-1.5 ps-4.5 text-muted-foreground text-xs">
@@ -242,10 +273,10 @@ function UpdateEverythingDialogContent({
           </p>
         ) : null}
         <AlertDialogClose ref={cancelRef} render={<Button variant="outline" disabled={busy} />}>
-          Cancel
+          <T>Cancel</T>
         </AlertDialogClose>
         <Button disabled={disabledReason !== null || busy} onClick={onConfirm}>
-          {confirmLabel}
+          {resolvedConfirmLabel}
         </Button>
       </AlertDialogFooter>
     </>
@@ -254,5 +285,11 @@ function UpdateEverythingDialogContent({
 
 function RunningThreads({ environmentId }: { readonly environmentId: EnvironmentId }) {
   const count = useAtomValue(runningThreadCountAtom(environmentId));
-  return count > 0 ? <span className="whitespace-nowrap text-warning">{count} running</span> : null;
+  return count > 0 ? (
+    <span className="whitespace-nowrap text-warning">
+      <T>
+        <Var>{count}</Var> running
+      </T>
+    </span>
+  ) : null;
 }

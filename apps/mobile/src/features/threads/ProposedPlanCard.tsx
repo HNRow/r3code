@@ -14,6 +14,7 @@ import * as Dialog from "../../components/ui/Dialog";
 import { projectEnvironment } from "../../state/projects";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { CopyTextButton } from "./CopyTextButton";
+import { useGT } from "gt-react-native";
 
 export function ProposedPlanCard(props: {
   readonly environmentId: EnvironmentId;
@@ -21,6 +22,7 @@ export function ProposedPlanCard(props: {
   readonly markdown: string;
   readonly renderMarkdown: (text: string) => ReactNode;
 }) {
+  const gt = useGT();
   const canWrite = useAtomValue(projectEnvironment.writeFile.permissionAtom(props.environmentId));
   const writeFile = useAtomCommand(projectEnvironment.writeFile, { reportFailure: false });
   const inFlight = useRef(false);
@@ -59,7 +61,7 @@ export function ProposedPlanCard(props: {
         <Text accessibilityRole="header" className="flex-1 font-t3-bold text-base text-foreground">
           {proposedPlanTitle(props.markdown) ?? "Proposed plan"}
         </Text>
-        <CopyTextButton accessibilityLabel="Copy plan" text={contents} />
+        <CopyTextButton accessibilityLabel={gt("Copy plan")} text={contents} />
       </View>
       {props.renderMarkdown(stripDisplayedPlanMarkdown(props.markdown))}
       <View className="flex-row">

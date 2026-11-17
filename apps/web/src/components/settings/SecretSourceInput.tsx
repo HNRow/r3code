@@ -24,6 +24,7 @@ import { Spinner } from "../ui/spinner";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { SecretInput } from "./SecretInput";
 import { classifySecretProvider } from "./SecretProviderDialog.logic";
+import { useGT } from "gt-react";
 
 export interface SecretSource {
   readonly id: SecretProviderId;
@@ -72,6 +73,7 @@ export function SecretSourceSelect(props: {
   readonly disabled?: boolean;
   readonly onValueChange: (provider: SecretProviderId | null) => void;
 }) {
+  const gt = useGT();
   const { value, sources } = props;
   const known = value === null || sources.some((source) => source.id === value);
   const title =
@@ -98,7 +100,7 @@ export function SecretSourceSelect(props: {
       </SelectTrigger>
       <SelectPopup align="start" alignItemWithTrigger={false}>
         <SelectItem value={STORED_VALUE}>
-          <SourceLabel icon={TypeIcon} label="Value" />
+          <SourceLabel icon={TypeIcon} label={gt("Value")} />
         </SelectItem>
         {sources.map((source) => (
           <SelectItem key={source.id} value={source.id}>

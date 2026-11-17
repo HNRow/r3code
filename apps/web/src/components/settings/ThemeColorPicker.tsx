@@ -6,6 +6,7 @@ import { ColorHueSlider, ColorSaturationValuePlane } from "../ui/color-picker";
 import { Input } from "../ui/input";
 import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import { T } from "gt-react";
 export function getThemeRoleLabel(role: ThemeColorRole): string {
   const labels: Partial<Record<ThemeColorRole, string>> = {
     canvas: "Background",
@@ -161,7 +162,9 @@ function ThemeColorPickerPanel({
       <div className="flex items-center justify-between border-b border-border/70 px-4 py-3">
         <div className="min-w-0">
           <p className="truncate text-xs font-semibold text-foreground">{label}</p>
-          <p className="text-2xs text-muted-foreground">Choose a color</p>
+          <p className="text-2xs text-muted-foreground">
+            <T>Choose a color</T>
+          </p>
         </div>
         <span
           className="size-7 shrink-0 rounded-full shadow-sm"
@@ -184,7 +187,7 @@ function ThemeColorPickerPanel({
         <div className="grid grid-cols-[1fr_1.2fr] gap-2">
           <label className="grid min-w-0 gap-1">
             <span className="px-1 text-3xs font-semibold uppercase tracking-widest text-muted-foreground">
-              HEX
+              <T>HEX</T>
             </span>
             <span className="flex min-w-0 items-center gap-2 rounded-lg border border-input bg-background px-2 focus-within:border-ring">
               <span
@@ -210,7 +213,7 @@ function ThemeColorPickerPanel({
           </label>
           <label className="grid min-w-0 gap-1">
             <span className="px-1 text-3xs font-semibold uppercase tracking-widest text-muted-foreground">
-              RGB
+              <T>RGB</T>
             </span>
             <span className="flex min-w-0 items-center rounded-lg border border-input bg-background px-2 focus-within:border-ring">
               <input

@@ -41,6 +41,7 @@ import {
   PullRequestMarkdownTextarea,
   type PullRequestCompletionScope,
 } from "./PullRequestMarkdownTextarea";
+import { T, useGT } from "gt-react";
 
 const CARD_CLASS =
   "mx-3 my-2 rounded-xl border border-border/70 bg-background p-3 text-sm shadow-sm";
@@ -92,6 +93,7 @@ export function PendingReviewCommentCard({
   comment: PendingReviewComment;
   onRemove: () => void;
 }) {
+  const gt = useGT();
   return (
     <div
       className={cn(CARD_CLASS, "border-dashed")}
@@ -100,12 +102,14 @@ export function PendingReviewCommentCard({
     >
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <MessageSquareIcon className="size-3.5" />
-        <span>Pending. Sent when you submit the review</span>
+        <span>
+          <T>Pending. Sent when you submit the review</T>
+        </span>
         <Button
           size="icon-xs"
           variant="ghost"
           className="ml-auto"
-          aria-label="Discard this comment"
+          aria-label={gt("Discard this comment")}
           onClick={onRemove}
         >
           <Trash2Icon className="size-3.5" />
@@ -224,6 +228,7 @@ export function ReviewThreadCard({
   /** Set on a diff line. Hidden draws nothing but stays mounted, so an unsent reply survives. */
   hidden?: boolean;
 }) {
+  const gt = useGT();
   const [expanded, setExpanded] = useState(hidden !== undefined || !thread.isResolved);
   const [replying, setReplying] = useState(false);
   const [reply, setReply] = useState("");
@@ -320,7 +325,11 @@ export function ReviewThreadCard({
           {thread.isResolved ? "Resolved" : "Open"} · {commentCount}{" "}
           {commentCount === 1 ? "comment" : "comments"}
         </button>
-        {thread.isOutdated ? <span>outdated</span> : null}
+        {thread.isOutdated ? (
+          <span>
+            <T>outdated</T>
+          </span>
+        ) : null}
         {onFix ? (
           <Button
             size="compact"
@@ -340,8 +349,10 @@ export function ReviewThreadCard({
             className={onFix ? undefined : "ml-auto"}
             onClick={() => onAddToChat({ ...thread, comments })}
           >
-            <MessageSquarePlusIcon className="size-3" />
-            Add to chat
+            <T>
+              <MessageSquarePlusIcon className="size-3" />
+              Add to chat
+            </T>
           </Button>
         ) : null}
         {canResolve ? (
@@ -384,7 +395,7 @@ export function ReviewThreadCard({
                     cwd={workspaceRoot}
                     environmentId={environmentId}
                     completionScope={completionScope}
-                    label="Edit comment"
+                    label={gt("Edit comment")}
                     saving={savingEdit}
                     onSave={(body) => void saveEdit(comment.id, body)}
                     onCancel={() => setEditingId(null)}
@@ -399,7 +410,7 @@ export function ReviewThreadCard({
                     />
                     {canEditComment(comment) ? (
                       <PullRequestEditButton
-                        aria-label="Edit comment"
+                        aria-label={gt("Edit comment")}
                         onClick={() => setEditingId(comment.id)}
                       />
                     ) : null}
@@ -441,8 +452,8 @@ export function ReviewThreadCard({
                       size="sm"
                       completionScope={completionScope}
                       value={reply}
-                      placeholder="Reply"
-                      aria-label="Reply to this conversation"
+                      placeholder={gt("Reply")}
+                      aria-label={gt("Reply to this conversation")}
                       onValueChange={setReply}
                       onKeyDown={submitKeys({
                         value: reply,
@@ -456,7 +467,7 @@ export function ReviewThreadCard({
                     <div className="mt-2 flex flex-wrap items-center justify-end gap-2">
                       <TextFieldSpeechControls speech={speech} disabled={pending} />
                       <Button size="xs" variant="ghost" onClick={() => setReplying(false)}>
-                        Cancel
+                        <T>Cancel</T>
                       </Button>
                       <Button
                         size="xs"
@@ -467,7 +478,7 @@ export function ReviewThreadCard({
                         }
                         onClick={() => speech.submitAfterDictation((text) => void send(text))}
                       >
-                        Reply
+                        <T>Reply</T>
                       </Button>
                     </div>
                   </div>
@@ -475,7 +486,7 @@ export function ReviewThreadCard({
               </SpeechTextField>
             ) : (
               <Button size="xs" variant="ghost" className="mt-2" onClick={() => setReplying(true)}>
-                Reply
+                <T>Reply</T>
               </Button>
             )
           ) : null}

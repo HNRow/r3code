@@ -16,6 +16,7 @@ import { Button } from "../ui/button";
 import { AddUsageLimitSourceDialog } from "./AddUsageLimitSourceDialog";
 import { searchableSetting } from "./settingsSearch";
 import { SettingsRow, SettingsSection } from "./settingsLayout";
+import { T, useGT, Var } from "gt-react";
 
 export function UsageProviderSettings({
   environmentId,
@@ -28,6 +29,7 @@ export function UsageProviderSettings({
   readonly sources: UnifiedSettings["usageLimitSources"];
   readonly readOnly: boolean;
 }) {
+  const gt = useGT();
   const updateSettings = useUpdateEnvironmentSettings(environmentId);
   const [adding, setAdding] = useState(false);
   const entries = Object.entries(sources);
@@ -39,14 +41,16 @@ export function UsageProviderSettings({
         headerAction={
           !readOnly ? (
             <Button size="xs" variant="outline" onClick={() => setAdding(true)}>
-              <PlusIcon className="size-3" aria-hidden />
-              Add hub
+              <T>
+                <PlusIcon className="size-3" aria-hidden />
+                Add hub
+              </T>
             </Button>
           ) : null
         }
       >
         {entries.length === 0 ? (
-          <SettingsRow title="No hubs configured." />
+          <SettingsRow title={gt("No hubs configured.")} />
         ) : (
           entries.map(([id, source]) => {
             const label = source.label?.trim() || source.url;
@@ -56,8 +60,10 @@ export function UsageProviderSettings({
                 title={label}
                 description={
                   <span className="break-all">
-                    CLI Proxy{source.enabled ? "" : " · Disabled"}
-                    {label !== source.url ? ` · ${source.url}` : ""}
+                    <T>
+                      CLI Proxy<Var>{source.enabled ? "" : " · Disabled"}</Var>
+                      <Var>{label !== source.url ? ` · ${source.url}` : ""}</Var>
+                    </T>
                   </span>
                 }
                 control={
@@ -97,20 +103,28 @@ function RemoveUsageProviderButton({
   return (
     <>
       <Button size="xs" variant="ghost" onClick={() => setOpen(true)}>
-        Remove
+        <T>Remove</T>
       </Button>
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove {label}?</AlertDialogTitle>
+            <AlertDialogTitle>
+              <T>
+                Remove <Var>{label}</Var>?
+              </T>
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              The hub's management key is deleted from this server. Its accounts leave the Limits
-              view; the hub itself is untouched. Add it again with the URL and key to bring them
-              back.
+              <T>
+                The hub's management key is deleted from this server. Its accounts leave the Limits
+                view; the hub itself is untouched. Add it again with the URL and key to bring them
+                back.
+              </T>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+            <AlertDialogClose render={<Button variant="outline" />}>
+              <T>Cancel</T>
+            </AlertDialogClose>
             <Button
               variant="destructive"
               onClick={() => {
@@ -118,7 +132,7 @@ function RemoveUsageProviderButton({
                 onConfirm();
               }}
             >
-              Remove hub
+              <T>Remove hub</T>
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>

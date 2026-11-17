@@ -101,6 +101,7 @@ import { canReactPullRequestComment } from "@t3tools/client-runtime/pull-request
 import { PullRequestResolveThreadButton } from "./PullRequestResolveThreadButton";
 import { PullRequestConversationGhost } from "./PullRequestGhosts";
 import { sectionCollapseAnchorScrollTop } from "./pullRequestSummaryScroll.logic";
+import { T, useGT, Var } from "gt-react";
 
 function reviewerKey(login: string): string {
   return login.toLowerCase();
@@ -165,7 +166,11 @@ function CommentLocation({
         <TooltipTrigger render={<span className="truncate font-mono" />}>{label}</TooltipTrigger>
         <TooltipPopup>{label}</TooltipPopup>
       </Tooltip>
-      {thread?.isOutdated ? <span className="shrink-0">Outdated</span> : null}
+      {thread?.isOutdated ? (
+        <span className="shrink-0">
+          <T>Outdated</T>
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -196,6 +201,7 @@ function CommentBody({
   editing: CommentEditing;
   className?: string | undefined;
 }) {
+  const gt = useGT();
   if (editing.editingId === comment.id) {
     return (
       <PullRequestMarkdownEditor
@@ -205,7 +211,7 @@ function CommentBody({
         environmentId={editing.environmentId}
         completionScope={editing.completionScope}
         threadRef={editing.threadRef}
-        label="Edit comment"
+        label={gt("Edit comment")}
         saving={editing.saving}
         onSave={(body) => editing.onSave(comment, body)}
         onCancel={() => editing.onEdit(null)}
@@ -223,7 +229,10 @@ function CommentBody({
         threadRef={editing.threadRef}
       />
       {editing.canEdit(comment) ? (
-        <PullRequestEditButton aria-label="Edit comment" onClick={() => editing.onEdit(comment)} />
+        <PullRequestEditButton
+          aria-label={gt("Edit comment")}
+          onClick={() => editing.onEdit(comment)}
+        />
       ) : null}
     </div>
   );
@@ -252,7 +261,9 @@ function AddToChatButton({ onClick }: { onClick: () => void }) {
       {/* Wrapped like Fix's label so both sit on the header's baseline. */}
       <span className="inline-flex items-baseline gap-1">
         <MessageSquarePlusIcon className="size-3 self-center" />
-        <span>Add to chat</span>
+        <span>
+          <T>Add to chat</T>
+        </span>
       </span>
     </Button>
   );
@@ -478,6 +489,7 @@ export function PullRequestSummaryTab({
   onRefresh: () => void;
   onRefreshChecks?: () => void;
 }) {
+  const gt = useGT();
   const terminology = sourceControlClients.get(detail.provider).changeRequest;
   const [shown, setShown] = useState({ url: detail.url, count: COMMENT_PAGE });
   const shownConversations = shown.url === detail.url ? shown.count : COMMENT_PAGE;
@@ -515,8 +527,11 @@ export function PullRequestSummaryTab({
         className="w-full"
         onClick={() => setShown({ url: detail.url, count: shownConversations + COMMENT_PAGE })}
       >
-        Show {Math.min(hiddenConversationCount, COMMENT_PAGE)} older conversation
-        {hiddenConversationCount === 1 ? "" : "s"} ({hiddenConversationCount} hidden)
+        <T>
+          Show <Var>{Math.min(hiddenConversationCount, COMMENT_PAGE)}</Var> older conversation
+          <Var>{hiddenConversationCount === 1 ? "" : "s"}</Var> (
+          <Var>{hiddenConversationCount}</Var> hidden)
+        </T>
       </Button>
     ) : null;
   // Verdicts outside the visible comment window still count.
@@ -836,10 +851,12 @@ export function PullRequestSummaryTab({
     >
       <section className="px-4 pt-2.5 pb-1">
         <div className="space-y-2">
-          <PullRequestMetaRow icon={<UsersIcon className="size-3.5" />} label="Reviewers">
+          <PullRequestMetaRow icon={<UsersIcon className="size-3.5" />} label={gt("Reviewers")}>
             <span className="flex min-w-0 flex-wrap items-center gap-1.5">
               {reviewerEntries.length === 0 ? (
-                <span className="text-muted-foreground">None</span>
+                <span className="text-muted-foreground">
+                  <T>None</T>
+                </span>
               ) : (
                 <span className="flex items-center -space-x-1">
                   {reviewerEntries.map((entry) => {
@@ -911,10 +928,12 @@ export function PullRequestSummaryTab({
             </span>
           </PullRequestMetaRow>
           {detail.labels.length > 0 || detail.capabilities.labels === true ? (
-            <PullRequestMetaRow icon={<TagIcon className="size-3.5" />} label="Labels">
+            <PullRequestMetaRow icon={<TagIcon className="size-3.5" />} label={gt("Labels")}>
               <span className="flex min-w-0 flex-wrap items-center gap-1">
                 {detail.labels.length === 0 ? (
-                  <span className="text-muted-foreground">None</span>
+                  <span className="text-muted-foreground">
+                    <T>None</T>
+                  </span>
                 ) : (
                   detail.labels.map((label) => (
                     <PullRequestLabelChip
@@ -941,7 +960,7 @@ export function PullRequestSummaryTab({
 
       <PullRequestSection
         key={`description:${detail.url}`}
-        title="Description"
+        title={gt("Description")}
         keepMounted
         revealCount={descriptionReveals}
       >
@@ -972,7 +991,7 @@ export function PullRequestSummaryTab({
               />
               {canEditDescription ? (
                 <PullRequestEditButton
-                  aria-label="Edit description"
+                  aria-label={gt("Edit description")}
                   onClick={() => setBodyScope({ url: detail.url, body: description })}
                 />
               ) : null}
@@ -983,19 +1002,23 @@ export function PullRequestSummaryTab({
 
       <PullRequestSection
         key={`checks:${detail.url}`}
-        title="Checks"
+        title={gt("Checks")}
         defaultOpen={false}
         revealCount={checksReveals}
       >
         {checksStale ? (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Check details are out of date.</span>
+            <span>
+              <T>Check details are out of date.</T>
+            </span>
             <Button size="xs" variant="ghost" onClick={onRefreshChecks}>
-              Refresh
+              <T>Refresh</T>
             </Button>
           </div>
         ) : detail.checks.length === 0 ? (
-          <p className="text-xs text-muted-foreground">No checks reported.</p>
+          <p className="text-xs text-muted-foreground">
+            <T>No checks reported.</T>
+          </p>
         ) : (
           detail.checks.map(
             (
@@ -1052,20 +1075,22 @@ export function PullRequestSummaryTab({
             <Menu>
               <MenuTrigger
                 render={<Button size="xs" variant="ghost-muted" />}
-                aria-label="Filter comments"
+                aria-label={gt("Filter comments")}
               >
                 <ListFilterIcon aria-hidden className="size-3" />
                 {filteredOutCount > 0 ? `${filteredOutCount} hidden` : "Filter"}
               </MenuTrigger>
               <MenuPopup align="end">
                 <MenuGroup>
-                  <MenuGroupLabel>Show</MenuGroupLabel>
+                  <MenuGroupLabel>
+                    <T>Show</T>
+                  </MenuGroupLabel>
                   <MenuCheckboxItem
                     checked={commentFilter.bots}
                     closeOnClick={false}
                     onCheckedChange={(bots) => setCommentFilter((value) => ({ ...value, bots }))}
                   >
-                    Bot comments
+                    <T>Bot comments</T>
                   </MenuCheckboxItem>
                   <MenuCheckboxItem
                     checked={commentFilter.resolved}
@@ -1074,7 +1099,7 @@ export function PullRequestSummaryTab({
                       setCommentFilter((value) => ({ ...value, resolved }))
                     }
                   >
-                    Resolved or dismissed
+                    <T>Resolved or dismissed</T>
                   </MenuCheckboxItem>
                 </MenuGroup>
               </MenuPopup>
@@ -1108,12 +1133,17 @@ export function PullRequestSummaryTab({
           <>
             {detail.commentsTruncated ? (
               <p className="mb-2 rounded-md border border-warning/30 bg-warning-surface px-2 py-1.5 text-xs">
-                This conversation is only partially loaded. {commentCount} comment
-                {commentCount === 1 ? " is" : "s are"} loaded; open it on the host to read the rest.
+                <T>
+                  This conversation is only partially loaded. <Var>{commentCount}</Var> comment
+                  <Var>{commentCount === 1 ? " is" : "s are"}</Var> loaded; open it on the host to
+                  read the rest.
+                </T>
               </p>
             ) : null}
             {items.length === 0 ? (
-              <p className="py-2 text-xs text-muted-foreground">No comments yet.</p>
+              <p className="py-2 text-xs text-muted-foreground">
+                <T>No comments yet.</T>
+              </p>
             ) : filteredItems.length === 0 ? (
               <p className="py-2 text-xs text-muted-foreground">
                 {filteredOutCount === 1
@@ -1132,7 +1162,9 @@ export function PullRequestSummaryTab({
                     className="w-full"
                     onClick={() => setShown({ url: detail.url, count: COMMENT_PAGE })}
                   >
-                    Show only {COMMENT_PAGE} recent conversations
+                    <T>
+                      Show only <Var>{COMMENT_PAGE}</Var> recent conversations
+                    </T>
                   </Button>
                 ) : null}
               </div>

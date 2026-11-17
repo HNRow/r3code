@@ -66,7 +66,7 @@ function WorkspaceRootTitle(props: {
           !settingsOpen && isSharedSlotTab(state.selectedTab) ? (
             <SharedSlotTitle tab={state.selectedTab} />
           ) : (
-            <CompactBrandTitle accessibilityLabel={`T3 Code, ${tabTitle}`} fit />
+            <CompactBrandTitle accessibilityLabel={`R3 Code, ${tabTitle}`} fit />
           )
         }
         maxWidth={maxWidth}

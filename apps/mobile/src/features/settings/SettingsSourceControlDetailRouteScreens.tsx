@@ -32,6 +32,7 @@ import {
 } from "./components/SourceControlProvidersSection";
 import { AppSignInRow } from "./components/SourceControlSignInSection";
 import type { SettingsTarget } from "./settings-environment-filter";
+import { T, useGT } from "gt-react-native";
 
 /** The environment a detail page edits, once it is connected, and whether this session may. */
 function useDetailEnvironment(environmentId: EnvironmentId) {
@@ -69,7 +70,7 @@ function DetailPage(props: { readonly title: string; readonly children: ReactNod
 
 const Unavailable = () => (
   <Text className="px-2 text-base text-foreground-muted">
-    Connect this environment to change its settings.
+    <T>Connect this environment to change its settings.</T>
   </Text>
 );
 
@@ -79,6 +80,7 @@ export function SettingsSourceControlProviderRouteScreen({
   readonly environmentId: EnvironmentId;
   readonly kind: SourceControlProviderKind;
 }>) {
+  const gt = useGT();
   const { environmentId, kind } = route.params;
   const { environment, canWrite } = useDetailEnvironment(environmentId);
   const definition = sourceControlClients.find(kind);
@@ -105,7 +107,7 @@ export function SettingsSourceControlProviderRouteScreen({
           ) : null}
           {appSignIn ? (
             <SettingsSection
-              title="Sign in"
+              title={gt("Sign in")}
               footer="A far higher API rate limit than a personal token or CLI login."
             >
               <AppSignInRow
@@ -118,7 +120,7 @@ export function SettingsSourceControlProviderRouteScreen({
             </SettingsSection>
           ) : null}
           {!credentials && definition.settings ? (
-            <SettingsSection title="Credentials">
+            <SettingsSection title={gt("Credentials")}>
               <SourceControlHostFieldsForm
                 environment={environment}
                 definition={definition}
@@ -151,6 +153,7 @@ export function SettingsIssueTrackerRouteScreen({
   readonly environmentId: EnvironmentId;
   readonly tracker: string;
 }>) {
+  const gt = useGT();
   const { environmentId } = route.params;
   const { environment, canWrite } = useDetailEnvironment(environmentId);
   const query = useEnvironmentQuery(
@@ -178,7 +181,7 @@ export function SettingsIssueTrackerRouteScreen({
           </SettingsSection>
           {usable && tracker.scopes.length > 0 ? (
             <SettingsSection
-              title="Projects"
+              title={gt("Projects")}
               footer={`Pick the ${tracker.displayName} ${tracker.scopeNoun} whose issues each project lists beside its repository's own.`}
             >
               <IssueTrackerProjectRows

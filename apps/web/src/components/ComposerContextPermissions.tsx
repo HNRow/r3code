@@ -15,6 +15,7 @@ import {
 import { ComposerContextLabel } from "./ComposerContextLabel";
 import { Menu, MenuPopup, MenuTrigger } from "./ui/menu";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
+import { Var, T, useMessages } from "gt-react";
 
 export function ComposerContextPermissions(props: {
   environmentId: EnvironmentId | null;
@@ -22,6 +23,7 @@ export function ComposerContextPermissions(props: {
   supportedRuntimeModes: ReadonlyArray<RuntimeMode> | undefined;
   onRuntimeModeChange: (mode: RuntimeMode) => void;
 }) {
+  const m = useMessages();
   const shortcutLabel = shortcutLabelForCommand(
     useAtomValue(primaryServerKeybindingsAtom),
     "composer.mode",
@@ -43,7 +45,7 @@ export function ComposerContextPermissions(props: {
                 <ComposerControl
                   size="xs"
                   className="ms-auto min-w-0 shrink-0"
-                  aria-label={`Permissions: ${label}`}
+                  aria-label={`${m("Permissions")}: ${m(label)}`}
                   data-composer-context-control
                 />
               }
@@ -51,9 +53,13 @@ export function ComposerContextPermissions(props: {
           }
         >
           <Icon aria-hidden="true" className="size-3" />
-          <ComposerContextLabel>{label}</ComposerContextLabel>
+          <ComposerContextLabel>{m(label)}</ComposerContextLabel>
         </TooltipTrigger>
-        <TooltipPopup>Permissions{shortcutLabel ? ` · ${shortcutLabel}` : null}</TooltipPopup>
+        <TooltipPopup>
+          <T>
+            Permissions<Var>{shortcutLabel ? ` · ${shortcutLabel}` : null}</Var>
+          </T>
+        </TooltipPopup>
       </Tooltip>
       <MenuPopup side="top" align="end" {...composerMenuProps}>
         <ComposerPermissionsSection

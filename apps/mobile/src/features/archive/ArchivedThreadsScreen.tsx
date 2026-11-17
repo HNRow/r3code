@@ -32,6 +32,7 @@ import { useEnvironmentScope } from "../../state/session";
 import { ThreadSwipeable } from "../home/thread-swipe-actions";
 import type { ArchivedThreadGroup, ArchivedThreadSortOrder } from "./archivedThreadList";
 import { SettingsScreenContent } from "../settings/components/SettingsScreen";
+import { useGT, T } from "gt-react-native";
 
 export interface ArchivedThreadsHeaderEnvironment {
   readonly environmentId: EnvironmentId;
@@ -48,12 +49,13 @@ function ArchivedThreadsHeader(props: {
   readonly onSearchQueryChange: (query: string) => void;
   readonly onSortOrderChange: (sortOrder: ArchivedThreadSortOrder) => void;
 }) {
+  const gt = useGT();
   const navigation = useNavigation();
   const { width } = useWindowDimensions();
   const hasCustomFilter = props.selectedEnvironmentId !== null || props.sortOrder !== "newest";
   return (
     <AppBar
-      title="Archived threads"
+      title={gt("Archived threads")}
       onBack={() => navigation.goBack()}
       search={{
         value: props.searchQuery,
@@ -270,14 +272,15 @@ function ArchivedThreadRow(props: {
 }
 
 function ArchiveError(props: { readonly message: string; readonly onRetry: () => void }) {
+  const gt = useGT();
   return (
     <View className="rounded-[20px] border border-danger-border bg-danger p-4">
       <Text className="text-base font-t3-bold text-danger-foreground">
-        Could not load every archive
+        <T>Could not load every archive</T>
       </Text>
       <Text className="mt-1 text-sm text-foreground-muted">{props.message}</Text>
       <View className="mt-3">
-        <Button label="Try again" tone="secondary" onPress={props.onRetry} />
+        <Button label={gt("Try again")} tone="secondary" onPress={props.onRetry} />
       </View>
     </View>
   );
@@ -381,7 +384,9 @@ export function ArchivedThreadsScreen(props: {
       return (
         <View className="items-center py-16">
           <AppActivityIndicator colorClassName="accent-icon" />
-          <Text className="mt-3 text-sm text-foreground-muted">Loading archive...</Text>
+          <Text className="mt-3 text-sm text-foreground-muted">
+            <T>Loading archive...</T>
+          </Text>
         </View>
       );
     }

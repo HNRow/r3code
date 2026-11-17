@@ -33,6 +33,7 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
 import type { ThreadNowItem } from "./ThreadNow";
+import { t, T, Var } from "gt-react";
 
 export function extensionStatusBannerItem(
   statuses: NonNullable<OrchestrationV2ProviderSession["extensionStatuses"]>,
@@ -105,7 +106,7 @@ export function goalNowItem(input: {
           {presentation.title}
           {presentation.usage === null ? null : ` · ${presentation.usage}`}
         </PopoverTrigger>
-        <PopoverPopup side="top" width="md" padding="compact" aria-label="Goal objective">
+        <PopoverPopup side="top" width="md" padding="compact" aria-label={t("Goal objective")}>
           <p className="whitespace-pre-wrap wrap-anywhere text-sm">{presentation.objective}</p>
         </PopoverPopup>
       </Popover>
@@ -119,7 +120,7 @@ export function goalNowItem(input: {
             <InlineButton
               onClick={() => void onSendCommand("/goal resume", "Failed to resume goal.")}
             >
-              Resume
+              <T>Resume</T>
             </InlineButton>
             <span aria-hidden>·</span>
           </>
@@ -128,7 +129,7 @@ export function goalNowItem(input: {
           tone="muted"
           onClick={() => void onSendCommand("/goal clear", "Failed to clear goal.")}
         >
-          Clear
+          <T>Clear</T>
         </InlineButton>
       </>
     ),
@@ -287,7 +288,9 @@ export function branchMismatchBannerItem(input: {
     icon: <GitBranchIcon />,
     title: (
       <span className="flex min-w-0 items-baseline gap-1.5">
-        <span className="shrink-0 font-normal text-muted-foreground">Branch changed from</span>
+        <span className="shrink-0 font-normal text-muted-foreground">
+          <T>Branch changed from</T>
+        </span>
         <Tooltip>
           <TooltipTrigger
             render={
@@ -297,8 +300,11 @@ export function branchMismatchBannerItem(input: {
             }
           />
           <TooltipPopup side="top">
-            This thread last ran on {mismatch.threadBranch}. Sending will continue on{" "}
-            {mismatch.currentBranch}.
+            <T>
+              This thread last ran on <Var>{mismatch.threadBranch}</Var>. Sending will continue on
+              <Var> </Var>
+              <Var>{mismatch.currentBranch}</Var>.
+            </T>
           </TooltipPopup>
         </Tooltip>
       </span>

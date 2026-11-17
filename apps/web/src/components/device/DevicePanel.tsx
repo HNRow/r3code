@@ -40,6 +40,7 @@ import {
 } from "./DeviceSetup";
 import { DeviceWorkspace } from "./DeviceWorkspace";
 import { PreviewPanelShell, type PreviewPanelMode } from "../preview/PreviewPanelShell";
+import { Var, T, useGT } from "gt-react";
 
 const platformLabel = (platform: DevicePlatform) =>
   platform === "ios" ? "iOS Simulators" : "Android Emulators";
@@ -238,8 +239,10 @@ export function DevicePanel(props: {
           <DeviceHostUpdates state={state} environmentId={environmentId} />
           {bootingDevices.length > 0 ? (
             <div role="status" className="border-b px-3 py-2 text-xs text-muted-foreground">
-              Starting {bootingDevices.map((device) => device.name).join(", ")}… This can take a
-              minute.
+              <T>
+                Starting <Var>{bootingDevices.map((device) => device.name).join(", ")}</Var>… This
+                can take a minute.
+              </T>
             </div>
           ) : null}
           {operationError ? (
@@ -285,7 +288,7 @@ export function DevicePanel(props: {
             >
               {loadError !== null ? (
                 <Button size="sm" variant="outline" onClick={refreshState}>
-                  Retry
+                  <T>Retry</T>
                 </Button>
               ) : null}
             </DeviceLoadingView>
@@ -363,8 +366,10 @@ export function DevicePanel(props: {
                 !state.devices.some((device) => device.platform === "android") &&
                 !unavailablePlatforms.some((platform) => platform.platform === "android") ? (
                   <p className="max-w-sm text-xs">
-                    No Android virtual devices found. Create one in Android Studio's Device Manager,
-                    then refresh.
+                    <T>
+                      No Android virtual devices found. Create one in Android Studio's Device
+                      Manager, then refresh.
+                    </T>
                   </p>
                 ) : null}
                 {loaded && !hostBusy ? (
@@ -374,7 +379,7 @@ export function DevicePanel(props: {
                     size="sm"
                     onClick={() => void list({ environmentId, input: {} })}
                   >
-                    Refresh devices
+                    <T>Refresh devices</T>
                   </Button>
                 ) : null}
               </div>
@@ -387,6 +392,7 @@ export function DevicePanel(props: {
 }
 
 function DeviceNotice(props: { readonly onDismiss: () => void; readonly children: ReactNode }) {
+  const gt = useGT();
   return (
     <div
       role="alert"
@@ -402,7 +408,7 @@ function DeviceNotice(props: { readonly onDismiss: () => void; readonly children
       <Button
         size="icon-xs"
         variant="ghost"
-        aria-label="Dismiss device error"
+        aria-label={gt("Dismiss device error")}
         onClick={props.onDismiss}
       >
         <X />
@@ -460,7 +466,7 @@ function DeviceDiscoveryWarning(props: {
             aria-label={`Details for ${props.label}`}
             render={<Button size="micro" variant="ghost" />}
           >
-            Details
+            <T>Details</T>
           </PopoverTrigger>
           <PopoverPopup side="bottom" align="end" width="lg" padding="compact">
             <p className="whitespace-pre-wrap break-words font-mono text-xs text-muted-foreground">

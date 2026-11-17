@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
 } from "./ui/alert-dialog";
 import { Button } from "./ui/button";
+import { T, useMessages } from "gt-react";
 
 type ConfirmationCopy = {
   readonly title: string;
@@ -52,6 +53,7 @@ function resolveConfirmDialogCopy(message: string): ConfirmationCopy {
 }
 
 export function ConfirmDialogHost() {
+  const m = useMessages();
   const state = useSyncExternalStore(
     subscribeConfirmDialogHost,
     readConfirmDialogState,
@@ -76,20 +78,24 @@ export function ConfirmDialogHost() {
     >
       <AlertDialogPopup>
         <AlertDialogHeader>
-          <AlertDialogTitle>{copy.title}</AlertDialogTitle>
+          <AlertDialogTitle>{m(copy.title)}</AlertDialogTitle>
           {copy.description ? (
             <AlertDialogDescription className="whitespace-pre-line">
-              {copy.description}
+              {copy.description ? m(copy.description) : null}
             </AlertDialogDescription>
           ) : null}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+          <AlertDialogClose render={<Button variant="outline" />}>
+            <T>Cancel</T>
+          </AlertDialogClose>
           {focusConfirm && confirmVariant === "default" ? (
-            <AlertDialogAction onClick={onConfirm}>Confirm</AlertDialogAction>
+            <AlertDialogAction onClick={onConfirm}>
+              <T>Confirm</T>
+            </AlertDialogAction>
           ) : (
             <Button variant={confirmVariant} onClick={onConfirm}>
-              Confirm
+              <T>Confirm</T>
             </Button>
           )}
         </AlertDialogFooter>

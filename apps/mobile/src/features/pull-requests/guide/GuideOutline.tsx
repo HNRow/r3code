@@ -8,6 +8,7 @@ import { PullRequestMarkdown } from "../PullRequestMarkdown";
 import { Menu } from "../../../components/ui/Menu";
 
 import { useAppearancePreferences } from "../../settings/appearance/AppearancePreferencesProvider";
+import { Var, T, useGT } from "gt-react-native";
 
 export function GuideOutline({
   guide,
@@ -18,19 +19,26 @@ export function GuideOutline({
   readonly onOpen: (position: number) => void;
   readonly onRewrite?: () => void;
 }) {
+  const gt = useGT();
   const { appearance, setCodeWordBreak } = useAppearancePreferences();
   const files = new Set(guide.stops.flatMap(stopFilePaths));
   return (
     <View>
       <View className="mb-5 flex-row items-center justify-between">
         <View className="flex-row items-baseline gap-2">
-          <Text className="text-base font-t3-semibold">{guide.stops.length} stops</Text>
+          <Text className="text-base font-t3-semibold">
+            <T>
+              <Var>{guide.stops.length}</Var> stops
+            </T>
+          </Text>
           <Text className="text-sm text-foreground-muted">
-            through {files.size} {files.size === 1 ? "file" : "files"}
+            <T>
+              through <Var>{files.size}</Var> <Var>{files.size === 1 ? "file" : "files"}</Var>
+            </T>
           </Text>
         </View>
         <Menu
-          title="Guide options"
+          title={gt("Guide options")}
           actions={[
             {
               id: "word-wrap",
@@ -50,7 +58,7 @@ export function GuideOutline({
         >
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Guide options"
+            accessibilityLabel={gt("Guide options")}
             className="h-11 w-11 items-center justify-center rounded-full active:bg-grouped-card"
           >
             <SymbolView name="ellipsis" size={20} tintColorClassName="accent-icon-muted" />
@@ -102,7 +110,12 @@ export function GuideOutline({
       })}
       {guide.stops.length ? (
         <View className="self-end">
-          <Button label="Start tour" tone="text" onPress={() => onOpen(0)} icon="arrow.right" />
+          <Button
+            label={gt("Start tour")}
+            tone="text"
+            onPress={() => onOpen(0)}
+            icon="arrow.right"
+          />
         </View>
       ) : null}
     </View>

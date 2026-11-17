@@ -29,6 +29,7 @@ import { composerPullRequests } from "../../../state/pull-requests";
 import { usePullRequestPermissions } from "../usePullRequestPermissions";
 import { pullRequestTarget } from "../usePullRequestDiff";
 import { useReviewGuide } from "./useReviewGuide";
+import { T } from "gt-react-native";
 
 export type GuideStopParams = PullRequestParams & {
   readonly position: number;
@@ -57,7 +58,9 @@ export function PullRequestGuideContent({
   return (
     <Animated.View layout={PR_ROW_LAYOUT} className="w-full max-w-[760px] self-center">
       {!state.enabled ? (
-        <Text>Review guides are disabled for this server.</Text>
+        <Text>
+          <T>Review guides are disabled for this server.</T>
+        </Text>
       ) : (
         <>
           <GuideNotice state={state} />
@@ -154,9 +157,13 @@ export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideSto
         >
           <View className="w-full max-w-[760px] self-center gap-5">
             {!state.enabled ? (
-              <Text>Review guides are disabled for this server.</Text>
+              <Text>
+                <T>Review guides are disabled for this server.</T>
+              </Text>
             ) : changedGuide ? (
-              <Text>This guide was rewritten. Go back to start the new tour.</Text>
+              <Text>
+                <T>This guide was rewritten. Go back to start the new tour.</T>
+              </Text>
             ) : !stop ? (
               <Text>{state.error ?? "Loading stop…"}</Text>
             ) : (
@@ -177,7 +184,7 @@ export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideSto
                 ) : null}
                 {stale ? (
                   <Text className="text-sm text-foreground-muted">
-                    Excerpts are hidden until the guide is rewritten for the current head.
+                    <T>Excerpts are hidden until the guide is rewritten for the current head.</T>
                   </Text>
                 ) : (
                   stop.excerpts.map((excerpt) => (
@@ -201,7 +208,9 @@ export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideSto
                 {diff.error ? <Text className="text-danger-foreground">{diff.error}</Text> : null}
                 {notes.length ? (
                   <View className="gap-4">
-                    <Text className="font-t3-semibold">Notes on this stop</Text>
+                    <Text className="font-t3-semibold">
+                      <T>Notes on this stop</T>
+                    </Text>
                     {notes.map(({ marker, note }) => (
                       <View key={marker} className="flex-row gap-3">
                         <View className="h-7 w-7 items-center justify-center rounded-lg bg-grouped-card">
@@ -239,7 +248,9 @@ export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideSto
                 ) : null}
                 {stop.questions.length ? (
                   <View className="gap-3">
-                    <Text className="font-t3-semibold">Questions to consider</Text>
+                    <Text className="font-t3-semibold">
+                      <T>Questions to consider</T>
+                    </Text>
                     {stop.questions.map((question) => (
                       <PullRequestMarkdown key={question} lineBreaks={false} markdown={question} />
                     ))}

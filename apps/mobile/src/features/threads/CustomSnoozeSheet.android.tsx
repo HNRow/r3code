@@ -38,6 +38,7 @@ import {
   applySnoozePickerTime,
   snoozeDateToPickerDate,
 } from "./customSnoozeDate";
+import { T } from "gt-react-native";
 
 type Props = {
   readonly onClose: () => void;
@@ -144,7 +145,9 @@ export function CustomSnoozeSheet(props: Props) {
                 verticalArrangement={{ spacedBy: 16 }}
                 modifiers={[fillMaxWidth(), padding(24, 24, 24, 16)]}
               >
-                <Text style={titleTypography}>Custom snooze</Text>
+                <Text style={titleTypography}>
+                  <T>Custom snooze</T>
+                </Text>
                 <RNHostView matchContents={{ vertical: true }} modifiers={[fillMaxWidth()]}>
                   <SegmentedControl
                     variant="card"
@@ -258,13 +261,17 @@ export function CustomSnoozeSheet(props: Props) {
                     onClick={props.onClose}
                     colors={{ contentColor: colors["--color-foreground"] }}
                   >
-                    <Text style={bodyTypography}>Cancel</Text>
+                    <Text style={bodyTypography}>
+                      <T>Cancel</T>
+                    </Text>
                   </TextButton>
                   <TextButton
                     onClick={submit}
                     colors={{ contentColor: colors["--color-foreground"] }}
                   >
-                    <Text style={bodyTypography}>Snooze</Text>
+                    <Text style={bodyTypography}>
+                      <T>Snooze</T>
+                    </Text>
                   </TextButton>
                 </Row>
               </Column>

@@ -14,6 +14,7 @@ import { scopeThreadRef } from "@t3tools/client-runtime/environment";
 import { useThreadShell, useThreadShells } from "../../state/entities";
 import { useEnvironmentQuery } from "../../state/query";
 import { ThreadMcpApp } from "./McpAppWebView";
+import { useGT, T } from "gt-react-native";
 
 type McpAppFullscreenScreenProps = StaticScreenProps<{
   readonly environmentId: string;
@@ -56,17 +57,20 @@ function descendsFrom(
 
 /** Resolve apps from stored tool calls so links cannot supply apps the call never produced. */
 export function McpAppFullscreenScreen({ route }: McpAppFullscreenScreenProps) {
+  const gt = useGT();
   const navigation = useNavigation();
   const { environmentId, threadId, itemId } = route.params;
   if (!environmentId?.trim() || !threadId?.trim() || !itemId?.trim()) {
     return (
       <View className="flex-1 bg-screen">
         <AppBar
-          title="App"
+          title={gt("App")}
           onClose={() => navigation.goBack()}
           closeAccessibilityLabel="Exit full screen"
         />
-        <Text className="m-6 text-sm text-foreground-muted">This app cannot be shown.</Text>
+        <Text className="m-6 text-sm text-foreground-muted">
+          <T>This app cannot be shown.</T>
+        </Text>
       </View>
     );
   }
@@ -157,7 +161,9 @@ function McpAppFullscreen({
       >
         {app === undefined ? (
           detail.data === undefined ? null : (
-            <Text className="m-6 text-sm text-foreground-muted">This app cannot be shown.</Text>
+            <Text className="m-6 text-sm text-foreground-muted">
+              <T>This app cannot be shown.</T>
+            </Text>
           )
         ) : size.width > 0 ? (
           <ThreadMcpApp

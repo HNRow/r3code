@@ -73,6 +73,7 @@ import { ComposerControl } from "./chat/ComposerControl";
 import { MiddleTruncate } from "./ui/middle-truncate";
 import { BranchPicker, BranchPickerRefItem } from "./BranchPicker";
 import { stackedThreadToast, toastManager } from "./ui/toast";
+import { Var, T } from "gt-react";
 
 export interface BranchToolbarBranchSelectorHandle {
   open: () => void;
@@ -613,7 +614,7 @@ export function BranchToolbarBranchSelector({
   useEffect(() => {
     if (projectCloneDone) refreshStaleRefs();
   }, [projectCloneDone]);
-  // A checkout made outside T3 Code, such as a clone finishing, leaves refs listed before it.
+  // A checkout made outside R3 Code, such as a clone finishing, leaves refs listed before it.
   const statusBranch = branchStatusQuery.data?.refName ?? null;
   const refreshRefsMissingStatusBranch = useEffectEvent((branch: string | null) => {
     if (isInitialBranchesLoadPending || branch === null) return;
@@ -729,7 +730,9 @@ export function BranchToolbarBranchSelector({
             <SourceControlIcon className="size-3.5 shrink-0 text-muted-foreground" />
             <span className="flex min-w-0 flex-col items-start">
               <span className="truncate font-medium">
-                Checkout {sourceControlPresentation.terminology.singular}
+                <T>
+                  Checkout <Var>{sourceControlPresentation.terminology.singular}</Var>
+                </T>
               </span>
               <span className="truncate text-muted-foreground text-xs">{prReference}</span>
             </span>
@@ -746,7 +749,11 @@ export function BranchToolbarBranchSelector({
           value={itemValue}
           onClick={() => selectPickerItem(itemValue)}
         >
-          <span className="truncate">Create new ref &quot;{newRefName}&quot;</span>
+          <span className="truncate">
+            <T>
+              Create new ref &quot;<Var>{newRefName}</Var>&quot;
+            </T>
+          </span>
         </ComboboxItem>
       );
     }

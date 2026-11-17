@@ -151,6 +151,7 @@ import { deriveLayout } from "./lib/layout";
 import { useNativeLayoutMetrics } from "./native/native-layout-metrics";
 import { isPresentedRoute } from "./native/workspace-stack-projection";
 import { workspaceDetailRouter } from "./features/layout/workspace/workspace-detail-selection";
+import { T } from "gt-react-native";
 
 const settingsPage = (title: string) => pageRoute({ title, itemStyle: "standard" });
 
@@ -477,13 +478,15 @@ function NotFoundScreen() {
       style={[{ flex: 1 }, screenBgStyle]}
     >
       <Text className="text-3xl font-t3-bold text-foreground" selectable>
-        Route not found
+        <T>Route not found</T>
       </Text>
       <Pressable
         style={returnHomeButtonStyle}
         onPress={() => navigation.dispatch(StackActions.replace("Home"))}
       >
-        <Text className="text-base font-t3-bold text-primary-foreground">Return home</Text>
+        <Text className="text-base font-t3-bold text-primary-foreground">
+          <T>Return home</T>
+        </Text>
       </Pressable>
     </ScrollView>
   );
@@ -756,7 +759,7 @@ const RootStackConfig = createWorkspaceStackNavigator({
       screen: ConnectOnboardingRouteScreen,
       linking: "connect-onboarding",
       options: sheetRoute({
-        title: "Set up T3 Connect",
+        title: "Set up R3 Connect",
         header: "solid",
         detent: 0.6,
         androidMaxDetent: 0.95,

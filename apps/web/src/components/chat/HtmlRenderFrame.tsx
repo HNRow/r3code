@@ -17,6 +17,7 @@ import { toastManager } from "../ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { HtmlRenderDialog } from "./HtmlRenderDialog";
 import { observeResize } from "~/lib/observeResize";
+import { useGT, T, Var } from "gt-react";
 
 const MIN_URL_LIFE_MS = 5 * 60_000;
 
@@ -26,6 +27,7 @@ export function HtmlRenderFrame(props: {
   readonly threadRef: ScopedThreadRef | undefined;
   readonly onFullscreenChange?: (fullscreen: boolean) => void;
 }) {
+  const gt = useGT();
   const { attachmentId, title } = props.htmlRender;
   const [width, setWidth] = useState(HTML_RENDER_COLUMN_WIDTH);
   const observeBox = (box: HTMLDivElement) => {
@@ -83,7 +85,7 @@ export function HtmlRenderFrame(props: {
               <TooltipTrigger
                 render={
                   <Button
-                    aria-label="Open full screen"
+                    aria-label={gt("Open full screen")}
                     size="icon-xs"
                     variant="glass"
                     onClick={async () => {
@@ -104,7 +106,9 @@ export function HtmlRenderFrame(props: {
               >
                 <Maximize2Icon className="size-3.5" />
               </TooltipTrigger>
-              <TooltipPopup side="left">Open full screen</TooltipPopup>
+              <TooltipPopup side="left">
+                <T>Open full screen</T>
+              </TooltipPopup>
             </Tooltip>
           </div>
           {expandedSrc !== null ? (
@@ -118,7 +122,9 @@ export function HtmlRenderFrame(props: {
         </>
       ) : failed ? (
         <p className="flex size-full items-center justify-center text-muted-foreground text-xs">
-          Unable to load {title}
+          <T>
+            Unable to load <Var>{title}</Var>
+          </T>
         </p>
       ) : null}
     </div>

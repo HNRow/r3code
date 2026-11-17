@@ -12,6 +12,7 @@ import { mermaidSvgForNative, withDiagramBackground } from "../lib/mermaidSvg";
 import { themeColorWithAlpha } from "../lib/mobileTheme";
 import { CodeBlockFrame, CodeBlockHeaderButton } from "./CodeBlockFrame";
 import type { NativeMarkdownTextStyle } from "./SelectableMarkdownText.types";
+import { useGT, Var, T } from "gt-react-native";
 
 type Pele = typeof import("pele/lazy");
 type Diagram =
@@ -129,6 +130,7 @@ function RenderedMermaidBlock(props: MermaidCodeBlockProps) {
 }
 
 function MermaidBlock(props: MermaidCodeBlockProps & { readonly diagram: Diagram | null }) {
+  const gt = useGT();
   const { code, textStyle, diagram } = props;
   const [showCode, setShowCode] = useState(false);
   const [expansion, setExpansion] = useState<Expansion | null>(null);
@@ -193,7 +195,7 @@ function MermaidBlock(props: MermaidCodeBlockProps & { readonly diagram: Diagram
 
   return (
     <CodeBlockFrame
-      label="Mermaid"
+      label={gt("Mermaid")}
       textStyle={textStyle}
       actions={
         <>
@@ -207,7 +209,7 @@ function MermaidBlock(props: MermaidCodeBlockProps & { readonly diagram: Diagram
           ) : null}
           <CodeBlockHeaderButton
             icon="doc.on.doc"
-            label="Copy code"
+            label={gt("Copy code")}
             textStyle={textStyle}
             onPress={() => copyTextWithHaptic(code)}
           />
@@ -217,7 +219,9 @@ function MermaidBlock(props: MermaidCodeBlockProps & { readonly diagram: Diagram
       <View style={styles.content}>
         {diagram?.status === "error" ? (
           <Text style={[styles.error, { color: secondaryColor, fontSize: codeFontSize * 0.85 }]}>
-            Unable to render diagram: {diagram.message}
+            <T>
+              Unable to render diagram: <Var>{diagram.message}</Var>
+            </T>
           </Text>
         ) : null}
         {svg && diagram?.status === "ready" && !showCode ? (
@@ -226,8 +230,8 @@ function MermaidBlock(props: MermaidCodeBlockProps & { readonly diagram: Diagram
           <View style={styles.diagramRow}>
             <Pressable
               accessibilityRole="imagebutton"
-              accessibilityLabel="Mermaid diagram"
-              accessibilityHint="Opens the diagram full screen"
+              accessibilityLabel={gt("Mermaid diagram")}
+              accessibilityHint={gt("Opens the diagram full screen")}
               onPress={() => {
                 if (expansion) return;
                 void Haptics.selectionAsync();

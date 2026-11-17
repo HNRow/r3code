@@ -15,6 +15,7 @@ import {
   type ThreadInspectorTarget,
 } from "./thread-inspector-navigation";
 import { ThreadPreviewRoute } from "./thread-preview-route";
+import { useGT } from "gt-react-native";
 
 /** A thread shown outside its route: in the inspector pane, or presented full screen with a close. */
 export type ThreadInspectorPresentation =
@@ -24,6 +25,7 @@ export type ThreadInspectorPresentation =
 export function ThreadInspectorHeader(
   props: ThreadInspectorPresentation & { readonly title: string; readonly subtitle?: string },
 ) {
+  const gt = useGT();
   if ("onMaximize" in props) {
     return (
       <AppBar
@@ -44,7 +46,7 @@ export function ThreadInspectorHeader(
       title={props.title}
       subtitle={props.subtitle}
       onClose={props.onClose}
-      accessibilityLabel="Close thread"
+      accessibilityLabel={gt("Close thread")}
     />
   );
 }

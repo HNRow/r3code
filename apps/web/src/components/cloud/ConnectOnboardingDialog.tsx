@@ -40,6 +40,7 @@ import { Dialog } from "../ui/dialog";
 import { Switch } from "../ui/switch";
 import { toastManager } from "../ui/toast";
 import { WizardSteps, WizardPopup, WizardHeader, WizardPanel, WizardFooter } from "../ui/wizard";
+import { useGT, T } from "gt-react";
 
 export function ConnectOnboardingDialog() {
   if (!hasCloudPublicConfig()) return null;
@@ -52,6 +53,7 @@ type OnboardingStep = "publish" | "devices";
 const EMPTY_SESSION_STATE_ATOM = Atom.make(AsyncResult.initial<AuthSessionState>());
 
 function ConfiguredConnectOnboardingDialog() {
+  const gt = useGT();
   // Pending Clerk sessions must not look signed out or activation would look like a new sign-in.
   const { isLoaded, isSignedIn, userId } = useAuth({ treatPendingAsSignedOut: false });
   const [optOutState, setOptOutState] = useLocalStorage(
@@ -209,9 +211,9 @@ function ConfiguredConnectOnboardingDialog() {
     if (!ok) return;
     toastManager.add({
       type: "success",
-      title: "T3 Connect enabled",
+      title: "R3 Connect enabled",
       description: exposeEnvironment
-        ? "This environment is available to your other devices through T3 Connect."
+        ? "This environment is available to your other devices through R3 Connect."
         : "This environment publishes agent activity to your mobile clients.",
     });
     setStep("devices");
@@ -235,11 +237,13 @@ function ConfiguredConnectOnboardingDialog() {
     >
       <WizardPopup>
         <WizardHeader
-          title="Set up T3 Connect"
+          title={gt("Set up R3 Connect")}
           description={
             <>
-              Mesh your devices together. Publish this environment and connect the rest, all in one
-              place.
+              <T>
+                Mesh your devices together. Publish this environment and connect the rest, all in
+                one place.
+              </T>
             </>
           }
         >
@@ -300,18 +304,20 @@ function ConfiguredConnectOnboardingDialog() {
         <WizardFooter
           leading={
             <label className="flex cursor-pointer items-center gap-2 self-start text-xs text-muted-foreground sm:self-center">
-              <Checkbox
-                checked={dontShowAgain}
-                onCheckedChange={(checked) => setDontShowAgain(checked === true)}
-              />
-              Don&apos;t show this again
+              <T>
+                <Checkbox
+                  checked={dontShowAgain}
+                  onCheckedChange={(checked) => setDontShowAgain(checked === true)}
+                />
+                Don&apos;t show this again
+              </T>
             </label>
           }
         >
           {step === "publish" ? (
             <>
               <Button variant="ghost" disabled={isApplying} onClick={() => setStep("devices")}>
-                Not now
+                <T>Not now</T>
               </Button>
               <Button
                 disabled={isApplying || !canManageRelay || linkStateData === null}
@@ -322,7 +328,7 @@ function ConfiguredConnectOnboardingDialog() {
             </>
           ) : (
             <Button disabled={isApplying} onClick={complete}>
-              Done
+              <T>Done</T>
             </Button>
           )}
         </WizardFooter>
@@ -364,27 +370,34 @@ function PublishStep({
   readonly onExposeEnvironmentChange: (enabled: boolean) => void;
   readonly onPublishAgentActivityChange: (enabled: boolean) => void;
 }) {
+  const gt = useGT();
   return (
     <div className="space-y-3">
       <div className="rounded-lg border">
         <OnboardingToggleRow
-          title="Publish this environment"
-          description="Make this environment available to your other devices through T3 Connect."
+          title={gt("Publish this environment")}
+          description={gt(
+            "Make this environment available to your other devices through R3 Connect.",
+          )}
           checked={exposeEnvironment}
           disabled={disabled}
           onCheckedChange={onExposeEnvironmentChange}
         />
         <OnboardingToggleRow
-          title="Publish agent activity"
-          description="Send activity from this environment to your mobile clients for push notifications and Live Activities."
+          title={gt("Publish agent activity")}
+          description={gt(
+            "Send activity from this environment to your mobile clients for push notifications and Live Activities.",
+          )}
           checked={publishAgentActivity}
           disabled={disabled}
           onCheckedChange={onPublishAgentActivityChange}
         />
         {requireDeviceApproval !== null ? (
           <OnboardingToggleRow
-            title="Require approval for new devices"
-            description="Devices that sign in to your T3 Connect account wait until someone already connected here approves them."
+            title={gt("Require approval for new devices")}
+            description={gt(
+              "Devices that sign in to your R3 Connect account wait until someone already connected here approves them.",
+            )}
             checked={requireDeviceApproval}
             disabled={disabled || requireDeviceApprovalLocked}
             onCheckedChange={onRequireDeviceApprovalChange}
@@ -458,8 +471,10 @@ function DevicesStep() {
         showSavedEnvironments
         empty={
           <p className="px-4 py-6 text-center text-sm text-muted-foreground">
-            No other environments are published to your account yet. Publish one from another device
-            and it will show up here.
+            <T>
+              No other environments are published to your account yet. Publish one from another
+              device and it will show up here.
+            </T>
           </p>
         }
       />

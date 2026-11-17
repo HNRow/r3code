@@ -48,6 +48,7 @@ import {
   showThemeInspectorHover,
   type ThemeElementInspection,
 } from "./themeInspector";
+import { T, useGT, Var } from "gt-react";
 
 const THEME_EDITOR_SIMPLE_ROLES: ReadonlyArray<ThemeColorRole> = ["canvas", "accent"];
 
@@ -339,6 +340,7 @@ export function ThemeEditorPanel({
   seedName?: string | undefined;
   restoreTheme: () => void;
 }) {
+  const gt = useGT();
   const isEditing = editingTheme !== null;
   const [name, setName] = useState("");
   const [activeAppearance, setActiveAppearance] = useState<ThemeAppearance>(initialAppearance);
@@ -902,7 +904,9 @@ export function ThemeEditorPanel({
 
   const renderNameField = () => (
     <label className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] items-center gap-3">
-      <span className="text-sm font-medium">Theme name</span>
+      <span className="text-sm font-medium">
+        <T>Theme name</T>
+      </span>
       <Input
         autoFocus
         size="sm"
@@ -935,9 +939,11 @@ export function ThemeEditorPanel({
 
   const renderAppearanceButtons = () => (
     <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] items-center gap-3">
-      <span className="text-sm font-medium">Appearance</span>
+      <span className="text-sm font-medium">
+        <T>Appearance</T>
+      </span>
       <ToggleGroup
-        aria-label="Theme appearance"
+        aria-label={gt("Theme appearance")}
         variant="segmented"
         value={[activeAppearance]}
         onValueChange={(next) => {
@@ -959,26 +965,32 @@ export function ThemeEditorPanel({
   const renderColorsHeader = () => (
     <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] items-start gap-3">
       <div>
-        <h3 className="text-sm font-medium">Colors</h3>
+        <h3 className="text-sm font-medium">
+          <T>Colors</T>
+        </h3>
         {isAdvanced ? null : (
-          <p className="text-xs text-muted-foreground">Two colors, rest derived</p>
+          <p className="text-xs text-muted-foreground">
+            <T>Two colors, rest derived</T>
+          </p>
         )}
       </div>
       <div className="flex min-w-0 items-start gap-3">
         {isAdvanced ? (
           <Input
-            aria-label="Filter colors"
+            aria-label={gt("Filter colors")}
             className="min-w-0 flex-1"
             onChange={(event) => setRoleQuery(event.currentTarget.value)}
-            placeholder="Filter colors"
+            placeholder={gt("Filter colors")}
             size="sm"
             value={roleQuery}
           />
         ) : null}
         <label className="ml-auto flex shrink-0 cursor-pointer items-center gap-2 pt-0.5 text-sm font-medium">
-          <span>Advanced</span>
+          <span>
+            <T>Advanced</T>
+          </span>
           <Switch
-            aria-label="Use advanced theme colors"
+            aria-label={gt("Use advanced theme colors")}
             checked={isAdvanced}
             onCheckedChange={(checked) => handleAdvancedChange(Boolean(checked))}
           />
@@ -1030,7 +1042,11 @@ export function ThemeEditorPanel({
             {renderRoleFields(group.families, "grid gap-1")}
           </section>
         ))}
-        {groups.length === 0 ? <p className="text-xs text-muted-foreground">No matches.</p> : null}
+        {groups.length === 0 ? (
+          <p className="text-xs text-muted-foreground">
+            <T>No matches.</T>
+          </p>
+        ) : null}
       </div>
     ) : (
       <div className="grid gap-1">
@@ -1212,7 +1228,7 @@ export function ThemeEditorPanel({
           {isMinimized ? <ChevronUpIcon /> : <ChevronDownIcon />}
         </Button>
         <Button
-          aria-label="Close the theme editor"
+          aria-label={gt("Close the theme editor")}
           size="icon-xs"
           variant="ghost"
           onClick={() => onOpenChange(false)}
@@ -1242,14 +1258,18 @@ export function ThemeEditorPanel({
                 variant="ghost"
                 onClick={() => setCssOpen(!cssOpen)}
               >
-                {cssOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}
-                Custom CSS
+                <T>
+                  <Var>{cssOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}</Var>
+                  Custom CSS
+                </T>
               </Button>
               {cssOpen ? (
                 <>
                   <p className="text-xs text-muted-foreground">
-                    Saved with this theme and included when you export it. Web and desktop only.
-                    Rules that load remote files are ignored.
+                    <T>
+                      Saved with this theme and included when you export it. Web and desktop only.
+                      Rules that load remote files are ignored.
+                    </T>
                   </p>
                   <ThemeCssEditor value={css} onChange={setCss} />
                 </>
@@ -1258,7 +1278,7 @@ export function ThemeEditorPanel({
           </div>
           <div className="flex items-center justify-end gap-2 border-t border-border/70 px-3 py-2">
             <Button size="sm" variant="ghost" onClick={() => onOpenChange(false)}>
-              Cancel
+              <T>Cancel</T>
             </Button>
             <Button disabled={!name.trim()} size="sm" onClick={handleSubmit}>
               {isEditing ? (
@@ -1274,8 +1294,10 @@ export function ThemeEditorPanel({
                 </>
               ) : (
                 <>
-                  <PaintbrushIcon />
-                  Create theme
+                  <T>
+                    <PaintbrushIcon />
+                    Create theme
+                  </T>
                 </>
               )}
             </Button>

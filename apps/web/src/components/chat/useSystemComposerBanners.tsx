@@ -33,6 +33,7 @@ import {
   resolveServerSelfUpdateCapability,
   supportsDesktopAppUpdate,
 } from "../../versionSkew";
+import { T, t } from "gt-react";
 
 export type EnvironmentUnavailableState = {
   readonly environmentId: EnvironmentId;
@@ -163,14 +164,14 @@ export function useSystemComposerBanners(input: SystemComposerBannersInput) {
           size="xs"
           variant="ghost"
           disabled={disconnectingEnvironment}
-          title="Hide this server's threads. Switch it on again in Environments."
+          title={t("Hide this server's threads. Switch it on again in Environments.")}
           onClick={() =>
             void handleDisconnectActiveEnvironmentStable(
               activeEnvironmentUnavailableState.environmentId,
             )
           }
         >
-          Disconnect server
+          <T>Disconnect server</T>
         </Button>
       ) : undefined;
     const environmentReconnecting =
@@ -251,7 +252,7 @@ export function useSystemComposerBanners(input: SystemComposerBannersInput) {
             installation={versionMismatchInstallation}
             desktopAppUpdate={versionMismatchDesktopAppUpdate}
             targetVersion={versionMismatch.clientVersion}
-            label="Retry"
+            label={t("Retry")}
             variant="ghost"
           />
         ),

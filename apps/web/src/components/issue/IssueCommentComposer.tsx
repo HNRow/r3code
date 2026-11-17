@@ -11,6 +11,7 @@ import { ComposerSurface } from "../chat/ComposerSurface";
 import { readableFailure } from "../pullRequest/pullRequestDetail.logic";
 import { Spinner } from "../ui/spinner";
 import { toastManager } from "../ui/toast";
+import { useGT } from "gt-react";
 
 /** The thread composer's card, floating over the issue's timeline, with a comment as its message. */
 export function IssueCommentComposer({
@@ -23,6 +24,7 @@ export function IssueCommentComposer({
   /** Why the viewer cannot comment here; null when they can. */
   blocked: string | null;
 }) {
+  const gt = useGT();
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -72,7 +74,7 @@ export function IssueCommentComposer({
               ref={textareaRef}
               rows={2}
               className="field-sizing-content max-h-64 min-h-[2lh] w-full resize-none bg-transparent px-3.5 pt-3 pb-1 text-base text-foreground outline-none wrap-anywhere placeholder:text-muted-foreground/70 disabled:opacity-64 sm:text-sm"
-              aria-label="Add a comment"
+              aria-label={gt("Add a comment")}
               placeholder={blocked ?? "Leave a comment"}
               value={body}
               // Lock while posting because success clears the draft.

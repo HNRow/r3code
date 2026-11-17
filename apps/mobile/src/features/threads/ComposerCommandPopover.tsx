@@ -23,6 +23,7 @@ import { ProviderIcon } from "../../components/ProviderIcon";
 import { cn } from "../../lib/cn";
 import type { ModelOption } from "../../lib/modelOptions";
 import { pullRequestStatus } from "../pull-requests/pullRequestStatus";
+import { T } from "gt-react-native";
 export type ComposerCommandItem =
   | {
       readonly id: string;
@@ -217,7 +218,9 @@ const CommandRow = memo(function CommandRow(props: {
       >
         {props.isSlashSkill && props.item.type === "skill" ? (
           <>
-            <Text className="text-foreground-muted">skill:</Text>
+            <Text className="text-foreground-muted">
+              <T>skill:</T>
+            </Text>
             {props.item.skill.name}
           </>
         ) : (

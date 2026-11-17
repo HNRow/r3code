@@ -14,6 +14,7 @@ import { useSelectedThreadGitState } from "../../../state/use-selected-thread-gi
 import { useSelectedThreadWorktree } from "../../../state/use-selected-thread-worktree";
 import { vcsEnvironment } from "../../../state/vcs";
 import { SheetActionButton } from "./gitSheetComponents";
+import { useGT } from "gt-react-native";
 
 type GitBranchesSheetProps = StaticScreenProps<{
   readonly environmentId: string;
@@ -21,6 +22,7 @@ type GitBranchesSheetProps = StaticScreenProps<{
 }>;
 
 export function GitBranchesSheet(_props: GitBranchesSheetProps) {
+  const gt = useGT();
   const navigation = useNavigation();
   const { selectedThread } = useThreadSelection();
   const { selectedThreadCwd } = useSelectedThreadWorktree();
@@ -60,20 +62,22 @@ export function GitBranchesSheet(_props: GitBranchesSheetProps) {
 
   return (
     <FitSheet
-      header={<SheetHeader title="Branches & worktrees" onClose={() => navigation.goBack()} />}
+      header={
+        <SheetHeader title={gt("Branches & worktrees")} onClose={() => navigation.goBack()} />
+      }
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-      <FormSection title="New branch">
+      <FormSection title={gt("New branch")}>
         <FormField
           value={newBranchName}
           onChangeText={setNewBranchName}
-          placeholder="feature/mobile-polish"
-          accessibilityLabel="New branch name"
+          placeholder={gt("feature/mobile-polish")}
+          accessibilityLabel={gt("New branch name")}
         />
         <SheetActionButton
           icon="plus"
-          label="Create & checkout"
+          label={gt("Create & checkout")}
           tone="primary"
           disabled={!canChangeThreadBranch || busy || newBranchName.trim().length === 0}
           onPress={() => {
@@ -88,24 +92,24 @@ export function GitBranchesSheet(_props: GitBranchesSheetProps) {
         />
       </FormSection>
 
-      <FormSection title="New worktree">
+      <FormSection title={gt("New worktree")}>
         <FormField
-          label="Base branch"
+          label={gt("Base branch")}
           value={worktreeBaseBranch}
           onChangeText={setWorktreeBaseBranchOverride}
-          placeholder="main"
-          accessibilityLabel="Worktree base branch"
+          placeholder={gt("main")}
+          accessibilityLabel={gt("Worktree base branch")}
         />
         <FormField
-          label="New branch"
+          label={gt("New branch")}
           value={worktreeBranchName}
           onChangeText={setWorktreeBranchName}
-          placeholder="feature/mobile-thread"
-          accessibilityLabel="Worktree branch name"
+          placeholder={gt("feature/mobile-thread")}
+          accessibilityLabel={gt("Worktree branch name")}
         />
         <SheetActionButton
           icon="square.split.2x1"
-          label="Create worktree"
+          label={gt("Create worktree")}
           tone="primary"
           disabled={
             !canChangeThreadBranch ||
@@ -129,7 +133,7 @@ export function GitBranchesSheet(_props: GitBranchesSheetProps) {
       </FormSection>
 
       <ListSection
-        title="Existing branches"
+        title={gt("Existing branches")}
         footer={
           branchesLoading
             ? "Loading branches..."

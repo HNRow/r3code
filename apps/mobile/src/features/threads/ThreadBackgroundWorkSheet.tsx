@@ -15,6 +15,7 @@ import { SymbolView } from "../../components/ui/AppSymbol";
 import { AppText as Text } from "../../components/ui/AppText";
 import { ScreenContent } from "../../components/ui/ScreenContent";
 import { environmentThreadShells } from "../../state/threads";
+import { T, useGT } from "gt-react-native";
 
 const KIND_LABELS = {
   subagent: "Subagent",
@@ -26,6 +27,7 @@ const KIND_LABELS = {
 type BackgroundWorkTarget = { readonly environmentId: EnvironmentId; readonly threadId: ThreadId };
 
 export function ThreadBackgroundWorkSheet({ route }: StaticScreenProps<BackgroundWorkTarget>) {
+  const gt = useGT();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const target = route.params;
@@ -50,7 +52,7 @@ export function ThreadBackgroundWorkSheet({ route }: StaticScreenProps<Backgroun
     >
       {presentation === null ? (
         <Text className="pt-6 text-center text-sm text-foreground-muted">
-          Nothing running in the background.
+          <T>Nothing running in the background.</T>
         </Text>
       ) : (
         presentation.items.map((item) => (
@@ -61,7 +63,7 @@ export function ThreadBackgroundWorkSheet({ route }: StaticScreenProps<Backgroun
   );
   return (
     <View collapsable={false} className="flex-1 bg-sheet">
-      <SheetHeader title="Background work" onClose={() => navigation.goBack()} />
+      <SheetHeader title={gt("Background work")} onClose={() => navigation.goBack()} />
       <ScreenContent>{content}</ScreenContent>
     </View>
   );

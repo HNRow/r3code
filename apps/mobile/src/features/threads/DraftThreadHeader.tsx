@@ -14,12 +14,14 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { vcsActionManager, vcsEnvironment } from "../../state/vcs";
 import { useVcsActionState } from "../../state/use-vcs-action-state";
 import { ThreadHeader } from "./ThreadHeader";
+import { useGT } from "gt-react-native";
 
 export function DraftThreadHeader(props: {
   readonly thread: EnvironmentThreadShell;
   readonly project: EnvironmentProject;
   readonly cwd: string | null;
 }) {
+  const gt = useGT();
   const navigation = useNavigation();
   const environmentId = props.thread.environmentId;
   const canReadFiles = useEnvironmentScope(environmentId, AuthFilesystemReadScope);
@@ -46,7 +48,7 @@ export function DraftThreadHeader(props: {
   return (
     <ThreadHeader
       draft
-      title="New thread"
+      title={gt("New thread")}
       subtitle=""
       hasThreadCwd={props.cwd !== null}
       inspectorMode={null}

@@ -122,6 +122,7 @@ import {
   useThreadSettingsSheetPresentation,
   type NavigationWithFinishTransitioning,
 } from "./use-thread-settings-sheet-presentation";
+import { useGT, T } from "gt-react-native";
 
 export const COMPOSER_COLLAPSED_CHROME = 60;
 export const THREAD_COMPOSER_BOTTOM_GUTTER = COMPOSER_BOTTOM_GUTTER;
@@ -213,6 +214,7 @@ function SendActionButton(props: {
   readonly disabled: boolean;
   readonly onSend: (followUp?: ActiveTurnComposerAction) => void;
 }) {
+  const gt = useGT();
   const { presentation } = props;
   const button = (
     <ComposerActionButton
@@ -232,7 +234,7 @@ function SendActionButton(props: {
   );
   return (
     <Menu
-      accessibilityLabel="Choose how to send this message"
+      accessibilityLabel={gt("Choose how to send this message")}
       shouldOpenOnLongPress
       actions={actions.map((action) => ({
         id: action,
@@ -250,6 +252,7 @@ function SendActionButton(props: {
 }
 
 export const ThreadComposer = function ThreadComposer(props: ThreadComposerProps) {
+  const gt = useGT();
   const project = useProject(scopeProjectRef(props.environmentId, props.selectedThread.projectId));
   const { themeVariables: materialTheme } = useAppearancePreferences();
   const composerPanel = materialTheme["--color-composer-panel"];
@@ -563,7 +566,7 @@ export const ThreadComposer = function ThreadComposer(props: ThreadComposerProps
     armAgentAwarenessLiveActivityForLocalWork({
       environmentId: props.environmentId,
       threadTitle: props.selectedThread.title,
-      projectTitle: props.environmentLabel ?? "T3 Code",
+      projectTitle: props.environmentLabel ?? "R3 Code",
     });
   };
 
@@ -756,7 +759,7 @@ export const ThreadComposer = function ThreadComposer(props: ThreadComposerProps
         ) : null}
         {modelUnavailable ? (
           <Button
-            label="Model unavailable. Open model settings."
+            label={gt("Model unavailable. Open model settings.")}
             tone="text"
             onPress={openSettings}
           />
@@ -993,7 +996,7 @@ export const ThreadComposer = function ThreadComposer(props: ThreadComposerProps
                 {showStopAction ? (
                   <ComposerActionButton
                     size={usesLargeControls ? "large" : "regular"}
-                    accessibilityLabel="Stop agent"
+                    accessibilityLabel={gt("Stop agent")}
                     icon="stop.fill"
                     variant="danger"
                     disabled={!props.canOperateThread}
@@ -1002,7 +1005,7 @@ export const ThreadComposer = function ThreadComposer(props: ThreadComposerProps
                 ) : showResumeAction ? (
                   <ComposerActionButton
                     size={usesLargeControls ? "large" : "regular"}
-                    accessibilityLabel="Resume thread"
+                    accessibilityLabel={gt("Resume thread")}
                     icon="play"
                     disabled={!props.canOperateThread || resumingQueue}
                     onPress={() => void handleResumeQueue()}
@@ -1061,7 +1064,7 @@ export const ThreadComposer = function ThreadComposer(props: ThreadComposerProps
                   {showStopAction ? (
                     <ComposerActionButton
                       size={usesLargeControls ? "large" : "regular"}
-                      accessibilityLabel="Stop agent"
+                      accessibilityLabel={gt("Stop agent")}
                       icon="stop.fill"
                       variant="danger"
                       disabled={!props.canOperateThread}
@@ -1070,7 +1073,7 @@ export const ThreadComposer = function ThreadComposer(props: ThreadComposerProps
                   ) : showResumeAction && voicePresentation.showsSend ? (
                     <ComposerActionButton
                       size={usesLargeControls ? "large" : "regular"}
-                      accessibilityLabel="Resume thread"
+                      accessibilityLabel={gt("Resume thread")}
                       icon="play"
                       disabled={!props.canOperateThread || resumingQueue}
                       onPress={() => void handleResumeQueue()}
@@ -1092,7 +1095,7 @@ export const ThreadComposer = function ThreadComposer(props: ThreadComposerProps
 
         {props.connectionState === "connected" && operateDenied ? (
           <Text className="pt-2 text-xs text-foreground-muted">
-            This connection cannot control this task. You can still edit your draft.
+            <T>This connection cannot control this task. You can still edit your draft.</T>
           </Text>
         ) : null}
       </Animated.View>

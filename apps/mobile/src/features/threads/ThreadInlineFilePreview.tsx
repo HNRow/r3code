@@ -19,6 +19,7 @@ import {
   releaseAudioSession,
 } from "../../lib/audioSession";
 import { usePlaybackAudioPlayer } from "../voice-input/usePlaybackAudioPlayer";
+import { Var, T } from "gt-react-native";
 
 type PreviewProps = {
   readonly source: FilePreviewSource;
@@ -45,8 +46,12 @@ function FileCardHeader(props: PreviewProps) {
           {props.source.name}
         </Text>
         <Text className="text-xs text-foreground-muted" numberOfLines={1}>
-          Audio
-          {props.sizeBytes !== undefined ? ` · ${formatAttachmentSize(props.sizeBytes)}` : ""}
+          <T>
+            Audio
+            <Var>
+              {props.sizeBytes !== undefined ? ` · ${formatAttachmentSize(props.sizeBytes)}` : ""}
+            </Var>
+          </T>
         </Text>
       </View>
       <SymbolView name="chevron.right" size={12} tintColorClassName="accent-foreground-muted" />

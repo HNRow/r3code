@@ -6,6 +6,7 @@ import { AppText as Text } from "../../components/ui/AppText";
 import { SymbolView } from "../../components/ui/AppSymbol";
 
 import { ConnectionStatusDot } from "../connection/ConnectionStatusDot";
+import { Var, T } from "gt-react-native";
 
 export function DraftEnvironmentControl(props: {
   readonly label: string;
@@ -29,7 +30,9 @@ export function DraftEnvironmentControl(props: {
         tintColorClassName="accent-icon-muted"
       />
       <Text className="shrink text-sm text-foreground-muted" numberOfLines={1}>
-        on {props.label}
+        <T>
+          on <Var>{props.label}</Var>
+        </T>
       </Text>
       <SymbolView name="chevron.right" size={11} tintColorClassName="accent-icon-muted" />
       {disconnected ? <ConnectionStatusDot state="error" pulse={false} size={6} /> : null}

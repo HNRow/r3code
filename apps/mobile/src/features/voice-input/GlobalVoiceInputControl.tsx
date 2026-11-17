@@ -21,6 +21,7 @@ import { cn } from "../../lib/cn";
 import { CompactVoiceWaveform, DictationElapsedTime } from "./ComposerDictationControl";
 import { useGlobalVoiceInput } from "./VoiceInputProvider";
 import { resolveVoiceComposerPresentation } from "./voiceInputPresentation";
+import { useGT } from "gt-react-native";
 
 const PILL_HEIGHT = 36;
 const COLLAPSED_WIDTH = 64;
@@ -65,6 +66,7 @@ function EdgeDictationPill(props: {
   readonly expanded: boolean;
   readonly onExpandedChange: (expanded: boolean) => void;
 }) {
+  const gt = useGT();
   const voice = useGlobalVoiceInput();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -111,7 +113,7 @@ function EdgeDictationPill(props: {
           >
             <Pressable
               accessibilityLabel={`${presentation.statusLabel}, dictating into ${label}`}
-              accessibilityHint="Shows dictation controls"
+              accessibilityHint={gt("Shows dictation controls")}
               accessibilityRole="button"
               className="flex-1 flex-row items-center justify-center gap-1.5 active:opacity-70"
               hitSlop={{ top: 6, bottom: 6, left: 6 }}
@@ -160,7 +162,7 @@ function EdgeDictationPill(props: {
             </Pressable>
             <Pressable
               accessibilityLabel={isError ? (presentation.statusLabel ?? label) : label}
-              accessibilityHint="Hides dictation controls"
+              accessibilityHint={gt("Hides dictation controls")}
               accessibilityRole="button"
               className="min-w-0 flex-1 justify-center self-stretch active:opacity-70"
               onPress={() => setExpanded(false)}
@@ -183,7 +185,7 @@ function EdgeDictationPill(props: {
                   seconds={voice.elapsedSeconds}
                 />
                 <Pressable
-                  accessibilityLabel="Finish dictation"
+                  accessibilityLabel={gt("Finish dictation")}
                   accessibilityRole="button"
                   className="size-[30px] items-center justify-center active:opacity-70"
                   onPress={voice.stop}

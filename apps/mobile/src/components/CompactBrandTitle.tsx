@@ -8,6 +8,7 @@ import { T3Wordmark } from "./T3Wordmark";
 import { IPAD_HOME_TITLE_OFFSET } from "../lib/layoutMetrics";
 import { resolveMobileStageLabel } from "../lib/mobileBranding";
 import { useAndroidControlSizing } from "./ui/useAndroidControlSizing";
+import { T } from "gt-react-native";
 
 const BRAND_MAX_FONT_SCALE = 1.4;
 
@@ -39,7 +40,7 @@ export function CompactBrandTitle(
         props.fit && showStage ? (event) => setFullWidth(event.nativeEvent.layout.width) : undefined
       }
       aria-level={1}
-      accessibilityLabel={props.accessibilityLabel ?? "T3 Code, Threads"}
+      accessibilityLabel={props.accessibilityLabel ?? "R3 Code, Threads"}
       accessible
       role="heading"
       className="flex-row items-center gap-1.5"
@@ -57,7 +58,7 @@ export function CompactBrandTitle(
         className="font-t3-medium text-foreground-muted"
         style={{ fontSize: 21 * scale, letterSpacing: -0.5 * scale }}
       >
-        Code
+        <T>Code</T>
       </Text>
       {showStage ? (
         <View

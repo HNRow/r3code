@@ -15,9 +15,11 @@ import { Spinner } from "../ui/spinner";
 import { Switch } from "../ui/switch";
 import { SettingsRow } from "./settingsLayout";
 import { searchableSetting } from "./settingsSearch";
+import { useGT, T, msg } from "gt-react";
 
 // Toggling relaunches desktop; the switch reflects startup state.
 export function LocalEnvironmentSetting() {
+  const gt = useGT();
   const setEnabled = window.desktopBridge?.setLocalEnvironmentEnabled;
   const [enabled] = useState(() => !isLocalEnvironmentDisabled());
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -42,15 +44,17 @@ export function LocalEnvironmentSetting() {
         {...searchableSetting("local-environment")}
         description={
           enabled
-            ? "Run agents on this computer. Turn off to use T3 Code only with remote environments."
-            : "Turned off. Agents only run in remote environments."
+            ? msg(
+                "Run agents on this computer. Turn off to use R3 Code only with remote environments.",
+              )
+            : msg("Turned off. Agents only run in remote environments.")
         }
         control={
           <Switch
             checked={enabled}
             disabled={isUpdating}
             onCheckedChange={() => setConfirmOpen(true)}
-            aria-label="Local environment"
+            aria-label={gt("Local environment")}
           />
         }
       />
@@ -69,14 +73,14 @@ export function LocalEnvironmentSetting() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               {enabled
-                ? "T3 Code will restart without running a server on this computer. Any agents and terminals running here will stop, and other devices will no longer be able to connect to this computer. Your projects, history, and remote environments are unaffected."
-                : "T3 Code will restart and start running a server on this computer again."}
+                ? "R3 Code will restart without running a server on this computer. Any agents and terminals running here will stop, and other devices will no longer be able to connect to this computer. Your projects, history, and remote environments are unaffected."
+                : "R3 Code will restart and start running a server on this computer again."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           {error ? <p className="px-6 pb-4 text-sm text-destructive">{error}</p> : null}
           <AlertDialogFooter>
             <AlertDialogClose disabled={isUpdating} render={<Button variant="outline" />}>
-              Cancel
+              <T>Cancel</T>
             </AlertDialogClose>
             <Button
               variant={enabled ? "destructive" : "default"}
@@ -85,8 +89,10 @@ export function LocalEnvironmentSetting() {
             >
               {isUpdating ? (
                 <>
-                  <Spinner size="sm" />
-                  Restarting…
+                  <T>
+                    <Spinner size="sm" />
+                    Restarting…
+                  </T>
                 </>
               ) : enabled ? (
                 "Restart and turn off"

@@ -13,6 +13,7 @@ import {
 import { cn } from "~/lib/utils";
 import { PROVIDER_ORDER, PROVIDER_PRESENTATION } from "./usageProviders";
 import { observeResize } from "~/lib/observeResize";
+import { T } from "gt-react";
 
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 260;
@@ -271,7 +272,9 @@ function UsageChartTooltip({
         );
       })}
       <div className="mt-1 flex items-center justify-between gap-3 border-t border-border pt-1">
-        <span className="text-muted-foreground">Total</span>
+        <span className="text-muted-foreground">
+          <T>Total</T>
+        </span>
         <span className={cn("tabular-nums", partial ? "text-muted-foreground" : "text-foreground")}>
           {format(column?.total ?? 0)}
         </span>
@@ -535,7 +538,11 @@ export function UsageProviderChart({
                 {PROVIDER_PRESENTATION[provider].label}
               </th>
             ))}
-            {providers.length > 1 ? <th scope="col">Total</th> : null}
+            {providers.length > 1 ? (
+              <th scope="col">
+                <T>Total</T>
+              </th>
+            ) : null}
           </tr>
         </thead>
         <tbody>

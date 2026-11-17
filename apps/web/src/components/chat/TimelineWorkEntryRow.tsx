@@ -71,6 +71,7 @@ import {
   THOUGHT_PREVIEW_PLUGINS,
   THOUGHT_PREVIEW_SOURCE_MAX_LENGTH,
 } from "./TimelineWorkEntryRow.logic";
+import { T, useGT } from "gt-react";
 
 export function useThreadReadTarget(entry: TimelineWorkEntry, environmentId: EnvironmentId) {
   const rawThreadId = threadReadTargetId(entry);
@@ -208,6 +209,7 @@ export function ViewedImagesTimelineRow({
 }
 
 function WorkEntryLogRow(props: WorkEntryRowProps) {
+  const gt = useGT();
   const { workEntry, workspaceRoot, displayLabel } = props;
   const ctx = use(TimelineRowCtx);
   const { threadRef, onImageExpand, timestampFormat } = ctx;
@@ -302,8 +304,10 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
               variant="outline"
               onClick={() => onRetryWorkspacePreparation(retryRunId)}
             >
-              <RotateCcwIcon aria-hidden />
-              Retry
+              <T>
+                <RotateCcwIcon aria-hidden />
+                Retry
+              </T>
             </Button>
           </div>
         ) : null}
@@ -524,19 +528,19 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
               }}
               onKeyDown={stopRowToggle}
             >
-              Open chat
+              <T>Open chat</T>
             </button>
           ) : null}
           {notifiedSubagentThreadId ? (
             <InlineButton
-              aria-label="Open subagent thread"
+              aria-label={gt("Open subagent thread")}
               onClick={(event) => {
                 event.stopPropagation();
                 ctx.onOpenThread(notifiedSubagentThreadId);
               }}
               onKeyDown={stopRowToggle}
             >
-              Open subagent
+              <T>Open subagent</T>
             </InlineButton>
           ) : null}
           {showFailedIndicator &&

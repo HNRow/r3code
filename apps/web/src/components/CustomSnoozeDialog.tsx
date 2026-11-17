@@ -33,6 +33,7 @@ import {
   DialogPanel,
   DialogFooter,
 } from "./ui/dialog";
+import { T, useGT } from "gt-react";
 
 type SnoozeChoice = { readonly snoozedUntil: string };
 type Request = { readonly resolve: (choice: SnoozeChoice | null) => void };
@@ -63,6 +64,7 @@ export function CustomSnoozeDialogHost() {
 }
 
 function CustomSnoozeDialog() {
+  const gt = useGT();
   const id = useId();
   const navigate = useNavigate();
   const [initial] = useState(() => new Date(Date.now() + 3_600_000));
@@ -103,13 +105,17 @@ function CustomSnoozeDialog() {
           }}
         >
           <DialogHeader>
-            <DialogTitle>Custom snooze</DialogTitle>
-            <DialogDescription>Choose when snoozed threads return to your inbox.</DialogDescription>
+            <DialogTitle>
+              <T>Custom snooze</T>
+            </DialogTitle>
+            <DialogDescription>
+              <T>Choose when snoozed threads return to your inbox.</T>
+            </DialogDescription>
           </DialogHeader>
           <DialogPanel>
             <div className="flex flex-col gap-4">
               <ToggleGroup
-                aria-label="Schedule type"
+                aria-label={gt("Schedule type")}
                 className="w-full *:flex-1"
                 value={[mode]}
                 onValueChange={(next) => {
@@ -118,14 +124,20 @@ function CustomSnoozeDialog() {
                   setError(null);
                 }}
               >
-                <Toggle value="date">Date and time</Toggle>
-                <Toggle value="duration">Duration</Toggle>
+                <Toggle value="date">
+                  <T>Date and time</T>
+                </Toggle>
+                <Toggle value="duration">
+                  <T>Duration</T>
+                </Toggle>
               </ToggleGroup>
               <div className="flex flex-col gap-4">
                 {mode === "date" ? (
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div className="flex min-w-0 flex-col gap-2">
-                      <Label htmlFor={`${id}-date`}>Date</Label>
+                      <Label htmlFor={`${id}-date`}>
+                        <T>Date</T>
+                      </Label>
                       <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                         <PopoverTrigger
                           render={
@@ -143,7 +155,7 @@ function CustomSnoozeDialog() {
                           })}
                           <CalendarIcon className="size-4 text-muted-foreground" />
                         </PopoverTrigger>
-                        <PopoverPopup align="start" aria-label="Choose snooze date">
+                        <PopoverPopup align="start" aria-label={gt("Choose snooze date")}>
                           <Calendar
                             mode="single"
                             required
@@ -161,19 +173,21 @@ function CustomSnoozeDialog() {
                       </Popover>
                     </div>
                     <Label className="flex min-w-0 flex-col items-stretch" htmlFor={`${id}-time`}>
-                      Time
-                      <Input
-                        nativeInput
-                        id={`${id}-time`}
-                        className="h-9 sm:h-8"
-                        type="time"
-                        required
-                        value={time}
-                        onChange={(event) => {
-                          setTime(event.target.value);
-                          setError(null);
-                        }}
-                      />
+                      <T>
+                        Time
+                        <Input
+                          nativeInput
+                          id={`${id}-time`}
+                          className="h-9 sm:h-8"
+                          type="time"
+                          required
+                          value={time}
+                          onChange={(event) => {
+                            setTime(event.target.value);
+                            setError(null);
+                          }}
+                        />
+                      </T>
                     </Label>
                   </div>
                 ) : (
@@ -188,33 +202,37 @@ function CustomSnoozeDialog() {
                         setError(null);
                       }}
                     >
-                      <Label htmlFor={`${id}-amount`}>Snooze for</Label>
+                      <Label htmlFor={`${id}-amount`}>
+                        <T>Snooze for</T>
+                      </Label>
                       <NumberFieldGroup>
-                        <NumberFieldDecrement aria-label="Decrease duration" />
+                        <NumberFieldDecrement aria-label={gt("Decrease duration")} />
                         <NumberFieldInput required />
-                        <NumberFieldIncrement aria-label="Increase duration" />
+                        <NumberFieldIncrement aria-label={gt("Increase duration")} />
                       </NumberFieldGroup>
                     </NumberField>
                     <Label className="flex min-w-0 flex-col items-stretch" htmlFor={`${id}-unit`}>
-                      Unit
-                      <Select
-                        value={unit}
-                        items={{ minutes: "Minutes", hours: "Hours", days: "Days" }}
-                        onValueChange={(value) => {
-                          if (value === "minutes" || value === "hours" || value === "days")
-                            setUnit(value);
-                          setError(null);
-                        }}
-                      >
-                        <SelectTrigger id={`${id}-unit`} className="min-w-0">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectPopup>
-                          <SelectItem value="minutes">Minutes</SelectItem>
-                          <SelectItem value="hours">Hours</SelectItem>
-                          <SelectItem value="days">Days</SelectItem>
-                        </SelectPopup>
-                      </Select>
+                      <T>
+                        Unit
+                        <Select
+                          value={unit}
+                          items={{ minutes: "Minutes", hours: "Hours", days: "Days" }}
+                          onValueChange={(value) => {
+                            if (value === "minutes" || value === "hours" || value === "days")
+                              setUnit(value);
+                            setError(null);
+                          }}
+                        >
+                          <SelectTrigger id={`${id}-unit`} className="min-w-0">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectPopup>
+                            <SelectItem value="minutes">Minutes</SelectItem>
+                            <SelectItem value="hours">Hours</SelectItem>
+                            <SelectItem value="days">Days</SelectItem>
+                          </SelectPopup>
+                        </Select>
+                      </T>
                     </Label>
                   </div>
                 )}
@@ -239,13 +257,17 @@ function CustomSnoozeDialog() {
                 });
               }}
             >
-              <Settings2Icon />
-              Edit snooze options
+              <T>
+                <Settings2Icon />
+                Edit snooze options
+              </T>
             </Button>
             <Button type="button" variant="outline" onClick={() => finish(null)}>
-              Cancel
+              <T>Cancel</T>
             </Button>
-            <Button type="submit">Snooze</Button>
+            <Button type="submit">
+              <T>Snooze</T>
+            </Button>
           </DialogFooter>
         </form>
       </DialogPopup>

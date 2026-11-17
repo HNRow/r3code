@@ -35,10 +35,12 @@ import { MESSAGE_HEADING_LEVEL, MessageAuthorHeading } from "./TimelineRowParts"
 import { useAtomValue } from "@effect/atom-react";
 import { AsyncResult, Atom } from "effect/reactivity";
 import { vcsEnvironment } from "../../state/vcs";
+import { T, useGT } from "gt-react";
 
 const NO_VCS_STATUS = Atom.make(AsyncResult.initial());
 
 export function AssistantTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "message" }> }) {
+  const gt = useGT();
   const ctx = use(TimelineRowCtx);
   // The timeline holds a streaming message's row while only its text grows.
   const liveText = useAssistantMessageText(
@@ -52,7 +54,7 @@ export function AssistantTimelineRow({ row }: { row: Extract<TimelineRow, { kind
   return (
     <>
       <div className="relative min-w-0 px-1 py-0.5">
-        <MessageAuthorHeading>T3 Code</MessageAuthorHeading>
+        <MessageAuthorHeading>{gt("R3 Code")}</MessageAuthorHeading>
         <div data-thread-find-text="true">
           <AssistantCitationSource
             messageId={row.message.id}
@@ -114,11 +116,12 @@ export function SentMessageTimelineRow({
 }: {
   row: Extract<TimelineRow, { kind: "sent-message" }>;
 }) {
+  const gt = useGT();
   const ctx = use(TimelineRowCtx);
 
   return (
     <div className="min-w-0 px-1 py-0.5">
-      <MessageAuthorHeading>T3 Code</MessageAuthorHeading>
+      <MessageAuthorHeading>{gt("R3 Code")}</MessageAuthorHeading>
       {/* Sent messages have no message id; citations name their turn item instead. */}
       <AssistantCitationSource
         messageId={MessageId.make(row.id)}
@@ -148,6 +151,7 @@ function AssistantForkButton({
 }: {
   readonly projectedItem: NonNullable<Extract<TimelineRow, { kind: "message" }>["projectedItem"]>;
 }) {
+  const gt = useGT();
   const ctx = use(TimelineRowCtx);
   const [busy, setBusy] = useState(false);
   const support = useV2ItemSupport({
@@ -179,13 +183,15 @@ function AssistantForkButton({
                 () => setBusy(false),
               );
             }}
-            aria-label="Fork from this response"
+            aria-label={gt("Fork from this response")}
           />
         }
       >
         <GitForkIcon className={cn("size-3", busy && "animate-pulse")} />
       </TooltipTrigger>
-      <TooltipPopup side="top">Fork from this response</TooltipPopup>
+      <TooltipPopup side="top">
+        <T>Fork from this response</T>
+      </TooltipPopup>
     </Tooltip>
   );
 }
@@ -265,6 +271,7 @@ function AssistantMessageMeta({
 }
 
 function AssistantReplyButton({ message, itemId }: { message: ChatMessage; itemId: TurnItemId }) {
+  const gt = useGT();
   const ctx = use(TimelineRowCtx);
   const { threadRef, onReplyToResponse } = ctx;
   if (!threadRef || !onReplyToResponse || !message.text.trim()) return null;
@@ -299,13 +306,15 @@ function AssistantReplyButton({ message, itemId }: { message: ChatMessage; itemI
             size="xs"
             variant="ghost-muted"
             onClick={reply}
-            aria-label="Reply to this response"
+            aria-label={gt("Reply to this response")}
           />
         }
       >
         <ReplyIcon className="size-3" />
       </TooltipTrigger>
-      <TooltipPopup side="top">Reply to this response</TooltipPopup>
+      <TooltipPopup side="top">
+        <T>Reply to this response</T>
+      </TooltipPopup>
     </Tooltip>
   );
 }

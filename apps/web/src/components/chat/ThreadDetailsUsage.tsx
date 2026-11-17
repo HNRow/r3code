@@ -23,6 +23,7 @@ import { formatUpcomingTimestamp } from "../../timestampFormat";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { formatContextWindowCompactionMessage } from "./compaction.logic";
 import { ThreadDetailsSection } from "./ThreadDetailsSection";
+import { useGT, Var, T } from "gt-react";
 
 const PACE_LABEL: Record<LimitPace, string> = {
   ahead: "Ahead of pace",
@@ -45,6 +46,7 @@ export function ThreadDetailsUsage({
   providers,
   sources,
 }: Omit<ThreadDetailsUsageInput, "contextWindow">) {
+  const gt = useGT();
   const nowMinute = useNowMinute();
   const now = Date.parse(`${nowMinute}:00Z`);
   const report =
@@ -62,13 +64,13 @@ export function ThreadDetailsUsage({
   return (
     <ThreadDetailsSection
       headingId="thread-details-usage-heading"
-      title="Usage limits"
+      title={gt("Usage limits")}
       showHeading={false}
     >
       <div className="grid grid-cols-[auto_minmax(3rem,1fr)_auto] gap-x-3 text-xs">
         {notice ? (
           <UsageRow
-            label="Limits"
+            label={gt("Limits")}
             fill={null}
             tone={null}
             value="Unavailable"
@@ -84,6 +86,7 @@ export function ThreadDetailsUsage({
 
 /** The thread's context window. The bar fills as context is used; the tick marks auto-compaction. */
 export function ThreadDetailsContext({ usage }: { readonly usage: ContextWindowSnapshot }) {
+  const gt = useGT();
   const maxTokens = usage.maxTokens != null && usage.maxTokens > 0 ? usage.maxTokens : null;
   const used =
     maxTokens !== null && usage.usedPercentage !== null
@@ -98,12 +101,12 @@ export function ThreadDetailsContext({ usage }: { readonly usage: ContextWindowS
   return (
     <ThreadDetailsSection
       headingId="thread-details-context-heading"
-      title="Context window"
+      title={gt("Context window")}
       showHeading={false}
     >
       <div className="grid grid-cols-[auto_minmax(3rem,1fr)_auto] gap-x-3 text-xs">
         <UsageRow
-          label="Context"
+          label={gt("Context")}
           fill={used}
           tone={used === null ? null : used >= 90 ? "error" : used >= 80 ? "warning" : null}
           tick={tick}
@@ -121,8 +124,12 @@ export function ThreadDetailsContext({ usage }: { readonly usage: ContextWindowS
               </span>
               {maxTokens !== null ? (
                 <span className="text-muted-foreground">
-                  {usage.usedTokens.toLocaleString("en-US")} of {maxTokens.toLocaleString("en-US")}{" "}
-                  tokens
+                  <T>
+                    <Var>{usage.usedTokens.toLocaleString("en-US")}</Var> of{" "}
+                    <Var>{maxTokens.toLocaleString("en-US")}</Var>
+                    <Var> </Var>
+                    tokens
+                  </T>
                 </span>
               ) : null}
               {threshold !== null && threshold > 0 ? (
@@ -159,12 +166,16 @@ function LimitRow({
       tooltip={
         <>
           <span className="text-foreground">
-            {window.label}: {left}% left
+            <T>
+              <Var>{window.label}</Var>: <Var>{left}</Var>% left
+            </T>
           </span>
           {window.resetsAt && resetsAt > now ? (
             <span className="text-muted-foreground">
-              Resets in {formatDuration(resetsAt - now)} ·{" "}
-              {formatUpcomingTimestamp(window.resetsAt, timestampFormat, now)}
+              <T>
+                Resets in <Var>{formatDuration(resetsAt - now)}</Var> ·<Var> </Var>
+                <Var>{formatUpcomingTimestamp(window.resetsAt, timestampFormat, now)}</Var>
+              </T>
             </span>
           ) : null}
           {pace ? <span className="text-muted-foreground">{PACE_LABEL[pace]}</span> : null}

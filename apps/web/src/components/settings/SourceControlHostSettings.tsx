@@ -8,6 +8,7 @@ import { serverEnvironment } from "../../state/server";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { Button } from "../ui/button";
 import { ProviderSettingsForm } from "./ProviderSettingsForm";
+import { T } from "gt-react";
 
 export function SourceControlHostSettings({
   environmentId,
@@ -68,7 +69,7 @@ export function SourceControlHostSettings({
               void save(Object.fromEntries(Object.keys(saved ?? {}).map((key) => [key, ""])))
             }
           >
-            Remove
+            <T>Remove</T>
           </Button>
         </div>
       ) : null}

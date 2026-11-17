@@ -104,6 +104,7 @@ import {
   resolveTerminalFontSizePreference,
   TYPOGRAPHY_ADVANCED_STORAGE_KEY,
 } from "../appearanceFonts";
+import { T } from "gt-react";
 
 const MIN_DRAWER_HEIGHT = 180;
 const MAX_DRAWER_HEIGHT_RATIO = 0.75;
@@ -1789,7 +1790,9 @@ export default function ThreadTerminalDrawer({
       >
         {resizeHandle}
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>No terminal sessions for this thread yet.</p>
+          <p>
+            <T>No terminal sessions for this thread yet.</T>
+          </p>
           <Button
             size="xs"
             variant="outline"

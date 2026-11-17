@@ -11,11 +11,13 @@ import {
 import { useWorkspaceTabs } from "./WorkspaceTabsContext";
 import { useSelectWorkspaceTab } from "./useSelectWorkspaceTab";
 import { useCompactWorkspaceTabs, useSidebarWorkspaceTabs } from "./useSystemWorkspaceTabBar";
+import { useGT } from "gt-react-native";
 
 const PULL_REQUEST_ICON = require("../../../../assets/icons/pull-request.png");
 const ISSUE_ICON = require("../../../../assets/icons/issue.png");
 
 export function WorkspaceTabToolbarButtons() {
+  const gt = useGT();
   const order = useNavigationTabOrder();
   const hidden = useHiddenNavigationTabs();
   const workspace = useWorkspaceTabs()!;
@@ -47,7 +49,7 @@ export function WorkspaceTabToolbarButtons() {
       ))}
       <Toolbar.Button
         identifier="workspace-tab-settings"
-        accessibilityLabel="Settings"
+        accessibilityLabel={gt("Settings")}
         icon="gearshape"
         tintColor={selected === "settings" ? selectedTint : undefined}
         onPress={() => selectTab("settings")}
@@ -63,6 +65,7 @@ export function WorkspaceSectionToolbar({
   readonly onNewTask: () => void;
   readonly showCompose?: boolean;
 }) {
+  const gt = useGT();
   const sidebarTabs = useSidebarWorkspaceTabs();
   const compactTabs = useCompactWorkspaceTabs();
   const deviceType = useDeviceType();
@@ -71,7 +74,7 @@ export function WorkspaceSectionToolbar({
       {showCompose && sidebarTabs !== "picker" && deviceType !== "duo-unfolded" && !compactTabs ? (
         <Toolbar placement="right">
           <Toolbar.Button
-            accessibilityLabel="New chat"
+            accessibilityLabel={gt("New chat")}
             icon="square.and.pencil"
             onPress={onNewTask}
           />

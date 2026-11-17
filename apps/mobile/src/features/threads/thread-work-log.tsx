@@ -109,6 +109,7 @@ import { useAssetUrl } from "../../state/assets";
 import { PullRequestGlyph } from "../pull-requests/pullRequestGlyphs";
 import { useOpenLinkedThread } from "./useOpenLinkedThread";
 import { startShimmerSteps } from "./work-shimmer-steps";
+import { useGT, T, Var } from "gt-react-native";
 
 const SHIMMER_WIDTH = 72;
 const SHIMMER_ICON_AND_GAP_WIDTH = 30;
@@ -773,6 +774,7 @@ function WorkspacePreparationRetryButton(props: {
   readonly threadId: ThreadId;
   readonly runId: RunId;
 }) {
+  const gt = useGT();
   const retryable = useAtomValue(
     environmentThreadDetails.threadAtom(scopeThreadRef(props.environmentId, props.threadId)),
     (thread) => {
@@ -786,9 +788,9 @@ function WorkspacePreparationRetryButton(props: {
   return (
     <View className="ml-7 mt-2">
       <Button
-        label="Retry"
+        label={gt("Retry")}
         tone="secondary"
-        accessibilityLabel="Retry workspace preparation"
+        accessibilityLabel={gt("Retry workspace preparation")}
         disabled={busy}
         onPress={() => {
           setBusy(true);
@@ -880,6 +882,7 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
     readonly expanded: boolean;
   },
 ) {
+  const gt = useGT();
   const { row, expanded } = props;
   const openLinkedThread = useOpenLinkedThread();
   const streamsOutput =
@@ -910,7 +913,7 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
     return (
       <WorkLogPressable
         accessibilityLabel={warning ? label : `${row.summary}: ${failureItem.failure.message}`}
-        accessibilityHint="Long press to copy."
+        accessibilityHint={gt("Long press to copy.")}
         onLongPress={() => props.onCopyRow(row.id, row.getCopyText())}
       >
         <View className="flex-1 py-1">
@@ -933,7 +936,7 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
             </Text>
             {props.copied ? (
               <Text className="pr-1 font-t3-medium text-3xs text-adaptive-emerald-600-400">
-                Copied
+                <T>Copied</T>
               </Text>
             ) : null}
             <Text
@@ -1014,7 +1017,9 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
   const exitLine =
     failedExitCode === null ? null : (
       <Text className="mt-1.5 font-mono text-2xs leading-normal text-danger-foreground">
-        exit {failedExitCode}
+        <T>
+          exit <Var>{failedExitCode}</Var>
+        </T>
       </Text>
     );
   const toolPresentation = resolveWorkEntryToolPresentation(row.workEntry);
@@ -1128,7 +1133,7 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
         <View className="shrink-0 flex-row items-center gap-px">
           {props.copied ? (
             <Text className="pr-1 font-t3-medium text-3xs text-adaptive-emerald-600-400">
-              Copied
+              <T>Copied</T>
             </Text>
           ) : null}
           {failed && toolIcon !== undefined ? (

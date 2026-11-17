@@ -28,6 +28,7 @@ import { useAppearanceCodeSurface } from "../settings/appearance/useAppearanceCo
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
 import { changeTone, DiffTokenText, ReviewChangeBar } from "./reviewDiffRendering";
 import { highlightReviewSelectedLines } from "./highlightReviewSelectedLines";
+import { useGT, T } from "gt-react-native";
 
 const REVIEW_COMMENT_PREVIEW_MAX_LINES = 5;
 const NO_LINES: ReturnType<typeof getSelectedReviewCommentLines> = [];
@@ -39,6 +40,7 @@ type ReviewCommentComposerSheetProps = StaticScreenProps<{
 }>;
 
 export function ReviewCommentComposerSheet(props: ReviewCommentComposerSheetProps) {
+  const gt = useGT();
   const navigation = useNavigation();
   const { width } = useWindowDimensions();
   const { themeAppearance: selectedTheme } = useAppearancePreferences();
@@ -128,21 +130,21 @@ export function ReviewCommentComposerSheet(props: ReviewCommentComposerSheetProp
 
   return (
     <View className="flex-1 bg-sheet">
-      <SheetHeader title="Add Comment" onClose={dismissComposer} />
+      <SheetHeader title={gt("Add Comment")} onClose={dismissComposer} />
       <KeyboardSheetBody
         toolbar={
           target ? (
             <>
               <ControlPill
-                accessibilityLabel="Add image"
+                accessibilityLabel={gt("Add image")}
                 icon="plus"
                 onPress={() => void handlePickImages()}
               />
               <View className="flex-1" />
               <ControlPill
-                accessibilityLabel="Comment"
+                accessibilityLabel={gt("Comment")}
                 icon="arrow.up"
-                label="Comment"
+                label={gt("Comment")}
                 variant="primary"
                 disabled={!canSubmit}
                 onPress={handleSubmit}
@@ -153,9 +155,11 @@ export function ReviewCommentComposerSheet(props: ReviewCommentComposerSheetProp
       >
         {!target ? (
           <View className="rounded-[22px] border border-border bg-card px-4 py-5">
-            <Text className="text-base font-t3-bold text-foreground">No selection</Text>
+            <Text className="text-base font-t3-bold text-foreground">
+              <T>No selection</T>
+            </Text>
             <Text className="mt-1 text-sm leading-normal text-foreground-muted">
-              Select a diff line or range first.
+              <T>Select a diff line or range first.</T>
             </Text>
           </View>
         ) : (
@@ -222,7 +226,9 @@ export function ReviewCommentComposerSheet(props: ReviewCommentComposerSheetProp
             </View>
 
             <View className="min-h-0 flex-1 gap-2">
-              <Text className="text-sm font-t3-bold text-foreground">Comment</Text>
+              <Text className="text-sm font-t3-bold text-foreground">
+                <T>Comment</T>
+              </Text>
               <View className="min-h-[132px] flex-1 overflow-hidden rounded-[20px] border border-border bg-card">
                 <View className="min-h-0 flex-1 px-4 pt-3.5">
                   <TextInputWrapper onPaste={handleNativePaste} style={{ flex: 1, minHeight: 0 }}>
@@ -230,7 +236,7 @@ export function ReviewCommentComposerSheet(props: ReviewCommentComposerSheetProp
                       autoFocus
                       multiline
                       scrollEnabled
-                      placeholder="Leave a comment..."
+                      placeholder={gt("Leave a comment...")}
                       textAlignVertical="top"
                       value={commentText}
                       onChangeText={setCommentText}

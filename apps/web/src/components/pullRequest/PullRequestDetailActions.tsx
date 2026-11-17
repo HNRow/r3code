@@ -27,6 +27,7 @@ import { PullRequestGlyph } from "./pullRequestIcons";
 import type { resolvePullRequestState } from "./pullRequestPresentation";
 import type { PickableEnvironment } from "./pullRequestProjectAssignment.logic";
 import { useInlineActionConfirm } from "./useInlineActionConfirm";
+import { Var, T, useGT } from "gt-react";
 
 export type PerformPullRequestAction = (
   action: PullRequestAction,
@@ -117,24 +118,32 @@ export function PullRequestCheckoutMenu({
             />
           }
         />
-        <TooltipPopup>Check out this {term}</TooltipPopup>
+        <TooltipPopup>
+          <T>
+            Check out this <Var>{term}</Var>
+          </T>
+        </TooltipPopup>
       </Tooltip>
       <MenuPopup align="end" side="bottom">
         <MenuItem disabled={!canPrepareWorktree} onClick={() => onCheckout("worktree")}>
           <GitBranchIcon className="mt-1 size-3.5 shrink-0 self-start" />
           <span className="flex min-w-0 flex-col">
-            <span>In a separate worktree</span>
+            <span>
+              <T>In a separate worktree</T>
+            </span>
             <span className="text-xs text-muted-foreground">
-              Its own folder and thread. Nothing you have open moves.
+              <T>Its own folder and thread. Nothing you have open moves.</T>
             </span>
           </span>
         </MenuItem>
         <MenuItem disabled={!canCheckoutHere} onClick={() => onCheckout("local")}>
           <FolderGit2Icon className="mt-1 size-3.5 shrink-0 self-start" />
           <span className="flex min-w-0 flex-col">
-            <span>In this repository</span>
+            <span>
+              <T>In this repository</T>
+            </span>
             <span className="text-xs text-muted-foreground">
-              Switches the branch you are working in.
+              <T>Switches the branch you are working in.</T>
             </span>
           </span>
         </MenuItem>
@@ -215,6 +224,7 @@ export function PullRequestPrimaryAction({
   perform: PerformPullRequestAction;
   resolveConflicts: ReactNode;
 }) {
+  const gt = useGT();
   const inlineConfirm = useInlineActionConfirm(pullRequestKey);
   const actionPending = pendingAction !== null;
   return (
@@ -230,7 +240,10 @@ export function PullRequestPrimaryAction({
             }
           />
           <TooltipPopup side="top">
-            {armedAutoMergeLabel}: the host will merge this on its own once its requirements are met
+            <T>
+              <Var>{armedAutoMergeLabel}</Var>: the host will merge this on its own once its
+              requirements are met
+            </T>
           </TooltipPopup>
         </Tooltip>
       ) : null}
@@ -246,15 +259,19 @@ export function PullRequestPrimaryAction({
                   variant="default"
                   disabled={actionPending}
                   onClick={() => void perform("ready")}
-                  aria-label="Ready for review"
+                  aria-label={gt("Ready for review")}
                 >
                   <PullRequestGlyph.pullRequest aria-hidden className="size-3.5" />
-                  <span className="@max-[30rem]/pr-header:hidden">Ready for review</span>
+                  <span className="@max-[30rem]/pr-header:hidden">
+                    <T>Ready for review</T>
+                  </span>
                 </Button>
               </span>
             }
           />
-          <TooltipPopup side="top">Ready for review</TooltipPopup>
+          <TooltipPopup side="top">
+            <T>Ready for review</T>
+          </TooltipPopup>
         </Tooltip>
       ) : primaryAction === "enable-auto-merge" ? (
         <Tooltip>
@@ -324,7 +341,10 @@ export function PullRequestPrimaryAction({
             }
           />
           <TooltipPopup side="top">
-            {armedAutoMergeLabel}: the host will merge this on its own once its requirements are met
+            <T>
+              <Var>{armedAutoMergeLabel}</Var>: the host will merge this on its own once its
+              requirements are met
+            </T>
           </TooltipPopup>
         </Tooltip>
       ) : primaryAction === "merge" ? (
@@ -426,10 +446,10 @@ export function PullRequestApproveWorkflowsButton({
               <PlayIcon aria-hidden className="size-3.5" />
               <span className="inline-grid">
                 <span aria-hidden className="invisible col-start-1 row-start-1">
-                  Approve workflows to run
+                  <T>Approve workflows to run</T>
                 </span>
                 <span aria-hidden className="invisible col-start-1 row-start-1">
-                  Confirm approve?
+                  <T>Confirm approve?</T>
                 </span>
                 <span className="col-start-1 row-start-1">
                   {pendingAction === "approve-workflows"

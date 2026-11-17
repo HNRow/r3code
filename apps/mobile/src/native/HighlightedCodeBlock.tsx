@@ -9,6 +9,7 @@ import type { HighlightScheme } from "../lib/highlights";
 import { CodeBlockFrame, CodeBlockHeaderButton } from "./CodeBlockFrame";
 import { fencedCodeMarkdown } from "./codeBlockMarkdown";
 import type { NativeMarkdownTextStyle } from "./SelectableMarkdownText.types";
+import { useGT } from "gt-react-native";
 
 // Header names from enriched-markdown's CodeBlockLanguages.cpp that are not the fence capitalized.
 const FENCE_DISPLAY_NAMES: Readonly<Record<string, string>> = {
@@ -45,6 +46,7 @@ export function HighlightedCodeBlock(props: {
   readonly textStyle: NativeMarkdownTextStyle;
   readonly codeStyle: NonNullable<MarkdownStyle["codeBlock"]>;
 }) {
+  const gt = useGT();
   const { code, codeStyle, textStyle } = props;
   const [wrapped, setWrapped] = useState(false);
   const lines = useMarkdownCodeHighlight({
@@ -113,7 +115,7 @@ export function HighlightedCodeBlock(props: {
           />
           <CodeBlockHeaderButton
             icon="doc.on.doc"
-            label="Copy code"
+            label={gt("Copy code")}
             textStyle={textStyle}
             onPress={() => copyTextWithHaptic(code)}
           />

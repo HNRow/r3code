@@ -18,6 +18,7 @@ import {
   ThemePreviewCircle,
 } from "./settings/ThemePreviewCircles";
 import { stackedThreadToast, toastManager } from "./ui/toast";
+import { T } from "gt-react";
 
 export const APPEARANCE_OPTIONS = [
   { mode: "system", label: "System", icon: MonitorIcon },
@@ -87,7 +88,9 @@ export function useCommandPaletteThemeItems() {
           titleTrailingContent: (
             <span className="flex shrink-0 items-center gap-2">
               {(themeHalves?.[resolvedTheme] ?? getThemeDefinition(theme)?.id ?? null) === id ? (
-                <span className="text-xs text-muted-foreground/70">Current</span>
+                <span className="text-xs text-muted-foreground/70">
+                  <T>Current</T>
+                </span>
               ) : null}
               <span className="flex items-center gap-1" aria-hidden>
                 {previews.map((preview) => (
@@ -133,7 +136,9 @@ export function useCommandPaletteThemeItems() {
           icon: <Icon className={ITEM_ICON_CLASS} />,
           titleTrailingContent:
             appearanceMode === mode ? (
-              <span className="text-xs text-muted-foreground/70">Current</span>
+              <span className="text-xs text-muted-foreground/70">
+                <T>Current</T>
+              </span>
             ) : undefined,
           run: async () => {
             if (!setAppearanceMode(mode)) notifyThemeSaveFailure();

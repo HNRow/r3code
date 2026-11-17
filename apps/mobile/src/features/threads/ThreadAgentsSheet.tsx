@@ -31,6 +31,7 @@ import { ScreenContent } from "../../components/ui/ScreenContent";
 import { subagentThreadTarget } from "./threadAgentsPresentation";
 
 import { useOpenThreadInspector } from "./thread-inspector-navigation";
+import { T, useGT } from "gt-react-native";
 
 type AgentsTarget = { readonly environmentId: EnvironmentId; readonly threadId: ThreadId };
 
@@ -47,6 +48,7 @@ export function useThreadTurnSubagents(target: AgentsTarget | null): ThreadTurnS
 }
 
 export function ThreadAgentsSheet({ route }: StaticScreenProps<AgentsTarget>) {
+  const gt = useGT();
   const target = route.params;
   const navigation = useNavigation();
   const openInspector = useOpenThreadInspector();
@@ -95,7 +97,7 @@ export function ThreadAgentsSheet({ route }: StaticScreenProps<AgentsTarget>) {
     >
       {subagents.length === 0 ? (
         <Text className="pt-6 text-center text-sm text-foreground-muted">
-          No agents in this turn.
+          <T>No agents in this turn.</T>
         </Text>
       ) : (
         subagents.map((subagent) => {
@@ -127,7 +129,7 @@ export function ThreadAgentsSheet({ route }: StaticScreenProps<AgentsTarget>) {
 
   return (
     <View collapsable={false} className="flex-1 bg-sheet">
-      <SheetHeader title="Agents" onClose={() => navigation.goBack()} />
+      <SheetHeader title={gt("Agents")} onClose={() => navigation.goBack()} />
       <ScreenContent>{content}</ScreenContent>
     </View>
   );
@@ -139,6 +141,7 @@ function AgentRow(props: {
   readonly tickSeconds: boolean;
   readonly onOpen: (child: { environmentId: EnvironmentId; threadId: ThreadId }) => void;
 }) {
+  const gt = useGT();
   const { subagent } = props;
   const { presentationById } = useEnvironments();
   const target = subagentThreadTarget(subagent, props.environmentId, (id) =>
@@ -172,7 +175,7 @@ function AgentRow(props: {
     ) : (
       <Pressable
         accessibilityRole="link"
-        accessibilityHint="Opens this agent's thread"
+        accessibilityHint={gt("Opens this agent's thread")}
         onPress={() => props.onOpen(target)}
         className="min-w-0 flex-1 active:opacity-70"
       >

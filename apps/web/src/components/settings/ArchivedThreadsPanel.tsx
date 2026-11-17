@@ -22,6 +22,7 @@ import { ProjectFavicon } from "../ProjectFavicon";
 
 import { useRef, useState } from "react";
 import { Tooltip, TooltipTrigger, TooltipPopup } from "../ui/tooltip";
+import { Var, T, msg, useMessages } from "gt-react";
 
 const ARCHIVE_ACTIONS = [
   { action: "unarchive", label: "Unarchive", Icon: ArchiveX },
@@ -30,6 +31,7 @@ const ARCHIVE_ACTIONS = [
 type ArchiveAction = (typeof ARCHIVE_ACTIONS)[number]["action"];
 
 export function ArchivedThreadsPanel() {
+  const m = useMessages();
   const { scope, groups: projectGroups, environments } = useSettingsScope();
   const { unarchiveThread, confirmAndDeleteThread } = useThreadActions();
   const pendingActionsRef = useRef(new Set<string>());
@@ -191,7 +193,7 @@ export function ArchivedThreadsPanel() {
       {archivedGroups.length === 0 ? (
         <SettingsSection
           id={isLoadingArchive ? undefined : searchableSetting("archive").id}
-          title={searchableSetting("archive").title}
+          title={m(searchableSetting("archive").title)}
         >
           <SettingsRow
             title={
@@ -210,7 +212,7 @@ export function ArchivedThreadsPanel() {
             }
             description={
               isLoadingArchive
-                ? "Checking connected environments."
+                ? msg("Checking connected environments.")
                 : (archiveError ?? "Archived threads will appear here.")
             }
           />
@@ -235,10 +237,14 @@ export function ArchivedThreadsPanel() {
                   title={thread.title}
                   description={
                     <span className={hasMultipleEnvironments ? "block truncate" : undefined}>
-                      {hasMultipleEnvironments ? `${thread.environmentLabel} · ` : null}
-                      Archived <RelativeTime timestamp={thread.archivedAt ?? thread.createdAt} />
-                      {" \u00b7 Created "}
-                      <RelativeTime timestamp={thread.createdAt} />
+                      <T>
+                        <Var>
+                          {hasMultipleEnvironments ? `${thread.environmentLabel} · ` : null}
+                        </Var>
+                        Archived <RelativeTime timestamp={thread.archivedAt ?? thread.createdAt} />
+                        <Var>{" \u00b7 Created "}</Var>
+                        <RelativeTime timestamp={thread.createdAt} />
+                      </T>
                     </span>
                   }
                   control={

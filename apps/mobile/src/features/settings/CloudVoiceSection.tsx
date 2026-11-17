@@ -41,6 +41,7 @@ import {
   cloudVoiceModelsAtom,
   runSpeech,
 } from "../voice-input/voiceDestination";
+import { useGT, T } from "gt-react-native";
 
 type CloudDestination = Extract<VoiceTranscriptionDestination, { kind: "cloud" }>;
 type Props = { environment: EnvironmentPresentation; active: CloudDestination | null };
@@ -55,11 +56,12 @@ export function CloudVoiceChoice({
   open,
   onOpenChange,
 }: Props & { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const gt = useGT();
   const usable = useAtomValue(cloudVoiceConnectionAtom(environment.environmentId)) !== null;
   return (
     <>
       <ListChoiceRow
-        label="Cloud provider"
+        label={gt("Cloud provider")}
         description={
           active
             ? `${CLOUD_SPEECH_LABELS[active.provider]}${active.provider === "openrouter" ? ` · ${active.model}` : ""}`
@@ -97,6 +99,7 @@ function ModelPicker({
   disabled: boolean;
   onChange: (model: CloudSpeechModelId) => void;
 }) {
+  const gt = useGT();
   const [query, setQuery] = useState("");
   const [showAll, setShowAll] = useState(false);
   const needle = query.trim().toLowerCase();
@@ -108,7 +111,7 @@ function ModelPicker({
   const delisted = current !== undefined && !models.some((model) => model.id === current);
   return (
     <ListSection
-      title="Model"
+      title={gt("Model")}
       footer={
         delisted
           ? `OpenRouter no longer lists ${current}. Dictation stays off until you choose another model.`
@@ -117,8 +120,8 @@ function ModelPicker({
     >
       <View className="px-4 py-3">
         <TextInput
-          accessibilityLabel="Search OpenRouter models"
-          placeholder="Search transcription models"
+          accessibilityLabel={gt("Search OpenRouter models")}
+          placeholder={gt("Search transcription models")}
           autoCapitalize="none"
           autoCorrect={false}
           editable={!disabled}
@@ -151,7 +154,7 @@ function ModelPicker({
       {matches.length === 0 ? (
         <Separated>
           <Text className="px-4 py-3 text-sm text-foreground-muted">
-            No transcription model matches.
+            <T>No transcription model matches.</T>
           </Text>
         </Separated>
       ) : matches.length > shown.length ? (
@@ -172,6 +175,7 @@ function Separated({ children }: { children: ReactNode }) {
 }
 
 function CloudChoices({ environment, active, onClose }: Props & { onClose: () => void }) {
+  const gt = useGT();
   const id = environment.environmentId;
   const connection = useAtomValue(cloudVoiceConnectionAtom(id));
   const keys = useAtomValue(cloudVoiceKeysAtom(id));
@@ -388,7 +392,7 @@ function CloudChoices({ environment, active, onClose }: Props & { onClose: () =>
               onChange={setModel}
             />
           ) : (
-            <ListSection title="Model">
+            <ListSection title={gt("Model")}>
               <ListActionRow
                 label={
                   AsyncResult.isFailure(models)
@@ -402,12 +406,12 @@ function CloudChoices({ environment, active, onClose }: Props & { onClose: () =>
           )
         ) : null}
         {canManage ? (
-          <ListSection title="API key" footer={keyFooter}>
+          <ListSection title={gt("API key")} footer={keyFooter}>
             <View className="gap-3 px-4 py-3">
               {sources.length > 0 && (
                 <View className="flex-row flex-wrap gap-2">
                   <Chip
-                    label="Value"
+                    label={gt("Value")}
                     size="small"
                     selected={sourceId === null}
                     disabled={saving}
@@ -458,7 +462,7 @@ function CloudChoices({ environment, active, onClose }: Props & { onClose: () =>
           <ListSection>
             {routed && !key && !canManage ? (
               <ListActionRow
-                label="Ask an administrator to add an OpenRouter key"
+                label={gt("Ask an administrator to add an OpenRouter key")}
                 disabled
                 onPress={() => {}}
               />
@@ -482,7 +486,7 @@ function CloudChoices({ environment, active, onClose }: Props & { onClose: () =>
               <Separated>
                 <ListActionRow
                   tone="danger"
-                  label="Remove key from environment"
+                  label={gt("Remove key from environment")}
                   disabled={saving}
                   onPress={() =>
                     Dialog.confirm({
@@ -499,7 +503,7 @@ function CloudChoices({ environment, active, onClose }: Props & { onClose: () =>
           </ListSection>
         ) : null}
         <ListSection>
-          <ListActionRow label="Back to providers" disabled={saving} onPress={reset} />
+          <ListActionRow label={gt("Back to providers")} disabled={saving} onPress={reset} />
         </ListSection>
       </>
     );

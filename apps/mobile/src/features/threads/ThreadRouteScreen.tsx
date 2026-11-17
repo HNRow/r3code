@@ -131,6 +131,7 @@ import { useStartSideChat } from "./useStartSideChat";
 import { useThreadStatusAnnouncements } from "./useThreadStatusAnnouncements";
 import type { ThreadInspectorMode, ThreadInspectorTarget } from "./thread-inspector-navigation";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
+import { useGT } from "gt-react-native";
 
 function firstRouteParam(value: string | string[] | undefined): string | null {
   const first = Array.isArray(value) ? value[0] : value;
@@ -143,13 +144,14 @@ const RECONNECT_ERROR_DELAY_MS = 5_000;
 const InspectorHeaderShownContext = createContext(false);
 
 function ThreadRouteFallbackLayout(props: { readonly children: ReactNode }) {
+  const gt = useGT();
   const goBack = useWorkspaceBackNavigation();
   const inspectorHeaderShown = use(InspectorHeaderShownContext);
   return (
     <ThreadScreenFallback
       header={
         inspectorHeaderShown ? undefined : (
-          <AppBar title="Thread" onBackToList={goBack} hideBottomBorder />
+          <AppBar title={gt("Thread")} onBackToList={goBack} hideBottomBorder />
         )
       }
     >
@@ -159,9 +161,10 @@ function ThreadRouteFallbackLayout(props: { readonly children: ReactNode }) {
 }
 
 function OpeningThreadLoadingScreen() {
+  const gt = useGT();
   return (
     <ThreadRouteFallbackLayout>
-      <LoadingScreen message="Opening thread…" messagePlacement="above-spinner" embedded />
+      <LoadingScreen message={gt("Opening thread…")} messagePlacement="above-spinner" embedded />
     </ThreadRouteFallbackLayout>
   );
 }
@@ -184,6 +187,7 @@ function ThreadUnavailableScreen(props: {
   readonly actionLabel: string;
   readonly onAction: () => void;
 }) {
+  const gt = useGT();
   return (
     <ThreadRouteFallbackLayout>
       <ScrollView
@@ -197,8 +201,8 @@ function ThreadUnavailableScreen(props: {
         className="bg-screen flex-1 android:bg-transparent"
       >
         <EmptyState
-          title="Thread unavailable"
-          detail="This thread is not available in the current mobile snapshot."
+          title={gt("Thread unavailable")}
+          detail={gt("This thread is not available in the current mobile snapshot.")}
           actionLabel={props.actionLabel}
           onAction={props.onAction}
         />

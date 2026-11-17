@@ -22,10 +22,12 @@ import {
   SHOWCASE_AVAILABLE_CLOUD_ENVIRONMENTS,
   SHOWCASE_CONNECTED_CLOUD_ENVIRONMENTS,
 } from "../showcase/showcaseEnvironmentRows";
+import { useGT } from "gt-react-native";
 
 const SHOWCASE_ENABLED = process.env.EXPO_PUBLIC_SHOWCASE === "1";
 
 export function SettingsEnvironmentsRouteScreen() {
+  const gt = useGT();
   const {
     connectedEnvironments,
     onReconnectEnvironment,
@@ -91,7 +93,7 @@ export function SettingsEnvironmentsRouteScreen() {
 
   return (
     <SettingsScreen
-      title="Environments"
+      title={gt("Environments")}
       refresh={
         relaySession
           ? {

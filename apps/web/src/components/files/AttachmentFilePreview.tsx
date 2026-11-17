@@ -45,6 +45,7 @@ import {
   FileSurfaceLoading,
   FileSurfaceNotice,
 } from "./fileSurfaceChrome";
+import { T, Var, useGT } from "gt-react";
 
 const LargeTextViewer = lazy(() => import("./LargeTextViewer"));
 
@@ -108,6 +109,7 @@ export function AttachmentFilePreview(props: {
   onRemove?: () => void;
   onClose?: () => void;
 }) {
+  const gt = useGT();
   const kind = filePreviewKind(props);
   const officeKind = officePreviewKind(props);
   const delimiter = filePreviewDelimiter(props);
@@ -378,10 +380,16 @@ export function AttachmentFilePreview(props: {
     />
   ) : (
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-1 px-6 text-center">
-      <p className="text-sm font-medium">No preview for this file</p>
+      <p className="text-sm font-medium">
+        <T>No preview for this file</T>
+      </p>
       <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">
-        Save it to open in an app that supports {props.name.split(".").at(-1) || "this format"}{" "}
-        files.
+        <T>
+          Save it to open in an app that supports{" "}
+          <Var>{props.name.split(".").at(-1) || "this format"}</Var>
+          <Var> </Var>
+          files.
+        </T>
       </p>
     </div>
   );
@@ -468,21 +476,25 @@ export function AttachmentFilePreview(props: {
           </FileSurfaceAction>
         ) : null}
         {props.onRemove ? (
-          <FileSurfaceAction label="Remove from draft" onPress={props.onRemove}>
+          <FileSurfaceAction label={gt("Remove from draft")} onPress={props.onRemove}>
             <Trash2Icon className="size-3.5" />
           </FileSurfaceAction>
         ) : null}
         {props.onClose ? (
-          <FileSurfaceAction label="Close" onPress={props.onClose}>
+          <FileSurfaceAction label={gt("Close")} onPress={props.onClose}>
             <XIcon className="size-3.5" />
           </FileSurfaceAction>
         ) : null}
       </div>
       {content?.truncated ? (
         <FileSurfaceNotice>
-          Preview limited to the first 1 MB
-          {props.sizeBytes > 0 ? ` of a ${props.sizeBytes.toLocaleString()} byte file` : ""}. Save
-          the file to read it in full.
+          <T>
+            Preview limited to the first 1 MB
+            <Var>
+              {props.sizeBytes > 0 ? ` of a ${props.sizeBytes.toLocaleString()} byte file` : ""}
+            </Var>
+            . Save the file to read it in full.
+          </T>
         </FileSurfaceNotice>
       ) : null}
       {body}

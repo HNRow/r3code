@@ -11,6 +11,7 @@ import { StandalonePage, StandalonePageHeader } from "../ui/standalone-page";
 import { resolveClerkSignInProps } from "../clerk/authRedirect";
 import { retryClerkLoad, useClerkLoadFailed } from "../clerk/clerkLoadFailure";
 import { Button } from "../ui/button";
+import { useGT, T } from "gt-react";
 
 const invalidLinkMessage = {
   context: "Authorization request",
@@ -20,6 +21,7 @@ const invalidLinkMessage = {
 } as const;
 
 export function ConnectCliAuthorizeSurface() {
+  const gt = useGT();
   const [request] = useState(() => readConnectAuthorizeRequest(new URL(window.location.href)));
   const clerk = useClerk();
   const { isLoaded, isSignedIn } = useAuth();
@@ -72,23 +74,23 @@ export function ConnectCliAuthorizeSurface() {
     <StandalonePage>
       <StandalonePageHeader
         context="Browser authorization"
-        title="Connecting your terminal"
+        title={gt("Connecting your terminal")}
         description={
           isSignedIn
-            ? "Redirecting to authorize T3 Connect for your CLI…"
-            : "Sign in to continue authorizing T3 Connect for your CLI."
+            ? "Redirecting to authorize R3 Connect for your CLI…"
+            : "Sign in to continue authorizing R3 Connect for your CLI."
         }
       />
       {loadFailed ? (
         <div className="mt-6">
           <Button type="button" onClick={retryClerkLoad}>
-            Retry sign-in
+            <T>Retry sign-in</T>
           </Button>
         </div>
       ) : isLoaded && !isSignedIn ? (
         <div className="mt-6">
           <Button type="button" onClick={openSignIn}>
-            Sign in
+            <T>Sign in</T>
           </Button>
         </div>
       ) : null}

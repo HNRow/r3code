@@ -30,6 +30,7 @@ import {
 } from "./terminalTheme";
 import { useTerminalSurfaceBuffer } from "./useTerminalSurfaceBuffer";
 import { createTerminalOutputWriter } from "./terminalOutputWriter";
+import { useGT, T } from "gt-react-native";
 
 interface TerminalInputEvent {
   readonly data: string;
@@ -87,6 +88,7 @@ const FallbackTerminalSurface = memo(function FallbackTerminalSurface({
   ref,
   ...props
 }: ReadyTerminalSurfaceProps) {
+  const gt = useGT();
   const fontSize = props.fontSize ?? MOBILE_TYPOGRAPHY.label.fontSize;
   const inputRef = useRef<TextInputInstance>(null);
   const { themeAppearance, themeId } = useAppearancePreferences();
@@ -164,7 +166,7 @@ const FallbackTerminalSurface = memo(function FallbackTerminalSurface({
           autoCorrect={false}
           blurOnSubmit={false}
           editable={props.isRunning && !props.readOnly}
-          placeholder="type and press return"
+          placeholder={gt("type and press return")}
           placeholderTextColor={theme.mutedForeground}
           returnKeyType="send"
           className="text-sm"
@@ -194,7 +196,7 @@ const FallbackTerminalSurface = memo(function FallbackTerminalSurface({
           onPress={() => props.onInput("\u0003")}
         >
           <Text className="text-2xs font-t3-bold" style={{ color: theme.foreground }}>
-            Ctrl-C
+            <T>Ctrl-C</T>
           </Text>
         </Pressable>
       </View>

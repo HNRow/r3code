@@ -34,15 +34,17 @@ import { SettingsSection } from "./components/SettingsSection";
 import { AddClaudeAccount, ClaudeAccount } from "./ClaudeAccounts";
 import { CLAUDE_DRIVER } from "./claude-accounts";
 import { useSettingsEnvironmentFilter, type SettingsTarget } from "./settings-environment-filter";
+import { useGT, T, Var } from "gt-react-native";
 
 export function SettingsProviderAccountsRouteScreen() {
+  const gt = useGT();
   const environmentMenu = useSettingsEnvironmentMenu();
   const { selectedTargets } = useSettingsEnvironmentFilter();
   const permittedEnvironments = useEnvironmentsWithScope(selectedTargets, AuthProvidersManageScope);
   const providersByEnvironment = useAtomValue(environmentPresentations.providersByEnvironmentAtom);
   const insets = useSafeAreaInsets();
   return (
-    <SettingsScreen title="Providers" menus={[environmentMenu]}>
+    <SettingsScreen title={gt("Providers")} menus={[environmentMenu]}>
       <ScreenScrollView
         className="flex-1"
         contentInsetAdjustmentBehavior="automatic"
@@ -50,13 +52,17 @@ export function SettingsProviderAccountsRouteScreen() {
         contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 18) + 18 }}
       >
         {selectedTargets.length === 0 ? (
-          <Text className="text-foreground-muted">Select a connected environment.</Text>
+          <Text className="text-foreground-muted">
+            <T>Select a connected environment.</T>
+          </Text>
         ) : (
           selectedTargets.map((environment) => (
             <SettingsSection key={environment.environmentId} title={environment.label}>
               {!permittedEnvironments.has(environment.environmentId) ? (
                 <View className="gap-1 p-4">
-                  <Text className="text-base text-foreground">Limited permissions</Text>
+                  <Text className="text-base text-foreground">
+                    <T>Limited permissions</T>
+                  </Text>
                   <Text className="text-sm text-foreground-muted">
                     {`This session can view ${environment.label}'s providers but can't change their settings.`}
                   </Text>
@@ -103,7 +109,7 @@ function EnvironmentProviders({
       ))}
       {accounts.length === 0 ? (
         <Text className="p-4 text-foreground-muted">
-          Configure a provider with in-app sign-in in web or desktop Settings.
+          <T>Configure a provider with in-app sign-in in web or desktop Settings.</T>
         </Text>
       ) : null}
       {claudeAccounts.map((provider) => (
@@ -139,6 +145,7 @@ function ProviderAccount({
   readonly provider: ServerProvider;
   readonly divider: boolean;
 }) {
+  const gt = useGT();
   const environmentId = environment.environmentId;
   const instanceId = provider.instanceId;
   const target = { environmentId, input: { instanceId } };
@@ -348,7 +355,7 @@ function ProviderAccount({
   ) : needsExternalSetup && provider.setup?.documentationUrl ? (
     <ControlPill
       variant="pill"
-      label="Docs"
+      label={gt("Docs")}
       onPress={() => {
         void Linking.openURL(provider.setup!.documentationUrl!).catch(() =>
           setError("Could not open the provider docs."),
@@ -358,7 +365,7 @@ function ProviderAccount({
   ) : active && state?.flowId ? (
     <ControlPill
       variant="pill"
-      label="Cancel"
+      label={gt("Cancel")}
       accessibilityLabel={`Cancel ${name} sign-in`}
       disabled={disabled}
       onPress={() => {
@@ -381,11 +388,15 @@ function ProviderAccount({
       accessible
       accessibilityRole="button"
       accessibilityLabel={`Sign in to ${name}`}
-      title="Sign in with"
+      title={gt("Sign in with")}
       actions={[...methodActions, ...removeActions]}
       onPressAction={({ nativeEvent }) => onMenuAction(nativeEvent.event)}
     >
-      <ControlPill variant="primary" label="Sign in" accessibilityLabel={`Sign in to ${name}`} />
+      <ControlPill
+        variant="primary"
+        label={gt("Sign in")}
+        accessibilityLabel={`Sign in to ${name}`}
+      />
     </Menu>
   ) : canSignIn && !signedIn ? (
     <ControlPill
@@ -417,7 +428,9 @@ function ProviderAccount({
         <View className="gap-2 px-4 pb-3">
           {interaction?.type === "deviceCode" ? (
             <Text selectable className="text-foreground">
-              Enter code {interaction.userCode} on the sign-in page.
+              <T>
+                Enter code <Var>{interaction.userCode}</Var> on the sign-in page.
+              </T>
             </Text>
           ) : null}
           {interaction?.type === "terminal" ? (
@@ -430,7 +443,7 @@ function ProviderAccount({
               {field("input", "Terminal response", true)}
               <SettingsActionRow
                 icon="arrow.up"
-                label="Send response"
+                label={gt("Send response")}
                 disabled={disabled}
                 onPress={() => {
                   void send({ type: "terminal", data: `${values.input ?? ""}\r` }).then((sent) => {
@@ -447,7 +460,7 @@ function ProviderAccount({
               ))}
               <SettingsActionRow
                 icon="person.crop.circle"
-                label="Connect"
+                label={gt("Connect")}
                 disabled={disabled}
                 onPress={() => {
                   void send({ type: "credentials", values }).then((sent) => {
@@ -462,7 +475,7 @@ function ProviderAccount({
               {field("callback", "Final localhost URL", false)}
               <SettingsActionRow
                 icon="arrow.right"
-                label="Continue"
+                label={gt("Continue")}
                 disabled={disabled || !values.callback?.trim()}
                 onPress={() => {
                   if (!state?.flowId) return;
@@ -488,7 +501,7 @@ function ProviderAccount({
       {url ? (
         <SettingsActionRow
           icon="globe"
-          label="Open sign-in page"
+          label={gt("Open sign-in page")}
           disabled={disabled}
           onPress={() => {
             void (async () => {

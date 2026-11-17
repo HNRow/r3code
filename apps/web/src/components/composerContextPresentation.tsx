@@ -52,6 +52,7 @@ import {
   PullRequestChip,
   UnresolvedChip,
 } from "./contextChipParts";
+import { useGT, T, t } from "gt-react";
 
 export type ComposerDraftContextRecord =
   | { kind: "terminal"; record: TerminalContextDraft }
@@ -311,6 +312,7 @@ function ComposerPreviewAnnotationDetails({
   annotation: PreviewAnnotationPayload;
   screenshot: ComposerImageAttachment | undefined;
 }) {
+  const gt = useGT();
   const summary = previewAnnotationTooltip(annotation);
   const screenshotUrl = annotation.screenshot?.dataUrl || screenshot?.previewUrl;
   return (
@@ -318,12 +320,12 @@ function ComposerPreviewAnnotationDetails({
       {screenshotUrl ? (
         <img
           src={screenshotUrl}
-          alt="Annotated preview crop"
+          alt={gt("Annotated preview crop")}
           className="max-h-64 w-full border-border/70 border-b bg-muted object-contain"
         />
       ) : (
         <div className="border-border/70 border-b bg-muted/40 px-3 py-2 text-secondary-label text-xs">
-          Screenshot unavailable
+          <T>Screenshot unavailable</T>
         </div>
       )}
       <div className="whitespace-pre-wrap wrap-break-word px-3 py-2.5 text-sm text-foreground">
@@ -349,10 +351,11 @@ function ComposerThreadContextChip(props: { record: ThreadContextRecord }) {
 }
 
 function UnresolvedContextChip(props: { label: string }) {
+  const gt = useGT();
   return (
     <UnresolvedChip
       label={props.label}
-      tooltip="This context is no longer available. Remove it or attach it again."
+      tooltip={gt("This context is no longer available. Remove it or attach it again.")}
     />
   );
 }
@@ -446,7 +449,7 @@ const composerContextPresentationRegistry = createContextPresentationRegistry<
           <ContextChip
             icon={<MousePointerClickIcon />}
             label={previewAnnotationContextLabel(entry.record)}
-            kindLabel="Preview annotation"
+            kindLabel={t("Preview annotation")}
             details={
               <ComposerPreviewAnnotationDetails
                 annotation={entry.record}

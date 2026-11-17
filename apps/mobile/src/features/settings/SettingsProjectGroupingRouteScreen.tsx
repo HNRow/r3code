@@ -14,6 +14,7 @@ import { ListChoiceRow as SettingsChoiceRow } from "../../components/ui/ListChoi
 import { SettingsSection } from "./components/SettingsSection";
 import { LanguageSettingsSection } from "./SettingsLanguageRouteScreen";
 import { NewThreadSettingsSection, WorkingSectionSettings } from "./ThreadSettingsSections";
+import { useGT } from "gt-react-native";
 
 const GROUPING_OPTIONS: ReadonlyArray<{
   readonly mode: SidebarProjectGroupingMode;
@@ -38,6 +39,7 @@ const GROUPING_OPTIONS: ReadonlyArray<{
 ];
 
 export function SettingsProjectGroupingRouteScreen() {
+  const gt = useGT();
   const insets = useSafeAreaInsets();
   const preferencesResult = useAtomValue(mobilePreferencesAtom);
   const savePreferences = useAtomSet(updateMobilePreferencesAtom);
@@ -47,7 +49,7 @@ export function SettingsProjectGroupingRouteScreen() {
     : null;
 
   return (
-    <SettingsScreen title="General">
+    <SettingsScreen title={gt("General")}>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
@@ -56,7 +58,7 @@ export function SettingsProjectGroupingRouteScreen() {
         contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 18) + 18 }}
       >
         <LanguageSettingsSection />
-        <SettingsSection title="Project grouping">
+        <SettingsSection title={gt("Project grouping")}>
           {GROUPING_OPTIONS.map((option, index) => (
             <SettingsChoiceRow
               key={option.mode}

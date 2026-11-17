@@ -27,6 +27,7 @@ import { Input } from "../ui/input";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
 import { toastManager } from "../ui/toast";
 import { SettingsRow } from "./settingsLayout";
+import { useGT, T } from "gt-react";
 
 interface AcpSessionProject {
   readonly id: ProjectId;
@@ -106,6 +107,7 @@ function InstanceSessionManagement(
     readonly onProjectChange: (projectId: ProjectId) => void;
   },
 ) {
+  const gt = useGT();
   const canOperate = useEnvironmentScope(props.environmentId, AuthOrchestrationOperateScope);
   const canRead = useEnvironmentScope(props.environmentId, AuthOrchestrationReadScope);
   const { projectId } = props;
@@ -390,8 +392,8 @@ function InstanceSessionManagement(
   return (
     <div className="grid gap-3">
       <SettingsRow
-        title="Native sessions"
-        description="Resume agent-owned conversations as T3 threads."
+        title={gt("Native sessions")}
+        description={gt("Resume agent-owned conversations as T3 threads.")}
         status={
           canList && props.projects.length === 0
             ? "Add a project before importing sessions."
@@ -420,7 +422,11 @@ function InstanceSessionManagement(
                     props.onProjectChange(value as ProjectId);
                   }}
                 >
-                  <SelectTrigger aria-label="Project for ACP sessions" className="w-40" size="sm">
+                  <SelectTrigger
+                    aria-label={gt("Project for ACP sessions")}
+                    className="w-40"
+                    size="sm"
+                  >
                     <SelectValue>
                       {props.projects.find((project) => project.id === projectId)?.title}
                     </SelectValue>
@@ -524,9 +530,11 @@ function InstanceSessionManagement(
         <div className="grid gap-3 border-t border-border/60 px-3 py-3 sm:px-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-xs font-medium text-foreground">Agent providers</p>
+              <p className="text-xs font-medium text-foreground">
+                <T>Agent providers</T>
+              </p>
               <p className="text-xs text-muted-foreground">
-                Configure non-secret routing. Headers are write-only.
+                <T>Configure non-secret routing. Headers are write-only.</T>
               </p>
             </div>
             <Button
@@ -551,7 +559,11 @@ function InstanceSessionManagement(
                 props.onProjectChange(value as ProjectId);
               }}
             >
-              <SelectTrigger aria-label="Project for ACP providers" className="min-w-48" size="xs">
+              <SelectTrigger
+                aria-label={gt("Project for ACP providers")}
+                className="min-w-48"
+                size="xs"
+              >
                 <SelectValue>
                   {props.projects.find((project) => project.id === projectId)?.title}
                 </SelectValue>
@@ -617,7 +629,7 @@ function InstanceSessionManagement(
                             }
                             onClick={() => void disableConfiguredProvider(provider)}
                           >
-                            Disable
+                            <T>Disable</T>
                           </Button>
                         ) : null}
                       </div>

@@ -51,6 +51,7 @@ import { issueListFiltersAtom } from "./issueListFilters";
 import { issueViewMatches } from "./issueSavedViews";
 import { SavedViewsMenu } from "../layout/workspace/SavedViewsMenu";
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
+import { useGT } from "gt-react-native";
 
 const DEFAULT_ISSUE_LIST_INPUT = { state: "open", involvement: "all", limit: 50 } as const;
 const STATES = {
@@ -104,6 +105,7 @@ export function IssuesScreen(
     readonly renderFrame?: (filters: PullRequestFilterMenu | null, list: ReactNode) => ReactNode;
   } = {},
 ) {
+  const gt = useGT();
   const primaryColumn = use(NativePrimaryColumnContext);
   const workspace = useWorkspaceTabs()!;
   const { environments } = useWorkspaceState();
@@ -362,7 +364,7 @@ export function IssuesScreen(
               <ListFilterMenu
                 label={STATES[state]}
                 active={state !== "open"}
-                accessibilityLabel="Filter by state"
+                accessibilityLabel={gt("Filter by state")}
                 actions={choices(STATES, state)}
                 onSelect={(id) => {
                   setState(id as IssueListState);
@@ -372,7 +374,7 @@ export function IssuesScreen(
               <ListFilterMenu
                 label={INVOLVEMENT[involvement]}
                 active={involvement !== "all"}
-                accessibilityLabel="Filter by involvement"
+                accessibilityLabel={gt("Filter by involvement")}
                 actions={choices(INVOLVEMENT, involvement)}
                 onSelect={(id) => {
                   setInvolvement(id as IssueInvolvement);
@@ -391,7 +393,7 @@ export function IssuesScreen(
                 trailingIcon="chevron.down"
                 glass
                 colorScheme={themeAppearance}
-                accessibilityLabel="Filter by label"
+                accessibilityLabel={gt("Filter by label")}
                 onPress={() =>
                   navigation.navigate("IssueFilterSearch", { kind: "labels", scopes: filterScopes })
                 }
@@ -402,7 +404,7 @@ export function IssuesScreen(
                 trailingIcon="chevron.down"
                 glass
                 colorScheme={themeAppearance}
-                accessibilityLabel="Filter by assignee"
+                accessibilityLabel={gt("Filter by assignee")}
                 onPress={() =>
                   navigation.navigate("IssueFilterSearch", {
                     kind: "assignee",
@@ -413,7 +415,7 @@ export function IssuesScreen(
               <ListFilterMenu
                 label={SORTS[sort]}
                 active={sort !== "updated"}
-                accessibilityLabel="Sort issues"
+                accessibilityLabel={gt("Sort issues")}
                 actions={choices(SORTS, sort)}
                 onSelect={(id) => {
                   setSort(id as IssueListSort);
@@ -433,15 +435,15 @@ export function IssuesScreen(
             <View className="items-center py-5">
               <AppActivityIndicator
                 colorClassName="accent-icon"
-                accessibilityLabel="Loading more issues"
+                accessibilityLabel={gt("Loading more issues")}
               />
             </View>
           ) : moreFailure ? (
             <View className="items-center gap-2 px-8 py-4">
               <Text className="text-xs text-foreground-muted">{moreFailure}</Text>
               <Button
-                label="Try again"
-                accessibilityLabel="Retry loading more issues"
+                label={gt("Try again")}
+                accessibilityLabel={gt("Retry loading more issues")}
                 onPress={() => void loadMore(true)}
               />
             </View>
@@ -449,8 +451,8 @@ export function IssuesScreen(
             // A filtered page can be too short to scroll, which leaves nothing to reach the end of.
             <View className="items-center py-4">
               <Button
-                label="Load more"
-                accessibilityLabel="Load more issues"
+                label={gt("Load more")}
+                accessibilityLabel={gt("Load more issues")}
                 onPress={() => void loadMore()}
               />
             </View>
@@ -484,7 +486,7 @@ export function IssuesScreen(
                     : capable.length > 0
                       ? "Reconnect to load issues."
                       : environments.length > 0
-                        ? "Update the environment's T3 Code server to browse issues."
+                        ? "Update the environment's R3 Code server to browse issues."
                         : "Add an environment in Settings to browse its issues.")
                 }
                 variant="plain"

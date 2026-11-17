@@ -14,6 +14,7 @@ import { PopoverCreateHandle, PopoverTrigger } from "../ui/popover";
 import { useMobileSidebarSheetMounted } from "../ui/sidebar";
 import { Toggle } from "../ui/toggle";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import { useGT, Var, T } from "gt-react";
 
 /** Matches the right inset of `ThreadPanelHeaderControl`. */
 const THREAD_PANEL_HEADER_INSET_PX = 12;
@@ -57,12 +58,13 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
   onToggleThreadPanel,
   onToggleRightPanel,
 }: PanelLayoutControlsProps) {
+  const gt = useGT();
   const threadPanelToggle = (
     <Toggle
       className="relative shrink-0 [-webkit-app-region:no-drag]"
       pressed={threadPanelOpen}
       onPressedChange={threadPanelPresentation === "popover" ? undefined : onToggleThreadPanel}
-      aria-label="Toggle thread details panel"
+      aria-label={gt("Toggle thread details panel")}
       variant="ghost"
       size="sm"
     >
@@ -79,8 +81,10 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
         )}
       </TooltipTrigger>
       <TooltipPopup side="bottom">
-        Toggle thread details
-        {threadPanelShortcutLabel ? ` (${threadPanelShortcutLabel})` : ""}
+        <T>
+          Toggle thread details
+          <Var>{threadPanelShortcutLabel ? ` (${threadPanelShortcutLabel})` : ""}</Var>
+        </T>
       </TooltipPopup>
     </Tooltip>
   );
@@ -98,7 +102,7 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
               className="shrink-0 [-webkit-app-region:no-drag]"
               pressed={terminalOpen}
               onPressedChange={onToggleTerminal}
-              aria-label="Toggle terminal drawer"
+              aria-label={gt("Toggle terminal drawer")}
               variant="ghost"
               size="sm"
               disabled={!terminalAvailable}
@@ -120,7 +124,7 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
               className="shrink-0 [-webkit-app-region:no-drag]"
               pressed={rightPanelOpen}
               onPressedChange={onToggleRightPanel}
-              aria-label="Toggle right panel"
+              aria-label={gt("Toggle right panel")}
               data-right-panel-toggle
               variant="ghost"
               size="sm"

@@ -73,6 +73,7 @@ import {
   pullRequestCompletionScope,
 } from "./PullRequestMarkdownTextarea";
 import { LegendList, type LegendListRef } from "@legendapp/list/react";
+import { useGT, T } from "gt-react";
 
 interface ReactionSurface {
   revealAnchor?: string | null;
@@ -193,6 +194,7 @@ function AddToChatButton({
   comment: PullRequestComment;
   reactions: ReactionSurface;
 }) {
+  const gt = useGT();
   const onAddToChat = reactions.onAddToChat;
   return onAddToChat === undefined ? null : (
     <Tooltip>
@@ -202,25 +204,28 @@ function AddToChatButton({
             size="icon-xs"
             variant="ghost-muted"
             className="-mt-1 shrink-0"
-            aria-label="Add to chat"
+            aria-label={gt("Add to chat")}
             onClick={() => onAddToChat(comment)}
           />
         }
       >
         <MessageSquarePlusIcon className="size-3" />
       </TooltipTrigger>
-      <TooltipPopup>Add to chat</TooltipPopup>
+      <TooltipPopup>
+        <T>Add to chat</T>
+      </TooltipPopup>
     </Tooltip>
   );
 }
 
 function OpenOnHostButton({ url, onOpen }: { url: string | null; onOpen: (url: string) => void }) {
+  const gt = useGT();
   return url === null ? null : (
     <Button
       size="icon-xs"
       variant="ghost-muted"
       className="-mr-1 shrink-0"
-      aria-label="Open activity on host"
+      aria-label={gt("Open activity on host")}
       onClick={() => onOpen(url)}
     >
       <ExternalLinkIcon className="size-3" />
@@ -246,6 +251,7 @@ function ConversationCard({
   /** A reply goes with its conversation, from the card that heads it. */
   reply?: boolean;
 }) {
+  const gt = useGT();
   const canReact = reactions.canReact(event);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -302,7 +308,10 @@ function ConversationCard({
             </PullRequestMetaLine>
           </div>
           {editable !== null && !editing ? (
-            <PullRequestEditButton aria-label="Edit comment" onClick={() => setEditing(true)} />
+            <PullRequestEditButton
+              aria-label={gt("Edit comment")}
+              onClick={() => setEditing(true)}
+            />
           ) : null}
           {event.body && event.comment && !reply ? (
             <AddToChatButton comment={event.comment} reactions={reactions} />
@@ -329,7 +338,7 @@ function ConversationCard({
             environmentId={reactions.environmentId}
             completionScope={reactions.completionScope}
             threadRef={reactions.threadRef}
-            label="Edit comment"
+            label={gt("Edit comment")}
             saving={saving}
             onSave={(body) => void save(body)}
             onCancel={() => setEditing(false)}
@@ -485,7 +494,9 @@ function ReviewThreadEvent({
           onClick={() => setExpanded((current) => !current)}
         >
           {thread.path === null ? (
-            <span className="min-w-0 truncate">Overview</span>
+            <span className="min-w-0 truncate">
+              <T>Overview</T>
+            </span>
           ) : (
             <>
               <FileCode2Icon aria-hidden className="size-3 shrink-0" />
@@ -496,12 +507,22 @@ function ReviewThreadEvent({
           )}
           {thread.isResolved ? (
             <span className="inline-flex shrink-0 items-center gap-1 font-medium text-success-foreground">
-              <CircleCheckIcon aria-hidden className="size-3" />
-              Resolved
+              <T>
+                <CircleCheckIcon aria-hidden className="size-3" />
+                Resolved
+              </T>
             </span>
           ) : null}
-          {dismissed ? <span className="shrink-0 font-medium">Review dismissed</span> : null}
-          {thread.isOutdated ? <span className="shrink-0 font-medium">Outdated</span> : null}
+          {dismissed ? (
+            <span className="shrink-0 font-medium">
+              <T>Review dismissed</T>
+            </span>
+          ) : null}
+          {thread.isOutdated ? (
+            <span className="shrink-0 font-medium">
+              <T>Outdated</T>
+            </span>
+          ) : null}
           {expanded ? null : (
             <span className="shrink-0">
               · {event.actor?.login ?? "ghost"}
@@ -685,7 +706,11 @@ function ReviewVerdictEvent({
                 }
               >
                 {pullRequestReviewOutcomeLabel(outcome)}
-                {stale ? <span className="sr-only">, before the latest commits</span> : null}
+                {stale ? (
+                  <span className="sr-only">
+                    <T>, before the latest commits</T>
+                  </span>
+                ) : null}
               </TooltipTrigger>
               <TooltipPopup>{pullRequestReviewOutcomeStaleLabel(outcome)}</TooltipPopup>
             </Tooltip>
@@ -887,7 +912,9 @@ export function PullRequestTimelineTab({
       <div ref={scrollerRef} className="scrollbar-gutter-both h-full overflow-y-auto px-4 py-5">
         <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
           <PullRequestGlyph.pullRequest className="mb-2 size-5" />
-          <p className="text-xs">No activity yet.</p>
+          <p className="text-xs">
+            <T>No activity yet.</T>
+          </p>
         </div>
       </div>
     );
@@ -911,7 +938,7 @@ export function PullRequestTimelineTab({
       ListHeaderComponent={
         anchor !== null && targetIndex < 0 && revealUrl === undefined ? (
           <p role="status" className="py-4 text-xs text-muted-foreground">
-            The linked item is not in the loaded activity.
+            <T>The linked item is not in the loaded activity.</T>
           </p>
         ) : (
           <div className="h-5" />

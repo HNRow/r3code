@@ -38,6 +38,7 @@ import {
   supportsEnvironmentUpdate,
 } from "./environment-maintenance";
 import { environmentReleaseCheckAtom, releaseCheckValue } from "./environmentUpdateCheck";
+import { T, useGT, Var } from "gt-react-native";
 
 export function SettingsEnvironmentDetailRouteScreen({
   route,
@@ -53,6 +54,7 @@ export function SettingsEnvironmentDetailRouteScreen({
 }
 
 function EnvironmentDetail({ environmentId }: { readonly environmentId: EnvironmentId }) {
+  const gt = useGT();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const connections = useRemoteConnections();
@@ -123,7 +125,7 @@ function EnvironmentDetail({ environmentId }: { readonly environmentId: Environm
       return;
     Dialog.alert(
       `Update ${environment?.environmentLabel ?? "environment"}?`,
-      `Install T3 Code ${targetVersion}. ${capabilities.serverSelfUpdate === "desktop-managed" ? "The desktop app will close and relaunch." : "The server will restart and reconnect."} Running threads may be interrupted.`,
+      `Install R3 Code ${targetVersion}. ${capabilities.serverSelfUpdate === "desktop-managed" ? "The desktop app will close and relaunch." : "The server will restart and reconnect."} Running threads may be interrupted.`,
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -181,11 +183,11 @@ function EnvironmentDetail({ environmentId }: { readonly environmentId: Environm
       >
         {!environment ? (
           <Text className="text-base text-foreground-muted">
-            This environment is no longer saved on this device.
+            <T>This environment is no longer saved on this device.</T>
           </Text>
         ) : (
           <>
-            <SettingsSection title="Connection">
+            <SettingsSection title={gt("Connection")}>
               <ConnectionEnvironmentRow
                 environment={environment}
                 expanded={connectionExpanded}
@@ -210,7 +212,7 @@ function EnvironmentDetail({ environmentId }: { readonly environmentId: Environm
               />
             ) : !connected ? (
               <Text className="px-2 text-sm text-foreground-muted">
-                Connect this environment to manage it.
+                <T>Connect this environment to manage it.</T>
               </Text>
             ) : !allowed ? (
               <Text className="px-2 text-sm text-foreground-muted">
@@ -232,12 +234,18 @@ function EnvironmentDetail({ environmentId }: { readonly environmentId: Environm
             {notice ? <Text className="px-2 text-sm text-foreground-muted">{notice}</Text> : null}
             {config && !outdated ? (
               <>
-                <SettingsSection title="T3 Code">
+                <SettingsSection title={gt("R3 Code")}>
                   <View className="gap-1 p-4">
-                    <Text className="text-base text-foreground">Version {version}</Text>
+                    <Text className="text-base text-foreground">
+                      <T>
+                        Version <Var>{version}</Var>
+                      </T>
+                    </Text>
                     {managedPolicy ? (
                       <Text className="text-sm text-foreground-muted">
-                        Managed by {managedPolicy.organization}
+                        <T>
+                          Managed by <Var>{managedPolicy.organization}</Var>
+                        </T>
                       </Text>
                     ) : null}
                     {updatesDenial ? (
@@ -267,7 +275,7 @@ function EnvironmentDetail({ environmentId }: { readonly environmentId: Environm
                       <Text className="text-sm text-foreground-muted">
                         {capabilities?.serverSelfUpdate === "desktop-managed"
                           ? "Update the desktop app on this machine."
-                          : "Update and restart T3 Code on this machine."}
+                          : "Update and restart R3 Code on this machine."}
                       </Text>
                     ) : null}
                   </View>
@@ -281,7 +289,7 @@ function EnvironmentDetail({ environmentId }: { readonly environmentId: Environm
                   {updatesDenial ? null : (
                     <SettingsActionRow
                       icon="arrow.clockwise"
-                      label="Check for updates"
+                      label={gt("Check for updates")}
                       disabled={disabled}
                       loading={pending === "check"}
                       onPress={() => {
@@ -307,10 +315,10 @@ function EnvironmentDetail({ environmentId }: { readonly environmentId: Environm
                     />
                   ) : null}
                 </SettingsSection>
-                <SettingsSection title="Providers">
+                <SettingsSection title={gt("Providers")}>
                   <SettingsActionRow
                     icon="arrow.clockwise"
-                    label="Refresh providers"
+                    label={gt("Refresh providers")}
                     disabled={busy || !canRead}
                     loading={pending === "refresh"}
                     onPress={() => {
@@ -376,7 +384,7 @@ function EnvironmentDetail({ environmentId }: { readonly environmentId: Environm
                           {provider.versionAdvisory?.status === "behind_latest" &&
                           !provider.versionAdvisory.canUpdate ? (
                             <Text className="text-sm text-foreground-muted">
-                              Update this provider on the environment's machine.
+                              <T>Update this provider on the environment's machine.</T>
                             </Text>
                           ) : null}
                         </View>

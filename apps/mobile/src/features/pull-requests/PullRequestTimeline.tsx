@@ -25,6 +25,7 @@ import { pullRequestDescriptionContent } from "./pullRequestDescriptionContent";
 import { discussionCommentCountLabel } from "./pullRequestDiffComments";
 import { normalizedReviewState } from "./pullRequestStatus";
 import type { PullRequestParams } from "./usePullRequestDiff";
+import { T } from "gt-react-native";
 
 function TimelineEvent(props: {
   icon: AppSymbolName | "commit";
@@ -256,7 +257,9 @@ export function pullRequestTimelineRows(
               <Text className="font-t3-medium">
                 {thread.comments[0]?.author?.login ?? "Unknown author"}
               </Text>
-              <Text className="text-foreground-muted"> started a discussion</Text>
+              <Text className="text-foreground-muted">
+                <T> started a discussion</T>
+              </Text>
             </Text>
             {thread.comments[0] ? (
               <Text className="text-2xs text-foreground-tertiary">
@@ -274,7 +277,9 @@ export function pullRequestTimelineRows(
           >
             <View className="flex-row items-center gap-2">
               {thread.path === null ? (
-                <Text className="flex-1 text-xs">Overview</Text>
+                <Text className="flex-1 text-xs">
+                  <T>Overview</T>
+                </Text>
               ) : (
                 <>
                   <SymbolView name="doc.text" size={14} tintColorClassName="accent-icon-muted" />
@@ -328,7 +333,7 @@ export function pullRequestTimelineRows(
       date: "",
       content: (
         <Text className="py-3 text-xs text-foreground-muted">
-          More activity is available on the provider.
+          <T>More activity is available on the provider.</T>
         </Text>
       ),
     });

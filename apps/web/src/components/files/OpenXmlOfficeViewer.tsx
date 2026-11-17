@@ -7,6 +7,7 @@ import {
   FILE_SURFACE_SUBHEADER_CLASS,
 } from "./fileSurfaceChrome";
 import { OFFICE_PREVIEW_MAX_BYTES, type OfficeWorkerResult } from "./officePreviewProtocol";
+import { T, Var } from "gt-react";
 const WordDocument = lazy(() => import("./office/WordDocument"));
 const Spreadsheet = lazy(() => import("./office/Spreadsheet"));
 const Presentation = lazy(() => import("./office/Presentation"));
@@ -97,9 +98,13 @@ export default function OfficeViewer(props: {
         role="alert"
         className="flex min-h-0 flex-1 flex-col items-center justify-center gap-1 px-6 text-center"
       >
-        <p className="text-sm font-medium">No preview for this file</p>
+        <p className="text-sm font-medium">
+          <T>No preview for this file</T>
+        </p>
         <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">
-          {error} Save it or open it in another app.
+          <T>
+            <Var>{error}</Var> Save it or open it in another app.
+          </T>
         </p>
       </div>
     );
@@ -117,7 +122,7 @@ export default function OfficeViewer(props: {
       ) : null}
       {prepared.truncated ? (
         <FileSurfaceNotice>
-          Preview limited. Save it or open it in another app to read the full document.
+          <T>Preview limited. Save it or open it in another app to read the full document.</T>
         </FileSurfaceNotice>
       ) : null}
       <Suspense fallback={<FileSurfaceLoading />}>

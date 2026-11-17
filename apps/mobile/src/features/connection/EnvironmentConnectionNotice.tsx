@@ -9,6 +9,7 @@ import { SymbolView } from "../../components/ui/AppSymbol";
 import { View } from "react-native";
 
 import { AppText as Text } from "../../components/ui/AppText";
+import { useGT } from "gt-react-native";
 
 function noticeTitle(
   phase: EnvironmentConnectionPhase,
@@ -67,6 +68,7 @@ export function EnvironmentConnectionNotice(props: {
   readonly resourceName: string;
   readonly onRetry: () => void;
 }) {
+  const gt = useGT();
   const isRetrying =
     props.connection.phase === "connecting" || props.connection.phase === "reconnecting";
 
@@ -105,7 +107,7 @@ export function EnvironmentConnectionNotice(props: {
 
         {props.connection.phase !== "offline" && props.connection.phase !== "unsupported" ? (
           <View className="mt-1">
-            <Button label="Retry now" tone="secondary" onPress={props.onRetry} />
+            <Button label={gt("Retry now")} tone="secondary" onPress={props.onRetry} />
           </View>
         ) : null}
       </View>

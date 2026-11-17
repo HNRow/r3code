@@ -35,6 +35,7 @@ import {
   previewStreamMessage,
   type PreviewStreamConfiguration,
 } from "./preview-stream-document";
+import { useGT, Var, T } from "gt-react-native";
 
 export interface PreviewStreamRef {
   readonly command: (input: PreviewStreamInput) => void;
@@ -118,6 +119,7 @@ export function PreviewStreamWebView(
       readonly paused?: boolean;
     },
 ) {
+  const gt = useGT();
   const { access, error, refresh, retryAfter } = usePreviewStreamAccess(props.environmentId);
   if (access && !props.paused) {
     return (
@@ -150,7 +152,7 @@ export function PreviewStreamWebView(
           </AppText>
           {error && (
             <View className="items-center">
-              <Button label="Retry" tone="secondary" onPress={refresh} />
+              <Button label={gt("Retry")} tone="secondary" onPress={refresh} />
             </View>
           )}
         </>
@@ -233,6 +235,7 @@ function PreviewStreamDocumentView({
   readonly onStreaming: () => void;
   readonly onRecoverProcess: () => boolean;
 }) {
+  const gt = useGT();
   const webView = useRef<WebView<object>>(null);
   const active = useRef(false);
   const failed = useRef(false);
@@ -431,10 +434,12 @@ function PreviewStreamDocumentView({
       {!compact && fileChooser && control?.controller === "you" ? (
         <View className="absolute inset-x-3 top-16 gap-3 rounded-xl border border-secondary-border bg-secondary p-4">
           <AppText className="text-sm text-secondary-foreground">
-            The page asks for {fileChooser.multiple ? "files" : "a file"}.
+            <T>
+              The page asks for <Var>{fileChooser.multiple ? "files" : "a file"}</Var>.
+            </T>
           </AppText>
           <View className="flex-row justify-end gap-3">
-            <Button label="Cancel" tone="text" onPress={() => answerFileChooser(false)} />
+            <Button label={gt("Cancel")} tone="text" onPress={() => answerFileChooser(false)} />
             <Button
               label={`Choose ${fileChooser.multiple ? "files" : "file"}`}
               tone="secondary"
@@ -450,7 +455,7 @@ function PreviewStreamDocumentView({
             <>
               {control.dialog.type === "prompt" ? (
                 <TextInput
-                  accessibilityLabel="Dialog response"
+                  accessibilityLabel={gt("Dialog response")}
                   className="rounded-lg border border-input-border bg-input px-3 py-2 text-foreground"
                   placeholderTextColorClassName="accent-placeholder"
                   selectionColorClassName="accent-focus/32"
@@ -460,12 +465,12 @@ function PreviewStreamDocumentView({
               ) : null}
               <View className="flex-row justify-end gap-3">
                 <Button
-                  label="Dismiss"
+                  label={gt("Dismiss")}
                   tone="text"
                   onPress={() => command({ type: "dialog", accept: false })}
                 />
                 <Button
-                  label="Accept"
+                  label={gt("Accept")}
                   tone="secondary"
                   onPress={() =>
                     command({
@@ -478,7 +483,9 @@ function PreviewStreamDocumentView({
               </View>
             </>
           ) : (
-            <AppText className="text-xs text-foreground-muted">Take control to respond.</AppText>
+            <AppText className="text-xs text-foreground-muted">
+              <T>Take control to respond.</T>
+            </AppText>
           )}
         </View>
       ) : null}
@@ -508,7 +515,9 @@ function PreviewStreamDocumentView({
               <AppText selectable className="flex-1 font-mono text-sm text-secondary-foreground">
                 {hostSetup.command}
               </AppText>
-              <AppText className="text-xs text-foreground-muted">Copy</AppText>
+              <AppText className="text-xs text-foreground-muted">
+                <T>Copy</T>
+              </AppText>
             </Pressable>
           ) : null}
           {status === "error" && !gone && !compact ? (

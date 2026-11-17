@@ -18,6 +18,7 @@ import {
   MenuTrigger,
 } from "~/components/ui/menu";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "~/components/ui/tooltip";
+import { useGT, T, Var } from "gt-react";
 
 const COLOR_SCHEME_OPTIONS: ReadonlyArray<{
   value: DesktopPreviewColorScheme;
@@ -54,20 +55,32 @@ interface Props {
   move?: { readonly label: string; readonly onMove: () => void };
 }
 
-const MenuTriggerButton = () => (
-  <Tooltip>
-    <TooltipTrigger
-      render={
-        <MenuTrigger
-          render={<Button variant="ghost" size="icon-xs" type="button" aria-label="Preview menu" />}
-        />
-      }
-    >
-      <MoreVertical />
-    </TooltipTrigger>
-    <TooltipPopup>More</TooltipPopup>
-  </Tooltip>
-);
+const MenuTriggerButton = () => {
+  const gt = useGT();
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <MenuTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                type="button"
+                aria-label={gt("Preview menu")}
+              />
+            }
+          />
+        }
+      >
+        <MoreVertical />
+      </TooltipTrigger>
+      <TooltipPopup>
+        <T>More</T>
+      </TooltipPopup>
+    </Tooltip>
+  );
+};
 
 export function PreviewMoreMenu({
   enabled,
@@ -81,6 +94,7 @@ export function PreviewMoreMenu({
   findShortcutLabel,
   move,
 }: Props) {
+  const gt = useGT();
   const zoomLabel = `${Math.round(zoomFactor * 100)}%`;
   const disabled = !enabled;
   return (
@@ -89,16 +103,20 @@ export function PreviewMoreMenu({
       <MenuPopup align="end" sideOffset={6}>
         {actions.find ? (
           <MenuItem onClick={actions.find} disabled={disabled}>
-            Find on page
-            {findShortcutLabel ? <MenuShortcut>{findShortcutLabel}</MenuShortcut> : null}
+            <T>
+              Find on page
+              <Var>
+                {findShortcutLabel ? <MenuShortcut>{findShortcutLabel}</MenuShortcut> : null}
+              </Var>
+            </T>
           </MenuItem>
         ) : null}
         <MenuItem onClick={actions.hardReload} disabled={disabled}>
-          Hard reload
+          <T>Hard reload</T>
         </MenuItem>
         {actions.openDevTools ? (
           <MenuItem onClick={actions.openDevTools} disabled={disabled}>
-            Open DevTools
+            <T>Open DevTools</T>
           </MenuItem>
         ) : null}
         {actions.toggleNativePictureInPicture ? (
@@ -113,7 +131,9 @@ export function PreviewMoreMenu({
           {deviceToolbarVisible ? "Hide device toolbar" : "Show device toolbar"}
         </MenuItem>
         <MenuSub>
-          <MenuSubTrigger disabled={disabled}>Appearance</MenuSubTrigger>
+          <MenuSubTrigger disabled={disabled}>
+            <T>Appearance</T>
+          </MenuSubTrigger>
           <MenuSubPopup>
             <MenuRadioGroup
               value={colorScheme}
@@ -134,14 +154,16 @@ export function PreviewMoreMenu({
           className="justify-between"
           disabled={disabled}
         >
-          <span>Zoom</span>
+          <span>
+            <T>Zoom</T>
+          </span>
           <span className="flex items-center gap-1">
             <Button
               variant="outline"
               size="icon-xs"
               type="button"
               onClick={actions.zoomOut}
-              aria-label="Zoom out"
+              aria-label={gt("Zoom out")}
               disabled={disabled}
             >
               <Minus />
@@ -154,7 +176,7 @@ export function PreviewMoreMenu({
               size="icon-xs"
               type="button"
               onClick={actions.zoomIn}
-              aria-label="Zoom in"
+              aria-label={gt("Zoom in")}
               disabled={disabled}
             >
               <PlusIcon />
@@ -164,7 +186,7 @@ export function PreviewMoreMenu({
               size="icon-xs"
               type="button"
               onClick={actions.resetZoom}
-              aria-label="Reset zoom"
+              aria-label={gt("Reset zoom")}
               disabled={disabled}
             >
               <RotateCcw />
@@ -175,11 +197,19 @@ export function PreviewMoreMenu({
         <MenuGroup>
           {profileName ? (
             <MenuGroupLabel className="max-w-64">
-              <span className="block truncate">Profile: {profileName}</span>
+              <span className="block truncate">
+                <T>
+                  Profile: <Var>{profileName}</Var>
+                </T>
+              </span>
             </MenuGroupLabel>
           ) : null}
-          <MenuItem onClick={actions.clearCookies}>Clear cookies</MenuItem>
-          <MenuItem onClick={actions.clearCache}>Clear cache</MenuItem>
+          <MenuItem onClick={actions.clearCookies}>
+            <T>Clear cookies</T>
+          </MenuItem>
+          <MenuItem onClick={actions.clearCache}>
+            <T>Clear cache</T>
+          </MenuItem>
         </MenuGroup>
       </MenuPopup>
     </Menu>

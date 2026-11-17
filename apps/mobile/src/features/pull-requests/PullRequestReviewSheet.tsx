@@ -21,6 +21,7 @@ import { pullRequestTarget, type PullRequestParams } from "./usePullRequestDiff"
 import { usePullRequestPermissions } from "./usePullRequestPermissions";
 import { PullRequestCompletionSuggestions } from "./PullRequestCompletionSuggestions";
 import { usePullRequestCompletions } from "./usePullRequestCompletions";
+import { Var, T } from "gt-react-native";
 
 function useActionSubmission(params: PullRequestParams) {
   const navigation = useNavigation();
@@ -203,8 +204,10 @@ export function PullRequestReviewSheet({
       {reviewing && store.draft.comments.length ? (
         <View className="gap-2">
           <Text className="text-sm font-t3-medium">
-            {store.draft.comments.length} pending line{" "}
-            {store.draft.comments.length === 1 ? "comment" : "comments"}
+            <T>
+              <Var>{store.draft.comments.length}</Var> pending line<Var> </Var>
+              <Var>{store.draft.comments.length === 1 ? "comment" : "comments"}</Var>
+            </T>
           </Text>
           {store.draft.comments.map((draft) => (
             <Pressable
@@ -249,14 +252,18 @@ export function PullRequestReviewSheet({
       ) : null}
       {reviewing && stale ? (
         <Text className="text-sm text-danger-foreground">
-          The branch changed since you wrote a comment. Choose its current line before submitting.
+          <T>
+            The branch changed since you wrote a comment. Choose its current line before submitting.
+          </T>
         </Text>
       ) : null}
       {reviewing && !canSubmitComments ? (
         <Text className="text-sm text-danger-foreground">
-          You can no longer submit line comments on this{" "}
-          {sourceControlClients.get(result.data?.provider).changeRequest.singular}. Your drafts are
-          kept here.
+          <T>
+            You can no longer submit line comments on this<Var> </Var>
+            <Var>{sourceControlClients.get(result.data?.provider).changeRequest.singular}</Var>.
+            Your drafts are kept here.
+          </T>
         </Text>
       ) : null}
       {submission.error || result.error || store.error ? (

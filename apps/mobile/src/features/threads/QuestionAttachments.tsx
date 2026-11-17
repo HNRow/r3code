@@ -29,6 +29,7 @@ import {
   questionAttachmentDraftKey,
   questionAttachmentPreparationAtom,
 } from "../../state/question-attachments";
+import { useGT } from "gt-react-native";
 
 export function QuestionAttachments(props: {
   requestId: string;
@@ -39,6 +40,7 @@ export function QuestionAttachments(props: {
   onChangeText: (value: string) => void;
   onInputFocusChange?: ((focused: boolean) => void) | undefined;
 }) {
+  const gt = useGT();
   const { selectedThread } = useThreadSelection();
   const navigation = useNavigation();
   const [previewFile, setPreviewFile] = useState<FilePreviewSource | null>(null);
@@ -224,7 +226,7 @@ export function QuestionAttachments(props: {
             focusedRef.current = false;
             onInputFocusChange?.(false);
           }}
-          placeholder="Or type a custom answer"
+          placeholder={gt("Or type a custom answer")}
           className="min-h-[54px] rounded-2xl border border-input-border bg-input px-3.5 py-3 font-sans text-base text-foreground"
         />
       </TextInputWrapper>

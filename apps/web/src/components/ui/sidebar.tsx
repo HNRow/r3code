@@ -26,6 +26,7 @@ import {
 import { resolveSidebarState, type ResponsiveSidebarState } from "./sidebarState";
 import * as Schema from "effect/Schema";
 import { announceSidebarVisibility } from "~/lib/accessibilityAnnouncements";
+import { T } from "gt-react";
 
 const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "calc(100vw - var(--spacing) * 3)";
@@ -352,7 +353,9 @@ function Sidebar({
           >
             <SheetHeader className="sr-only">
               <SheetTitle>{props["aria-label"] ?? "Sidebar"}</SheetTitle>
-              <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+              <SheetDescription>
+                <T>Displays the mobile sidebar.</T>
+              </SheetDescription>
             </SheetHeader>
             <div
               className={cn(
@@ -444,7 +447,9 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
       {...props}
     >
       {isOpen ? <PanelLeftCloseIcon className="size-4" /> : <PanelLeftIcon className="size-4" />}
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">
+        <T>Toggle Sidebar</T>
+      </span>
     </Button>
   );
 }

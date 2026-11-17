@@ -5,6 +5,7 @@ import { View } from "react-native";
 import { AppText as Text, AppTextInput } from "../../../components/ui/AppText";
 import { ListChoiceRow as SettingsChoiceRow } from "../../../components/ui/ListChoiceRow";
 import { SettingsSection } from "./SettingsSection";
+import { useGT, T } from "gt-react-native";
 
 const MODES = {
   static: { label: "Static prefix", description: "Add your prefix to the generated branch name." },
@@ -26,6 +27,7 @@ export function BranchNamingSettings(props: {
   disabled: Readonly<Record<"mode" | "prefix" | "instructions", boolean>>;
   onChange: (patch: ServerSettingsPatch) => void;
 }) {
+  const gt = useGT();
   // Save on exit too: Android Back hides the keyboard without ending editing.
   type Field = "branchNamePrefix" | "branchNameInstructions";
   const drafts = useRef<Partial<Record<Field, { text: string; over: string | null }>>>({});
@@ -55,9 +57,13 @@ export function BranchNamingSettings(props: {
   useEffect(() => () => saveDrafts(), []);
   return (
     <SettingsSection
-      title="Worktree branch naming"
+      title={gt("Worktree branch naming")}
       trailing={
-        props.mode === null ? <Text className="text-xs text-foreground-muted">Mixed</Text> : null
+        props.mode === null ? (
+          <Text className="text-xs text-foreground-muted">
+            <T>Mixed</T>
+          </Text>
+        ) : null
       }
     >
       {BranchNamingMode.literals.map((mode, index) => (
@@ -74,11 +80,11 @@ export function BranchNamingSettings(props: {
       {props.mode === "static" ? (
         <View className="gap-2 px-4 py-3">
           <Text className="text-sm text-foreground-muted">
-            Use t3 or t3/ for t3/add-search. Leave empty for no prefix.
+            <T>Use t3 or t3/ for t3/add-search. Leave empty for no prefix.</T>
           </Text>
           <AppTextInput
             key={props.prefix}
-            accessibilityLabel="Branch prefix"
+            accessibilityLabel={gt("Branch prefix")}
             onChangeText={(text) => edit("branchNamePrefix", text)}
             defaultValue={props.prefix ?? ""}
             placeholder={props.prefix === null ? "Mixed" : "No prefix"}
@@ -93,11 +99,11 @@ export function BranchNamingSettings(props: {
       {props.mode === "custom" ? (
         <View className="gap-2 px-4 py-3">
           <Text className="text-sm text-foreground-muted">
-            Append instructions to the naming prompt.
+            <T>Append instructions to the naming prompt.</T>
           </Text>
           <AppTextInput
             key={props.instructions}
-            accessibilityLabel="Branch naming instructions"
+            accessibilityLabel={gt("Branch naming instructions")}
             onChangeText={(text) => edit("branchNameInstructions", text)}
             defaultValue={props.instructions ?? ""}
             placeholder={

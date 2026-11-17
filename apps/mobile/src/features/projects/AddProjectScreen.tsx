@@ -107,6 +107,7 @@ import {
   setComposerDraftText,
   waitForComposerDraftsLoaded,
 } from "../../state/use-composer-drafts";
+import { useGT, T } from "gt-react-native";
 
 interface EnvironmentOption {
   readonly environmentId: EnvironmentId;
@@ -283,6 +284,7 @@ function ProjectPathInput(props: {
   readonly onChangeText: (value: string) => void;
   readonly onSubmit: () => void;
 }) {
+  const gt = useGT();
   return (
     <TextInput
       className="h-12 min-h-12 rounded-[24px] px-4 py-0 text-base leading-snug"
@@ -290,7 +292,7 @@ function ProjectPathInput(props: {
       onChangeText={(text) => props.onChangeText(resolvePastedPath(props.value, text))}
       autoCapitalize="none"
       autoCorrect={false}
-      placeholder="~/projects/my-app"
+      placeholder={gt("~/projects/my-app")}
       returnKeyType="done"
       onSubmitEditing={props.onSubmit}
     />
@@ -475,17 +477,20 @@ function useSelectedEnvironment(requestedEnvironmentId: EnvironmentId | null): {
 }
 
 function EmptyEnvironmentState() {
+  const gt = useGT();
   const navigation = useNavigation();
 
   return (
     <View className="items-center gap-3 rounded-2xl bg-grouped-card px-5 py-8">
-      <Text className="text-center text-lg font-t3-bold">Environment unavailable</Text>
+      <Text className="text-center text-lg font-t3-bold">
+        <T>Environment unavailable</T>
+      </Text>
       <Text className="text-center text-sm leading-normal text-foreground-muted">
-        Start or reconnect an environment before adding a project.
+        <T>Start or reconnect an environment before adding a project.</T>
       </Text>
       <View className="mt-1">
         <Button
-          label="Add environment"
+          label={gt("Add environment")}
           tone="primary"
           onPress={() => navigation.dispatch(StackActions.replace("ConnectionsNew"))}
         />
@@ -549,6 +554,7 @@ function SourceControlRow(props: {
 }
 
 export function AddProjectSourceScreen(props: { readonly environmentId?: string | string[] }) {
+  const gt = useGT();
   const navigation = useNavigation();
   const { environmentOptions, selectedEnvironment, setSelectedEnvironmentId } =
     useSelectedEnvironment(stringParam(props.environmentId) as EnvironmentId | null);
@@ -573,12 +579,14 @@ export function AddProjectSourceScreen(props: { readonly environmentId?: string 
   const readiness = buildAddProjectRemoteSourceReadiness(discoveryState.data);
 
   return (
-    <AddProjectShell title="Add project">
+    <AddProjectShell title={gt("Add project")}>
       {selectedEnvironment === null ? <EmptyEnvironmentState /> : null}
 
       {environmentOptions.length > 1 || (selectedEnvironment !== null && !isConnected) ? (
         <>
-          <SectionTitle>Environments</SectionTitle>
+          <SectionTitle>
+            <T>Environments</T>
+          </SectionTitle>
           <ListSection>
             {environmentOptions.map((environment, index) => (
               <ListRow
@@ -625,8 +633,8 @@ export function AddProjectSourceScreen(props: { readonly environmentId?: string 
           <ListSection>
             {selectedEnvironment.newProjectsRoot !== null ? (
               <ListRow
-                title="New project"
-                subtitle="Start a new Git repository from a name"
+                title={gt("New project")}
+                subtitle={gt("Start a new Git repository from a name")}
                 disabled={!isConnected}
                 icon={
                   <SymbolView
@@ -647,7 +655,7 @@ export function AddProjectSourceScreen(props: { readonly environmentId?: string 
               />
             ) : null}
             <ListRow
-              title="Local folder"
+              title={gt("Local folder")}
               subtitle={
                 canCreateProject
                   ? "Browse a folder on disk"
@@ -1022,7 +1030,9 @@ function FolderBrowser(props: {
 
   return (
     <>
-      <SectionTitle>Browse folders</SectionTitle>
+      <SectionTitle>
+        <T>Browse folders</T>
+      </SectionTitle>
       {!canReadFiles && !fileAccess.isPending ? (
         <ErrorBanner message={fileAccess.error ?? "This connection cannot browse host folders."} />
       ) : null}
@@ -1031,7 +1041,7 @@ function FolderBrowser(props: {
           failure: browseState.failure,
         }) ? (
         <Text className="text-sm text-foreground-muted">
-          This folder does not exist yet. Cloning creates it.
+          <T>This folder does not exist yet. Cloning creates it.</T>
         </Text>
       ) : (
         <ErrorBanner message={browseState.error} />
@@ -1092,6 +1102,7 @@ function FolderBrowser(props: {
 }
 
 export function AddProjectNewScreen(props: { readonly environmentId?: string | string[] }) {
+  const gt = useGT();
   const openNewTaskDraft = useOpenNewTaskDraft();
   const navigation = useNavigation();
   const environmentOptions = useEnvironmentOptions().filter(
@@ -1242,7 +1253,7 @@ export function AddProjectNewScreen(props: { readonly environmentId?: string | s
   };
 
   return (
-    <AddProjectShell title="New project">
+    <AddProjectShell title={gt("New project")}>
       {error ? <ErrorBanner message={error} /> : null}
       {environment ? (
         <>
@@ -1252,7 +1263,7 @@ export function AddProjectNewScreen(props: { readonly environmentId?: string | s
             onChangeText={setName}
             autoCorrect={false}
             autoFocus
-            placeholder="Project name"
+            placeholder={gt("Project name")}
             returnKeyType="done"
             onSubmitEditing={() => void submit()}
           />
@@ -1325,15 +1336,15 @@ export function AddProjectNewScreen(props: { readonly environmentId?: string | s
             </ListSection>
           ) : null}
           <PrimaryActionButton
-            label="Create project"
+            label={gt("Create project")}
             disabled={isSubmitting || trimmedName.length === 0}
             onPress={() => void submit()}
             loading={isSubmitting}
           />
           <ListSection>
             <ListRow
-              title="Add existing project"
-              subtitle="Open a folder or clone a repository"
+              title={gt("Add existing project")}
+              subtitle={gt("Open a folder or clone a repository")}
               icon={
                 <SymbolView
                   name="folder.badge.plus"
@@ -1361,6 +1372,7 @@ export function AddProjectNewScreen(props: { readonly environmentId?: string | s
 }
 
 export function AddProjectLocalFolderScreen(props: { readonly environmentId?: string | string[] }) {
+  const gt = useGT();
   const environment = useEnvironmentFromParam(props.environmentId);
   const canCreateProject = useEnvironmentScope(
     environment?.environmentId ?? null,
@@ -1399,16 +1411,16 @@ export function AddProjectLocalFolderScreen(props: { readonly environmentId?: st
   };
 
   return (
-    <AddProjectShell title="Local folder">
+    <AddProjectShell title={gt("Local folder")}>
       {error ? <ErrorBanner message={error} /> : null}
       {environment ? (
         <>
           {!canCreateProject ? (
-            <ErrorBanner message="This connection cannot add projects." />
+            <ErrorBanner message={gt("This connection cannot add projects.")} />
           ) : null}
           <ProjectPathInput value={pathInput} onChangeText={setPathInput} onSubmit={submitPath} />
           <PrimaryActionButton
-            label="Add project"
+            label={gt("Add project")}
             disabled={!canCreateProject || isBrowseNavigating || isSubmitting}
             onPress={submitPath}
             loading={isSubmitting}
@@ -1434,6 +1446,7 @@ export function AddProjectDestinationScreen(props: {
   readonly repositoryName?: string | string[];
   readonly prompt?: string | string[];
 }) {
+  const gt = useGT();
   const openNewTaskDraft = useOpenNewTaskDraft();
   const startProjectClone = useAtomCommand(sourceControlEnvironment.startProjectClone, {
     reportFailure: false,
@@ -1548,7 +1561,7 @@ export function AddProjectDestinationScreen(props: {
   };
 
   return (
-    <AddProjectShell title="Clone destination">
+    <AddProjectShell title={gt("Clone destination")}>
       {error ? <ErrorBanner message={error} /> : null}
       {repositoryTitle ? (
         <View className="rounded-[24px] bg-grouped-card px-4 py-3">
@@ -1562,14 +1575,14 @@ export function AddProjectDestinationScreen(props: {
         <>
           <ProjectPathInput value={pathInput} onChangeText={setPathInput} onSubmit={submitPath} />
           <PrimaryActionButton
-            label="Clone project"
+            label={gt("Clone project")}
             disabled={!canCloneProject || isBrowseNavigating || isSubmitting || !remoteUrl}
             onPress={submitPath}
             loading={isSubmitting}
           />
           {!canCloneProject ? (
             <Text className="text-sm text-foreground-muted">
-              This connection cannot clone projects.
+              <T>This connection cannot clone projects.</T>
             </Text>
           ) : null}
           <FolderBrowser
