@@ -37,7 +37,12 @@ function fakeStandaloneTracker(
     ...fakeTracker({
       getViewer: () => Effect.succeed("usr_julius"),
       getIssue: (input) =>
-        Effect.succeed({ ...issue(input.key), displayKey: input.key, viewer: "usr_julius" }),
+        Effect.succeed({
+          ...issue(input.key),
+          url: `https://linear.app/acme/issue/${input.key}/canonical-title`,
+          displayKey: input.key,
+          viewer: "usr_julius",
+        }),
       ...overrides,
     }),
     kind: LINEAR,
@@ -47,6 +52,18 @@ function fakeStandaloneTracker(
       host: "linear.app",
       scopeNoun: "team",
       credential: { label: "Personal API key", helpUrl: null },
+    },
+    parseIssueUrl: (url) => {
+      const links = new Map([
+        ["https://linear.app/acme/issue/ENG-1/old-title", "acme"],
+        ["https://linear.app/acme/issue/ENG-1/issue-title", "acme"],
+        ["https://linear.app/acme/issue/ENG-1/canonical-title", "acme"],
+        ["https://linear.app/other-workspace/issue/ENG-1/old-title", "other-workspace"],
+      ]);
+      const workspace = links.get(url.href);
+      return workspace === undefined
+        ? null
+        : { host: "linear.app", workspace, scope: "ENG", key: "ENG-1" };
     },
     probeCredential: () => Effect.succeed({ account: "julius", scopes: [] }),
   };
@@ -139,7 +156,7 @@ function makeService(input: {
   readonly projects: ReadonlyArray<OrchestrationProjectShell>;
   readonly trackers: ReadonlyArray<IssueTrackerApi>;
   readonly bindings?: Record<string, IssueTrackerProjectBinding>;
-  readonly readBindings?: IssueTrackerBindings.IssueTrackerBindingsRepository["Service"]["list"];
+  readonly bindingsFailure?: PersistenceSqlError;
 }) {
   return IssueService.IssueService.pipe(
     Effect.provide(
@@ -148,15 +165,16 @@ function makeService(input: {
           Layer.mergeAll(
             Layer.mock(IssueTrackerBindings.IssueTrackerBindingsRepository)({
               list:
-                input.readBindings ??
-                Effect.succeed(
-                  new Map(
-                    Object.entries(input.bindings ?? {}).map(([id, binding]) => [
-                      id as ProjectId,
-                      binding,
-                    ]),
-                  ),
-                ),
+                input.bindingsFailure !== undefined
+                  ? Effect.fail(input.bindingsFailure)
+                  : Effect.succeed(
+                      new Map(
+                        Object.entries(input.bindings ?? {}).map(([id, binding]) => [
+                          id as ProjectId,
+                          binding,
+                        ]),
+                      ),
+                    ),
             }),
             Layer.succeed(
               IssueTrackerRegistry.IssueTrackerRegistry,
@@ -436,33 +454,28 @@ describe("IssueService", () => {
 });
 
 describe("IssueService with a standalone tracker", () => {
-  it.effect("reads bindings once per listing and sees changes on the next listing", () =>
+  it.effect("rejects a URL from another workspace with the same team and issue key", () =>
     Effect.gen(function* () {
-      const web = project({ id: "web", repository: "acme/web" });
-      const docs = project({ id: "docs", repository: "acme/docs" });
-      let reads = 0;
-      let scope = "ENG";
       const service = yield* makeService({
-        projects: [web, docs],
-        trackers: [fakeTracker(), fakeStandaloneTracker()],
-        readBindings: Effect.sync(() => {
-          reads += 1;
-          return new Map([[web.id, { tracker: LINEAR, scope }]]);
-        }),
+        projects: [project({ id: "web" })],
+        trackers: [fakeStandaloneTracker()],
+        bindings: { web: { tracker: LINEAR, scope: "ENG" } },
       });
-
-      const first = yield* service.list({ state: "open" });
-      expect(first.errors).toEqual([]);
-      expect(reads).toBe(1);
-
-      scope = "OPS";
-      const next = yield* service.list({ state: "open" });
-      expect(next.errors).toEqual([]);
-      expect(reads).toBe(2);
-
-      const missing = yield* service.list({ state: "open", projectId: "missing" as ProjectId });
-      expect(missing.entries).toEqual([]);
-      expect(reads).toBe(2);
+      expect(
+        yield* service.resolveUrl("https://linear.app/acme/issue/ENG-1/old-title"),
+      ).toMatchObject({ key: "ENG-1", writable: true });
+      const refused = yield* service
+        .resolveUrl("https://linear.app/other-workspace/issue/ENG-1/old-title")
+        .pipe(Effect.result);
+      expect(refused).toMatchObject({
+        _tag: "Failure",
+        failure: {
+          _tag: "IssueOperationError",
+          operation: "resolveUrl",
+          reason: "not-found",
+          detail: "This issue URL does not belong to the connected workspace.",
+        },
+      });
     }),
   );
 
@@ -519,6 +532,21 @@ describe("IssueService with a standalone tracker", () => {
         }),
       ).toMatchObject({ host: "github.com", writable: true });
 
+      const resolved = yield* bound
+        .resolveUrl("https://linear.app/acme/issue/ENG-1/issue-title", "web" as ProjectId)
+        .pipe(Effect.result);
+      expect(resolved).toMatchObject({
+        _tag: "Success",
+        success: {
+          projectId: "web",
+          tracker: LINEAR,
+          host: "linear.app",
+          scope: "ENG",
+          key: "ENG-1",
+          writable: true,
+        },
+      });
+
       // Unbound, the standalone scope is gone and its references are unsupported.
       listed.length = 0;
       const unbound = yield* makeService({ projects, trackers });
@@ -546,12 +574,10 @@ describe("IssueService with a standalone tracker", () => {
       const unreadable = yield* makeService({
         projects,
         trackers,
-        readBindings: Effect.fail(
-          new PersistenceSqlError({
-            operation: "IssueTrackerBindingsRepository.list",
-            detail: "disk I/O error",
-          }),
-        ),
+        bindingsFailure: new PersistenceSqlError({
+          operation: "IssueTrackerBindingsRepository.list",
+          detail: "disk I/O error",
+        }),
       });
       expect(yield* Effect.flip(unreadable.list({ state: "open" }))).toMatchObject({
         _tag: "IssueOperationError",
