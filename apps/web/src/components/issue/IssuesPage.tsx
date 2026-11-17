@@ -94,13 +94,13 @@ import { primaryServerKeybindingsAtom } from "~/state/server";
 import { useGT, T, Var, t } from "gt-react";
 
 export interface IssuesSearch extends IssueListPreferences {
-  readonly selectedEnvironmentId?: EnvironmentId;
-  readonly selectedProjectId?: ProjectId;
+  readonly selectedEnvironmentId?: EnvironmentId | undefined;
+  readonly selectedProjectId?: ProjectId | undefined;
   /** Part of the panel tab's identity, so a link reopens the tab a row press opened. */
-  readonly selectedHost?: string;
-  readonly tracker?: string;
-  readonly scope?: string;
-  readonly key?: string;
+  readonly selectedHost?: string | undefined;
+  readonly tracker?: string | undefined;
+  readonly scope?: string | undefined;
+  readonly key?: string | undefined;
 }
 
 const STATE_TABS = [
