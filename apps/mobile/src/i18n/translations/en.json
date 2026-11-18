@@ -201,8 +201,6 @@
   "bdf11d0dcd29fc4c": "Could not save the queued message",
   "6ad508d2af838010": "It may have already started. Your edit is still in the composer.",
   "74e7e5c0536cda02": "Side chat not started",
-  "be6231ac5b08f35e": "Side chats take text only",
-  "faf9ee0a28119e10": "Remove the attachments and context, then send it again.",
   "a0269861cbd8c727": "Ask a side question",
   "38df8e01a5344a77": "Type the question after /side, then send it.",
   "2498db230c4b87b6": "Too much context",
