@@ -11,6 +11,7 @@ import {
   resolvePullRequestAnchorRange,
   resolvePullRequestReviewAnchor,
 } from "@t3tools/shared/pullRequestAnchor";
+import { T, useGT, Var } from "gt-react-native";
 import { AppActivityIndicator } from "../../components/ui/AppActivityIndicator";
 import { Chip } from "../../components/ui/Chip";
 import { pullRequestTabOffset } from "./pullRequestTabScroll";
@@ -70,7 +71,7 @@ import { NativeScrollView } from "../../native/NativeScrollViewMarker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppText as Text } from "../../components/ui/AppText";
-import { AppBar } from "../../components/ui/AppBar";
+import { AppBar, type AppBarMenu } from "../../components/ui/AppBar";
 import { useContentTopInset } from "../../components/ui/useBarInset";
 import { useAndroidControlSizing } from "../../components/ui/useAndroidControlSizing";
 import { useAdaptiveWorkspaceLayout } from "../layout/AdaptiveWorkspaceLayout";
@@ -101,7 +102,11 @@ import { useAppearancePreferences } from "../settings/appearance/AppearancePrefe
 import { useAppearanceCodeSurface } from "../settings/appearance/useAppearanceCodeSurface";
 import { useNativeReviewDiffBridge } from "../review/useNativeReviewDiffBridge";
 import { pullRequestTimelineRows } from "./PullRequestTimeline";
-import { PullRequestActionToolbar, PullRequestCardGroup } from "./PullRequestControls";
+import {
+  PullRequestActionToolbar,
+  PullRequestCardGroup,
+  usePullRequestVerticalControls,
+} from "./PullRequestControls";
 import {
   pullRequestTarget as requestTarget,
   usePullRequestDiff,
@@ -130,12 +135,8 @@ import { PullRequestStackCard } from "./PullRequestStackCard";
 import { usePullRequestStack, type PullRequestStackState } from "./usePullRequestStack";
 import { usePullRequestEnvironmentFallback } from "./usePullRequestEnvironmentFallback";
 import { pullRequestFileJumpScope, subscribePullRequestFileJump } from "./pullRequestFileJump";
-import {
-  capitalizeTerm,
-  sourceControlClients,
-} from "@t3tools/client-runtime/source-control-clients";
-import { T, useGT } from "gt-react-native";
-import { t } from "../../i18n/gt";
+import { sourceControlClients } from "@t3tools/client-runtime/source-control-clients";
+import { changeRequestTermKind } from "../../lib/changeRequestTerm";
 
 function usePullRequestActivityRows(params: PullRequestParams, filter: ActivityFilter) {
   const navigation = useNavigation();
@@ -204,6 +205,7 @@ function PullRequestIdentity(props: {
   readonly params: PullRequestParams;
 }) {
   const { pr } = props;
+  const gt = useGT();
   const status = pullRequestStatus({ state: pr.state, isDraft: pr.isDraft === true });
   return (
     <View className="gap-3">
@@ -219,51 +221,53 @@ function PullRequestIdentity(props: {
         <PullRequestDiffStats additions={pr.additions ?? 0} deletions={pr.deletions ?? 0} compact />
         {"changedFiles" in pr && pr.changedFiles !== undefined ? (
           <Text className="text-2xs text-foreground-muted">
-            {pr.changedFiles} {pr.changedFiles === 1 ? "file" : "files"}
+            {gt("{count, plural, one {{count} file} other {{count} files}}", {
+              count: pr.changedFiles,
+            })}
           </Text>
         ) : (
           <View className="h-3 w-12 rounded bg-subtle-strong" />
         )}
       </View>
-      <Text translate={false} selectable className="text-xl font-t3-bold leading-7">
+      <Text selectable className="text-xl font-t3-bold leading-7">
         {pr.title}
       </Text>
       <View className="flex-row items-center gap-2">
         <PullRequestAvatar actor={pr.author ?? null} size={20} />
         <Text className="min-w-0 flex-1 text-xs font-t3-medium" numberOfLines={1}>
-          {pr.author?.login ?? t("Unknown author")}
+          {pr.author?.login ?? gt("Unknown author")}
         </Text>
         <Text className="shrink text-right text-2xs text-foreground-muted" numberOfLines={1}>
           <T>
-            Updated <RelativeTime timestamp={pr.updatedAt} /> ago
+            Updated{" "}
+            <Var>
+              <RelativeTime timestamp={pr.updatedAt} />
+            </Var>{" "}
+            ago
           </T>
         </Text>
       </View>
       <View className="flex-row items-start gap-1.5">
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Copy base branch ${pr.baseBranch}`}
+          accessibilityLabel={gt("Copy base branch {branch}", { branch: pr.baseBranch })}
           onPress={() => void Clipboard.setStringAsync(pr.baseBranch)}
           className="min-w-0 shrink active:opacity-70"
           hitSlop={8}
         >
-          <Text translate={false} className="font-mono text-2xs text-foreground-muted">
-            {pr.baseBranch}
-          </Text>
+          <Text className="font-mono text-2xs text-foreground-muted">{pr.baseBranch}</Text>
         </Pressable>
         <View className="pt-0.5">
           <SymbolView name="arrow.left" size={11} tintColorClassName="accent-icon-muted" />
         </View>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Copy head branch ${pr.headBranch}`}
+          accessibilityLabel={gt("Copy head branch {branch}", { branch: pr.headBranch })}
           onPress={() => void Clipboard.setStringAsync(pr.headBranch)}
           className="min-w-0 shrink active:opacity-70"
           hitSlop={8}
         >
-          <Text translate={false} className="font-mono text-2xs text-foreground-muted">
-            {pr.headBranch}
-          </Text>
+          <Text className="font-mono text-2xs text-foreground-muted">{pr.headBranch}</Text>
         </Pressable>
       </View>
     </View>
@@ -274,8 +278,8 @@ function PullRequestLabels(props: {
   readonly pr: PullRequestDetail;
   readonly params: PullRequestParams;
 }) {
-  const gt = useGT();
   const navigation = useNavigation();
+  const gt = useGT();
   const connected = usePullRequestConnected(props.params.environmentId);
   const canWrite = useAtomValue(
     composerPullRequests.setLabels.permissionAtom(requestTarget(props.params).environmentId),
@@ -308,7 +312,11 @@ function PullRequestLabels(props: {
       })}
       {editable ? (
         <Chip
-          label={props.pr.labels.length ? "Edit" : "Add labels"}
+          label={
+            props.pr.labels.length
+              ? gt("Edit", { $context: "verb, edit labels" })
+              : gt("Add labels")
+          }
           icon="tag"
           size="small"
           accessibilityLabel={gt("Edit labels")}
@@ -372,6 +380,7 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
   const returnToList = useAndroidWorkspaceBack();
   const { layout } = useAdaptiveWorkspaceLayout();
   const navigation = useNavigation();
+  const gt = useGT();
   const insets = useSafeAreaInsets();
   const [toolbarHeight, setToolbarHeight] = usePullRequestToolbarHeight(insets.bottom);
   const contentTopInset = useContentTopInset();
@@ -539,7 +548,10 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
     action.confirm(
       "delete-branch",
       pullRequestActionLabel("delete-branch", terminology),
-      t`Delete ${pr.headBranch} from ${pr.headRepositoryNameWithOwner ?? pr.repository}? Local branches and worktrees are not changed.`,
+      gt("Delete {branch} from {repository}? Local branches and worktrees are not changed.", {
+        branch: pr.headBranch,
+        repository: pr.headRepositoryNameWithOwner ?? pr.repository,
+      }),
     );
   const stack = usePullRequestStack(params, pr);
   const refreshActivity = useAtomRefresh(composerPullRequests.activity(requestTarget(params)));
@@ -577,126 +589,131 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
       if (filesY.current > 0) requestAnimationFrame(jumpToFiles);
     }
   };
+  const verticalControls = usePullRequestVerticalControls();
+  const pullRequestMenu: AppBarMenu = {
+    title: gt(
+      "{term, select, mr {Merge request} cr {Change request} other {Pull request}} actions",
+      { term: changeRequestTermKind(terminology) },
+    ),
+    icon: "ellipsis",
+    items: [
+      ...(permissions.verdicts.length
+        ? [
+            {
+              id: "submit-review",
+              title: gt("Submit review"),
+              icon: "text.bubble",
+              onPress: () =>
+                navigation.navigate("PullRequestReview", { ...params, mode: "review" }),
+            },
+          ]
+        : []),
+      ...(permissions.canComment
+        ? [
+            {
+              id: "add-comment",
+              title: gt("Add comment"),
+              icon: "plus.bubble",
+              onPress: () =>
+                navigation.navigate("PullRequestReview", { ...params, mode: "comment" }),
+            },
+          ]
+        : []),
+      ...(permissions.canEditChangeRequest
+        ? [
+            {
+              id: "edit-title",
+              title: gt("Edit title"),
+              icon: "pencil",
+              onPress: () => navigation.navigate("PullRequestEdit", { ...params, field: "title" }),
+            },
+            {
+              id: "edit-description",
+              title: gt("Edit description"),
+              icon: "doc.text",
+              disabled: description.pending,
+              subtitle: description.pending ? gt("Saving…") : undefined,
+              onPress: () => navigation.navigate("PullRequestEdit", { ...params, field: "body" }),
+            },
+          ]
+        : []),
+      ...(maintainerEdits.visible
+        ? [
+            {
+              id: "maintainer-edits",
+              title: gt("Allow edits from maintainers"),
+              icon: "pencil",
+              selected: maintainerEdits.value,
+              disabled: maintainerEdits.saving,
+              subtitle: maintainerEdits.subtitle,
+              onPress: maintainerEdits.toggle,
+            },
+          ]
+        : []),
+      ...(identity
+        ? [
+            {
+              id: "open-on-provider",
+              title: openOnProviderLabel(identity.provider),
+              icon: "arrow.up.right",
+              onPress: () => void Linking.openURL(identity.url),
+            },
+            {
+              id: "copy-link",
+              title: gt("Copy link"),
+              icon: "link",
+              onPress: () => copyPullRequestLink(identity),
+            },
+            {
+              id: "share",
+              title: gt("Share…"),
+              icon: "square.and.arrow.up",
+              onPress: () => sharePullRequestLink(identity),
+            },
+          ]
+        : []),
+      ...(stateAction
+        ? [
+            {
+              id: "state",
+              title: pullRequestActionLabel(stateAction, terminology),
+              icon: PR_ACTION_ICONS[stateAction],
+              destructive: stateAction === "close",
+              onPress: runStateAction,
+            },
+          ]
+        : []),
+      ...(showsDeleteBranch
+        ? [
+            {
+              id: "delete-branch",
+              title: pullRequestActionLabel("delete-branch", terminology),
+              icon: PR_ACTION_ICONS["delete-branch"],
+              destructive: true,
+              disabled: !action.available("delete-branch"),
+              subtitle: action.busy
+                ? gt("Deleting…")
+                : connected
+                  ? pr.headBranch
+                  : gt("Reconnect to delete this branch."),
+              onPress: confirmDeleteBranch,
+            },
+          ]
+        : []),
+    ],
+  };
   return (
     <PullRequestMarkdownRepository params={params} changeRequest={pr}>
       <View className="flex-1 android:bg-header ios:bg-screen">
         <AppBar
           title={`#${params.number}`}
-          subtitle={connected ? params.repository : `${params.repository} · Offline`}
+          subtitle={
+            connected
+              ? params.repository
+              : gt("{repository} · Offline", { repository: params.repository })
+          }
           onBack={layout.usesSplitView ? undefined : returnToList}
-          menus={[
-            {
-              title: `${capitalizeTerm(terminology.singular)} actions`,
-              icon: "ellipsis",
-              items: [
-                ...(permissions.verdicts.length
-                  ? [
-                      {
-                        id: "submit-review",
-                        title: t("Submit review"),
-                        icon: "text.bubble",
-                        onPress: () =>
-                          navigation.navigate("PullRequestReview", { ...params, mode: "review" }),
-                      },
-                    ]
-                  : []),
-                ...(permissions.canComment
-                  ? [
-                      {
-                        id: "add-comment",
-                        title: t("Add comment"),
-                        icon: "plus.bubble",
-                        onPress: () =>
-                          navigation.navigate("PullRequestReview", { ...params, mode: "comment" }),
-                      },
-                    ]
-                  : []),
-                ...(permissions.canEditChangeRequest
-                  ? [
-                      {
-                        id: "edit-title",
-                        title: t("Edit title"),
-                        icon: "pencil",
-                        onPress: () =>
-                          navigation.navigate("PullRequestEdit", { ...params, field: "title" }),
-                      },
-                      {
-                        id: "edit-description",
-                        title: t("Edit description"),
-                        icon: "doc.text",
-                        disabled: description.pending,
-                        subtitle: description.pending ? "Saving…" : undefined,
-                        onPress: () =>
-                          navigation.navigate("PullRequestEdit", { ...params, field: "body" }),
-                      },
-                    ]
-                  : []),
-                ...(maintainerEdits.visible
-                  ? [
-                      {
-                        id: "maintainer-edits",
-                        title: t("Allow edits from maintainers"),
-                        icon: "pencil",
-                        selected: maintainerEdits.value,
-                        disabled: maintainerEdits.saving,
-                        subtitle: maintainerEdits.subtitle,
-                        onPress: maintainerEdits.toggle,
-                      },
-                    ]
-                  : []),
-                ...(identity
-                  ? [
-                      {
-                        id: "open-on-provider",
-                        title: openOnProviderLabel(identity.provider),
-                        icon: "arrow.up.right",
-                        onPress: () => void Linking.openURL(identity.url),
-                      },
-                      {
-                        id: "copy-link",
-                        title: t("Copy link"),
-                        icon: "link",
-                        onPress: () => copyPullRequestLink(identity),
-                      },
-                      {
-                        id: "share",
-                        title: t("Share…"),
-                        icon: "square.and.arrow.up",
-                        onPress: () => sharePullRequestLink(identity),
-                      },
-                    ]
-                  : []),
-                ...(stateAction
-                  ? [
-                      {
-                        id: "state",
-                        title: pullRequestActionLabel(stateAction, terminology),
-                        icon: PR_ACTION_ICONS[stateAction],
-                        destructive: stateAction === "close",
-                        onPress: runStateAction,
-                      },
-                    ]
-                  : []),
-                ...(showsDeleteBranch
-                  ? [
-                      {
-                        id: "delete-branch",
-                        title: pullRequestActionLabel("delete-branch", terminology),
-                        icon: PR_ACTION_ICONS["delete-branch"],
-                        destructive: true,
-                        disabled: !action.available("delete-branch"),
-                        subtitle: action.busy
-                          ? "Deleting…"
-                          : connected
-                            ? pr.headBranch
-                            : "Reconnect to delete this branch.",
-                        onPress: confirmDeleteBranch,
-                      },
-                    ]
-                  : []),
-              ],
-            },
-          ]}
+          menus={verticalControls ? undefined : [pullRequestMenu]}
         />
         <ScreenContent onLayout={(event) => setViewportHeight(event.nativeEvent.layout.height)}>
           {(["overview", "guide", "activity"] as const)
@@ -911,11 +928,16 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
                           {Platform.OS !== "ios" || section === tab ? (
                             <SegmentedControl
                               options={[
-                                { value: "overview", label: t("Overview") },
+                                { value: "overview", label: gt("Overview") },
                                 ...(guidesEnabled
-                                  ? [{ value: "guide" as const, label: t("Guide") }]
+                                  ? [
+                                      {
+                                        value: "guide" as const,
+                                        label: gt("Guide", { $context: "review guide tab" }),
+                                      },
+                                    ]
                                   : []),
-                                { value: "activity", label: t("Activity") },
+                                { value: "activity", label: gt("Activity") },
                               ]}
                               selected={section}
                               onSelect={selectSection}
@@ -937,6 +959,7 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
         <PullRequestActionToolbar
           pr={pr}
           params={params}
+          menu={pullRequestMenu}
           onOpenFiles={openFiles}
           onHeightChange={setToolbarHeight}
         />
@@ -954,12 +977,12 @@ type PullRequestFileRouteProps = StaticScreenProps<
 >;
 
 export function PullRequestFileRouteScreen(props: PullRequestFileRouteProps) {
-  const gt = useGT();
   const navigation =
     useNavigation<NativeStackNavigationProp<ReactNavigation.RootParamList, "PullRequestFile">>();
   const ready = usePullRequestDiffEntry(navigation);
+  const gt = useGT();
   if (ready) return <PullRequestFileRouteContent {...props} />;
-  const title = props.route.params.commit ? "Commit changes" : "Changes";
+  const title = props.route.params.commit ? gt("Commit changes") : gt("Changes");
   return (
     <View className="flex-1 bg-screen">
       <AppBar title={title} onBack={() => navigation.goBack()} />
@@ -971,8 +994,8 @@ export function PullRequestFileRouteScreen(props: PullRequestFileRouteProps) {
 }
 
 function PullRequestFileRouteContent({ route }: PullRequestFileRouteProps) {
-  const gt = useGT();
   const navigation = useNavigation();
+  const gt = useGT();
   const insets = useSafeAreaInsets();
   const contentTopInset = useContentTopInset();
   const [toolbarHeight, setToolbarHeight] = usePullRequestToolbarHeight(insets.bottom);
@@ -1205,87 +1228,96 @@ function PullRequestFileRouteContent({ route }: PullRequestFileRouteProps) {
     setSelectedRowId(null);
     filter.toggle();
   };
-  const title = commit ? "Commit changes" : "Changes";
+  const title = commit ? gt("Commit changes") : gt("Changes");
   const seekingFile = !targetFile && result.nextCursor !== null;
   const loadingDiff = (result.isPending && !data.rows.length) || (seekingFile && !result.error);
+  const verticalControls = usePullRequestVerticalControls();
+  const diffMenu: AppBarMenu = {
+    title: gt("Diff options"),
+    icon: "ellipsis",
+    items: [
+      ...(permissions.verdicts.length
+        ? [
+            {
+              id: "submit-review",
+              title: gt("Submit review"),
+              icon: "text.bubble",
+              onPress: () =>
+                navigation.navigate("PullRequestReview", {
+                  ...route.params,
+                  mode: "review",
+                }),
+            },
+          ]
+        : []),
+      ...(permissions.canComment
+        ? [
+            {
+              id: "comment-on-pr",
+              title: gt("Add comment"),
+              icon: "plus.bubble",
+              onPress: () =>
+                navigation.navigate("PullRequestReview", {
+                  ...route.params,
+                  mode: "comment",
+                }),
+            },
+          ]
+        : []),
+      {
+        id: "word-wrap",
+        title: gt("Word wrap"),
+        icon: "text.alignleft",
+        selected: appearance.codeWordBreak,
+        onPress: () => setCodeWordBreak(!appearance.codeWordBreak),
+      },
+      {
+        id: "hide-tests",
+        title: gt("Hide test files"),
+        icon: "line.3.horizontal.decrease",
+        selected: filter.hideTestFiles,
+        onPress: toggleTestFiles,
+      },
+      ...(selectedRow && selectedFile && canCommentOnDiff
+        ? [
+            {
+              id: "comment",
+              title: route.params.replacingDraftId
+                ? gt("Move draft to this line")
+                : gt("Add review comment"),
+              icon: "bubble.left",
+              onPress: () => commentOnLine(),
+            },
+          ]
+        : []),
+      ...(selectedRow && selectedFile
+        ? [
+            {
+              id: "copy",
+              title: gt("Copy line"),
+              icon: "document.on.document",
+              onPress: () => void Clipboard.setStringAsync(selectedRow.content ?? ""),
+            },
+          ]
+        : []),
+    ],
+  };
   return (
     <View className="flex-1 android:bg-header ios:bg-screen">
       <AppBar
         title={title}
-        subtitle={`${commit ? commit.slice(0, 7) : `#${route.params.number}`} · ${data.files.length} ${data.files.length === 1 ? "file" : "files"}${filter.hideTestFiles && filter.hiddenCount ? ` · ${filter.hiddenCount} ${filter.hiddenCount === 1 ? "test" : "tests"} hidden` : ""}`}
+        subtitle={`${commit ? commit.slice(0, 7) : `#${route.params.number}`} · ${gt(
+          "{count, plural, one {{count} file} other {{count} files}}",
+          { count: data.files.length },
+        )}${
+          filter.hideTestFiles && filter.hiddenCount
+            ? ` · ${gt("{count, plural, one {{count} test hidden} other {{count} tests hidden}}", {
+                count: filter.hiddenCount,
+              })}`
+            : ""
+        }`}
         onBack={() => navigation.goBack()}
-        menus={[
-          {
-            title: t("Diff options"),
-            icon: "ellipsis",
-            items: [
-              ...(permissions.verdicts.length
-                ? [
-                    {
-                      id: "submit-review",
-                      title: t("Submit review"),
-                      icon: "text.bubble",
-                      onPress: () =>
-                        navigation.navigate("PullRequestReview", {
-                          ...route.params,
-                          mode: "review",
-                        }),
-                    },
-                  ]
-                : []),
-              ...(permissions.canComment
-                ? [
-                    {
-                      id: "comment-on-pr",
-                      title: t("Add comment"),
-                      icon: "plus.bubble",
-                      onPress: () =>
-                        navigation.navigate("PullRequestReview", {
-                          ...route.params,
-                          mode: "comment",
-                        }),
-                    },
-                  ]
-                : []),
-              {
-                id: "word-wrap",
-                title: t("Word wrap"),
-                icon: "text.alignleft",
-                selected: appearance.codeWordBreak,
-                onPress: () => setCodeWordBreak(!appearance.codeWordBreak),
-              },
-              {
-                id: "hide-tests",
-                title: t("Hide test files"),
-                icon: "line.3.horizontal.decrease",
-                selected: filter.hideTestFiles,
-                onPress: toggleTestFiles,
-              },
-              ...(selectedRow && selectedFile && canCommentOnDiff
-                ? [
-                    {
-                      id: "comment",
-                      title: route.params.replacingDraftId
-                        ? "Move draft to this line"
-                        : "Add review comment",
-                      icon: "bubble.left",
-                      onPress: () => commentOnLine(),
-                    },
-                  ]
-                : []),
-              ...(selectedRow && selectedFile
-                ? [
-                    {
-                      id: "copy",
-                      title: t("Copy line"),
-                      icon: "document.on.document",
-                      onPress: () => void Clipboard.setStringAsync(selectedRow.content ?? ""),
-                    },
-                  ]
-                : []),
-            ],
-          },
-        ]}
+        menus={verticalControls ? undefined : [diffMenu]}
       />
       {route.params.replacingDraftId ? (
         <Text className="px-4 py-2 text-xs text-foreground-muted">
@@ -1412,7 +1444,12 @@ function PullRequestFileRouteContent({ route }: PullRequestFileRouteProps) {
           ) : !result.isPending && !result.error && !seekingFile ? (
             <EmptyState
               title={gt("Diff unavailable")}
-              detail={`Open this ${terminology.singular} on its provider to view the changes.`}
+              detail={gt(
+                "Open this {term, select, mr {merge request} cr {change request} other {pull request}} on its provider to view the changes.",
+                {
+                  term: changeRequestTermKind(terminology),
+                },
+              )}
               variant="plain"
             />
           ) : null}
@@ -1442,6 +1479,7 @@ function PullRequestFileRouteContent({ route }: PullRequestFileRouteProps) {
         pr={detail.data}
         params={route.params}
         filePath={visibleFile?.path}
+        menu={diffMenu}
         onOpenFiles={() => navigation.navigate("PullRequestFiles", route.params)}
         onHeightChange={setToolbarHeight}
       />
