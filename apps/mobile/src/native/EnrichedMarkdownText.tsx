@@ -41,7 +41,7 @@ import {
   enrichedModelReference,
   enrichedLinkVariantPattern,
 } from "../lib/enrichedLinkPresentation";
-import { t } from "../i18n/gt";
+import { gt, t } from "../i18n/gt";
 
 function enrichedStyle(
   style: SelectableMarkdownTextProps["textStyle"],
@@ -428,6 +428,17 @@ export function MobileEnrichedMarkdownText(props: SelectableMarkdownTextProps) {
           containerStyle={{ flexShrink: 1, minWidth: 0 }}
           flavor="github"
           selectable
+          contextMenuItems={
+            props.onCiteText
+              ? [
+                  {
+                    text: gt("Cite", { $context: "verb, quote selected text" }),
+                    icon: "quote.bubble",
+                    onPress: ({ text }) => props.onCiteText?.(text),
+                  },
+                ]
+              : undefined
+          }
           selectionClipboard={selectionClipboard}
           selectionColor={props.textStyle.selectionColor}
           selectionHandleColor={props.textStyle.selectionHandleColor}
