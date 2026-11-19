@@ -1,13 +1,13 @@
 # Remote access
 
-Connect a phone, browser, or another desktop app to R3 Code running on a different
+Connect a phone, browser, or another desktop app to T3 Code running on a different
 machine. That machine must stay running and reachable while you work.
 
-## R3 Connect
+## T3 Connect
 
-R3 Connect makes an environment available to your other devices without setting
+T3 Connect makes an environment available to your other devices without setting
 up router forwarding. In the desktop app on the host, open **Settings →
-Sharing & access**, sign in, and enable **R3 Connect** for that environment.
+Sharing & access**, sign in, and enable **T3 Connect** for that environment.
 
 For a command-line host, run:
 
@@ -15,9 +15,9 @@ For a command-line host, run:
 t3 up
 ```
 
-It asks how your other devices reach the machine: R3 Connect, the local network,
-or both. Choose R3 Connect and follow the sign-in instructions. It then runs
-R3 Code as a [background service](./background-service.md).
+It asks how your other devices reach the machine: T3 Connect, the local network,
+or both. Choose T3 Connect and follow the sign-in instructions. It then runs
+T3 Code as a [background service](./background-service.md).
 `t3 connect` is the same as `t3 up --connect`. Run `t3 up` again to change your
 choice, and `t3 status` to see it.
 
@@ -26,24 +26,24 @@ its local environment enabled. Closing the desktop app's last window stops its
 local server. Saving your sign-in alone does not start a server or make the
 machine reachable.
 
-On your other device, sign in to the same R3 Connect account and choose the
+On your other device, sign in to the same T3 Connect account and choose the
 environment. On the app.t3.codes home page with no computer added yet, signing
 in adds compatible computers linked to your account. Over SSH, the CLI prints a
 browser link and a short code. Open the link on any device, confirm the code
 matches, and approve. The CLI continues on its own, so you do not need to forward
 an OAuth callback port.
 
-R3 Connect renews access credentials when needed without disconnecting a healthy
+T3 Connect renews access credentials when needed without disconnecting a healthy
 connection. Pull request diffs and provider settings keep working after the
 previous credential expires. A failed renewal affects that request; it does not
 disconnect an otherwise healthy conversation.
 
 ### Approve new devices
 
-By default, any device signed in to your R3 Connect account can open a linked
+By default, any device signed in to your T3 Connect account can open a linked
 machine. To require approval instead, turn on **Require approval for new
-devices** with the R3 Connect settings in **Settings → Sharing & access** on the
-host, or when you first set up R3 Connect. Then someone who takes over your R3
+devices** with the T3 Connect settings in **Settings → Sharing & access** on the
+host, or when you first set up T3 Connect. Then someone who takes over your T3
 Connect account cannot reach the machine from a new device without your
 approval. Review the devices that are already approved, described below.
 
@@ -55,12 +55,12 @@ headless host, run `t3 auth connect-device list` and then
 and the device asks again when it retries. Deny keeps that device out until its
 request expires.
 
-Each device is approved once. Revoke it from **R3 Connect devices** in the same
+Each device is approved once. Revoke it from **T3 Connect devices** in the same
 settings page, or with `t3 auth connect-device revoke <code>`. With approval on,
 it has to ask again. With approval off, it can connect again on its own, so
-revoking in the app offers to turn approval on first. Devices that connected through R3 Connect while approval was off stay
+revoking in the app offers to turn approval on first. Devices that connected through T3 Connect while approval was off stay
 approved and appear in that list for you to review. A device that has not
-connected since you updated R3 Code asks for approval like a new one. Older apps
+connected since you updated T3 Code asks for approval like a new one. Older apps
 cannot show the code, so update them before you turn approval on.
 
 ### Scripts and agents
@@ -69,7 +69,7 @@ cannot show the code, so update them before you turn approval on.
 `--no-` forms. Choices you do not name keep their settings, and `--yes` takes
 the defaults. Without a terminal:
 
-- R3 Connect sign-in prints a URL and a code. Approve it on any device.
+- T3 Connect sign-in prints a URL and a code. Approve it on any device.
 - A needed restart runs without asking, and stops running agent turns.
 - With nothing set up and no choice named, `t3 up` stops and names the flags.
 
@@ -78,7 +78,7 @@ examples.
 
 ### More machines with T3 Chat
 
-Each R3 Connect account can link up to 3 machines. Phones and browsers do not
+Each T3 Connect account can link up to 3 machines. Phones and browsers do not
 count. A paid T3 Chat plan raises the limit to 10 machines with Pro, or 100 with
 Premier.
 
@@ -102,7 +102,7 @@ For a command-line host, choose the local network in `t3 up`, or run:
 t3 up --lan
 ```
 
-For a server in a terminal, run `t3 serve --lan`. Either way, R3 Code then
+For a server in a terminal, run `t3 serve --lan`. Either way, T3 Code then
 accepts connections from your local network and tailnet, so a pairing code is
 all that keeps other devices on them out.
 
@@ -137,18 +137,18 @@ another link to share.
 ### Reach one machine several ways
 
 A machine can have more than one route: LAN, Tailscale, another VPN, a public
-URL, SSH, or R3 Connect. Tailscale shares its `100.64.0.0/10` address range with
+URL, SSH, or T3 Connect. Tailscale shares its `100.64.0.0/10` address range with
 other VPNs such as Cloudflare WARP, so an address in that range shows as VPN
 unless the machine confirms it is on Tailscale. To add a route, choose **Add
-route** in the machine's route list, or next to it in the R3 Connect list.
+route** in the machine's route list, or next to it in the T3 Connect list.
 A pairing link for a saved machine is refused when it comes from an address
 that machine does not have yet; add that address with **Add route** instead.
 Pairing again over an address the machine already has still works. A new route
 is placed by speed, in that order, and you can reorder routes at any time.
 
-While connected through R3 Connect or a paired address, R3 Code also learns the
+While connected through T3 Connect or a paired address, T3 Code also learns the
 machine's current LAN and Tailscale addresses and adds them as routes, so
-pairing once through R3 Connect is enough to use the LAN at home. When the
+pairing once through T3 Connect is enough to use the LAN at home. When the
 machine's LAN address changes, for example after it joins another Wi-Fi network,
 the learned route follows it. The machine must allow network access for its LAN
 address to be learned: **Network access** in the desktop app, or the
@@ -157,10 +157,10 @@ You can reorder a learned route, but not remove it; it
 goes away with the route it was learned through, or when the machine stops
 reporting that address.
 
-R3 Code connects over the first route that answers. Away from home, a LAN
+T3 Code connects over the first route that answers. Away from home, a LAN
 address that does not answer is checked briefly and skipped. It is only tried
 again, after the other routes, if none of them connect. While connected over a
-later route, R3 Code checks the earlier ones when your network changes, when you
+later route, T3 Code checks the earlier ones when your network changes, when you
 return to the app, and every minute, and moves back as soon as one works. A
 route whose machine refused this device's sign-in is marked **Sign-in
 refused**; pair that address again with **Add route** to use it.
@@ -168,14 +168,14 @@ refused**; pair that address again with **Add route** to use it.
 On web and desktop, select the route count under the machine's name in
 **Settings → Environments** to see its routes. Drag a route to change the order,
 or remove it. On mobile, open the machine under **Settings → Environments** and
-choose **Edit**. Signing out of R3 Connect removes only that route; a machine
+choose **Edit**. Signing out of T3 Connect removes only that route; a machine
 you can still reach another way stays saved.
 
 Open **Permissions** next to **Routes** in web or desktop, or **Your permissions**
 in the mobile route details, to see what your current connection can do on that
 environment. For a remote environment, this is in its route details. Permissions
 shown there apply only to the route marked **In use**; other routes are not
-checked. Direct pairing and R3 Connect have separate sessions and may grant
+checked. Direct pairing and T3 Connect have separate sessions and may grant
 different permissions.
 
 ### Balance new threads across machines
@@ -203,9 +203,9 @@ HTTPS** in **Settings → Sharing & access**. Turn it off there to remove that r
 
 Your tailnet needs MagicDNS and HTTPS certificates enabled; see
 [Tailscale's HTTPS setup](https://tailscale.com/docs/how-to/set-up-https-certificates).
-On Linux, R3 Code also needs permission to manage Tailscale; see
+On Linux, T3 Code also needs permission to manage Tailscale; see
 [operator permission](https://tailscale.com/docs/reference/troubleshooting/linux/linux-operator-permission)
-for non-root users. If any of these is missing, R3 Code still starts but can't
+for non-root users. If any of these is missing, T3 Code still starts but can't
 add the HTTPS route.
 
 To start a command-line server with Tailscale HTTPS:
@@ -244,13 +244,13 @@ scheme uses HTTP, so include `https://` when your server uses HTTPS.
 ## Desktop-managed SSH
 
 In the desktop app, open **Settings → Environments → Add environment**, choose
-**SSH**, and enter a host or SSH alias such as `user@example.com`. R3 Code starts
+**SSH**, and enter a host or SSH alias such as `user@example.com`. T3 Code starts
 or reuses a server there and opens the port forward for you. Projects, provider
 credentials, and agent work stay on the remote machine.
 
 The remote host must be Linux or an Apple Silicon Mac with `curl` or `wget`,
 `tar`, `sha256sum` or `shasum`, and [provider setup](./install.md#providers).
-The first launch downloads R3 Code's server to `~/.t3/runtime` on the host, so
+The first launch downloads T3 Code's server to `~/.t3/runtime` on the host, so
 it takes longer than later ones.
 Provider CLIs must be on the `PATH` of a non-interactive login shell there;
 check with:
@@ -260,7 +260,7 @@ ssh user@example.com 'sh -lc "command -v claude codex"'
 ```
 
 If SSH reconnecting fails after an app update, retry the launch once. Removing
-the connection stops a server that R3 Code launched; a server that was already
+the connection stops a server that T3 Code launched; a server that was already
 running is left alone.
 
 Each desktop app keeps one session on the host for its SSH connection and reuses
@@ -279,6 +279,27 @@ tabs from any device. The desktop app shows its own environment's tabs
 directly. Every other device, and the desktop app for other environments,
 streams them from the host. Agents keep using them while no device is
 connected, and `localhost` addresses reach servers on the host.
+
+A tab you open yourself in the desktop app for another environment loads on
+your computer instead, so the element picker, screenshots, and annotations work
+as they do locally. Its `localhost` addresses still reach servers on the host,
+over the connection the app already has, whichever way you connected. If the
+host cannot be reached, the tab shows a connection error; a `localhost`,
+`127.0.0.1`, or `[::1]` address never opens a server on your own computer.
+Other names that point at your computer, such as `/etc/hosts` entries, still
+do. These tabs ignore your system proxy settings, so they can't reach a host
+you connect to only through a proxy or over HTTPS with a privately issued
+certificate. The web app keeps streaming.
+
+On iPhone, iPad, and Android, a tab showing one of the host's `localhost` pages
+has **Open on this device** in its menu. So does a long press on a `localhost`
+link in a chat. It opens the page in the phone's own browser view, at the same
+`localhost` address, so it scrolls and responds to touch natively. Like the
+desktop app, it never opens a server on the phone itself. The streamed tab
+stays where it was, and agents keep using it. Each host keeps its own cookies
+and site data on the phone. On iPhone and iPad the page runs under a stand-in
+address while the address bar shows `localhost`, so browser features that need
+a secure page, such as the clipboard or service workers, aren't available there.
 
 The first tab downloads a headless Chrome, about 120 MB, into the T3 home. It
 is the same browser [HTML renders](html-renders.md) use, so a host downloads it
@@ -302,13 +323,13 @@ apps.
 ### Local servers
 
 The browser lists ports held by processes your terminals and agents started.
-R3 Code reads which process holds each port and never connects to it, so a
+T3 Code reads which process holds each port and never connects to it, so a
 listed port opens as `http://localhost:<port>` and might not be a web page. For
 an HTTPS server or a specific path, set the **Preview URL** on the project
-script that starts it; R3 Code checks that address and opens it as written.
+script that starts it; T3 Code checks that address and opens it as written.
 
 To stop listing ports, set `T3CODE_PORT_DISCOVERY=0` in the environment that
-starts the R3 Code server, such as
+starts the T3 Code server, such as
 [`service.env`](./background-service.md#configure-the-service-environment) for
 the background service, and restart it. Script preview URLs still appear.
 
@@ -352,7 +373,7 @@ environment of an already running T3 server.
 
 ## Connect an outside agent
 
-Claude Code, Codex, ChatGPT and other agents R3 Code did not start can drive
+Claude Code, Codex, ChatGPT and other agents T3 Code did not start can drive
 threads on an environment through its MCP server. See
 [outside agents](./outside-agents.md) for setup.
 
@@ -370,7 +391,7 @@ off, its result arrives once it is back on.
 
 On the machine you will work from, open **Settings → Environments → Linked environments**,
 choose **Link**, and pick the other machine or enter its address. The list
-holds the machines this app knows and those on your R3 Connect account. If this
+holds the machines this app knows and those on your T3 Connect account. If this
 app has an address for that machine and is connected to it with a session that
 manages access there, it makes the pairing code itself; otherwise paste one
 from that machine's **Settings → Sharing & access**. An address you type always
@@ -411,7 +432,7 @@ management is available through `t3 auth --help`.
 
 When the app connects to more than one environment, choose one at the top of the
 page. A desktop app with **Local environment** off can manage a background
-service on the same machine this way, including its R3 Connect link.
+service on the same machine this way, including its T3 Connect link.
 
 A session with an open connection stays listed after its access credential
 expires.
@@ -425,7 +446,8 @@ t3 pair --scope orchestration:read --scope relay:read
 The selected scopes replace the default permissions. The same option works with
 `t3 auth pairing create` and `t3 auth session issue`; each command's
 `--help` lists the available scopes. Without `--scope`, pairing tokens and issued
-bearer sessions get every permission, including managing access and R3 Connect.
+bearer sessions get the standard client permissions, including managing access.
+Setting up or replacing a T3 Connect link requires the separate `relay:configure` permission.
 A terminal or a full-access agent on the host can reach those as well, so a
 client that should not manage access also needs to go without `terminal:operate`
 and `orchestration:operate`.
@@ -448,8 +470,10 @@ worktree still creates that branch and worktree with `orchestration:operate`,
 and the agent it runs can use Git however the environment allows.
 
 Settings changes, provider management, environment maintenance, access
-management, and R3 Connect management can each be granted separately. New
-pairings without `--scope` include all of them. Existing clients keep the
+management, and T3 Connect preferences can each be granted separately. Setting
+up or replacing a T3 Connect link requires the administrative
+`relay:configure` permission. `relay:write` covers preferences and unlinking.
+New pairings without `--scope` include the standard client permissions. Existing clients keep the
 permissions they paired with and can stay connected after an update, but newly
 separated features may require pairing again with the permissions they need.
 Older clients may show controls that the server denies. Create a fresh pairing
@@ -459,28 +483,35 @@ link to change a client's permissions.
 local changes. Add `filesystem:write` to allow editing files or saving plans to
 the workspace. These scopes control direct file access from the client.
 
-To remove an environment from R3 Connect, open your account menu's **R3 Connect**
-page, or **Settings → R3 Connect** on mobile, and choose **Deregister**. This
+Some permissions also give a client indirect access. With `terminal:operate`,
+a client can run commands that read or change any files the server’s OS account
+can access, even when the pairing link omits file permissions. With
+`relay:configure`, a client can replace the trusted issuer of pairing
+credentials. Grant these permissions only to clients you trust with those
+capabilities.
+
+To remove an environment from T3 Connect, open your account menu's **T3 Connect**
+page, or **Settings → T3 Connect** on mobile, and choose **Deregister**. This
 revokes its cloud access and frees its host space even when the environment is
-offline or has been wiped. When R3 Connect rejects a host's link, the host
-shows that it was removed from R3 Connect. To link it again, turn on
-**R3 Connect** in **Settings → Sharing & access** on a desktop host, or run
-`t3 connect link` on a command-line host and then restart R3 Code there. A
+offline or has been wiped. When T3 Connect rejects a host's link, the host
+shows that it was removed from T3 Connect. To link it again, turn on
+**T3 Connect** in **Settings → Sharing & access** on a desktop host, or run
+`t3 connect link` on a command-line host and then restart T3 Code there. A
 command-line host that released its tunnel when it last stopped may link itself
 again on its next start; run `t3 connect unlink` on that host to keep it off.
 Removing an environment from a device's connection settings only forgets it on
-that device and doesn't change your R3 Connect account. A device keeps a saved
+that device and doesn't change your T3 Connect account. A device keeps a saved
 environment after it's deregistered until you remove it from that device.
 
-When idle tunnel cleanup is enabled, R3 Connect removes a linked environment's
+When idle tunnel cleanup is enabled, T3 Connect removes a linked environment's
 tunnel after it stays offline for several minutes. The environment stays linked
-and keeps the same address. When the host starts again or wakes, R3 Connect
+and keeps the same address. When the host starts again or wakes, T3 Connect
 creates a replacement tunnel on its own. You do not need to pair again. Cleanup
 usually runs five to ten minutes after the tunnel goes down.
 
-R3 Connect also removes the tunnel of an environment running an older version of
-R3 Code once it has been offline for seven days. That environment shows a message
-asking you to update. Start R3 Code on that computer and update it to the latest
+T3 Connect also removes the tunnel of an environment running an older version of
+T3 Code once it has been offline for seven days. That environment shows a message
+asking you to update. Start T3 Code on that computer and update it to the latest
 version; it reconnects at the same address without pairing again.
 
 On a command-line host, `t3 connect unlink` disables exposure while retaining
@@ -490,19 +521,19 @@ your login; `t3 connect logout` also clears that login. Background-service
 Treat pairing URLs and authorization codes as passwords. Do not include them in
 screenshots, logs, or bug reports.
 
-## R3 Connect troubleshooting
+## T3 Connect troubleshooting
 
-When a R3 Connect connection fails, see
-[R3 Connect troubleshooting](./t3-connect-troubleshooting.md). It explains each
+When a T3 Connect connection fails, see
+[T3 Connect troubleshooting](./t3-connect-troubleshooting.md). It explains each
 error, where the problem is, and how to fix it.
 
 ## Using the Desktop App as a Remote Only
 
 If a computer should only drive work running elsewhere, turn off its local environment. In the
 desktop app, open **Settings → Environments** and switch off **Local
-environment**. R3 Code restarts without a local server: no local agents or terminals run, WSL
+environment**. T3 Code restarts without a local server: no local agents or terminals run, WSL
 backends stay off, and other devices can no longer connect to this computer. Your projects,
-history, and saved connections are kept, and you keep working through pairing, R3 Connect, or SSH.
+history, and saved connections are kept, and you keep working through pairing, T3 Connect, or SSH.
 If a [background service](./background-service.md) on this computer uses the same T3 home, the
 app still treats it as this computer: **Open in** and file reveal for its projects run here,
 whichever connection you reach it through.

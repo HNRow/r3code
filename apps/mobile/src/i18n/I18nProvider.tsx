@@ -7,6 +7,7 @@ import { Platform, TurboModuleRegistry, View, type TurboModule } from "react-nat
 
 import { mobilePreferencesAtom } from "../state/preferences";
 import { setGlobalLocale } from "./gtInit";
+import { setActiveLocale } from "./messages";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "./locales";
 
 // Read the device languages from gt-react-native's own native module: GT's getLocale() prefers
@@ -41,6 +42,7 @@ export function I18nProvider(props: { readonly children: ReactNode }) {
   );
   // 渲染期同步全局 store：provider 之外（原生 header/footer）的 t() 读的就是它。
   setGlobalLocale(locale);
+  setActiveLocale(locale);
   return (
     <GTProvider locale={locale} fallback={<View className="flex-1 bg-screen" />}>
       {props.children}

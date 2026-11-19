@@ -19,4 +19,7 @@ vi.mock("gt-react", () => ({
   Var: (props: { readonly children?: unknown }) => props.children,
   useGT: () => identity,
   useMessages: () => identity,
+  decodeOptions: () => undefined,
+  gtFallback: (message: string) => message,
+  getReactI18nCache: () => ({ lookupTranslation: () => undefined }),
 }));

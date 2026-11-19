@@ -38,7 +38,7 @@ import {
   RELAY_MINT_RESPONSE_TYP,
   verifyRelayJwt,
 } from "@t3tools/shared/relayJwt";
-import { isSecureRelayUrl } from "@t3tools/shared/relayUrl";
+import { isSecureRelayUrl, normalizeSecureRelayUrl } from "@t3tools/shared/relayUrl";
 import * as Context from "effect/Context";
 import * as SecureRandom from "effect/crypto/SecureRandom";
 import * as Signature from "effect/crypto/Signature";
@@ -46,6 +46,7 @@ import * as Jwk from "effect/jose/Jwk";
 import * as DateTime from "effect/DateTime";
 import * as Duration from "effect/Duration";
 import * as Effect from "effect/Effect";
+import * as FetchHttpClient from "effect/http/FetchHttpClient";
 import * as FileSystem from "effect/FileSystem";
 import * as Layer from "effect/Layer";
 import * as Option from "effect/Option";
@@ -172,7 +173,7 @@ export class CloudLinkNotLinkedError extends Schema.TaggedError<CloudLinkNotLink
   {},
 ) {
   override get message(): string {
-    return "Link this environment to R3 Connect first.";
+    return "Link this environment to T3 Connect first.";
   }
 }
 
@@ -244,14 +245,15 @@ const INTERNAL_OPERATION_MESSAGES = {
   "persist-relay-config": "Could not persist environment relay configuration.",
   "register-endpoint-origin": "Could not register the managed endpoint origin.",
   "resolve-server-origin": "Could not resolve the local server origin.",
-  "persist-desired-link": "Could not persist desired R3 Connect link state.",
+  "persist-desired-link": "Could not persist desired T3 Connect link state.",
   "sign-recovery-proof": "Could not sign the managed tunnel recovery request.",
   "unsupported-recovered-tunnel":
-    "R3 Connect returned an unsupported managed tunnel configuration.",
+    "T3 Connect returned an unsupported managed tunnel configuration.",
   "persist-recovered-tunnel": "Could not persist the recovered managed tunnel configuration.",
   "read-relay-config": "Could not read environment relay configuration.",
   "remove-relay-config": "Could not remove environment relay configuration.",
-  "update-webhook-settings": "Could not update R3 Connect webhook settings.",
+  "update-live-activity-preference": "Could not update T3 Connect Live Activity preferences.",
+  "update-webhook-settings": "Could not update T3 Connect webhook settings.",
   "read-preferences": "Could not read environment cloud preferences.",
   "persist-preferences": "Could not persist environment cloud preferences.",
   "answer-health": "Could not answer cloud health request.",
@@ -299,7 +301,7 @@ export const shouldRetryCloudLink = (error: unknown): boolean =>
   !(CliTokenManager.isCloudCliCredentialRefreshError(error) && error.requiresLogin);
 
 const rollbackFailed = (cause: unknown) =>
-  Effect.logWarning("Could not roll back a R3 Connect preference", { cause });
+  Effect.logWarning("Could not roll back a T3 Connect preference", { cause });
 
 const requireRelayUrl = relayUrlConfig.pipe(
   Effect.mapError(
@@ -454,6 +456,12 @@ export class CloudLink extends Context.Service<
     ) => Effect.Effect<
       EnvironmentCloudLinkStateResult,
       CloudLinkNotLinkedError | CloudLinkInternalError | ManagedLimits.ManagedPolicyRefusedError
+    >;
+    readonly updateLiveActivityPreference: (
+      enabled: boolean,
+    ) => Effect.Effect<
+      RelayOkResponse,
+      CloudLinkInternalError | ManagedLimits.ManagedPolicyRefusedError
     >;
     readonly answerHealthRequest: (
       request: RelayCloudEnvironmentHealthRequest,
@@ -976,7 +984,7 @@ const make = Effect.gen(function* () {
           return false;
         }
         yield* Effect.logWarning(
-          "R3 Connect no longer accepts this environment's link. Link it again to restore remote access.",
+          "T3 Connect no longer accepts this environment's link. Link it again to restore remote access.",
           { cause },
         );
         yield* secrets.set(CLOUD_LINK_REVOKED, stringToBytes("true"));
@@ -1232,22 +1240,27 @@ const make = Effect.gen(function* () {
       yield* Effect.logInfo("Keeping the managed tunnel across the update restart");
       return false;
     }
-    const token = yield* cliTokenManager.getExisting;
-    if (Option.isNone(token)) {
+    const relayUrl = yield* requireRelayUrl.pipe(Effect.option);
+    const installedRelayUrl = yield* secrets.get(RELAY_URL_SECRET);
+    if (
+      Option.isNone(relayUrl) ||
+      Option.isNone(installedRelayUrl) ||
+      normalizeSecureRelayUrl(bytesToString(installedRelayUrl.value)) !== relayUrl.value
+    ) {
       return false;
     }
-    // Use the persisted relay URL; T3CODE_RELAY_URL may have changed since linking.
-    const relayUrl = yield* secrets.get(RELAY_URL_SECRET);
-    if (Option.isNone(relayUrl)) {
+    const token = yield* cliTokenManager.getExisting;
+    if (Option.isNone(token)) {
       return false;
     }
     const environmentId = yield* environment.getEnvironmentId;
     yield* endpointRuntime.applyConfig(null);
     const response = yield* HttpClientRequest.delete(
-      `${bytesToString(relayUrl.value)}/v1/client/environment-links/${encodeURIComponent(environmentId)}/tunnel`,
+      `${relayUrl.value}/v1/client/environment-links/${encodeURIComponent(environmentId)}/tunnel`,
     ).pipe(
       HttpClientRequest.bearerToken(token.value.accessToken),
       httpClient.execute,
+      Effect.provideService(FetchHttpClient.RequestInit, { redirect: "error" }),
       Effect.flatMap(filterRelayResponse),
       Effect.flatMap(HttpClientResponse.schemaBodyJson(RelayOkResponse)),
       withRelayClientTracing,
@@ -1423,6 +1436,37 @@ const make = Effect.gen(function* () {
       return yield* readCloudLinkState();
     },
     Effect.catchIf(ServerSecretStore.isSecretStoreError, internalError("read-preferences")),
+  );
+
+  const updateLiveActivityPreference = Effect.fn("environment.cloud.updateLiveActivityPreference")(
+    function* (liveActivitiesEnabled: boolean) {
+      return yield* endpointRuntime.withLinkStateLock(
+        Effect.gen(function* () {
+          const connection = yield* readRelayConnection.pipe(withSecrets);
+          const cloudUserId = yield* secrets.get(CLOUD_LINKED_USER_ID);
+          const revoked = yield* secrets.get(CLOUD_LINK_REVOKED);
+          if (connection === null || Option.isNone(cloudUserId) || Option.isSome(revoked)) {
+            return { ok: false };
+          }
+          const environmentId = yield* environment.getEnvironmentId;
+          const client = yield* makeRelayEnvironmentClient(connection);
+          return yield* client.server
+            .updateLiveActivityPreference({
+              params: { environmentId },
+              payload: { cloudUserId: bytesToString(cloudUserId.value), liveActivitiesEnabled },
+            })
+            .pipe(
+              Effect.provideService(FetchHttpClient.RequestInit, { redirect: "error" }),
+              Effect.timeout("10 seconds"),
+              Effect.catch(internalError("update-live-activity-preference")),
+            );
+        }),
+      );
+    },
+    Effect.catchIf(
+      ServerSecretStore.isSecretStoreError,
+      internalError("update-live-activity-preference"),
+    ),
   );
 
   const answerHealthRequest = Effect.fn("environment.cloud.health")(
@@ -1635,9 +1679,9 @@ const make = Effect.gen(function* () {
   if (!ManagedLimits.allowsConnect(managedPolicy)) {
     // Reading state and unlinking stay available so clients can show and leave the old link.
     yield* unlink().pipe(
-      Effect.tap(() => Effect.logInfo("R3 Connect is off by managed policy; unlinked.")),
+      Effect.tap(() => Effect.logInfo("T3 Connect is off by managed policy; unlinked.")),
       Effect.catch((cause) =>
-        Effect.logWarning("Failed to unlink R3 Connect turned off by managed policy", { cause }),
+        Effect.logWarning("Failed to unlink T3 Connect turned off by managed policy", { cause }),
       ),
     );
     const refused = Effect.fn("CloudLink.refusedByPolicy")(function* () {
@@ -1654,6 +1698,7 @@ const make = Effect.gen(function* () {
       linkState,
       unlink,
       updatePreferences: refused,
+      updateLiveActivityPreference: refused,
       answerHealthRequest: refused,
       mintCredential: refused,
       reconcileDesiredLinkIfStillDesired: notDesired,
@@ -1670,6 +1715,7 @@ const make = Effect.gen(function* () {
     linkState,
     unlink,
     updatePreferences,
+    updateLiveActivityPreference,
     answerHealthRequest,
     mintCredential,
     reconcileDesiredLinkIfStillDesired,

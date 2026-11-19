@@ -1,7 +1,10 @@
+import { errorDisplayMessage } from "@t3tools/client-runtime/errors";
+import { msg, useGT, useMessages } from "gt-react-native";
 import * as Dialog from "../../components/ui/Dialog";
+import { managedCapabilityDenial } from "@t3tools/client-runtime/contract-labels";
 import {
+  AuthRelayConfigureScope,
   AuthRelayWriteScope,
-  managedCapabilityDenial,
   type EnvironmentId,
 } from "@t3tools/contracts";
 import { readEnvironmentScope } from "../../state/session";
@@ -13,13 +16,16 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import * as Notifications from "expo-notifications";
 import { useNavigation } from "@react-navigation/native";
 import * as Effect from "effect/Effect";
+import * as Schema from "effect/Schema";
 import { AsyncResult } from "effect/reactivity";
 import { useRef, useState, useSyncExternalStore } from "react";
 import { Linking, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { m as resolveMessage } from "../../i18n/messages";
 
 import { AppText as Text } from "../../components/ui/AppText";
 import {
+  createEnvironmentCommand,
   isAtomCommandInterrupted,
   reportAtomCommandResult,
   settleAsyncResult,
@@ -31,7 +37,10 @@ import {
   openAndroidLiveUpdateSettings,
   supportsAndroidLiveUpdateSettings,
 } from "../agent-awareness/androidNotifications";
-import { setLiveActivityUpdatesEnabled } from "../agent-awareness/liveActivityPreferences";
+import {
+  LiveActivityEnvironmentUpdateError,
+  setLiveActivityUpdatesEnabled,
+} from "../agent-awareness/liveActivityPreferences";
 import { requestAgentNotificationPermission } from "../agent-awareness/notificationPermissions";
 import {
   agentAwarenessNotificationsReady,
@@ -39,6 +48,11 @@ import {
   refreshAgentAwarenessRegistration,
   subscribeAgentAwarenessRegistrationStatus,
 } from "../agent-awareness/remoteRegistration";
+import { connectionAtomRuntime } from "../../connection/runtime";
+import {
+  CloudEnvironmentLinkError,
+  updateLinkedEnvironmentLiveActivityPreference,
+} from "../cloud/linkEnvironment";
 import { refreshManagedRelayEnvironments } from "../cloud/managedRelayState";
 import { hasCloudPublicConfig, resolveRelayClerkTokenOptions } from "../cloud/publicConfig";
 import { makePermissionStatusAtom } from "../../lib/permissionStatusAtom";
@@ -50,19 +64,47 @@ import { SettingsSection } from "./components/SettingsSection";
 import { SettingsSwitchRow } from "./components/SettingsSwitchRow";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { resolveAgentAwarenessPlatformPresentation } from "./SettingsRouteScreen.logic";
-import { useGT, T } from "gt-react-native";
-import { msg, t } from "../../i18n/gt";
+
+const updateLiveActivityPreference = createEnvironmentCommand(connectionAtomRuntime, {
+  label: "updateLiveActivityPreference",
+  execute: updateLinkedEnvironmentLiveActivityPreference,
+});
+
+const isLiveActivityEnvironmentUpdateError = Schema.is(LiveActivityEnvironmentUpdateError);
+const isCloudEnvironmentLinkError = Schema.is(CloudEnvironmentLinkError);
+
+const updateEnvironmentPreference = Effect.fn("updateEnvironmentPreference")(function* (
+  environmentId: EnvironmentId,
+  enabled: boolean,
+) {
+  const result = yield* Effect.promise(() =>
+    updateLiveActivityPreference.run(appAtomRegistry, { environmentId, input: enabled }),
+  );
+  if (result._tag === "Success") return result.value;
+  const cause = squashAtomCommandFailure(result);
+  return yield* isCloudEnvironmentLinkError(cause)
+    ? cause
+    : new CloudEnvironmentLinkError({
+        message: resolveMessage(
+          msg("Could not update the environment's Live Activity preference."),
+        ),
+        cause,
+      });
+});
 
 /**
  * A policy that turns Connect off refuses relay links and preferences, which would fail the
  * whole batch, so those environments are skipped like ones this session cannot configure.
  */
-function canLinkEnvironmentToConnect(environmentId: EnvironmentId) {
+function canManageConnect(
+  environmentId: EnvironmentId,
+  scope: typeof AuthRelayConfigureScope | typeof AuthRelayWriteScope,
+) {
   const policy = appAtomRegistry.get(
     serverEnvironment.configValueAtom(environmentId),
   )?.managedPolicy;
   return (
-    readEnvironmentScope(environmentId, AuthRelayWriteScope) &&
+    readEnvironmentScope(environmentId, scope) &&
     managedCapabilityDenial(policy, "connect") === undefined
   );
 }
@@ -71,13 +113,13 @@ type NotificationStatus = "checking" | "enabled" | "disabled" | "unsupported";
 type LiveActivityStatus = "checking" | "enabled" | "disabled" | "signed-out" | "linking";
 
 const notificationStatusAtom = makePermissionStatusAtom<NotificationStatus>({
-  label: msg("mobile:notification-permission"),
+  label: "mobile:notification-permission",
   initial: "checking",
   read: async () => {
     if (Platform.OS !== "ios" && Platform.OS !== "android") return "unsupported";
     const result = await settlePromise(() => Notifications.getPermissionsAsync());
     if (result._tag === "Failure") {
-      reportAtomCommandResult(result, { label: t("notification permission refresh") });
+      reportAtomCommandResult(result, { label: "notification permission refresh" });
       return "disabled";
     }
     return result.value.granted ? "enabled" : "disabled";
@@ -129,7 +171,7 @@ export function SettingsNotificationsRouteScreen() {
           contentContainerClassName="px-5 pt-4"
         >
           <Text className="text-base text-foreground-muted">
-            <T>Notifications require R3 Connect in this app build.</T>
+            {gt("Notifications require {product} in this app build.", { product: "T3 Connect" })}
           </Text>
         </ScrollView>
       </SettingsScreen>
@@ -141,13 +183,14 @@ export function SettingsNotificationsRouteScreen() {
 
 function ConfiguredSettingsNotificationsRouteScreen() {
   const gt = useGT();
+  const m = useMessages();
   const preferencesResult = useAtomValue(mobilePreferencesAtom);
   const savePreferences = useAtomSet(updateMobilePreferencesAtom);
   const agentAwarenessPushAvailable = supportsAgentAwarenessPush();
-  const agentAwarenessPlatform = resolveAgentAwarenessPlatformPresentation(Platform.OS);
+  const agentAwarenessPlatform = resolveAgentAwarenessPlatformPresentation(Platform.OS, m);
   const agentAwarenessSubtitle =
     Platform.OS === "android" && !agentAwarenessPushAvailable
-      ? "Install a newer app build to enable notifications"
+      ? gt("Install a newer app build to enable notifications")
       : agentAwarenessPlatform.subtitle;
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -198,8 +241,10 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       if (!isAtomCommandInterrupted(result)) {
         const error = squashAtomCommandFailure(result);
         Dialog.alert(
-          t("Notifications unavailable"),
-          error instanceof Error ? error.message : "Could not request notification permission.",
+          gt("Notifications unavailable"),
+          error instanceof Error
+            ? (errorDisplayMessage(error, resolveMessage) ?? error.message)
+            : gt("Could not request notification permission."),
         );
       }
       return;
@@ -208,9 +253,10 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       setNotificationStatus("enabled");
       if (!agentAwarenessNotificationsReady()) {
         Dialog.alert(
-          t("Couldn't finish enabling notifications"),
-          t(
-            "Notification access was granted, but this device could not be registered with R3 Connect. Notifications will start once registration succeeds.",
+          gt("Couldn't finish enabling notifications"),
+          gt(
+            "Notification access was granted, but this device could not be registered with {product}. Notifications will start once registration succeeds.",
+            { product: "T3 Connect" },
           ),
         );
       }
@@ -219,34 +265,36 @@ function ConfiguredSettingsNotificationsRouteScreen() {
     if (result.value.type === "unsupported") {
       setNotificationStatus("unsupported");
       Dialog.alert(
-        t("Notifications unavailable"),
-        t("Agent notifications are unavailable on this platform."),
+        gt("Notifications unavailable"),
+        gt("Agent notifications are unavailable on this platform."),
       );
       return;
     }
     setNotificationStatus("disabled");
     if (result.value.canAskAgain) {
-      Dialog.alert(t("Notifications disabled"), t("Notifications were not enabled."));
+      Dialog.alert(gt("Notifications disabled"), gt("Notifications were not enabled."));
       return;
     }
     Dialog.alert(
-      t("Notifications disabled"),
-      t("Notifications were denied for this app. Open Settings to enable them."),
+      gt("Notifications disabled"),
+      gt("Notifications were denied for this app. Open Settings to enable them."),
       [
-        { text: t("Cancel"), style: "cancel" },
-        { text: t("Open Settings"), onPress: () => void Linking.openSettings() },
+        { text: gt("Cancel"), style: "cancel" },
+        { text: gt("Open Settings"), onPress: () => void Linking.openSettings() },
       ],
     );
   };
 
   const promptSignIn = () => {
     Dialog.alert(
-      t("Sign in to R3 Connect"),
-      t("Live Activity updates require R3 Connect so relay can deliver updates to this device."),
+      gt("Sign in to {product}", { product: "T3 Connect" }),
+      gt("Live Activity updates require {product} so relay can deliver updates to this device.", {
+        product: "T3 Connect",
+      }),
       [
-        { text: t("Cancel"), style: "cancel" },
+        { text: gt("Cancel"), style: "cancel" },
         {
-          text: t("Continue"),
+          text: gt("Continue"),
           onPress: () => navigation.navigate("SettingsAuth"),
         },
       ],
@@ -268,19 +316,21 @@ function ConfiguredSettingsNotificationsRouteScreen() {
         setLiveActivityStatus("disabled");
         const error = squashAtomCommandFailure(permission);
         Dialog.alert(
-          t("Ongoing activity unavailable"),
-          error instanceof Error ? error.message : "Could not enable agent notifications.",
+          gt("Ongoing activity unavailable"),
+          error instanceof Error
+            ? (errorDisplayMessage(error, resolveMessage) ?? error.message)
+            : gt("Could not enable agent notifications."),
         );
         return;
       }
       if (permission.value.type !== "granted") {
         setLiveActivityStatus("disabled");
         Dialog.alert(
-          t("Notification permission needed"),
-          t("Enable notifications in system Settings to show ongoing agent activity."),
+          gt("Notification permission needed"),
+          gt("Enable notifications in system Settings to show ongoing agent activity."),
           [
-            { text: t("Cancel"), style: "cancel" },
-            { text: t("Open Settings"), onPress: () => void Linking.openSettings() },
+            { text: gt("Cancel"), style: "cancel" },
+            { text: gt("Open Settings"), onPress: () => void Linking.openSettings() },
           ],
         );
         return;
@@ -292,8 +342,12 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       setLiveActivityStatus("disabled");
       const error = squashAtomCommandFailure(tokenResult);
       Dialog.alert(
-        Platform.OS === "android" ? "Ongoing activity unavailable" : "Live Activities unavailable",
-        error instanceof Error ? error.message : "Could not enable agent activity updates.",
+        Platform.OS === "android"
+          ? gt("Ongoing activity unavailable")
+          : gt("Live Activities unavailable"),
+        error instanceof Error
+          ? (errorDisplayMessage(error, resolveMessage) ?? error.message)
+          : gt("Could not enable agent activity updates."),
       );
       return;
     }
@@ -306,7 +360,9 @@ function ConfiguredSettingsNotificationsRouteScreen() {
     const updateResult = await settleAsyncResult(() =>
       runtime.runPromiseExit(
         setLiveActivityUpdatesEnabled({
-          canConfigureEnvironment: canLinkEnvironmentToConnect,
+          updateEnvironment: updateEnvironmentPreference,
+          canConfigureEnvironment: (id) => canManageConnect(id, AuthRelayConfigureScope),
+          canUpdateEnvironment: (id) => canManageConnect(id, AuthRelayWriteScope),
           enabled: true,
           previousEnabled: liveActivitiesPreferenceEnabled,
           clerkToken: tokenResult.value,
@@ -318,11 +374,14 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       setLiveActivityStatus("disabled");
       if (!isAtomCommandInterrupted(updateResult)) {
         const error = squashAtomCommandFailure(updateResult);
+        if (reportPartialEnvironmentUpdate(error)) return;
         Dialog.alert(
           Platform.OS === "android"
-            ? "Ongoing activity unavailable"
-            : "Live Activities unavailable",
-          error instanceof Error ? error.message : "Could not enable agent activity updates.",
+            ? gt("Ongoing activity unavailable")
+            : gt("Live Activities unavailable"),
+          error instanceof Error
+            ? (errorDisplayMessage(error, resolveMessage) ?? error.message)
+            : gt("Could not enable agent activity updates."),
         );
       }
       return;
@@ -332,18 +391,28 @@ function ConfiguredSettingsNotificationsRouteScreen() {
     refreshManagedRelayEnvironments();
     setLiveActivityStatus("enabled");
     // Environment linking can precede device registration; only registered devices can receive Live Activities.
-    if (getAgentAwarenessRegistrationStatus() === "registered") {
+    if (updateResult.value) {
       Dialog.alert(
-        Platform.OS === "android" ? "Ongoing activity enabled" : "Live Activities enabled",
+        gt("Some environments need an update"),
+        gt(
+          "The device preference was saved. Update older environment servers to apply the setting there.",
+        ),
+      );
+    } else if (getAgentAwarenessRegistrationStatus() === "registered") {
+      Dialog.alert(
+        Platform.OS === "android" ? gt("Ongoing activity enabled") : gt("Live Activities enabled"),
         environmentCount > 0
-          ? "Agent activity updates are enabled for environments this connection can configure."
-          : "Agent activity updates are enabled. Add an environment to start receiving updates.",
+          ? gt("Agent activity updates are enabled for eligible environments.")
+          : gt(
+              "Agent activity updates are enabled. Add an environment to start receiving updates.",
+            ),
       );
     } else {
       Dialog.alert(
-        t("Couldn't finish enabling activity updates"),
-        t(
-          "This device could not be registered with R3 Connect, so activity updates won't appear yet. They'll start once registration succeeds.",
+        gt("Couldn't finish enabling activity updates"),
+        gt(
+          "This device could not be registered with {product}, so activity updates won't appear yet. They'll start once registration succeeds.",
+          { product: "T3 Connect" },
         ),
       );
     }
@@ -360,11 +429,11 @@ function ConfiguredSettingsNotificationsRouteScreen() {
     }
 
     Dialog.alert(
-      t("Disable notifications"),
-      t("Open system Settings to disable notifications for R3 Code."),
+      gt("Disable notifications"),
+      gt("Open system Settings to disable notifications for {product}.", { product: "T3 Code" }),
       [
-        { text: t("Cancel"), style: "cancel" },
-        { text: t("Open Settings"), onPress: () => void Linking.openSettings() },
+        { text: gt("Cancel"), style: "cancel" },
+        { text: gt("Open Settings"), onPress: () => void Linking.openSettings() },
       ],
     );
   };
@@ -376,7 +445,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       if (tokenResult._tag === "Failure") {
         setLiveActivityStatus("enabled");
         reportAtomCommandResult(tokenResult, {
-          label: t("live activity disable token lookup"),
+          label: "live activity disable token lookup",
         });
         return;
       }
@@ -386,7 +455,9 @@ function ConfiguredSettingsNotificationsRouteScreen() {
     const updateResult = await settleAsyncResult(() =>
       runtime.runPromiseExit(
         setLiveActivityUpdatesEnabled({
-          canConfigureEnvironment: canLinkEnvironmentToConnect,
+          updateEnvironment: updateEnvironmentPreference,
+          canConfigureEnvironment: (id) => canManageConnect(id, AuthRelayConfigureScope),
+          canUpdateEnvironment: (id) => canManageConnect(id, AuthRelayWriteScope),
           enabled: false,
           previousEnabled: liveActivitiesPreferenceEnabled,
           clerkToken: token,
@@ -396,14 +467,36 @@ function ConfiguredSettingsNotificationsRouteScreen() {
     );
     if (updateResult._tag === "Failure") {
       setLiveActivityStatus(isSignedIn ? "enabled" : "signed-out");
-      reportAtomCommandResult(updateResult, {
-        label: t("live activity disable"),
-      });
+      if (!reportPartialEnvironmentUpdate(squashAtomCommandFailure(updateResult))) {
+        reportAtomCommandResult(updateResult, {
+          label: "live activity disable",
+        });
+      }
       return;
     }
     savePreferences({ liveActivitiesEnabled: false });
     refreshManagedRelayEnvironments();
     setLiveActivityStatus("disabled");
+    if (updateResult.value) {
+      Dialog.alert(
+        gt("Some environments need an update"),
+        gt(
+          "The device preference was saved. Update older environment servers to apply the setting there.",
+        ),
+      );
+    }
+  }
+
+  function reportPartialEnvironmentUpdate(error: unknown): boolean {
+    if (!isLiveActivityEnvironmentUpdateError(error)) return false;
+    refreshManagedRelayEnvironments();
+    Dialog.alert(
+      gt("Some environments were updated"),
+      gt("The device setting was not saved. The new setting was applied to: {environments}.", {
+        environments: error.updatedEnvironments.join(", "),
+      }),
+    );
+    return true;
   }
 
   // Both writers settle their own failures, so awaiting them never throws.
@@ -466,9 +559,9 @@ function ConfiguredSettingsNotificationsRouteScreen() {
             label={
               Platform.OS === "android"
                 ? supportsAndroidLiveUpdateSettings()
-                  ? "Agent Live Updates"
-                  : "Ongoing Agent Activity"
-                : "Live Activity Updates"
+                  ? gt("Agent Live Updates")
+                  : gt("Ongoing Agent Activity")
+                : gt("Live Activity Updates")
             }
             subtitle={agentAwarenessSubtitle}
             value={
@@ -492,9 +585,10 @@ function ConfiguredSettingsNotificationsRouteScreen() {
               onPress={() => {
                 void openAndroidLiveUpdateSettings().catch(() => {
                   Dialog.alert(
-                    t("Couldn't open Settings"),
-                    t(
-                      "Open Android Settings, select R3 Code, then enable Live Updates in Notifications.",
+                    gt("Couldn't open Settings"),
+                    gt(
+                      "Open Android Settings, select {product}, then enable Live Updates in Notifications.",
+                      { product: "T3 Code" },
                     ),
                   );
                 });

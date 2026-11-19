@@ -17,6 +17,9 @@ vi.mock("gt-react-native", () => ({
   Var: (props: { readonly children?: unknown }) => props.children,
   useGT: () => identity,
   useMessages: () => identity,
+  decodeOptions: () => undefined,
+  gtFallback: (message: string) => message,
+  getReactI18nCache: () => ({ lookupTranslation: () => undefined }),
 }));
 
 vi.mock("@generaltranslation/react-core/pure", () => ({
