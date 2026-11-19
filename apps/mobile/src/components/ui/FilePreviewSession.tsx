@@ -138,7 +138,7 @@ function ResolvedFilePreview(
         },
         (error: unknown) => {
           if (controller.signal.aborted) return;
-          if (progressiveGallery && index !== selectedIndex) return settle(index, null);
+          if (index !== selectedIndex) return settle(index, null);
           controller.abort();
           onResolutionError(
             isPreviewResolutionError(error)
@@ -152,7 +152,7 @@ function ResolvedFilePreview(
       controller.abort();
       for (const dispose of leases) dispose();
     };
-  }, [items, selectedIndex, progressiveGallery]);
+  }, [items, selectedIndex]);
   const selected = { ...items[selectedIndex]!, name: filePreviewName(items[selectedIndex]!) };
   if (selected.kind === "image") {
     // A viewer that resets image gestures when its sources change waits for every image.
