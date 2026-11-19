@@ -3,17 +3,10 @@ import { describe, expect, it } from "@effect/vitest";
 import * as Exit from "effect/Exit";
 import * as Option from "effect/Option";
 import * as Effect from "effect/Effect";
-import * as Layer from "effect/Layer";
-import * as HttpClient from "effect/http/HttpClient";
 import type { EnvironmentId } from "@t3tools/contracts";
 import { ManagedRelay } from "@t3tools/client-runtime/relay";
 
 import type { SavedRemoteConnection } from "../../lib/connection";
-import {
-  MobilePreferencesSaveError,
-  MobilePreferencesStore,
-} from "../../persistence/mobile-preferences";
-import { MobileStorage } from "../../persistence/mobile-storage";
 import { CloudEnvironmentLinkError } from "../cloud/linkEnvironment";
 import { setLiveActivityUpdatesEnabled } from "./liveActivityPreferences";
 import { updateAgentAwarenessRegistrationPreferences } from "./remoteRegistration";
@@ -50,13 +43,9 @@ const updateEnvironment = vi.fn<
 
 const linkEnvironment = vi.fn<
   (
-    connection: SavedRemoteConnection,
+    id: EnvironmentId,
     input: { readonly clerkToken: string; readonly liveActivitiesEnabled: boolean },
   ) => Effect.Effect<void, CloudEnvironmentLinkError>
->(() => Effect.void);
-
-const saveLocalPreference = vi.fn<
-  (enabled: boolean) => Effect.Effect<void, MobilePreferencesSaveError>
 >(() => Effect.void);
 
 const connection: SavedRemoteConnection = {
@@ -69,14 +58,7 @@ const connection: SavedRemoteConnection = {
   bearerToken: "local-bearer",
 };
 
-const withRelayClient = Effect.provide(
-  Layer.mergeAll(
-    Layer.succeed(ManagedRelay.ManagedRelayClient, null as never),
-    Layer.succeed(MobileStorage, null as never),
-    Layer.succeed(MobilePreferencesStore, null as never),
-    Layer.succeed(HttpClient.HttpClient, null as never),
-  ),
-);
+const withRelayClient = Effect.provideService(ManagedRelay.ManagedRelayClient, null as never);
 
 describe("liveActivityPreferences", () => {
   beforeEach(() => {
@@ -94,7 +76,6 @@ describe("liveActivityPreferences", () => {
         setLiveActivityUpdatesEnabled({
           updateEnvironment,
           linkEnvironment,
-          saveLocalPreference,
           enabled: false,
           previousEnabled: true,
           clerkToken: "clerk-token",
@@ -122,33 +103,6 @@ describe("liveActivityPreferences", () => {
     }).pipe(withRelayClient);
   });
 
-  it.effect("restores the device preference when the device cannot save the setting", () => {
-    saveLocalPreference.mockImplementationOnce(() =>
-      Effect.fail(new MobilePreferencesSaveError({ cause: new Error("storage full") })),
-    );
-
-    return Effect.gen(function* () {
-      const exit = yield* Effect.exit(
-        setLiveActivityUpdatesEnabled({
-          updateEnvironment,
-          linkEnvironment,
-          saveLocalPreference,
-          enabled: true,
-          previousEnabled: false,
-          clerkToken: "clerk-token",
-          connections: [connection],
-          canConfigureEnvironment: () => false,
-          canUpdateEnvironment: () => true,
-        }),
-      );
-
-      expect(Exit.isFailure(exit)).toBe(true);
-      expect(updateAgentAwarenessRegistrationPreferences).toHaveBeenLastCalledWith({
-        liveActivitiesEnabled: false,
-      });
-    }).pipe(withRelayClient);
-  });
-
   it.effect("reports a relay preference committed before environment configuration fails", () => {
     const failure = new CloudEnvironmentLinkError({
       message: "environment configuration failed",
@@ -162,7 +116,6 @@ describe("liveActivityPreferences", () => {
         setLiveActivityUpdatesEnabled({
           updateEnvironment,
           linkEnvironment,
-          saveLocalPreference,
           enabled: true,
           previousEnabled: false,
           clerkToken: "clerk-token",
@@ -203,7 +156,6 @@ describe("liveActivityPreferences", () => {
       yield* setLiveActivityUpdatesEnabled({
         updateEnvironment,
         linkEnvironment,
-        saveLocalPreference,
         enabled: true,
         previousEnabled: false,
         clerkToken: "clerk-token",
@@ -215,7 +167,7 @@ describe("liveActivityPreferences", () => {
       expect(updateAgentAwarenessRegistrationPreferences).toHaveBeenCalledWith({
         liveActivitiesEnabled: true,
       });
-      expect(linkEnvironment).toHaveBeenCalledExactlyOnceWith(dpopConnection, {
+      expect(linkEnvironment).toHaveBeenCalledExactlyOnceWith(connection.environmentId, {
         clerkToken: "clerk-token",
         liveActivitiesEnabled: true,
       });
@@ -233,7 +185,6 @@ describe("liveActivityPreferences", () => {
       const partial = yield* setLiveActivityUpdatesEnabled({
         updateEnvironment,
         linkEnvironment,
-        saveLocalPreference,
         enabled: false,
         previousEnabled: true,
         clerkToken: "clerk-token",
@@ -258,7 +209,6 @@ describe("liveActivityPreferences", () => {
       yield* setLiveActivityUpdatesEnabled({
         updateEnvironment,
         linkEnvironment,
-        saveLocalPreference,
         enabled: false,
         previousEnabled: true,
         clerkToken: "clerk-token",

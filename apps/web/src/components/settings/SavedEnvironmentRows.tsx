@@ -48,7 +48,6 @@ import {
   supportsDesktopAppUpdate,
 } from "~/versionSkew";
 import { hasCloudPublicConfig } from "~/cloud/publicConfig";
-import { isElectron } from "~/env";
 import { useT3ConnectTurnOn } from "~/cloud/useT3ConnectTurnOn";
 import { useCloudLinkController } from "~/cloud/useCloudLinkController";
 import { useManagedTunnelUsage } from "~/cloud/managedRelayState";
@@ -554,8 +553,8 @@ function ConfiguredCloudLinkRow({
   // The server unlinks and refuses relay changes under such a policy; unlinking stays possible.
   const connectDenial = managedCapabilityDenial(useManagedPolicy(environmentId), "connect");
   const turnOn = useT3ConnectTurnOn(environmentId);
-  // Turning on links from this desktop's own backend only; turning off works from anywhere.
-  const showSwitch = isElectron && (turnOn.kind !== "on-host" || managedTunnelActive);
+  // Turning on needs relay configuration permission; turning off works from anywhere.
+  const showSwitch = turnOn.kind !== "on-host" || managedTunnelActive;
   const [isUpdating, setIsUpdating] = useState(false);
   const [isUpdatingPreference, setIsUpdatingPreference] = useState(false);
 
@@ -730,12 +729,12 @@ function ConfiguredCloudLinkRow({
             "This environment was removed from R3 Connect. Run `t3 connect link` on the host to link it again.",
           )}
         />
-      ) : isElectron ? (
+      ) : (
         <SettingsRow
           title={m(searchableSetting("t3-connect").title)}
           description={gt("Run `t3 connect link` on the host, then restart R3 Code there.")}
         />
-      ) : null}
+      )}
       {signedOut && showSwitch ? null : (
         <SettingsRow
           title={m(searchableSetting("publish-agent-activity").title)}
