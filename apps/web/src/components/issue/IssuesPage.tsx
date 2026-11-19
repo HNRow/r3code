@@ -499,7 +499,7 @@ export function IssuesPage() {
   ) : noneAnswered && list.error ? (
     <PullRequestsUnavailableState
       error={list.error}
-      onRetry={list.refresh}
+      onRetry={list.retry}
       refreshing={list.isPending}
     />
   ) : groups.length === 0 ? (
@@ -525,7 +525,7 @@ export function IssuesPage() {
               <Var>{list.error}</Var> Showing the issues that loaded.
             </T>
           </span>
-          <Button size="xs" variant="outline" onClick={list.refresh}>
+          <Button size="xs" variant="outline" onClick={list.retry}>
             <T>Retry</T>
           </Button>
         </div>
