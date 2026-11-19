@@ -139,7 +139,7 @@ function makeService(input: {
   readonly projects: ReadonlyArray<OrchestrationProjectShell>;
   readonly trackers: ReadonlyArray<IssueTrackerApi>;
   readonly bindings?: Record<string, IssueTrackerProjectBinding>;
-  readonly bindingsFailure?: PersistenceSqlError;
+  readonly readBindings?: IssueTrackerBindings.IssueTrackerBindingsRepository["Service"]["list"];
 }) {
   return IssueService.IssueService.pipe(
     Effect.provide(
@@ -148,16 +148,15 @@ function makeService(input: {
           Layer.mergeAll(
             Layer.mock(IssueTrackerBindings.IssueTrackerBindingsRepository)({
               list:
-                input.bindingsFailure !== undefined
-                  ? Effect.fail(input.bindingsFailure)
-                  : Effect.succeed(
-                      new Map(
-                        Object.entries(input.bindings ?? {}).map(([id, binding]) => [
-                          id as ProjectId,
-                          binding,
-                        ]),
-                      ),
-                    ),
+                input.readBindings ??
+                Effect.succeed(
+                  new Map(
+                    Object.entries(input.bindings ?? {}).map(([id, binding]) => [
+                      id as ProjectId,
+                      binding,
+                    ]),
+                  ),
+                ),
             }),
             Layer.succeed(
               IssueTrackerRegistry.IssueTrackerRegistry,
@@ -437,6 +436,61 @@ describe("IssueService", () => {
 });
 
 describe("IssueService with a standalone tracker", () => {
+  it.effect("reads bindings once per listing and sees changes on the next listing", () =>
+    Effect.gen(function* () {
+      const web = project({ id: "web", repository: "acme/web" });
+      const docs = project({ id: "docs", repository: "acme/docs" });
+      let reads = 0;
+      let scope = "ENG";
+      const service = yield* makeService({
+        projects: [web, docs],
+        trackers: [fakeTracker(), fakeStandaloneTracker()],
+        readBindings: Effect.sync(() => {
+          reads += 1;
+          return new Map([[web.id, { tracker: LINEAR, scope }]]);
+        }),
+      });
+
+      const first = yield* service.list({ state: "open" });
+      expect(first.scopes?.map((entry) => entry.scope)).toEqual(["ENG", "acme/web", "acme/docs"]);
+      expect(reads).toBe(1);
+
+      scope = "OPS";
+      const next = yield* service.list({ state: "open", refresh: true });
+      expect(next.scopes?.map((entry) => entry.scope)).toEqual(["OPS", "acme/web", "acme/docs"]);
+      expect(reads).toBe(2);
+
+      const missing = yield* service.list({ state: "open", projectId: "missing" as ProjectId });
+      expect(missing.scopes).toEqual([]);
+      expect(reads).toBe(2);
+    }),
+  );
+
+  it.effect("rejects a URL from another workspace with the same team and issue key", () =>
+    Effect.gen(function* () {
+      const service = yield* makeService({
+        projects: [project({ id: "web" })],
+        trackers: [fakeStandaloneTracker()],
+        bindings: { web: { tracker: LINEAR, scope: "ENG" } },
+      });
+      expect(
+        yield* service.resolveUrl("https://linear.app/acme/issue/ENG-1/old-title"),
+      ).toMatchObject({ key: "ENG-1", writable: true });
+      const refused = yield* service
+        .resolveUrl("https://linear.app/other-workspace/issue/ENG-1/old-title")
+        .pipe(Effect.result);
+      expect(refused).toMatchObject({
+        _tag: "Failure",
+        failure: {
+          _tag: "IssueOperationError",
+          operation: "resolveUrl",
+          reason: "not-found",
+          detail: "This issue URL does not belong to the connected workspace.",
+        },
+      });
+    }),
+  );
+
   it.effect("lists a bound project's standalone scope beside its git host and serves both", () =>
     Effect.gen(function* () {
       const listed: string[] = [];
@@ -511,10 +565,12 @@ describe("IssueService with a standalone tracker", () => {
       const unreadable = yield* makeService({
         projects,
         trackers,
-        bindingsFailure: new PersistenceSqlError({
-          operation: "IssueTrackerBindingsRepository.list",
-          detail: "disk I/O error",
-        }),
+        readBindings: Effect.fail(
+          new PersistenceSqlError({
+            operation: "IssueTrackerBindingsRepository.list",
+            detail: "disk I/O error",
+          }),
+        ),
       });
       expect(yield* Effect.flip(unreadable.list({ state: "open" }))).toMatchObject({
         _tag: "IssueOperationError",
