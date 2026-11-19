@@ -20,9 +20,9 @@ import {
   compareDiffFileTreeEntries,
   collectDirectoryPaths,
   diffFileTreeModel,
-  diffFileTreePositions,
   type DiffFileTreeEntry,
 } from "./diffFileTree.logic";
+import { diffFileTreePositions } from "@t3tools/client-runtime/diff-file-order";
 import { T, t } from "gt-react";
 
 export type { DiffFileTreeEntry } from "./diffFileTree.logic";
