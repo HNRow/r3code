@@ -52,6 +52,7 @@ const PREVIEW_FORWARDED_COMMANDS = [
   "sidebar.toggle",
   "rightPanel.toggle",
   "rightPanel.toggleMaximized",
+  "rightPanel.close",
   "preview.focusUrl",
   "preview.zoomIn",
   "preview.zoomOut",
