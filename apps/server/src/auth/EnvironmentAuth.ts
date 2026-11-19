@@ -59,7 +59,7 @@ import { requestUrl } from "../requestUrl.ts";
 
 const DEFAULT_SESSION_SUBJECT = "cli-issued-session";
 export const INTERNAL_ADMINISTRATIVE_BOOTSTRAP_SUBJECT = "administrative-bootstrap";
-/** Sessions and pairing links R3 Connect minted for a device signed in to the linked account. */
+/** Sessions and pairing links T3 Connect minted for a device signed in to the linked account. */
 export const CLOUD_CONNECT_SUBJECT = "cloud-connect";
 
 export interface IssuedPairingLink {
@@ -96,7 +96,7 @@ export interface McpClientSession {
   readonly sessionId: AuthSessionId;
   readonly label: string;
   readonly access: AuthMcpClientAccess;
-  /** Another R3 Code environment's link, whose work here stays within it. */
+  /** Another T3 Code environment's link, whose work here stays within it. */
   readonly peerLink: boolean;
 }
 
@@ -356,7 +356,7 @@ export class ServerAuthConnectDevicesError extends Schema.TaggedError<ServerAuth
   },
 ) {
   override get message(): string {
-    return "Failed to update R3 Connect devices.";
+    return "Failed to update T3 Connect devices.";
   }
 }
 
@@ -455,13 +455,13 @@ export const serverAuthInvalidRequestReason = (
 ): "invalid_scope" | "scope_not_granted" =>
   error._tag === "ServerAuthInvalidScopeError" ? "invalid_scope" : "scope_not_granted";
 
-/** The credential is fine, but the host has not approved this R3 Connect device yet. */
+/** The credential is fine, but the host has not approved this T3 Connect device yet. */
 export class ServerAuthConnectApprovalPendingError extends Schema.TaggedError<ServerAuthConnectApprovalPendingError>()(
   "ServerAuthConnectApprovalPendingError",
   {},
 ) {
   override get message(): string {
-    return "This R3 Connect device is waiting for approval.";
+    return "This T3 Connect device is waiting for approval.";
   }
 }
 
@@ -543,7 +543,7 @@ export class EnvironmentAuth extends Context.Service<
       ServerAuthInternalError | ManagedLimits.ManagedPolicyRefusedError
     >;
     /**
-     * The one-time credential R3 Connect hands a device. With approval required, an untrusted
+     * The one-time credential T3 Connect hands a device. With approval required, an untrusted
      * device key gets one that waits for approval, and keeps it across retries.
      */
     readonly issueConnectCredential: (input: {
@@ -560,10 +560,10 @@ export class EnvironmentAuth extends Context.Service<
     readonly approveConnectDeviceByCode: (
       verificationCode: string,
     ) => Effect.Effect<boolean, ServerAuthInternalError>;
-    /** Revokes the one trusted device that shows this code; two that share it are ambiguous. */
-    readonly revokeConnectDeviceByCode: (
+    /** Trusted devices that show this code; more than one is ambiguous. */
+    readonly connectDevicesShowingCode: (
       verificationCode: string,
-    ) => Effect.Effect<"revoked" | "not-found" | "ambiguous", ServerAuthInternalError>;
+    ) => Effect.Effect<ReadonlyArray<AuthConnectDevice>, ServerAuthInternalError>;
     readonly listConnectDevices: () => Effect.Effect<
       ReadonlyArray<AuthConnectDevice>,
       ServerAuthInternalError
@@ -602,6 +602,10 @@ export class EnvironmentAuth extends Context.Service<
     readonly listClientSessions: (
       currentSessionId: AuthSessionId,
     ) => Effect.Effect<ReadonlyArray<AuthClientSession>, ServerAuthInternalError>;
+    /** Revokes a session; one bound to a device key takes the device's trust and sessions with it. */
+    readonly revokeClient: (
+      sessionId: AuthSessionId,
+    ) => Effect.Effect<boolean, ServerAuthInternalError>;
     readonly revokeClientSession: (
       currentSessionId: AuthSessionId,
       targetSessionId: AuthSessionId,
@@ -1002,7 +1006,7 @@ export const make = Effect.gen(function* () {
       readonly requestedScopes?: ReadonlyArray<AuthEnvironmentScope>;
       readonly requiredScopes?: ReadonlyArray<AuthEnvironmentScope>;
       readonly allowedSubject?: string;
-      /** Shown to approvers when the credential waits on R3 Connect device approval. */
+      /** Shown to approvers when the credential waits on T3 Connect device approval. */
       readonly requestMetadata?: AuthClientMetadata;
     },
   ): Effect.Effect<
@@ -1049,7 +1053,7 @@ export const make = Effect.gen(function* () {
     );
   };
 
-  // R3 Connect credential issuance, DPoP exchanges and device revocation take turns. Two mints
+  // T3 Connect credential issuance, DPoP exchanges and device revocation take turns. Two mints
   // at once would open two requests with one code, and a revoke landing between an exchange
   // spending its credential and trusting the key would be undone by that exchange.
   const connectTrustLock = yield* Semaphore.make(1);
@@ -1098,7 +1102,7 @@ export const make = Effect.gen(function* () {
         requestMetadata,
         ...(requestedScopes !== undefined ? { requestedScopes } : {}),
       }).pipe(
-        // Every R3 Connect key that gets in is remembered, so turning approval on later
+        // Every T3 Connect key that gets in is remembered, so turning approval on later
         // keeps the devices already in use and lists them for review.
         Effect.tap((grant) =>
           grant.subject === CLOUD_CONNECT_SUBJECT && input?.proofKeyThumbprint
@@ -1264,7 +1268,7 @@ export const make = Effect.gen(function* () {
       subject: CLOUD_CONNECT_SUBJECT,
       // Long enough for someone to notice the request and approve it.
       ttl: mustWait ? Duration.minutes(10) : Duration.minutes(2),
-      label: "R3 Connect",
+      label: "T3 Connect",
       proofKeyThumbprint,
       ...(mustWait ? { requiresConnectApproval: true } : {}),
     });
@@ -1315,16 +1319,12 @@ export const make = Effect.gen(function* () {
     }).pipe(connectTrustLock.withPermits(1));
   });
 
-  const revokeConnectDeviceByCode: EnvironmentAuth["Service"]["revokeConnectDeviceByCode"] =
-    Effect.fn("EnvironmentAuth.revokeConnectDeviceByCode")(function* (verificationCode) {
+  const connectDevicesShowingCode: EnvironmentAuth["Service"]["connectDevicesShowingCode"] =
+    Effect.fn("EnvironmentAuth.connectDevicesShowingCode")(function* (verificationCode) {
       const wanted = normalizeVerificationCode(verificationCode);
-      const matches = (yield* listConnectDevices()).filter(
+      return (yield* listConnectDevices()).filter(
         (device) => normalizeVerificationCode(device.verificationCode) === wanted,
       );
-      if (matches.length === 0) return "not-found" as const;
-      if (matches.length > 1) return "ambiguous" as const;
-      yield* revokeConnectDevice(matches[0]!.proofKeyThumbprint);
-      return "revoked" as const;
     });
 
   const issueSession: EnvironmentAuth["Service"]["issueSession"] = (input) =>
@@ -1437,25 +1437,36 @@ export const make = Effect.gen(function* () {
       Effect.withSpan("EnvironmentAuth.listClientSessions"),
     );
 
+  const proofKeyOf = (sessionId: AuthSessionId) =>
+    sessions
+      .proofKeyThumbprintOf(sessionId)
+      .pipe(Effect.mapError((cause) => new ServerAuthSessionRevocationError({ cause })));
+
+  const revokeClient: EnvironmentAuth["Service"]["revokeClient"] = Effect.fn(
+    "EnvironmentAuth.revokeClient",
+  )(function* (sessionId) {
+    // A T3 Connect device would otherwise mint itself a new session right away.
+    return yield* Option.match(yield* proofKeyOf(sessionId), {
+      onNone: () => revokeSession(sessionId),
+      onSome: revokeConnectDevice,
+    });
+  });
+
   const revokeClientSession: EnvironmentAuth["Service"]["revokeClientSession"] = Effect.fn(
     "EnvironmentAuth.revokeClientSession",
   )(function* (currentSessionId, targetSessionId) {
     if (currentSessionId === targetSessionId) {
       return yield* new ServerAuthForbiddenOperationError({});
     }
-    const proofKeyThumbprint = yield* sessions
-      .proofKeyThumbprintOf(targetSessionId)
-      .pipe(Effect.mapError((cause) => new ServerAuthSessionRevocationError({ cause })));
-    // A R3 Connect device would otherwise mint itself a new session right away.
-    if (Option.isSome(proofKeyThumbprint)) {
-      const currentProofKey = yield* sessions
-        .proofKeyThumbprintOf(currentSessionId)
-        .pipe(Effect.mapError((cause) => new ServerAuthSessionRevocationError({ cause })));
-      if (Option.getOrUndefined(currentProofKey) !== proofKeyThumbprint.value) {
-        return yield* revokeConnectDevice(proofKeyThumbprint.value);
-      }
+    const targetProofKey = Option.getOrUndefined(yield* proofKeyOf(targetSessionId));
+    // Revoking the caller's own device would cut off the caller too.
+    if (
+      targetProofKey !== undefined &&
+      Option.getOrUndefined(yield* proofKeyOf(currentSessionId)) === targetProofKey
+    ) {
+      return yield* revokeSession(targetSessionId);
     }
-    return yield* revokeSession(targetSessionId);
+    return yield* revokeClient(targetSessionId);
   });
 
   const revokeOtherClientSessions: EnvironmentAuth["Service"]["revokeOtherClientSessions"] =
@@ -1658,7 +1669,7 @@ export const make = Effect.gen(function* () {
     approveConnectDeviceByCode,
     listConnectDevices,
     revokeConnectDevice,
-    revokeConnectDeviceByCode,
+    connectDevicesShowingCode,
     issuePairingCredential,
     issueStartupPairingCredential,
     listPairingLinks,
@@ -1667,6 +1678,7 @@ export const make = Effect.gen(function* () {
     listSessions,
     revokeSession,
     listClientSessions,
+    revokeClient,
     revokeClientSession,
     revokeOtherClientSessions,
     authenticateHttpRequest,
