@@ -22,7 +22,7 @@ import {
   parseDeviceHostDraft,
   type DeviceHostCheckTarget,
 } from "./deviceHostConnectionChecks";
-import { Var, T, useGT } from "gt-react";
+import { Var, T, useGT, t } from "gt-react";
 
 export function DeviceHostEditor({
   host,
@@ -105,7 +105,7 @@ function DeviceHostEditorForm({
       }}
     >
       <DialogHeader>
-        <DialogTitle>{isNew ? "Add device host" : "Edit device host"}</DialogTitle>
+        <DialogTitle>{isNew ? t("Add device host") : t("Edit device host")}</DialogTitle>
         <DialogDescription>
           <T>
             <Var>

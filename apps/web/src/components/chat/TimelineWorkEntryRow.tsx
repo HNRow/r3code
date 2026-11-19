@@ -20,6 +20,7 @@ import {
   workEntryViewedImagePath,
 } from "@t3tools/client-runtime/work-log/presentation";
 import {
+  restartNoticeForItem,
   turnItemHasDetail,
   turnItemNeedsDetailFetch,
 } from "@t3tools/client-runtime/work-log/item-detail";
@@ -71,7 +72,8 @@ import {
   THOUGHT_PREVIEW_PLUGINS,
   THOUGHT_PREVIEW_SOURCE_MAX_LENGTH,
 } from "./TimelineWorkEntryRow.logic";
-import { T, useGT } from "gt-react";
+import { T, useGT, useMessages } from "gt-react";
+import { translateServerNotice } from "../../lib/timelineText";
 
 export function useThreadReadTarget(entry: TimelineWorkEntry, environmentId: EnvironmentId) {
   const rawThreadId = threadReadTargetId(entry);
@@ -210,6 +212,7 @@ export function ViewedImagesTimelineRow({
 
 function WorkEntryLogRow(props: WorkEntryRowProps) {
   const gt = useGT();
+  const m = useMessages();
   const { workEntry, workspaceRoot, displayLabel } = props;
   const ctx = use(TimelineRowCtx);
   const { threadRef, onImageExpand, timestampFormat } = ctx;
@@ -223,6 +226,10 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
     workEntry.projectedItem?.item.type === "notification"
       ? notificationChildThreadId(workEntry.projectedItem.item.source)
       : undefined;
+  const restartNotice =
+    workEntry.projectedItem === undefined
+      ? null
+      : restartNoticeForItem(workEntry.projectedItem.item);
   const groupView = use(WorkGroupViewCtx);
   const [expanded, setExpanded] = useState(
     () => groupView?.state.expandedEntries.has(workEntry.id) ?? false,
@@ -337,7 +344,8 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
       ? workEntry.toolLifecycleStatus === "inProgress"
         ? "Thinking"
         : "Thought"
-      : questionHeading || (displayLabel ?? workEntryDisplayLabel(workEntry, workspaceRoot));
+      : questionHeading ||
+        translateServerNotice(displayLabel ?? workEntryDisplayLabel(workEntry, workspaceRoot), m);
   const answerPreview =
     workEntry.questionAnswer && hasQuestionAnswer(workEntry.questionAnswer)
       ? getQuestionAnswerPreview(workEntry.questionAnswer)
@@ -383,7 +391,10 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
       ? plainOutput !== undefined
         ? plainOutput
         : buildToolCallExpandedBody(
-            workEntry,
+            // 展开体直接引用 detail；服务端写死的重启通知要在这里翻译。
+            workEntry.detail === undefined
+              ? workEntry
+              : { ...workEntry, detail: translateServerNotice(workEntry.detail, m) },
             workspaceRoot,
             previewText,
             viewedImage ? viewedImagePath : null,
@@ -597,6 +608,7 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
               onOpenToolDiff={ctx.onOpenToolDiff}
               onImageExpand={expandImage}
               source={ctx.turnItemSource}
+              restartNotice={restartNotice}
             />
           ) : (
             <>

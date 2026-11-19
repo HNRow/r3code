@@ -9,30 +9,40 @@ import type {
 import type { AppSymbolName } from "../../components/ui/AppSymbol";
 import { PullRequestGlyph } from "./pullRequestGlyphs";
 
+import { t } from "../../i18n/gt";
+
 const STATES = {
   open: {
-    label: "Open",
+    get label() {
+      return t("Open");
+    },
     icon: PullRequestGlyph.pullRequest,
     tint: "accent-adaptive-emerald-600-400",
     text: "text-adaptive-emerald-600-400",
     background: "bg-adaptive-emerald-500-a12-a16",
   },
   merged: {
-    label: "Merged",
+    get label() {
+      return t("Merged");
+    },
     icon: PullRequestGlyph.merged,
     tint: "accent-adaptive-violet-600-400",
     text: "text-adaptive-violet-600-400",
     background: "bg-adaptive-violet-500-a12-a16",
   },
   closed: {
-    label: "Closed",
+    get label() {
+      return t("Closed");
+    },
     icon: PullRequestGlyph.closed,
     tint: "accent-danger-foreground",
     text: "text-danger-foreground",
     background: "bg-danger",
   },
   draft: {
-    label: "Draft",
+    get label() {
+      return t("Draft");
+    },
     icon: PullRequestGlyph.draft,
     tint: "accent-icon-muted",
     text: "text-foreground-muted",
@@ -61,30 +71,30 @@ export function checkStatus(check: PullRequestCheck) {
   switch (check.status) {
     case "success":
       return {
-        label: "Passed",
+        label: t("Passed"),
         icon: "checkmark.circle",
         tint: "accent-adaptive-emerald-600-400",
       } as const;
     case "failure":
       return {
-        label: "Failed",
+        label: t("Failed"),
         icon: "exclamationmark.circle",
         tint: "accent-danger-foreground",
       } as const;
     case "action-required":
       return {
-        label: "Action required",
+        label: t("Action required"),
         icon: "exclamationmark.circle",
         tint: "accent-warning-foreground",
       } as const;
     case "pending":
-      return { label: "Pending", icon: "clock", tint: "accent-warning-foreground" } as const;
+      return { label: t("Pending"), icon: "clock", tint: "accent-warning-foreground" } as const;
     case "cancelled":
-      return { label: "Cancelled", icon: "minus", tint: "accent-icon-muted" } as const;
+      return { label: t("Cancelled"), icon: "minus", tint: "accent-icon-muted" } as const;
     case "skipped":
-      return { label: "Skipped", icon: "slash.circle", tint: "accent-icon-muted" } as const;
+      return { label: t("Skipped"), icon: "slash.circle", tint: "accent-icon-muted" } as const;
     case "neutral":
-      return { label: "Neutral", icon: "minus", tint: "accent-icon-muted" } as const;
+      return { label: t("Neutral"), icon: "minus", tint: "accent-icon-muted" } as const;
   }
 }
 
@@ -109,7 +119,7 @@ export function pullRequestChecksSummary(pr: Pick<PullRequestDetail, "checks">) 
   if (required)
     return {
       label: `${required} need attention`,
-      title: "Checks need attention",
+      title: t("Checks need attention"),
       count: `${required} awaiting action`,
       icon: "exclamationmark.circle",
       tint: "accent-warning-foreground",
@@ -117,7 +127,7 @@ export function pullRequestChecksSummary(pr: Pick<PullRequestDetail, "checks">) 
   if (pending)
     return {
       label: `${pending} pending`,
-      title: "Checks running",
+      title: t("Checks running"),
       count: `${pending} pending`,
       icon: "clock",
       tint: "accent-warning-foreground",
@@ -179,7 +189,7 @@ export function pullRequestReviewSummary(
   );
   if (requested.length)
     return {
-      title: "Changes requested",
+      title: t("Changes requested"),
       count: `${requested.length} ${requested.length === 1 ? "reviewer" : "reviewers"}`,
       icon: "xmark.circle.fill",
       tint: "accent-danger-foreground",
@@ -199,7 +209,7 @@ export function pullRequestReviewSummary(
   const commented = reviews.filter((review) => review.reviewState === "COMMENTED");
   if (commented.length && !pr.reviewers.length)
     return {
-      title: "Reviews",
+      title: t("Reviews"),
       count: `${commented.length} commented`,
       icon: "bubble.left",
       tint: "accent-icon-muted",

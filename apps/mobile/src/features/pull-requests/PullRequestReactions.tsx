@@ -27,6 +27,7 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { pullRequestTarget, type PullRequestParams } from "./usePullRequestDiff";
 import { usePullRequestPermissions } from "./usePullRequestPermissions";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const EMPTY_PENDING: ReadonlyMap<PullRequestReactionContent, PendingPullRequestReaction> =
   new Map();
@@ -55,7 +56,7 @@ export function ReactionPills(props: {
         next.delete(content);
         return { signature: current.signature, values: next };
       });
-      Dialog.alert("Couldn't save the reaction", "Try again in a moment.");
+      Dialog.alert(t("Couldn't save the reaction"), t("Try again in a moment."));
       return;
     }
     props.onChanged?.();

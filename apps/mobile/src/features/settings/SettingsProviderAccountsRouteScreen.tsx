@@ -35,6 +35,7 @@ import { AddClaudeAccount, ClaudeAccount } from "./ClaudeAccounts";
 import { CLAUDE_DRIVER } from "./claude-accounts";
 import { useSettingsEnvironmentFilter, type SettingsTarget } from "./settings-environment-filter";
 import { useGT, T, Var } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function SettingsProviderAccountsRouteScreen() {
   const gt = useGT();
@@ -64,7 +65,7 @@ export function SettingsProviderAccountsRouteScreen() {
                     <T>Limited permissions</T>
                   </Text>
                   <Text className="text-sm text-foreground-muted">
-                    {`This session can view ${environment.label}'s providers but can't change their settings.`}
+                    {t`This session can view ${environment.label}'s providers but can't change their settings.`}
                   </Text>
                 </View>
               ) : (
@@ -276,7 +277,7 @@ function ProviderAccount({
     ? [
         {
           id: "remove",
-          title: "Remove incomplete connection",
+          title: t("Remove incomplete connection"),
           attributes: { disabled: disabled || active || !canRemoveMethod },
           subactions: removableMethods.map((method) => ({
             id: `remove:${method.id}`,
@@ -291,12 +292,12 @@ function ProviderAccount({
   }
   function signOut() {
     Dialog.alert(
-      "Sign out?",
-      `Running threads sharing this sign-in on ${environment.label} will stop. Thread history is kept.`,
+      t("Sign out?"),
+      t`Running threads sharing this sign-in on ${environment.label} will stop. Thread history is kept.`,
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("Cancel"), style: "cancel" },
         {
-          text: "Sign out",
+          text: t("Sign out"),
           style: "destructive",
           onPress: () => {
             void run(() => logout(target));
@@ -323,7 +324,7 @@ function ProviderAccount({
       ? [
           {
             id: "change",
-            title: "Change account",
+            title: t("Change account"),
             image: "person.crop.circle",
             attributes: { disabled: signInDisabled },
             ...(methodActions.length > 1
@@ -341,7 +342,7 @@ function ProviderAccount({
       ? [
           {
             id: "signOut",
-            title: "Sign out",
+            title: t("Sign out"),
             image: "rectangle.portrait.and.arrow.right",
             attributes: { destructive: true, disabled: disabled || state === null },
           },

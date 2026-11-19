@@ -233,6 +233,7 @@ describe("when: the ref is on GitLab", () => {
       branchName: "main",
       includesCommit: false,
       terminology: sourceControlClients.get("gitlab").changeRequest,
+      translate: (message) => message,
     });
     assert.equal(copy.title, "Push & create MR from default ref?");
     assert.include(copy.description, "create a merge request on");

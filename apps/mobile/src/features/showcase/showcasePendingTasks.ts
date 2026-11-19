@@ -9,19 +9,24 @@ import {
 } from "@t3tools/contracts";
 
 import type { QueuedThreadMessage } from "../../state/thread-outbox-model";
+import { t } from "../../i18n/gt";
 
 export const SHOWCASE_PENDING_TASK_DEFINITIONS = [
   {
     projectId: "t3code",
     id: "offline-launch-checklist",
-    text: "Ship the offline launch checklist before touchdown ✈️",
+    get text() {
+      return t("Ship the offline launch checklist before touchdown ✈️");
+    },
     branch: "feat/offline-launchpad",
     minutesAgo: 8,
   },
   {
     projectId: "react",
     id: "train-tunnel-suspense",
-    text: "Polish the Suspense handoff for the train tunnel 🚇",
+    get text() {
+      return t("Polish the Suspense handoff for the train tunnel 🚇");
+    },
     branch: "perf/tunnel-handoff",
     minutesAgo: 27,
   },

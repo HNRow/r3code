@@ -6,7 +6,7 @@ import { textDirection } from "~/textDirection";
 
 import { ComposerContextActionsContext } from "../composerContextActions";
 import { Button } from "../ui/button";
-import { useGT, Var, T } from "gt-react";
+import { useGT, Var, T, t } from "gt-react";
 
 export function AssistantCitationCommentEditor({
   citation,
@@ -138,7 +138,7 @@ export function AssistantCitationCommentEditor({
           onPointerDown={(event) => event.preventDefault()}
           onClick={submit}
         >
-          {commentTooLong ? "Shorten comment" : "Save"}
+          {commentTooLong ? t("Shorten comment") : t("Save")}
         </Button>
       </div>
     </div>

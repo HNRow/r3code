@@ -33,6 +33,7 @@ import {
   pullRequestConflict,
   pullRequestStatus,
 } from "../pull-requests/pullRequestStatus";
+import { t } from "../../i18n/gt";
 
 export function useLinkedPullRequestLines(
   thread: EnvironmentThreadShell | null,
@@ -92,7 +93,7 @@ export const LinkedPullRequestRow = memo(function LinkedPullRequestRow(props: {
       onPress={() => {
         void props.openPullRequest(link.url).then((opened) => {
           if (!opened)
-            Dialog.alert(`Unable to open ${shortLabel}`, `The ${singular} could not be opened.`);
+            Dialog.alert(t`Unable to open ${shortLabel}`, t`The ${singular} could not be opened.`);
         });
       }}
       style={{ paddingLeft: 16 + Math.min(depth, 3) * 16 }}
@@ -161,7 +162,7 @@ export const LinkedPullRequestRow = memo(function LinkedPullRequestRow(props: {
           numberOfLines={2}
           ellipsizeMode="tail"
         >
-          {snapshot?.title ?? "Waiting for host state"}
+          {snapshot?.title ?? t("Waiting for host state")}
         </Text>
       </View>
     </Pressable>

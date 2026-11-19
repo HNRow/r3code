@@ -73,7 +73,8 @@ import {
   needsWorkspaceFileContents,
 } from "./filePath";
 import { useWorkspaceFileAssetUrlState } from "./workspaceFileAssetUrl";
-import { useGT, T } from "gt-react-native";
+import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 function FilesBrowserHeader(props: {
   readonly projectName: string;
@@ -93,11 +94,11 @@ function FilesBrowserHeader(props: {
       search={{
         value: props.searchQuery,
         onChangeText: props.onSearchQueryChange,
-        placeholder: "Search files",
+        placeholder: t("Search files"),
         closeAccessibilityLabel: "Close file search",
         clearAccessibilityLabel: "Clear file search",
       }}
-      refresh={{ accessibilityLabel: "Refresh files", onPress: props.onRefresh }}
+      refresh={{ accessibilityLabel: t("Refresh files"), onPress: props.onRefresh }}
     />
   );
 }
@@ -129,7 +130,7 @@ function FileHeader(props: {
       backInSplitView={
         props.fileInspectorSupported
           ? {
-              accessibilityLabel: "Return to chat",
+              accessibilityLabel: t("Return to chat"),
               icon: "chevron.left",
               onPress: props.onReturnToThread,
             }
@@ -151,7 +152,7 @@ function FileHeader(props: {
       }
       menus={[
         {
-          title: "File actions",
+          title: t("File actions"),
           icon: "ellipsis",
           separateBackground: false,
           items: [
@@ -334,7 +335,7 @@ function FileContent(props: {
     <View className="flex-1 bg-sheet" style={{ paddingTop: reservedHeaderInset }}>
       {props.truncated ? (
         <FilePreviewNotice title={gt("Partial file")}>
-          <T>Preview limited to the first 1 MB of a truncated file.</T>
+          {gt("Preview limited to the first 1 MB of a truncated file.")}
         </FilePreviewNotice>
       ) : null}
       {props.activeMode === "preview" && delimiter ? (
@@ -837,7 +838,7 @@ export function ThreadFileScreen(props: ThreadFileRouteScreenProps) {
       canToggleMode
         ? ({
             id: "source",
-            title: "Source",
+            title: t("Source"),
             icon: "doc.text",
             inline: true,
             onPress: () => setModeOverride({ path: relativePath, mode: "source" }),
@@ -875,7 +876,7 @@ export function ThreadFileScreen(props: ThreadFileRouteScreenProps) {
         : [
             {
               id: "copy-path",
-              title: "Copy path",
+              title: t("Copy path"),
               icon: "doc.on.doc",
               inline: false,
               onPress: () =>
@@ -899,7 +900,7 @@ export function ThreadFileScreen(props: ThreadFileRouteScreenProps) {
       isPdfFile({ name: relativePath }) && previewUri !== null
         ? ({
             id: "open-pdf",
-            title: "Open PDF",
+            title: t("Open PDF"),
             icon: "arrow.up.left.and.arrow.down.right",
             inline: false,
             onPress: () =>
@@ -933,7 +934,7 @@ export function ThreadFileScreen(props: ThreadFileRouteScreenProps) {
       (isBrowserFile || isImageFile || isVideoFile || isAudioFile)
         ? ({
             id: "refresh",
-            title: "Refresh",
+            title: t("Refresh"),
             icon: "arrow.clockwise",
             inline: false,
             onPress: async () => {

@@ -26,6 +26,7 @@ import {
 import { getVirtualizedScrollFadeClassName } from "./ui/scroll-area";
 import { ProjectPinButton } from "./ProjectPinButton";
 import { SearchMatchHintLine, ThreadSearchMatchExcerpt } from "./ThreadSearchMatch";
+import { t } from "gt-react";
 
 interface CommandPaletteResultsProps {
   emptyStateMessage?: string;
@@ -41,8 +42,8 @@ function CommandPaletteEmptyState(props: { emptyStateMessage?: string; isActions
     <div className="py-10 text-center text-sm text-muted-foreground">
       {props.emptyStateMessage ??
         (props.isActionsOnly
-          ? "No matching actions."
-          : "No matching commands, projects, or threads.")}
+          ? t("No matching actions.")
+          : t("No matching commands, projects, or threads."))}
     </div>
   );
 }

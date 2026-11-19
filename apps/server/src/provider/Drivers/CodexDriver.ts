@@ -25,6 +25,7 @@ import {
   type CodexAdapterV2DriverEnv,
 } from "../../orchestration-v2/Adapters/CodexAdapterV2.ts";
 import { ProviderDriverError } from "../Errors.ts";
+import { makeCodexPluginManagement, type CodexPluginRequest } from "./CodexPlugins.ts";
 import * as ResetCreditCoordinator from "../resetCreditCoordinator.ts";
 import {
   checkCodexProviderStatus,
@@ -412,6 +413,35 @@ export const CodexDriver: ProviderDriver<
         Effect.forkScoped,
       );
     }
+    const pluginRequest = ((method: string, params: unknown) =>
+      Effect.gen(function* () {
+        const { client } = yield* withCodexAppServerClient({
+          binaryPath: effectiveConfig.binaryPath,
+          homePath: effectiveConfig.homePath,
+          launchArgs: resolveCodexLaunchArgs(effectiveConfig.launchArgs, processEnv),
+          cwd: process.cwd(),
+          environment: processEnv,
+        });
+        return yield* client.request(method as never, params as never);
+      }).pipe(
+        Effect.scoped,
+        Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner),
+        Effect.mapError(
+          (cause) =>
+            new ProviderDriverError({
+              driver: DRIVER_KIND,
+              instanceId,
+              detail: `Codex app-server ${method} failed.`,
+              cause,
+            }),
+        ),
+      )) as CodexPluginRequest;
+    const pluginManagement = makeCodexPluginManagement({
+      configHome: homeLayout.sharedHomePath,
+      instanceId,
+      request: pluginRequest,
+    });
+
     return {
       instanceId,
       driverKind: DRIVER_KIND,
@@ -422,6 +452,7 @@ export const CodexDriver: ProviderDriver<
       snapshot,
       snapshotForCwd,
       consumeResetCredit,
+      pluginManagement,
       orchestrationAdapter,
       textGeneration,
     } satisfies ProviderInstance;

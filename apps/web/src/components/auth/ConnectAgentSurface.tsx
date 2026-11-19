@@ -31,15 +31,19 @@ import { Input } from "../ui/input";
 import { RadioGroup } from "../ui/radio-group";
 import { Spinner } from "../ui/spinner";
 import { StandalonePage, StandalonePageHeader } from "../ui/standalone-page";
-import { useGT, T, Var } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 export const accessConfig: Record<
   AuthMcpClientAccess,
   { readonly label: string; readonly description: string; readonly icon: LucideIcon }
 > = {
   "read-only": {
-    label: "Read only",
-    description: "Read projects and threads. Cannot start, message or change anything.",
+    get label() {
+      return t("Read only");
+    },
+    get description() {
+      return t("Read projects and threads. Cannot start, message or change anything.");
+    },
     icon: EyeIcon,
   },
   ...runtimeModeConfig,
@@ -262,7 +266,7 @@ export function McpConsent({
   return (
     <StandalonePage>
       <ConnectAgentHeading
-        title={`Connect ${details.clientName}`}
+        title={t`Connect ${details.clientName}`}
         description={
           <>
             <T>
@@ -388,9 +392,9 @@ export function McpConsent({
         <div className="flex flex-wrap gap-2">
           <Button disabled={!canApprove} type="submit">
             {pending === "approve"
-              ? "Approving…"
+              ? t("Approving…")
               : approveLevel === null
-                ? "Choose what it may do"
+                ? t("Choose what it may do")
                 : `Approve ${accessConfig[approveLevel].label}`}
           </Button>
           <Button
@@ -399,7 +403,7 @@ export function McpConsent({
             type="button"
             variant="outline"
           >
-            {pending === "deny" ? "Denying…" : "Deny"}
+            {pending === "deny" ? t("Denying…") : t("Deny")}
           </Button>
         </div>
       </form>

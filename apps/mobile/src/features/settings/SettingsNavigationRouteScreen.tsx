@@ -25,6 +25,7 @@ import { SettingsScreen } from "./components/SettingsScreen";
 import { SettingsSection } from "./components/SettingsSection";
 import { resolveWorkspaceTabOrder } from "../layout/workspace/workspace-tabs-state";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function SettingsNavigationRouteScreen() {
   const gt = useGT();
@@ -47,8 +48,12 @@ export function SettingsNavigationRouteScreen() {
       >
         <Text className="px-2 text-sm text-foreground-muted">
           {customizable
-            ? "Phones show the first four enabled sections; Android tablet rails show all enabled sections. Remaining sections appear at the top of Settings. Hidden sections appear only here. Settings always stays last. Saved on this device."
-            : "Tab customization becomes available when there are six sections, including Settings."}
+            ? t(
+                "Phones show the first four enabled sections; Android tablet rails show all enabled sections. Remaining sections appear at the top of Settings. Hidden sections appear only here. Settings always stays last. Saved on this device.",
+              )
+            : t(
+                "Tab customization becomes available when there are six sections, including Settings.",
+              )}
         </Text>
         <SettingsSection title={gt("Tab order")}>
           {order.map((tab, index) => (
@@ -62,10 +67,10 @@ export function SettingsNavigationRouteScreen() {
                 <Text>{WORKSPACE_TAB_LABELS[tab]}</Text>
                 <Text className="text-xs text-foreground-muted">
                   {hidden.includes(tab)
-                    ? "Hidden"
+                    ? t("Hidden")
                     : enabled.indexOf(tab) < capacity
                       ? `Tab ${enabled.indexOf(tab) + 1}`
-                      : "In Settings"}
+                      : t("In Settings")}
                 </Text>
               </View>
               <IconButton

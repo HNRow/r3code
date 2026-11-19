@@ -23,6 +23,7 @@ import { SettingsSection } from "./components/SettingsSection";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { formatBytes } from "../../lib/formatBytes";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function SettingsClientStorageRouteScreen() {
   const gt = useGT();
@@ -49,9 +50,10 @@ export function SettingsClientStorageRouteScreen() {
       savedConnectionsById[environment.environmentId]?.environmentLabel ??
       environment.environmentId;
     Dialog.confirm({
-      title: `Clear cache for ${label}?`,
-      message:
+      title: t`Clear cache for ${label}?`,
+      message: t(
         "This removes offline threads, server metadata, and cached branches for this environment. The saved connection and credentials stay intact.",
+      ),
       confirmText: "Clear Cache",
       destructive: true,
       onConfirm: () =>
@@ -61,9 +63,10 @@ export function SettingsClientStorageRouteScreen() {
 
   const confirmClearAll = () => {
     Dialog.confirm({
-      title: "Clear all client caches?",
-      message:
+      title: t("Clear all client caches?"),
+      message: t(
         "This removes offline data for every environment. Connections, credentials, account data, and app preferences stay intact.",
+      ),
       confirmText: "Clear All Caches",
       destructive: true,
       onConfirm: () => clearCache({ type: "all" }),
@@ -180,7 +183,7 @@ function CacheEnvironmentRow(props: {
       <SettingsActionRow
         icon={ENVIRONMENT_MACHINE_SYMBOLS[props.machine]}
         label={props.environmentLabel}
-        description={`Clear ${formatBytes(props.environment.payloadBytes)} of cached data`}
+        description={t`Clear ${formatBytes(props.environment.payloadBytes)} of cached data`}
         tone="danger"
         disabled={props.disabled}
         onPress={props.onClear}

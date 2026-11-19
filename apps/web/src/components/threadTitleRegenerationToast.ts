@@ -6,6 +6,7 @@ import {
 } from "@t3tools/client-runtime/state/runtime";
 
 import { stackedThreadToast } from "./ui/toast";
+import { t } from "gt-react";
 
 type TitleRegenerationResult = AtomCommandResult<ThreadTitleRegenerationOutcome | null, unknown>;
 
@@ -44,8 +45,8 @@ export function titleRegenerationToast(results: ReadonlyArray<TitleRegenerationR
   if (results.length === 1) {
     return stackedThreadToast({
       type: "info",
-      title: "Title kept",
-      description: "The current title already fits this thread.",
+      title: t("Title kept"),
+      description: t("The current title already fits this thread."),
     });
   }
   return stackedThreadToast({

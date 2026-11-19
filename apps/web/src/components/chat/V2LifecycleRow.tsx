@@ -68,7 +68,7 @@ import { TimelineSystemDivider } from "./TimelineSystemDivider";
 import { subagentResumedSince } from "./V2LifecycleRow.logic";
 import { Button, InlineButton } from "../ui/button";
 import { T3Wordmark } from "../T3Wordmark";
-import { useGT, T, Var } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 export type { HandoffTimelineRun } from "@t3tools/client-runtime/handoff";
 
@@ -122,7 +122,7 @@ export function V2LifecycleRow(props: {
             <MessageSquareIcon className="size-4 text-secondary-label" aria-hidden />
           </span>
           <span className="min-w-0 flex-1 truncate text-sm font-medium">
-            {item.title ?? "Created thread"}
+            {item.title ?? t("Created thread")}
           </span>
           <Button
             size="xs"
@@ -184,14 +184,54 @@ const STATUS_VISUALS: Record<
   OrchestrationV2TurnItem["status"],
   { dotClass: string; label: string }
 > = {
-  pending: { dotClass: "bg-info", label: "Queued" },
-  running: { dotClass: "bg-info", label: "Running" },
-  waiting: { dotClass: "bg-info", label: "Waiting" },
-  idle: { dotClass: "bg-muted-foreground/50", label: "Idle · resumable" },
-  completed: { dotClass: "bg-success", label: "Completed" },
-  failed: { dotClass: "bg-destructive", label: "Failed" },
-  cancelled: { dotClass: "bg-muted-foreground/60", label: "Stopped" },
-  interrupted: { dotClass: "bg-muted-foreground/60", label: "Stopped" },
+  pending: {
+    dotClass: "bg-info",
+    get label() {
+      return t("Queued");
+    },
+  },
+  running: {
+    dotClass: "bg-info",
+    get label() {
+      return t("Running");
+    },
+  },
+  waiting: {
+    dotClass: "bg-info",
+    get label() {
+      return t("Waiting");
+    },
+  },
+  idle: {
+    dotClass: "bg-muted-foreground/50",
+    get label() {
+      return t("Idle · resumable");
+    },
+  },
+  completed: {
+    dotClass: "bg-success",
+    get label() {
+      return t("Completed");
+    },
+  },
+  failed: {
+    dotClass: "bg-destructive",
+    get label() {
+      return t("Failed");
+    },
+  },
+  cancelled: {
+    dotClass: "bg-muted-foreground/60",
+    get label() {
+      return t("Stopped");
+    },
+  },
+  interrupted: {
+    dotClass: "bg-muted-foreground/60",
+    get label() {
+      return t("Stopped");
+    },
+  },
 };
 
 function subagentStatusVisual(status: OrchestrationV2TurnItem["status"]) {

@@ -25,7 +25,7 @@ import {
   pullRequestChecksStatePresentation,
   summarizePullRequestChecks,
 } from "./pullRequestPresentation";
-import { T, Var } from "gt-react";
+import { T, Var, t } from "gt-react";
 
 // Fetch only on open to avoid per-row requests.
 function LazyChecksBody({
@@ -46,7 +46,7 @@ function LazyChecksBody({
   if (detailQuery.data === null) {
     return (
       <p className="text-muted-foreground text-xs">
-        {detailQuery.isPending ? "Loading checks…" : "No checks reported"}
+        {detailQuery.isPending ? t("Loading checks…") : t("No checks reported")}
       </p>
     );
   }
@@ -106,7 +106,10 @@ function ChecksBody({
                       if (!check.url) return;
                       void openLink(check.url).catch((error: unknown) => {
                         console.error(error);
-                        toastManager.add({ type: "error", title: "Unable to open check details" });
+                        toastManager.add({
+                          type: "error",
+                          title: t("Unable to open check details"),
+                        });
                       });
                     }}
                   >
@@ -125,7 +128,7 @@ function ChecksBody({
           aria-expanded={showAll}
           onClick={() => setShowAll(!showAll)}
         >
-          {showAll ? "Show less" : "Show all"}
+          {showAll ? t("Show less") : t("Show all")}
         </Button>
       ) : null}
     </>

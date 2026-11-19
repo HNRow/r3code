@@ -100,6 +100,8 @@ import {
   AgentSessionScanInput,
   AgentSessionScanResult,
   AgentSessionScanError,
+  AgentSessionListInput,
+  AgentSessionListResult,
 } from "./agentSessions.ts";
 import {
   AssetAccessError,
@@ -169,6 +171,28 @@ import {
   ProviderUploadFeedbackResult,
 } from "./provider.ts";
 import { ProviderInstanceId, ProviderInstanceMutation } from "./providerInstance.ts";
+import {
+  SkillInstallInput,
+  SkillInventory,
+  SkillInventoryConflictError,
+  SkillInventoryListError,
+  SkillMutationError,
+  SkillMutationResult,
+  SkillSetEnabledInput,
+  SkillSyncInput,
+  SkillSyncResult,
+  SkillUninstallInput,
+} from "./skills.ts";
+import {
+  PluginInventory,
+  PluginInventoryConflictError,
+  PluginInventoryListError,
+  PluginListInput,
+  PluginMutationError,
+  PluginMutationResult,
+  PluginSetEnabledInput,
+  PluginUninstallInput,
+} from "./plugins.ts";
 import {
   IssueCandidates,
   IssueCommentInput,
@@ -455,6 +479,7 @@ export const WS_METHODS = {
   filesystemBrowse: "filesystem.browse",
   filesystemGetMetadata: "filesystem.getMetadata",
   agentSessionsScan: "agentSessions.scan",
+  agentSessionsList: "agentSessions.list",
   agentSessionsImport: "agentSessions.import",
   assetsCreateUrl: "assets.createUrl",
   assetsPersistChatAttachments: "assets.persistChatAttachments",
@@ -467,6 +492,14 @@ export const WS_METHODS = {
   mcpAppsUpdateModelContext: "mcpApps.updateModelContext",
 
   providerUploadFeedback: "provider.uploadFeedback",
+  skillsList: "skills.list",
+  skillsInstall: "skills.install",
+  skillsSetEnabled: "skills.setEnabled",
+  skillsUninstall: "skills.uninstall",
+  skillsSync: "skills.sync",
+  pluginsList: "plugins.list",
+  pluginsSetEnabled: "plugins.setEnabled",
+  pluginsUninstall: "plugins.uninstall",
   providerAuthStart: "provider.auth.start",
   providerConsumeResetCredit: "provider.consumeResetCredit",
   providerAuthComplete: "provider.auth.complete",
@@ -731,6 +764,63 @@ export const WsServerRefreshProvidersRpc = Rpc.make(WS_METHODS.serverRefreshProv
   }),
   success: ServerProviderUpdatedPayload,
   error: Schema.Union([EnvironmentAuthorizationError, ProviderSetupError]),
+});
+
+const WsSkillsListRpc = Rpc.make(WS_METHODS.skillsList, {
+  payload: Schema.Struct({
+    instanceId: Schema.optional(ProviderInstanceId),
+    cwd: TrimmedNonEmptyString,
+  }),
+  success: SkillInventory,
+  error: Schema.Union([SkillInventoryListError, EnvironmentAuthorizationError]),
+});
+
+const SkillMutationRpcError = Schema.Union([
+  SkillMutationError,
+  SkillInventoryConflictError,
+  EnvironmentAuthorizationError,
+]);
+const WsSkillsInstallRpc = Rpc.make(WS_METHODS.skillsInstall, {
+  payload: SkillInstallInput,
+  success: SkillMutationResult,
+  error: SkillMutationRpcError,
+});
+const WsSkillsSetEnabledRpc = Rpc.make(WS_METHODS.skillsSetEnabled, {
+  payload: SkillSetEnabledInput,
+  success: SkillMutationResult,
+  error: SkillMutationRpcError,
+});
+const WsSkillsUninstallRpc = Rpc.make(WS_METHODS.skillsUninstall, {
+  payload: SkillUninstallInput,
+  success: SkillMutationResult,
+  error: SkillMutationRpcError,
+});
+const WsSkillsSyncRpc = Rpc.make(WS_METHODS.skillsSync, {
+  payload: SkillSyncInput,
+  success: SkillSyncResult,
+  error: SkillMutationRpcError,
+});
+
+const WsPluginsListRpc = Rpc.make(WS_METHODS.pluginsList, {
+  payload: PluginListInput,
+  success: PluginInventory,
+  error: Schema.Union([PluginInventoryListError, EnvironmentAuthorizationError]),
+});
+
+const PluginMutationRpcError = Schema.Union([
+  PluginMutationError,
+  PluginInventoryConflictError,
+  EnvironmentAuthorizationError,
+]);
+const WsPluginsSetEnabledRpc = Rpc.make(WS_METHODS.pluginsSetEnabled, {
+  payload: PluginSetEnabledInput,
+  success: PluginMutationResult,
+  error: PluginMutationRpcError,
+});
+const WsPluginsUninstallRpc = Rpc.make(WS_METHODS.pluginsUninstall, {
+  payload: PluginUninstallInput,
+  success: PluginMutationResult,
+  error: PluginMutationRpcError,
 });
 
 const WsServerUpdateProviderRpc = Rpc.make(WS_METHODS.serverUpdateProvider, {
@@ -1590,6 +1680,17 @@ const WsAgentSessionsScanRpc = Rpc.make(WS_METHODS.agentSessionsScan, {
   error: Schema.Union([AgentSessionScanError, EnvironmentAuthorizationError]),
 });
 
+const WsAgentSessionsListRpc = Rpc.make(WS_METHODS.agentSessionsList, {
+  payload: AgentSessionListInput,
+  success: AgentSessionListResult,
+  error: Schema.Union([
+    AgentSessionImportProjectChangedError,
+    AgentSessionImportProjectNotFoundError,
+    AgentSessionScanError,
+    EnvironmentAuthorizationError,
+  ]),
+});
+
 const WsAgentSessionsImportRpc = Rpc.make(WS_METHODS.agentSessionsImport, {
   payload: AgentSessionImportInput,
   success: AgentSessionImportResult,
@@ -2263,6 +2364,14 @@ export const WsRpcGroup = RpcGroup.make(
   WsServerProbeRpc,
   WsServerGetConfigRpc,
   WsServerRefreshProvidersRpc,
+  WsSkillsListRpc,
+  WsSkillsInstallRpc,
+  WsSkillsSetEnabledRpc,
+  WsSkillsUninstallRpc,
+  WsSkillsSyncRpc,
+  WsPluginsListRpc,
+  WsPluginsSetEnabledRpc,
+  WsPluginsUninstallRpc,
   WsServerUpdateProviderRpc,
   WsProviderConsumeResetCreditRpc,
   WsProviderAuthStartRpc,
@@ -2394,6 +2503,7 @@ export const WsRpcGroup = RpcGroup.make(
   WsFilesystemBrowseRpc,
   WsFilesystemGetMetadataRpc,
   WsAgentSessionsScanRpc,
+  WsAgentSessionsListRpc,
   WsAgentSessionsImportRpc,
   WsAssetsCreateUrlRpc,
   WsAssetsPersistChatAttachmentsRpc,

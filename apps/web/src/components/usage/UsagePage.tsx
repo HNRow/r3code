@@ -106,7 +106,7 @@ import {
   saveUsagePagePreferences,
   type UsagePagePreferences,
 } from "./usagePagePreferences";
-import { useGT, T, Var } from "gt-react";
+import { useGT, useMessages, T, Var, t } from "gt-react";
 
 function isUsageMetric(value: string | null | undefined): value is UsageMetric {
   return METRIC_OPTIONS.some((option) => option.value === value);
@@ -177,6 +177,7 @@ function UsageModelDialogHost({
 
 export function UsagePage() {
   const gt = useGT();
+  const m = useMessages();
   const [preferences, setPreferences] = useState(readUsagePagePreferences);
   const keybindings = useAtomValue(primaryServerKeybindingsAtom);
   const hour12 = usePrimarySettings((settings) => resolveHour12(settings.timestampFormat));
@@ -186,7 +187,7 @@ export function UsagePage() {
     const shortcut = shortcutLabelForCommand(keybindings, option.command, {
       context: { usagePageOpen: true },
     });
-    return shortcut ? `${option.label} (${shortcut})` : option.label;
+    return shortcut ? `${m(option.label)} (${shortcut})` : m(option.label);
   };
   const [windowSelection, setWindowSelection] = useState(() => ({
     days: preferences.windowDays,
@@ -409,7 +410,7 @@ export function UsagePage() {
           >
             {WINDOW_OPTIONS.map((option) => (
               <Toggle key={option.days} value={String(option.days)} title={shortcutTitle(option)}>
-                {option.label}
+                {m(option.label)}
               </Toggle>
             ))}
           </ToggleGroup>
@@ -425,7 +426,7 @@ export function UsagePage() {
         >
           {METRIC_OPTIONS.map((option) => (
             <Toggle key={option.value} value={option.value} title={shortcutTitle(option)}>
-              {option.label}
+              {m(option.label)}
             </Toggle>
           ))}
         </ToggleGroup>
@@ -450,7 +451,7 @@ export function UsagePage() {
               className="w-auto min-w-0"
             >
               <SelectValue>
-                {WINDOW_OPTIONS.find((option) => option.days === windowDays)?.label}
+                {m(WINDOW_OPTIONS.find((option) => option.days === windowDays)?.label ?? "")}
               </SelectValue>
             </SelectTrigger>
             <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -460,7 +461,7 @@ export function UsagePage() {
                   value={String(option.days)}
                   title={shortcutTitle(option)}
                 >
-                  {option.label}
+                  {m(option.label)}
                 </SelectItem>
               ))}
             </SelectPopup>
@@ -479,13 +480,13 @@ export function UsagePage() {
             className="w-auto min-w-0"
           >
             <SelectValue>
-              {METRIC_OPTIONS.find((option) => option.value === metric)?.label}
+              {m(METRIC_OPTIONS.find((option) => option.value === metric)?.label ?? "")}
             </SelectValue>
           </SelectTrigger>
           <SelectPopup align="end" alignItemWithTrigger={false}>
             {METRIC_OPTIONS.map((option) => (
               <SelectItem key={option.value} value={option.value} title={shortcutTitle(option)}>
-                {option.label}
+                {m(option.label)}
               </SelectItem>
             ))}
           </SelectPopup>
@@ -774,7 +775,8 @@ function UsageOverview({
 
         <div className="flex min-w-0 flex-col gap-3">
           <h2 className="text-sm font-medium text-foreground">
-            {shownHourly ? "Hourly" : "Daily"} {metric === "tokens" ? "processed tokens" : "cost"}
+            {shownHourly ? t("Hourly") : t("Daily")}{" "}
+            {metric === "tokens" ? "processed tokens" : "cost"}
           </h2>
           <UsageProviderChart
             providers={activeProviders}
@@ -871,7 +873,7 @@ function UsageOverview({
           >
             {(
               [
-                { value: "model", label: "Model" },
+                { value: "model", label: t("Model") },
                 { value: "time", label: shownHourly ? "Hour" : "Day" },
               ] as const
             ).map((option) => (
@@ -979,7 +981,7 @@ function UsageOverview({
               </colgroup>
               <thead>
                 <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                  <th className="py-2 pl-2 font-normal">{shownHourly ? "Hour" : "Day"}</th>
+                  <th className="py-2 pl-2 font-normal">{shownHourly ? t("Hour") : t("Day")}</th>
                   {activeProviders.map((provider) => (
                     <th key={provider} className="py-2 pl-4 text-right font-normal">
                       {PROVIDER_PRESENTATION[provider].label}
@@ -1166,7 +1168,7 @@ function UsageEnvironmentFilter({
   const gt = useGT();
   const allSelected = selectedEnvironmentIds === null;
   const label = allSelected
-    ? "All environments"
+    ? gt("All environments")
     : selectedEnvironments.length === 1
       ? selectedEnvironments[0]!.label
       : `${selectedEnvironments.length} environments`;
@@ -1208,19 +1210,19 @@ function UsageEnvironmentFilter({
           const progress = usageEnvironmentProgress(environment, refreshing);
           const status =
             environment.error !== null
-              ? "Unavailable"
+              ? gt("Unavailable")
               : environment.summary !== null &&
                   !isCompatibleUsageContractVersion(
                     environment.summary.contractVersion,
                     USAGE_CONTRACT_VERSION,
                   )
-                ? "Update required"
+                ? gt("Update required")
                 : !environment.isConnected
-                  ? "Connecting…"
+                  ? gt("Connecting…")
                   : progress.phase === "loading"
-                    ? "Scanning…"
+                    ? gt("Scanning…")
                     : progress.phase === "stale"
-                      ? "Refreshing…"
+                      ? gt("Refreshing…")
                       : progress.phase === "partway"
                         ? updatingProvidersLabel(progress.providers, providerLabel)
                         : "Ready";
@@ -1288,12 +1290,13 @@ function UsageProviderFilter({
   readonly hiddenProviders: ReadonlySet<UsageProviderKind>;
   readonly onChange: (hiddenProviders: readonly UsageProviderKind[]) => void;
 }) {
+  const gt = useGT();
   const visible = PROVIDER_ORDER.filter((provider) => !hiddenProviders.has(provider));
   const label =
     visible.length === PROVIDER_ORDER.length
-      ? "All providers"
+      ? gt("All providers")
       : visible.length === 0
-        ? "No providers"
+        ? gt("No providers")
         : visible.length === 1
           ? PROVIDER_PRESENTATION[visible[0]!].label
           : `${visible.length} providers`;

@@ -43,6 +43,7 @@ import { Button } from "../../components/ui/Button";
 import { Sheet } from "../../components/ui/Sheet";
 import { RUNTIME_MODE_CHOICES } from "./thread-settings-options";
 import { T, useGT, Var } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 /** The same five levels as web's access picker: read-only, then the runtime modes. */
 const ACCESS_CHOICES: ReadonlyArray<{
@@ -52,8 +53,12 @@ const ACCESS_CHOICES: ReadonlyArray<{
 }> = [
   {
     access: "read-only",
-    label: "Read only",
-    description: "Read projects and threads. Cannot start, message or change anything.",
+    get label() {
+      return t("Read only");
+    },
+    get description() {
+      return t("Read projects and threads. Cannot start, message or change anything.");
+    },
   },
   ...RUNTIME_MODE_CHOICES.map((choice) => ({ ...choice, access: choice.mode })),
 ];
@@ -109,7 +114,7 @@ function PendingLinkRequest(props: {
   const [declining, setDeclining] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const answer = useAtomCommand(peerLinkEnvironment.answerRequest, {
-    label: "decline link request",
+    label: t("decline link request"),
     reportFailure: false,
     reportDefect: false,
   });
@@ -136,11 +141,13 @@ function PendingLinkRequest(props: {
       <View className="gap-1">
         <Text className="font-t3-bold text-base text-foreground">
           {picksMachine(item)
-            ? "Link a machine to this environment"
+            ? t("Link a machine to this environment")
             : `Link ${target} to this environment`}
         </Text>
         {item.reason.trim() ? (
-          <Text className="font-sans text-sm leading-5 text-foreground-muted">{item.reason}</Text>
+          <Text translate={false} className="font-sans text-sm leading-5 text-foreground-muted">
+            {item.reason}
+          </Text>
         ) : null}
       </View>
       {error !== null ? (
@@ -213,7 +220,7 @@ function LinkRequestSheet(props: {
   // Submit then a tap can both run before a re-render; this guard is synchronous.
   const inFlight = useRef(false);
   const answer = useAtomCommand(peerLinkEnvironment.answerRequest, {
-    label: "answer link request",
+    label: t("answer link request"),
     // The failure cause holds the request, and with it the code; keep it out of the console.
     reportFailure: false,
     reportDefect: false,
@@ -309,7 +316,11 @@ function LinkRequestSheet(props: {
             </T>
           </Text>
           {item.url !== undefined && target.kind === "machine" ? (
-            <Text className="font-sans text-xs text-foreground-muted" numberOfLines={1}>
+            <Text
+              translate={false}
+              className="font-sans text-xs text-foreground-muted"
+              numberOfLines={1}
+            >
               {item.url}
             </Text>
           ) : null}
@@ -367,7 +378,7 @@ function LinkRequestSheet(props: {
           <View className="gap-2">
             <TextInput
               accessibilityLabel={gt("Address")}
-              placeholder="https://machine.tailnet.ts.net"
+              placeholder={t("https://machine.tailnet.ts.net")}
               value={address}
               onChangeText={setAddress}
               editable={!busy}

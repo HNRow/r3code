@@ -18,6 +18,7 @@ import { configuredHostedAppUrl } from "~/hostedPairing";
 import { draftModelSelectionApplies } from "~/lib/chatThreadActions";
 
 import { stackedThreadToast, toastManager } from "../ui/toast";
+import { t } from "gt-react";
 
 /** A shareable link to a prompt on the hosted app, or null when the prompt cannot fit in one. */
 export function promptLinkFor(
@@ -77,7 +78,7 @@ export async function copyPromptLink(link: string): Promise<void> {
     toastManager.add(
       stackedThreadToast({
         type: "error",
-        title: "Could not copy the prompt link",
+        title: t("Could not copy the prompt link"),
         description: error instanceof Error ? error.message : "An error occurred.",
       }),
     );

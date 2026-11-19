@@ -97,6 +97,7 @@ import {
   formatScheduledTaskInterval,
 } from "./scheduledTaskPresentation";
 import { Var, T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 type ScheduledTaskRoutes = {
   SettingsScheduledTaskNew: undefined;
@@ -107,13 +108,48 @@ type ScheduledTaskRoutes = {
 };
 
 const DAYS = [
-  { index: 1, label: "Mon" },
-  { index: 2, label: "Tue" },
-  { index: 3, label: "Wed" },
-  { index: 4, label: "Thu" },
-  { index: 5, label: "Fri" },
-  { index: 6, label: "Sat" },
-  { index: 0, label: "Sun" },
+  {
+    index: 1,
+    get label() {
+      return t("Mon");
+    },
+  },
+  {
+    index: 2,
+    get label() {
+      return t("Tue");
+    },
+  },
+  {
+    index: 3,
+    get label() {
+      return t("Wed");
+    },
+  },
+  {
+    index: 4,
+    get label() {
+      return t("Thu");
+    },
+  },
+  {
+    index: 5,
+    get label() {
+      return t("Fri");
+    },
+  },
+  {
+    index: 6,
+    get label() {
+      return t("Sat");
+    },
+  },
+  {
+    index: 0,
+    get label() {
+      return t("Sun");
+    },
+  },
 ] as const;
 
 const THREAD_MODE_LABELS: Record<ScheduledTaskThreadMode, string> = {
@@ -443,7 +479,7 @@ export function SettingsScheduledTasksRouteScreen() {
       title={gt("Scheduled tasks")}
       actions={[
         {
-          accessibilityLabel: "New task",
+          accessibilityLabel: t("New task"),
           icon: "plus",
           disabled: visibleEnvironments.length === 0,
           onPress: newTask,
@@ -488,8 +524,8 @@ export function SettingsScheduledTasksRouteScreen() {
         ) : (
           <Text className="px-2 text-base text-foreground-muted">
             {availableTargets.length === 0
-              ? "Connect an environment to view and create scheduled tasks."
-              : "No environments match these filters. Change the filter above."}
+              ? t("Connect an environment to view and create scheduled tasks.")
+              : t("No environments match these filters. Change the filter above.")}
           </Text>
         )}
       </ScrollView>
@@ -561,13 +597,13 @@ function SettingsScheduledTaskEditorScreen({ title }: { readonly title: string }
       return;
     }
     if (saving) {
-      Dialog.alert("Saving task", "Wait for the task to finish saving before leaving.");
+      Dialog.alert(t("Saving task"), t("Wait for the task to finish saving before leaving."));
       return;
     }
-    Dialog.alert("Discard changes?", "Your unsaved changes will be lost.", [
-      { text: "Keep editing", style: "cancel" },
+    Dialog.alert(t("Discard changes?"), t("Your unsaved changes will be lost."), [
+      { text: t("Keep editing"), style: "cancel" },
       {
-        text: "Discard changes",
+        text: t("Discard changes"),
         style: "destructive",
         onPress: () => {
           if (voiceInput.isBusy) voiceInput.cancel();
@@ -655,8 +691,10 @@ function SettingsScheduledTaskEditorScreen({ title }: { readonly title: string }
         ) : (
           <Text className="px-2 text-base text-foreground-muted">
             {availableTargets.length === 0
-              ? "Connect an environment to create a scheduled task."
-              : "No environments match the current filters. Change the filters to create a task."}
+              ? t("Connect an environment to create a scheduled task.")
+              : t(
+                  "No environments match the current filters. Change the filters to create a task.",
+                )}
           </Text>
         )}
       </ScrollView>
@@ -720,7 +758,7 @@ function TaskForm({
     serverEnvironment.upsertScheduledTask.permissionAtom(environmentId),
   );
   const upsert = useAtomCommand(serverEnvironment.upsertScheduledTask, {
-    label: "scheduled task upsert",
+    label: t("scheduled task upsert"),
     reportFailure: false,
   });
   const submissionPending = useRef(false);
@@ -770,27 +808,31 @@ function TaskForm({
       parseMaxDeliveryAge(draft.schedule.maxDeliveryAgeMinutes) === undefined
     ) {
       Dialog.alert(
-        "Invalid age limit",
-        `Enter whole minutes from 1 to ${MAX_WEBHOOK_DELIVERY_AGE_MINUTES}, or leave it blank.`,
+        t("Invalid age limit"),
+        t`Enter whole minutes from 1 to ${MAX_WEBHOOK_DELIVERY_AGE_MINUTES}, or leave it blank.`,
       );
       return;
     }
     if (draft.schedule.mode === "once" && !offersOnce) {
       Dialog.alert(
-        "Once is not available here",
-        "This environment runs an older R3 Code. Update it to schedule a one-time task, or pick another schedule.",
+        t("Once is not available here"),
+        t(
+          "This environment runs an older R3 Code. Update it to schedule a one-time task, or pick another schedule.",
+        ),
       );
       return;
     }
     const parsedFilters = parseWebhookFilterDrafts(draft.schedule.filters);
     if (draft.schedule.mode === "webhook" && "error" in parsedFilters) {
-      Dialog.alert("Invalid filter", parsedFilters.error);
+      Dialog.alert(t("Invalid filter"), parsedFilters.error);
       return;
     }
     if (draft.schedule.mode === "webhook" && schedule === null) {
       Dialog.alert(
-        "Invalid webhook settings",
-        "Each dedupe key must contain a valid request placeholder. The coalesce window must be whole seconds from 10 to 3600, or blank.",
+        t("Invalid webhook settings"),
+        t(
+          "Each dedupe key must contain a valid request placeholder. The coalesce window must be whole seconds from 10 to 3600, or blank.",
+        ),
       );
       return;
     }
@@ -803,13 +845,13 @@ function TaskForm({
       (draft.workspace === "existing_worktree" && !draft.checkoutPath.trim())
     ) {
       Dialog.alert(
-        "Incomplete task",
-        "Add a name, prompt, project, model, valid schedule, and checkout path if needed.",
+        t("Incomplete task"),
+        t("Add a name, prompt, project, model, valid schedule, and checkout path if needed."),
       );
       return;
     }
     if (!projects.some((project) => project.id === draft.projectId)) {
-      Dialog.alert("Project unavailable", "Choose a project in this environment.");
+      Dialog.alert(t("Project unavailable"), t("Choose a project in this environment."));
       return;
     }
     const input: ScheduledTaskUpsertInput = {
@@ -1026,17 +1068,17 @@ function TaskForm({
             actions={[
               {
                 id: "worktree",
-                title: "New worktree",
+                title: t("New worktree"),
                 state: draft.workspace === "worktree" ? "on" : undefined,
               },
               {
                 id: "root",
-                title: "Project checkout",
+                title: t("Project checkout"),
                 state: draft.workspace === "root" ? "on" : undefined,
               },
               {
                 id: "existing_worktree",
-                title: "Specific checkout",
+                title: t("Specific checkout"),
                 state: draft.workspace === "existing_worktree" ? "on" : undefined,
               },
             ]}
@@ -1079,14 +1121,14 @@ function TaskForm({
             <SegmentedControl
               variant="card"
               options={[
-                { value: "fixed_time", label: "At a time" },
+                { value: "fixed_time", label: t("At a time") },
                 // Older servers reject one-time schedules on save.
                 ...(offersOnce || draft.schedule.mode === "once"
-                  ? [{ value: "once" as const, label: "Once" }]
+                  ? [{ value: "once" as const, label: t("Once") }]
                   : []),
-                { value: "interval", label: "Interval" },
+                { value: "interval", label: t("Interval") },
                 ...(webhookDenial === undefined || draft.schedule.mode === "webhook"
-                  ? [{ value: "webhook" as const, label: "On webhook" }]
+                  ? [{ value: "webhook" as const, label: t("On webhook") }]
                   : []),
               ]}
               selected={draft.schedule.mode}
@@ -1160,12 +1202,12 @@ function TaskForm({
                 actions={[
                   {
                     id: "every_day",
-                    title: "Every day",
+                    title: t("Every day"),
                     state: draft.schedule.weekdays.length === 7 ? "on" : undefined,
                   },
                   {
                     id: "weekdays",
-                    title: "Weekdays",
+                    title: t("Weekdays"),
                     state: repeatLabel(draft.schedule.weekdays) === "Weekdays" ? "on" : undefined,
                   },
                   ...DAYS.map((day) => ({
@@ -1198,7 +1240,7 @@ function TaskForm({
             </>
           ) : draft.schedule.mode === "webhook" && webhookDenial !== undefined && draft.enabled ? (
             <Text className="border-t border-border-subtle px-4 py-3 text-sm text-foreground-muted">
-              {`${webhookDenial} Switch the task to a timer, or turn it off, to save it.`}
+              {t`${webhookDenial} Switch the task to a timer, or turn it off, to save it.`}
             </Text>
           ) : draft.schedule.mode === "once" ? (
             (["date", "time"] as const).map((field) => {
@@ -1213,7 +1255,7 @@ function TaskForm({
                     className="min-h-14 flex-row items-center gap-3 border-t border-border-subtle px-4 py-3 active:opacity-70"
                   >
                     <Text textRole="body" className="text-foreground">
-                      {field === "date" ? "Date" : "Time"}
+                      {field === "date" ? t("Date") : t("Time")}
                     </Text>
                     <Text
                       textRole="footnote"
@@ -1414,7 +1456,7 @@ function WebhookScheduleDetails({
   const gt = useGT();
   const [rotating, setRotating] = useState(false);
   const rotate = useAtomCommand(serverEnvironment.rotateScheduledTaskWebhookToken, {
-    label: "scheduled task rotate webhook token",
+    label: t("scheduled task rotate webhook token"),
     reportFailure: false,
   });
   const preparedConnection = usePreparedConnection(environmentId);
@@ -1444,7 +1486,7 @@ function WebhookScheduleDetails({
             className="gap-1 active:opacity-70"
           >
             <Text textRole="body" className="text-foreground">
-              {resolved.copyable ? "Webhook URL" : "Webhook path"}
+              {resolved.copyable ? t("Webhook URL") : t("Webhook path")}
             </Text>
             <Text className="text-sm text-foreground-muted" numberOfLines={2} selectable>
               {resolved.address}
@@ -1458,10 +1500,10 @@ function WebhookScheduleDetails({
             tone="danger"
             disabled={disabled || rotating}
             onPress={() =>
-              Dialog.alert("Rotate URL?", "The current URL stops working immediately.", [
-                { text: "Cancel", style: "cancel" },
+              Dialog.alert(t("Rotate URL?"), t("The current URL stops working immediately."), [
+                { text: t("Cancel"), style: "cancel" },
                 {
-                  text: "Rotate",
+                  text: t("Rotate"),
                   style: "destructive",
                   onPress: () => {
                     setRotating(true);
@@ -1469,7 +1511,7 @@ function WebhookScheduleDetails({
                       setRotating(false);
                       if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
                         Dialog.alert(
-                          "Could not rotate URL",
+                          t("Could not rotate URL"),
                           String(squashAtomCommandFailure(result)),
                         );
                       }
@@ -1513,15 +1555,15 @@ function EnvironmentTasks({
     serverEnvironment.upsertScheduledTask.permissionAtom(environmentId),
   );
   const setEnabled = useAtomCommand(serverEnvironment.setScheduledTaskEnabled, {
-    label: "scheduled task enabled",
+    label: t("scheduled task enabled"),
     reportFailure: false,
   });
   const runNow = useAtomCommand(serverEnvironment.runScheduledTaskNow, {
-    label: "scheduled task run",
+    label: t("scheduled task run"),
     reportFailure: false,
   });
   const remove = useAtomCommand(serverEnvironment.deleteScheduledTask, {
-    label: "scheduled task delete",
+    label: t("scheduled task delete"),
     reportFailure: false,
   });
   const selectDetail = useSelectWorkspaceDetail();
@@ -1563,7 +1605,7 @@ function EnvironmentTasks({
         </Text>
       ) : visibleTasks?.length === 0 ? (
         <Text className="p-4 text-base text-foreground-muted">
-          {projectIds === null ? "No scheduled tasks yet." : "No tasks in this project."}
+          {projectIds === null ? t("No scheduled tasks yet.") : t("No tasks in this project.")}
         </Text>
       ) : (
         visibleTasks?.map((task, index) => (
@@ -1583,7 +1625,7 @@ function EnvironmentTasks({
               }}
               className="min-w-0 flex-1 gap-1 active:opacity-70"
             >
-              <Text textRole="body" className="text-foreground" numberOfLines={1}>
+              <Text translate={false} textRole="body" className="text-foreground" numberOfLines={1}>
                 {task.title}
               </Text>
               <Text className="text-sm text-foreground-muted" numberOfLines={2}>
@@ -1595,7 +1637,7 @@ function EnvironmentTasks({
                     : ""}
               </Text>
               {task.blockedByPolicy ? (
-                <Text className="text-sm text-foreground-muted" numberOfLines={2}>
+                <Text translate={false} className="text-sm text-foreground-muted" numberOfLines={2}>
                   {task.blockedByPolicy}
                 </Text>
               ) : null}
@@ -1609,9 +1651,9 @@ function EnvironmentTasks({
             </Pressable>
             <Menu
               actions={[
-                { id: "edit", title: "Edit" },
+                { id: "edit", title: t("Edit") },
                 ...(task.threadId !== null && scheduledTaskThreadMode(task) !== "new_thread"
-                  ? [{ id: "thread", title: "Open thread" }]
+                  ? [{ id: "thread", title: t("Open thread") }]
                   : []),
                 {
                   id: "toggle",
@@ -1620,10 +1662,10 @@ function EnvironmentTasks({
                 },
                 ...(task.schedule.type === "webhook"
                   ? []
-                  : [{ id: "run", title: "Run now", attributes: { disabled: !canOperate } }]),
+                  : [{ id: "run", title: t("Run now"), attributes: { disabled: !canOperate } }]),
                 {
                   id: "delete",
-                  title: "Delete",
+                  title: t("Delete"),
                   attributes: { destructive: true, disabled: !canOperate },
                 },
               ]}
@@ -1640,10 +1682,10 @@ function EnvironmentTasks({
                     },
                   });
                 } else if (action === "delete") {
-                  Dialog.alert("Delete task?", task.title, [
-                    { text: "Cancel", style: "cancel" },
+                  Dialog.alert(t("Delete task?"), task.title, [
+                    { text: t("Cancel"), style: "cancel" },
                     {
-                      text: "Delete",
+                      text: t("Delete"),
                       style: "destructive",
                       onPress: () => void act(task, "delete"),
                     },

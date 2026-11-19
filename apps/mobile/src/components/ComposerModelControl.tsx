@@ -79,12 +79,14 @@ export function ComposerModelControl(props: {
         )
       }
       label={providerNameLabel ?? shortLabel}
+      labelTranslate={false}
       labelEllipsizeMode={providerNameLabel ? "middle" : undefined}
       iconOnly={props.iconOnly}
       suffixWidth={providerNameLabel ? 96 : undefined}
       suffix={
         providerNameLabel ? (
           <Text
+            translate={false}
             className={
               props.size === "large"
                 ? "text-sm text-foreground-muted"

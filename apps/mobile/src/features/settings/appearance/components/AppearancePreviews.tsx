@@ -90,7 +90,7 @@ export function TerminalAppearancePreview(props: { readonly fontSize: number }) 
           <T>Local: </T>
         </Text>
         <Text style={span(theme.palette[6], { textDecorationLine: "underline" })}>
-          http://127.0.0.1:5173/
+          http://127.0.0.1:5173
         </Text>
       </Text>
       <Text style={span(theme.foreground)}>
@@ -166,6 +166,7 @@ export function CodeAppearancePreview(props: {
 
   const codeLine = (line: CodePreviewLine, wrap: boolean) => (
     <Text
+      translate={false}
       className="text-foreground"
       key={line.id}
       numberOfLines={wrap ? undefined : 1}

@@ -18,6 +18,7 @@ import { usePullRequestPermissions } from "./usePullRequestPermissions";
 import { PullRequestCompletionSuggestions } from "./PullRequestCompletionSuggestions";
 import { usePullRequestCompletions } from "./usePullRequestCompletions";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export type InlineCommentParams = PullRequestParams & {
   readonly draftId?: string;
@@ -144,10 +145,10 @@ export function PullRequestInlineCommentScreen({ route }: StaticScreenProps<Inli
         <Button
           label={gt("Delete draft")}
           onPress={() =>
-            Dialog.alert("Delete this draft?", "Your other review comments will be kept.", [
-              { text: "Cancel", style: "cancel" },
+            Dialog.alert(t("Delete this draft?"), t("Your other review comments will be kept."), [
+              { text: t("Cancel"), style: "cancel" },
               {
-                text: "Delete",
+                text: t("Delete"),
                 style: "destructive",
                 onPress: () => {
                   store.update((draft) => ({

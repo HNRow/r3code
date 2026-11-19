@@ -23,7 +23,7 @@ import { Alert } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Dialog, DialogHeader, DialogPanel, DialogPopup, DialogTitle } from "../ui/dialog";
 import { ThemeSearchSection } from "./ThemeSearchSection";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 /**
  * The guard runs on the size before the bytes are ever read: a large file
@@ -461,7 +461,7 @@ function ThemeImportBody({
         const chooseButton = (label = "Choose files") => (
           <Button disabled={isReading} size="sm" variant="outline" onClick={openFilePicker}>
             <DownloadIcon />
-            {isReading ? "Reading…" : label}
+            {isReading ? t("Reading…") : label}
           </Button>
         );
         const editorSection = () => (
@@ -516,7 +516,7 @@ function ThemeImportBody({
                   <T>Theme file</T>
                 </p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {fileName ?? "Drop R3 Code or VS Code .json files"}
+                  {fileName ?? t("Drop R3 Code or VS Code .json files")}
                 </p>
               </div>
               {chooseButton()}

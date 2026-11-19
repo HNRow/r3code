@@ -39,6 +39,7 @@ import {
   type ComposerDocumentAttachment,
 } from "../lib/composerContext";
 import { T } from "gt-react-native";
+import { t } from "../i18n/gt";
 
 export type ComposerEditorProps = NativeComposerEditorProps & {
   readonly draftKey?: string | null;
@@ -118,8 +119,8 @@ export function ComposerEditor({
       }
       if (!insertComposerDraftContext(draftKey, result, insertion)) {
         Dialog.alert(
-          "Could not paste context",
-          "Remove some attachments or context items from the draft, then paste again.",
+          t("Could not paste context"),
+          t("Remove some attachments or context items from the draft, then paste again."),
         );
         return;
       }
@@ -134,7 +135,7 @@ export function ComposerEditor({
         );
       if (warnings.length > 0)
         Dialog.alert(
-          "Some context is unavailable",
+          t("Some context is unavailable"),
           [...warnings, "Those references are marked unavailable."].join("\n\n"),
         );
     });
@@ -143,7 +144,7 @@ export function ComposerEditor({
     if (AsyncResult.isFailure(settled) && !signal.aborted) {
       const error = squashAtomCommandFailure(settled);
       Dialog.alert(
-        "Could not paste context",
+        t("Could not paste context"),
         error instanceof Error ? error.message : "Try copying again.",
       );
     }

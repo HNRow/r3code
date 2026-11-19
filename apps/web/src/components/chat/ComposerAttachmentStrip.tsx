@@ -47,7 +47,7 @@ import {
   SnapShotAttachmentDetails,
 } from "./SnapShotAttachmentDetails";
 import { prepareVideoFirstFrame } from "../../lib/videoFirstFrame";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 function ComposerAttachmentUploadProgress({
   id,
@@ -291,7 +291,7 @@ export function ComposerAttachmentMediaRow({
                   {upload?.status === "uploading" ? (
                     <ComposerAttachmentUploadProgress id={image.id} upload={upload} />
                   ) : (
-                    "Preparing"
+                    t("Preparing")
                   )}
                 </span>
               )}
@@ -486,9 +486,9 @@ export function ComposerAttachmentFileList({
             <span className="shrink-0 text-xs text-secondary-label">
               {needsReattach ? (
                 canReattachFile ? (
-                  "Attach again"
+                  t("Attach again")
                 ) : (
-                  "Remove to send"
+                  t("Remove to send")
                 )
               ) : upload?.status === "uploading" ? (
                 <ComposerAttachmentUploadProgress

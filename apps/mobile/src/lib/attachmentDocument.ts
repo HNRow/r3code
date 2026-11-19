@@ -18,6 +18,7 @@ import { localAttachmentPreviewAtom, localAttachmentPreviewState } from "./local
 import { downloadAndShareAttachment, shareLocalAttachment } from "./attachmentDownload";
 import { refreshAssetUrl, useFreshAssetUrl, useRefreshAssetUrl } from "../state/assets";
 import { attachmentDocumentPresentation } from "./attachmentDocumentPresentation";
+import { t } from "../i18n/gt";
 
 const isLocalUri = (uri: string) => /^(file|content):/.test(uri);
 
@@ -166,7 +167,7 @@ export function useAttachmentDocument(input: {
     if (AsyncResult.isFailure(result)) {
       const cause = squashAtomCommandFailure(result);
       Dialog.alert(
-        "Could not share file",
+        t("Could not share file"),
         cause instanceof Error ? cause.message : "Please try again.",
       );
     }

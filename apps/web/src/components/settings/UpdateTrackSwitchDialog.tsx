@@ -35,7 +35,7 @@ import {
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
-import { Var, T } from "gt-react";
+import { Var, T, t } from "gt-react";
 
 /** Moves this app and every connected machine to `channel`. */
 export function UpdateTrackSwitchDialog({
@@ -65,7 +65,7 @@ export function UpdateTrackSwitchDialog({
               ? npmReleaseFailureMessage(release.cause)
               : AsyncResult.isSuccess(release)
                 ? `Could not find the latest ${label} release in this environment's npm registry.`
-                : "Checking releases…"}
+                : t("Checking releases…")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -122,7 +122,7 @@ function SwitchPlan({
     setChecking(true);
     const fail = (description: string) =>
       toastManager.add(
-        stackedThreadToast({ type: "error", title: `Could not switch to ${label}`, description }),
+        stackedThreadToast({ type: "error", title: t`Could not switch to ${label}`, description }),
       );
     const prepared = await prepareLocalTrackSwitch(bridge, {
       channel: release.channel,
@@ -174,7 +174,7 @@ function SwitchPlan({
     <UpdateEverythingDialog
       open
       onOpenChange={(open) => !open && !checking && onClose()}
-      title={`Switch to ${label}?`}
+      title={t`Switch to ${label}?`}
       version={release.version}
       providerCount={0}
       rows={everything.rows}

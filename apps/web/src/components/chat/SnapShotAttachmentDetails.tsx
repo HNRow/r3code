@@ -13,7 +13,7 @@ import {
   showAnchoredCopyErrorToast,
 } from "../ui/anchoredCopyToast";
 import { HighlightedTokens } from "./HighlightedTokens";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 export const SNAP_SHOT_ATTACHMENT_FRAME_CLASS =
   "relative h-28 w-52 max-w-full overflow-hidden rounded-lg border border-border/80";
@@ -235,7 +235,7 @@ export function SnapShotAttachmentDetails({
           />
         </div>
         <div className="truncate text-3xs leading-3.5 text-white/70">
-          {source.windowTitle || "Captured window"}
+          {source.windowTitle || t("Captured window")}
         </div>
       </div>
     </div>

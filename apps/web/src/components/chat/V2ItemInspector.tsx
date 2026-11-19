@@ -1,5 +1,10 @@
 import type { ToolCallDiffTarget } from "../../diffPanelStore";
-import type { EnvironmentId, OrchestrationV2ProjectedTurnItem } from "@t3tools/contracts";
+import type {
+  EnvironmentId,
+  OrchestrationV2ProjectedTurnItem,
+  OrchestrationV2RestartCancelledBackgroundWork,
+} from "@t3tools/contracts";
+import type { RestartNotice } from "@t3tools/client-runtime/work-log/item-detail";
 import {
   isJsonToolText,
   toolCallLines,
@@ -19,6 +24,7 @@ import { resolveDiffThemeName } from "../../lib/diffRendering";
 import { getSyntaxHighlighterPromise } from "../../lib/syntaxHighlighting";
 import { useTurnItemDetail } from "../../state/queries";
 import { formatWorkspaceRelativePath } from "../../filePathDisplay";
+import { translateServerNotice } from "../../lib/timelineText";
 import { Button } from "../ui/button";
 import ChatMarkdown from "../ChatMarkdown";
 import { ChatMarkdownAssetImage } from "./ChatMarkdownMedia";
@@ -28,7 +34,7 @@ import { resolveExternalWebLinkHref } from "./externalLinkContextMenu";
 import type { ExpandedImagePreview } from "./ExpandedImagePreview";
 import { ShellCommandBlock } from "./ShellCommandBlock";
 import { useInitialOutputReady, type TurnItemSource } from "./timelineRowContext";
-import { useGT, T, Var } from "gt-react";
+import { useGT, useMessages, msg, T, Var, t } from "gt-react";
 
 interface V2ItemInspectorProps {
   readonly onInitialOutputReady?: (() => void) | undefined;
@@ -39,6 +45,8 @@ interface V2ItemInspectorProps {
   readonly onOpenToolDiff?: ((target: ToolCallDiffTarget) => void) | undefined;
   readonly onImageExpand?: ((preview: ExpandedImagePreview) => void) | undefined;
   readonly source?: TurnItemSource | undefined;
+  /** Null unless the item is a restart continuation's notification. */
+  readonly restartNotice?: RestartNotice | null | undefined;
 }
 
 function SyntaxTokens({
@@ -66,6 +74,65 @@ function SyntaxTokens({
 
 const monoClassName =
   "font-mono text-(length:--font-size-code,var(--text-2xs)) leading-relaxed whitespace-pre-wrap break-words select-text";
+
+const RESTART_CANCELLED_WORK_KIND_TEXT: Record<
+  OrchestrationV2RestartCancelledBackgroundWork["kind"],
+  string
+> = {
+  subagent: msg("Subagent"),
+  shell: msg("Shell"),
+  monitor: msg("Monitor"),
+  task: msg("Task"),
+};
+
+/** The restart note's own detail is the prompt sent to the agent, so the restarted server's list stands alone. */
+function RestartContinuationBody(props: {
+  readonly notice: RestartNotice;
+  readonly detail: string | undefined;
+}) {
+  const m = useMessages();
+  const { notice } = props;
+  return (
+    <div className="space-y-1.5">
+      {notice.state === "legacy" ? (
+        <p className="text-muted-foreground">{m("R3 Code restarted.")}</p>
+      ) : notice.settled ? (
+        <p className="text-muted-foreground">
+          {m("R3 Code restarted. Its background tasks stopped.")}
+        </p>
+      ) : notice.cancelledWork.length === 0 ? (
+        <p className="text-muted-foreground">
+          {m("R3 Code restarted and continued this turn automatically.")}
+        </p>
+      ) : (
+        <p className="text-muted-foreground">
+          {m(
+            "R3 Code restarted. These background tasks were cancelled and will not report back. Run them again if you still need them:",
+          )}
+        </p>
+      )}
+      {notice.state === "structured" && notice.cancelledWork.length > 0 ? (
+        <ul className="ml-4 list-disc space-y-0.5 text-muted-foreground">
+          {notice.cancelledWork.map((work, index) => (
+            <li key={`${work.kind}:${work.id ?? index}`}>
+              {`${m(RESTART_CANCELLED_WORK_KIND_TEXT[work.kind])}: ${work.label}`}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {props.detail === undefined ? null : (
+        <details>
+          <summary className="cursor-pointer select-none text-muted-foreground">
+            {m("Original message sent to the agent")}
+          </summary>
+          <div className="mt-1">
+            <StructuredValue value={props.detail} />
+          </div>
+        </details>
+      )}
+    </div>
+  );
+}
 
 function StructuredValue({
   value,
@@ -241,6 +308,7 @@ function ToolCallBody(
 }
 
 export const V2ItemInspector = memo(function V2ItemInspector(props: V2ItemInspectorProps) {
+  const m = useMessages();
   // Command rows stream their output, including the final output, from the server.
   const environmentStreamsOutput = useCommandOutputStreaming(props.environmentId);
   const streamsOutput =
@@ -381,7 +449,7 @@ export const V2ItemInspector = memo(function V2ItemInspector(props: V2ItemInspec
                   </a>
                 ) : (
                   <p className="font-medium text-foreground">
-                    {result.title ?? result.url ?? "Search result"}
+                    {result.title ?? result.url ?? t("Search result")}
                   </p>
                 )}
                 {result.snippet ? <p className="text-muted-foreground">{result.snippet}</p> : null}
@@ -412,8 +480,18 @@ export const V2ItemInspector = memo(function V2ItemInspector(props: V2ItemInspec
             .join("\n\n")}
         />
       ) : null}
-      {item.type === "notification" ? <StructuredValue value={item.detail} /> : null}
-      {item.type === "system_notice" ? <StructuredValue value={item.message} /> : null}
+      {item.type === "notification" ? (
+        props.restartNotice == null ? (
+          <StructuredValue
+            value={item.detail === undefined ? item.detail : translateServerNotice(item.detail, m)}
+          />
+        ) : (
+          <RestartContinuationBody notice={props.restartNotice} detail={item.detail} />
+        )
+      ) : null}
+      {item.type === "system_notice" ? (
+        <StructuredValue value={translateServerNotice(item.message, m)} />
+      ) : null}
       {item.type === "error" ? <StructuredValue value={item.failure.message} /> : null}
       {item.type === "todo_list" ? (
         <StructuredValue

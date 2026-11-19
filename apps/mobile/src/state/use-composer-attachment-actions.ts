@@ -20,6 +20,7 @@ import {
   type ComposerDraftInsertion,
 } from "./use-composer-drafts";
 import { startComposerDraftOperation } from "./composerDraftOperations";
+import { t } from "../i18n/gt";
 
 export function useComposerAttachmentActions(props: {
   readonly draftKey: string | null;
@@ -79,7 +80,7 @@ export function useComposerAttachmentActions(props: {
     if (!key || props.locked) return;
     const maxBytes = capabilities?.fileAttachments?.maxUploadBytes;
     if (maxBytes === undefined) {
-      Dialog.alert("Could not attach file", "This server does not support file attachments.");
+      Dialog.alert(t("Could not attach file"), t("This server does not support file attachments."));
       return;
     }
     const insertion = captureComposerDraftInsertion(key);
@@ -109,7 +110,7 @@ export function useComposerAttachmentActions(props: {
         );
       } catch (error) {
         Dialog.alert(
-          "Could not paste images",
+          t("Could not paste images"),
           error instanceof Error ? error.message : "Try again.",
         );
       }
@@ -140,7 +141,7 @@ export function useComposerAttachmentActions(props: {
         report("Could not attach pasted text", null, rejected);
       } catch (error) {
         Dialog.alert(
-          "Could not attach pasted text",
+          t("Could not attach pasted text"),
           error instanceof Error ? error.message : "Try again.",
         );
       }

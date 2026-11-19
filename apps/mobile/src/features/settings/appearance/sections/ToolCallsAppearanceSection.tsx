@@ -8,15 +8,36 @@ import { ListChoiceRow } from "../../../../components/ui/ListChoiceRow";
 import { mobilePreferencesAtom, updateMobilePreferencesAtom } from "../../../../state/preferences";
 import { SettingsSection } from "../../components/SettingsSection";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../../../i18n/gt";
 
 const TOOL_CALL_VISIBILITY_OPTIONS: ReadonlyArray<{
   readonly value: ToolCallVisibility;
   readonly label: string;
 }> = [
-  { value: "showAll", label: "Show all" },
-  { value: "hideSuccessful", label: "Hide successful" },
-  { value: "hideAll", label: "Hide all" },
-  { value: "zen", label: "Zen" },
+  {
+    value: "showAll",
+    get label() {
+      return t("Show all");
+    },
+  },
+  {
+    value: "hideSuccessful",
+    get label() {
+      return t("Hide successful");
+    },
+  },
+  {
+    value: "hideAll",
+    get label() {
+      return t("Hide all");
+    },
+  },
+  {
+    value: "zen",
+    get label() {
+      return t("Zen");
+    },
+  },
 ];
 
 export function ToolCallsAppearanceSection() {

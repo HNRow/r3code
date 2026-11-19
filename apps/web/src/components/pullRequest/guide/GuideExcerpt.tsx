@@ -37,7 +37,7 @@ import type { PullRequestCompletionScope } from "../PullRequestMarkdownTextarea"
 import { excerptLoader } from "./GuideExcerpt.logic";
 import { GuideNoteMarker } from "./GuideNotes";
 import { GuideProse } from "./GuideProse";
-import { Var, T } from "gt-react";
+import { Var, T, t } from "gt-react";
 
 const EXCERPT_UNSAFE_CSS = `${DIFF_VIEW_UNSAFE_CSS}
 [data-code]::-webkit-scrollbar-thumb {
@@ -313,7 +313,7 @@ function ExcerptDiff({
                 {...(commenting.canComment && onAskAgent !== null
                   ? {
                       secondaryAction: {
-                        label: "Ask agent",
+                        label: t("Ask agent"),
                         onAction: (text: string) => askAgent(text),
                       },
                     }

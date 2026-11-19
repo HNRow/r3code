@@ -15,6 +15,7 @@ import {
   releaseComposerDraftModelSelection,
   updateComposerDraftSettings,
 } from "./use-composer-drafts";
+import { t } from "../i18n/gt";
 
 /** Sets an existing thread's pick on the thread, so any next turn runs on it. */
 export function selectThreadModel(
@@ -46,8 +47,8 @@ export function selectThreadModel(
     } else {
       const error = squashAtomCommandFailure(result);
       Dialog.alert(
-        "Could not apply model selection",
-        `This model pick was not saved. ${error instanceof Error ? error.message : "Try again."}`,
+        t("Could not apply model selection"),
+        t`This model pick was not saved. ${error instanceof Error ? error.message : "Try again."}`,
       );
     }
   });

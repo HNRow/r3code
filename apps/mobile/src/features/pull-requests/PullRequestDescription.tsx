@@ -18,6 +18,7 @@ import { isBotBadgeImage } from "./botBadgeImages";
 import { PullRequestMarkdown } from "./PullRequestMarkdown";
 import { pullRequestDescriptionContent } from "./pullRequestDescriptionContent";
 import { T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const COLLAPSED_HEIGHT = 240;
 
@@ -132,7 +133,7 @@ export function PullRequestDescription(props: {
                 className="min-h-11 flex-row items-center justify-center gap-1 py-2 active:opacity-70"
               >
                 <Text className="text-xs font-t3-medium text-foreground">
-                  {expanded ? "Show less" : "Show more"}
+                  {expanded ? t("Show less") : t("Show more")}
                 </Text>
                 <SymbolView
                   name={expanded ? "chevron.up" : "chevron.down"}

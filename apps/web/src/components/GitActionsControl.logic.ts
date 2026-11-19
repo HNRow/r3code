@@ -1,4 +1,4 @@
-import { msg } from "gt-react";
+import { t } from "gt-react";
 import type {
   GitRunStackedActionResult,
   GitStackedAction,
@@ -140,7 +140,7 @@ export function buildMenuItems(
 
   const commitItem: GitActionMenuItem = {
     id: "commit",
-    label: "Commit",
+    label: t("Commit"),
     disabled: !canCommit,
     icon: "commit",
     kind: "open_dialog",
@@ -153,7 +153,7 @@ export function buildMenuItems(
 
   const pushItem: GitActionMenuItem = {
     id: "push",
-    label: "Push",
+    label: t("Push"),
     disabled: !canPush,
     icon: "push",
     kind: "open_dialog",
@@ -169,7 +169,7 @@ export function buildMenuItems(
     pushItem,
     {
       id: "pr",
-      label: `Create ${terminology.shortLabel}`,
+      label: t`Create ${terminology.shortLabel}`,
       disabled: !canCreatePr,
       icon: "pr",
       kind: "open_dialog",
@@ -257,15 +257,20 @@ export function resolveQuickAction(
   hasPrimaryRemote = true,
 ): GitQuickAction {
   if (isBusy) {
-    return { label: "Commit", disabled: true, kind: "show_hint", hint: "Git action in progress." };
+    return {
+      label: t("Commit"),
+      disabled: true,
+      kind: "show_hint",
+      hint: t("Git action in progress."),
+    };
   }
 
   if (!gitStatus) {
     return {
-      label: "Commit",
+      label: t("Commit"),
       disabled: true,
       kind: "show_hint",
-      hint: "Git status is unavailable.",
+      hint: t("Git status is unavailable."),
     };
   }
 
@@ -280,22 +285,27 @@ export function resolveQuickAction(
 
   if (!hasBranch) {
     return {
-      label: "Commit",
+      label: t("Commit"),
       disabled: true,
       kind: "show_hint",
-      hint: `Create and checkout a ref before pushing or opening a ${terminology.singular}.`,
+      hint: t`Create and checkout a ref before pushing or opening a ${terminology.singular}.`,
     };
   }
 
   if (hasChanges) {
     if (isBehind || (!gitStatus.hasUpstream && !hasPrimaryRemote)) {
-      return { label: "Commit", disabled: false, kind: "run_action", action: "commit" };
+      return { label: t("Commit"), disabled: false, kind: "run_action", action: "commit" };
     }
     if (hasOpenPr || isDefaultRef) {
-      return { label: "Commit & push", disabled: false, kind: "run_action", action: "commit_push" };
+      return {
+        label: t("Commit & push"),
+        disabled: false,
+        kind: "run_action",
+        action: "commit_push",
+      };
     }
     return {
-      label: `Commit, push & ${terminology.shortLabel}`,
+      label: t`Commit, push & ${terminology.shortLabel}`,
       disabled: false,
       kind: "run_action",
       action: "commit_push_pr",
@@ -305,7 +315,7 @@ export function resolveQuickAction(
   if (!gitStatus.hasUpstream) {
     if (!hasPrimaryRemote) {
       return {
-        label: "Publish repository",
+        label: t("Publish repository"),
         disabled: false,
         kind: "open_publish",
       };
@@ -313,29 +323,29 @@ export function resolveQuickAction(
     if (!isAhead) {
       if (hasOpenPr) {
         return {
-          label: "Commit",
+          label: t("Commit"),
           disabled: true,
           kind: "show_hint",
-          hint: "Branch is up to date. No action needed.",
+          hint: t("Branch is up to date. No action needed."),
         };
       }
       return {
-        label: "Push",
+        label: t("Push"),
         disabled: true,
         kind: "show_hint",
-        hint: "No local commits to push.",
+        hint: t("No local commits to push."),
       };
     }
     if (hasOpenPr || isDefaultRef) {
       return {
-        label: "Push",
+        label: t("Push"),
         disabled: false,
         kind: "run_action",
         action: isDefaultRef ? "commit_push" : "push",
       };
     }
     return {
-      label: `Push & create ${terminology.shortLabel}`,
+      label: t`Push & create ${terminology.shortLabel}`,
       disabled: false,
       kind: "run_action",
       action: "create_pr",
@@ -344,16 +354,16 @@ export function resolveQuickAction(
 
   if (isDiverged) {
     return {
-      label: "Sync ref",
+      label: t("Sync ref"),
       disabled: true,
       kind: "show_hint",
-      hint: "Branch has diverged from upstream. Rebase/merge first.",
+      hint: t("Branch has diverged from upstream. Rebase/merge first."),
     };
   }
 
   if (isBehind) {
     return {
-      label: "Pull",
+      label: t("Pull"),
       disabled: false,
       kind: "run_pull",
     };
@@ -362,14 +372,14 @@ export function resolveQuickAction(
   if (isAhead) {
     if (hasOpenPr || isDefaultRef) {
       return {
-        label: "Push",
+        label: t("Push"),
         disabled: false,
         kind: "run_action",
         action: isDefaultRef ? "commit_push" : "push",
       };
     }
     return {
-      label: `Push & create ${terminology.shortLabel}`,
+      label: t`Push & create ${terminology.shortLabel}`,
       disabled: false,
       kind: "run_action",
       action: "create_pr",
@@ -378,16 +388,16 @@ export function resolveQuickAction(
 
   if (hasOpenPr && gitStatus.hasUpstream) {
     return {
-      label: "Commit",
+      label: t("Commit"),
       disabled: true,
       kind: "show_hint",
-      hint: "Branch is up to date. No action needed.",
+      hint: t("Branch is up to date. No action needed."),
     };
   }
 
   if (hasDefaultBranchDelta && !isDefaultRef) {
     return {
-      label: `Create ${terminology.shortLabel}`,
+      label: t`Create ${terminology.shortLabel}`,
       disabled: false,
       kind: "run_action",
       action: "create_pr",
@@ -395,10 +405,10 @@ export function resolveQuickAction(
   }
 
   return {
-    label: "Commit",
+    label: t("Commit"),
     disabled: true,
     kind: "show_hint",
-    hint: "Branch is up to date. No action needed.",
+    hint: t("Branch is up to date. No action needed."),
   };
 }
 
@@ -406,54 +416,66 @@ function fill(template: string, vars: Readonly<Record<number, string>>): string 
   return template.replace(/\{(\d+)\}/g, (match, index: string) => vars[Number(index)] ?? match);
 }
 
+/** `translate` resolves the catalog after the branch name is filled in, so each locale keeps its own placeholders. */
 export function resolveDefaultBranchActionDialogCopy(input: {
   action: DefaultBranchConfirmableAction;
   branchName: string;
   includesCommit: boolean;
   terminology: ChangeRequestTerminology;
+  translate: (message: string) => string;
 }): DefaultBranchActionDialogCopy {
   const branchLabel = input.branchName;
-  const { terminology } = input;
-  const suffix = msg(
-    " You can continue on this ref or create a feature ref and run the same action there.",
+  const { terminology, translate } = input;
+  const suffix = translate(
+    t(" You can continue on this ref or create a feature ref and run the same action there."),
   );
 
   if (input.action === "push" || input.action === "commit_push") {
     if (input.includesCommit) {
       return {
-        title: msg("Commit & push to default ref?"),
-        description: msg("This action will commit and push changes on {1}.") + suffix,
-        continueLabel: fill(msg("Commit & push to {1}"), { 1: branchLabel }),
+        title: translate(t("Commit & push to default ref?")),
+        description:
+          fill(translate(t("This action will commit and push changes on {1}.")), {
+            1: branchLabel,
+          }) + suffix,
+        continueLabel: fill(translate(t("Commit & push to {1}")), { 1: branchLabel }),
       };
     }
     return {
-      title: msg("Push to default ref?"),
-      description: msg("This action will push local commits on {1}.") + suffix,
-      continueLabel: fill(msg("Push to {1}"), { 1: branchLabel }),
+      title: translate(t("Push to default ref?")),
+      description:
+        fill(translate(t("This action will push local commits on {1}.")), {
+          1: branchLabel,
+        }) + suffix,
+      continueLabel: fill(translate(t("Push to {1}")), { 1: branchLabel }),
     };
   }
 
   if (input.includesCommit) {
     return {
-      title: fill(msg("Commit, push & create {1} from default ref?"), {
+      title: fill(translate(t("Commit, push & create {1} from default ref?")), {
         1: terminology.shortLabel,
       }),
       description:
-        fill(msg("This action will commit, push, and create a {1} on {2}."), {
+        fill(translate(t("This action will commit, push, and create a {1} on {2}.")), {
           1: terminology.singular,
           2: branchLabel,
         }) + suffix,
-      continueLabel: fill(msg("Commit, push & create {1}"), { 1: terminology.shortLabel }),
+      continueLabel: fill(translate(t("Commit, push & create {1}")), {
+        1: terminology.shortLabel,
+      }),
     };
   }
   return {
-    title: fill(msg("Push & create {1} from default ref?"), { 1: terminology.shortLabel }),
+    title: fill(translate(t("Push & create {1} from default ref?")), {
+      1: terminology.shortLabel,
+    }),
     description:
-      fill(msg("This action will push local commits and create a {1} on {2}."), {
+      fill(translate(t("This action will push local commits and create a {1} on {2}.")), {
         1: terminology.singular,
         2: branchLabel,
       }) + suffix,
-    continueLabel: fill(msg("Push & create {1}"), { 1: terminology.shortLabel }),
+    continueLabel: fill(translate(t("Push & create {1}")), { 1: terminology.shortLabel }),
   };
 }
 

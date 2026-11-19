@@ -320,7 +320,9 @@ import { ZoomableImagePressable } from "./ZoomableImagePressable";
 import { openSettings } from "../settings/settings-navigation";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { useMessageTimeFormatter } from "./useMessageTimeFormatter";
-import { useGT, T, Var, t } from "gt-react-native";
+import { useGT, useMessages, T, Var } from "gt-react-native";
+import { t } from "../../i18n/gt";
+import { translateTurnFoldLabel } from "../../lib/timelineText";
 
 const WIDE_MARKDOWN_BLOCK_OPTIONS = {
   // iOS blockquotes and selectable text measure separately; definite bubble width matches UIKit's drawing width.
@@ -393,7 +395,13 @@ export interface ThreadFeedProps {
 }
 
 const USER_MESSAGE_COPY_MENU_ACTIONS = [
-  { id: "copy-prompt-link", title: "Copy prompt link", image: "link" },
+  {
+    id: "copy-prompt-link",
+    get title() {
+      return t("Copy prompt link");
+    },
+    image: "link",
+  },
 ];
 
 function UserMessageCopyButton(props: {
@@ -401,10 +409,9 @@ function UserMessageCopyButton(props: {
   readonly onCopy: (() => Promise<void>) | undefined;
   readonly tintColor: ColorValue;
 }) {
-  const gt = useGT();
   const button = (
     <CopyTextButton
-      accessibilityLabel={gt("Copy message")}
+      accessibilityLabel={t("Copy message")}
       text={props.text}
       onCopy={props.onCopy}
       tintColor={props.tintColor}
@@ -475,8 +482,8 @@ function AssistantForkButton(props: {
             if (isAtomCommandInterrupted(result)) return;
             if (result._tag !== "Success") {
               Dialog.alert(
-                "Could not confirm fork",
-                "Reconnect and check the thread list before trying again.",
+                t("Could not confirm fork"),
+                t("Reconnect and check the thread list before trying again."),
               );
               return;
             }
@@ -485,8 +492,10 @@ function AssistantForkButton(props: {
             );
             if (!targetThreadReady) {
               Dialog.alert(
-                "Fork created",
-                "Its thread data did not reach this client. Reconnect and try opening it from the thread list.",
+                t("Fork created"),
+                t(
+                  "Its thread data did not reach this client. Reconnect and try opening it from the thread list.",
+                ),
               );
               return;
             }
@@ -735,7 +744,7 @@ function MessageAttachmentFile(props: {
     setOpening(true);
     const finish = (message: string | null) => {
       if (message !== null && !controller.signal.aborted) {
-        Dialog.alert("Could not open attachment", message);
+        Dialog.alert(t("Could not open attachment"), message);
       }
       if (openingRef.current === controller) {
         openingRef.current = null;
@@ -864,7 +873,11 @@ function MessageAttachmentFile(props: {
             )}
           </View>
           <View className="min-w-0 flex-1 gap-1">
-            <Text className="font-t3-medium text-sm text-foreground" numberOfLines={2}>
+            <Text
+              translate={false}
+              className="font-t3-medium text-sm text-foreground"
+              numberOfLines={2}
+            >
               {attachment.name}
             </Text>
             <Text className="text-xs text-foreground-muted" numberOfLines={1}>
@@ -1725,7 +1738,7 @@ function RunFoldWorking(props: {
         className="shrink font-t3-medium text-sm tabular-nums text-foreground-muted"
       >
         <T>
-          Working for <Var>{seconds > 0 ? formatDuration(seconds * 1_000) : "0s"}</Var>
+          Working for <Var>{seconds > 0 ? formatDuration(seconds * 1_000) : t("0s")}</Var>
         </T>
       </Text>
     </View>
@@ -1747,6 +1760,7 @@ function RunFoldButton({
   rowSizing: ReturnType<typeof deriveThreadWorkLogSizing>;
   iconColor: ColorValue;
 }) {
+  const m = useMessages();
   const loadWork = useAtomCommand(threadEnvironment.loadEarlierHistory, { reportFailure: false });
   const anchorsKey = entry.deferredWorkItemIds?.join("\n") ?? "";
   const [failed, setFailed] = useState(false);
@@ -1790,7 +1804,7 @@ function RunFoldButton({
           numberOfLines={1}
           className="shrink font-t3-medium text-sm tabular-nums text-foreground-muted"
         >
-          {entry.label}
+          {translateTurnFoldLabel(entry.label, m)}
           {error ? ` · ${error}` : ""}
         </Text>
         <ThreadDisclosureChevron
@@ -2457,7 +2471,7 @@ function renderFeedEntry(
                 {entry.pendingMessage &&
                 !entry.acknowledged &&
                 entry.id !== props.pendingFoldMessageId
-                  ? "Pending"
+                  ? t("Pending")
                   : timestampLabel}
               </Text>
               {props.onEditPendingMessage !== null &&
@@ -2689,8 +2703,8 @@ function UserMessageContent(props: UserMessageContentProps) {
             return {
               title: record?.label ?? "Context unavailable",
               actions: [
-                { id: "open-context", title: "Open context" },
-                { id: "copy-context", title: "Copy context", disabled: !record },
+                { id: "open-context", title: t("Open context") },
+                { id: "copy-context", title: t("Copy context"), disabled: !record },
               ],
             };
           },
@@ -2715,7 +2729,7 @@ function UserMessageContent(props: UserMessageContentProps) {
               )
                 .then(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success))
                 .catch(() => {
-                  Dialog.alert("Could not copy context", "Try copying this context again.");
+                  Dialog.alert(t("Could not copy context"), t("Try copying this context again."));
                 });
             }
           },
@@ -3357,10 +3371,10 @@ export const ThreadFeed = memo(function ThreadFeed(props: ThreadFeedProps) {
           actions: [
             {
               id: "open-skill",
-              title: "View instructions",
+              title: t("View instructions"),
               disabled: !enrichedSkillInstructionsPath(skill),
             },
-            { id: "copy-skill", title: "Copy skill" },
+            { id: "copy-skill", title: t("Copy skill") },
           ],
         };
       }
@@ -3370,8 +3384,8 @@ export const ThreadFeed = memo(function ThreadFeed(props: ThreadFeedProps) {
           title:
             appAtomRegistry.get(environmentThreadShells.threadShellAtom(thread))?.title ?? "Thread",
           actions: [
-            { id: "open-thread", title: "Open thread" },
-            { id: "copy-thread-link", title: "Copy link" },
+            { id: "open-thread", title: t("Open thread") },
+            { id: "copy-thread-link", title: t("Copy link") },
           ],
         };
       }

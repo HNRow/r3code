@@ -4,6 +4,8 @@ import { Platform } from "react-native";
 import { brandTitleOffset, CompactBrandTitle } from "../../../components/CompactBrandTitle";
 import { WorkspaceConnectionTitle } from "../../home/WorkspaceConnectionTitle";
 
+import { msg } from "../../../i18n/gt";
+
 function renderCompactBrandTitle() {
   return <CompactBrandTitle allowFontScaling={Platform.OS === "ios"} />;
 }
@@ -14,7 +16,8 @@ export function getCompactBrandHeaderOptions(
   return {
     headerTitle: renderCompactBrandTitle,
     headerTitleStyle: fallbackTitleStyle,
-    title: "Threads",
+    // 这份 options 在模块加载时构建，早于 GT 初始化；标题用编译期 msg。
+    title: msg("Threads"),
     unstable_headerLeftItems: undefined,
   };
 }

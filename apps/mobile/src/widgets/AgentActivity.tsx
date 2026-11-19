@@ -19,6 +19,11 @@ import {
   type LiveActivityComponent,
   type LiveActivityLayout,
 } from "expo-widgets";
+import {
+  DEFAULT_AGENT_ACTIVITY_LABELS,
+  formatLabelCount,
+  type AgentActivityLabels,
+} from "./agentActivityLabels";
 
 type LiveActivityEnvironment = Parameters<LiveActivityComponent<AgentActivityProps>>[1];
 
@@ -49,6 +54,7 @@ export interface AgentActivityProps {
   readonly activeCount: number;
   readonly updatedAt: string;
   readonly activities: ReadonlyArray<AgentActivityRowProps>;
+  readonly labels?: AgentActivityLabels;
 }
 
 // Widget serialization excludes module helpers; use only imported view/modifier factories.
@@ -57,6 +63,7 @@ function AgentActivity(
   environment: LiveActivityEnvironment,
 ): LiveActivityLayout {
   "widget";
+  const labels = props.labels ?? DEFAULT_AGENT_ACTIVITY_LABELS;
 
   // Hierarchical foregrounds inherit system tint and vibrancy.
   type Foreground = Parameters<typeof foregroundStyle>[0];
@@ -103,7 +110,7 @@ function AgentActivity(
     ? props.activities.map((row) =>
         row.phase === "completed" || row.phase === "failed"
           ? row
-          : { ...row, phase: "stale", status: "Out of date" },
+          : { ...row, phase: "stale", status: labels.outOfDate },
       )
     : props.activities;
   const ordered = [...activities].sort((a, b) => phasePriority(a.phase) - phasePriority(b.phase));
@@ -127,24 +134,29 @@ function AgentActivity(
       : tint;
 
   const allDone = props.activeCount === 0;
-  const doneLabel = failedRow ? "Failed" : "Done";
-  const outcomeLabel = failedRow ? "Agent work failed" : "Agent work completed";
+  const doneLabel = failedRow ? labels.failed : labels.done;
+  const outcomeLabel = failedRow ? labels.agentWorkFailed : labels.agentWorkCompleted;
 
-  const agentWord = props.activeCount === 1 ? "agent" : "agents";
   const agentsLabel = allDone
     ? outcomeLabel
     : environment.isStale
-      ? "Agent status out of date"
-      : `${props.activeCount} active ${agentWord}`;
+      ? labels.agentStatusOutOfDate
+      : formatLabelCount(
+          props.activeCount === 1 ? labels.activeAgentOne : labels.activeAgentMany,
+          props.activeCount,
+        );
   const attentionSuffix =
     attentionRows.length > 0
-      ? `${attentionRows.length} need${attentionRows.length === 1 ? "s" : ""} attention`
+      ? formatLabelCount(
+          attentionRows.length === 1 ? labels.needAttentionOne : labels.needAttentionMany,
+          attentionRows.length,
+        )
       : "";
   const activeLabel = allDone
     ? doneLabel
     : environment.isStale
-      ? "Out of date"
-      : `${props.activeCount} active`;
+      ? labels.outOfDate
+      : formatLabelCount(labels.active, props.activeCount);
   const showCompactGlyph = !attentionRow && !failedRow && !allDone && !environment.isStale;
   const summary = attentionSuffix || activeLabel;
 
@@ -346,10 +358,10 @@ function AgentActivity(
       >
         {attentionRow
           ? attentionRow.phase === "waiting_for_approval"
-            ? "Approval"
-            : "Input"
+            ? labels.approval
+            : labels.input
           : failedRow
-            ? "Failed"
+            ? labels.failed
             : activeLabel}
       </Text>
     ),

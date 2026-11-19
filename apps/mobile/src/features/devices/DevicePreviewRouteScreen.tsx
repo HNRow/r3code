@@ -45,6 +45,7 @@ import {
 } from "./threadDevicePreviews";
 import { createShakeDetector } from "./shakeDetector";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const OVERLAY_ENTERING = FadeIn.duration(160).reduceMotion(ReduceMotion.System);
 const OVERLAY_EXITING = FadeOut.duration(120).reduceMotion(ReduceMotion.System);
@@ -146,7 +147,7 @@ export function DevicePreviewScreen({
       },
     }).finally(() => setShuttingDown(false));
     if (result._tag === "Failure") {
-      Dialog.alert("Could not shut down device", String(Cause.squash(result.cause)));
+      Dialog.alert(t("Could not shut down device"), String(Cause.squash(result.cause)));
     }
   };
 
@@ -158,7 +159,7 @@ export function DevicePreviewScreen({
       )
       .map((host) => ({
         id: `retry-${host.id}`,
-        title: `Retry ${host.label}`,
+        title: t`Retry ${host.label}`,
         icon: "arrow.clockwise" as const,
         onPress: () => {
           void retryHost({ environmentId, input: { retryHostId: host.id } });
@@ -168,7 +169,7 @@ export function DevicePreviewScreen({
       ? [
           {
             id: "check-device-tools",
-            title: "Check device tool versions",
+            title: t("Check device tool versions"),
             icon: "arrow.clockwise" as const,
             onPress: () => {
               void retryHost({ environmentId, input: { inspectOnly: true } });
@@ -178,11 +179,11 @@ export function DevicePreviewScreen({
       : []),
     {
       id: "device-tools",
-      title: "Device tool versions",
+      title: t("Device tool versions"),
       icon: "info.circle",
       onPress: () =>
         Dialog.alert(
-          "Device tool versions",
+          t("Device tool versions"),
           deviceToolUpdateOwnership +
             "\n\n" +
             deviceToolUpdatePolicy(
@@ -201,7 +202,7 @@ export function DevicePreviewScreen({
     },
     {
       id: "reload",
-      title: "Reload stream",
+      title: t("Reload stream"),
       icon: "arrow.clockwise" as const,
       disabled: !preview || shuttingDown,
       onPress: () => {
@@ -213,7 +214,7 @@ export function DevicePreviewScreen({
       ? [
           {
             id: "back",
-            title: "Back",
+            title: t("Back"),
             icon: "arrow.left",
             disabled: !inputConnected,
             onPress: () => streamRef.current?.back(),
@@ -222,7 +223,7 @@ export function DevicePreviewScreen({
       : []),
     {
       id: "app-switcher",
-      title: "App switcher",
+      title: t("App switcher"),
       icon: "square.on.square",
       disabled: !inputConnected,
       onPress: () => streamRef.current?.appSwitcher(),
@@ -231,7 +232,7 @@ export function DevicePreviewScreen({
       ? [
           {
             id: "rotate",
-            title: "Rotate device",
+            title: t("Rotate device"),
             icon: "arrow.clockwise" as const,
             disabled: !inputConnected,
             onPress: () => streamRef.current?.rotate(),
@@ -252,7 +253,7 @@ export function DevicePreviewScreen({
       ? [
           {
             id: "devices",
-            title: "Devices",
+            title: t("Devices"),
             inline: true,
             items: previews.map((device) => ({
               id: device.key,
@@ -275,7 +276,7 @@ export function DevicePreviewScreen({
             title={preview?.name ?? "Devices"}
             actions={[
               {
-                accessibilityLabel: "Maximize device",
+                accessibilityLabel: t("Maximize device"),
                 icon: "arrow.up.left.and.arrow.down.right",
                 onPress: () => onMaximize(preview?.key ?? null),
               },
@@ -339,7 +340,7 @@ export function DevicePreviewScreen({
             <GlassSurface className="flex-row items-center gap-1 p-1">
               <SheetCloseButton accessibilityLabel={gt("Close device preview")} onClose={onClose} />
               <AppText numberOfLines={1} className="flex-1 text-center font-t3-medium text-base">
-                {preview?.name ?? "Devices"}
+                {preview?.name ?? t("Devices")}
               </AppText>
               <ControlPill
                 accessibilityLabel={gt("Home")}

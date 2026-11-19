@@ -102,7 +102,7 @@ import {
 import { stackedThreadToast, toastManager } from "~/components/ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "~/components/ui/tooltip";
 import { observeResize } from "~/lib/observeResize";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 interface Props {
   threadRef: ScopedThreadRef;
@@ -280,7 +280,7 @@ export function PreviewView({
       if (isBrowserSettingsReadError(error)) {
         toastManager.add({
           type: "error",
-          title: "Unable to open browser",
+          title: t("Unable to open browser"),
           description: error.message,
         });
       }
@@ -303,7 +303,7 @@ export function PreviewView({
     } catch (error) {
       toastManager.add({
         type: "error",
-        title: "Could not open this address",
+        title: t("Could not open this address"),
         description: isPreviewUrlNormalizationError(error)
           ? "Enter an http or https URL."
           : error instanceof Error
@@ -325,7 +325,7 @@ export function PreviewView({
     } catch (error) {
       toastManager.add({
         type: "error",
-        title: "Could not open this address",
+        title: t("Could not open this address"),
         description: isPreviewUrlNormalizationError(error)
           ? "Enter an http or https URL."
           : error instanceof Error
@@ -355,7 +355,7 @@ export function PreviewView({
       const error = squashAtomCommandFailure(result);
       toastManager.add({
         type: "error",
-        title: "Unable to change the browser tab",
+        title: t("Unable to change the browser tab"),
         description: error instanceof Error ? error.message : "An error occurred.",
       });
       return;
@@ -387,7 +387,7 @@ export function PreviewView({
     !isUnreachable;
   const handleFind = () => {
     if (!canFindInPage) {
-      toastManager.add({ type: "info", title: "Find on page isn't available for this page" });
+      toastManager.add({ type: "info", title: t("Find on page isn't available for this page") });
       return;
     }
     setFind((previous) => ({ tabId: runtimeTabId, requestId: (previous?.requestId ?? 0) + 1 }));
@@ -480,7 +480,7 @@ export function PreviewView({
       const error = squashAtomCommandFailure(result);
       toastManager.add({
         type: "error",
-        title: "Unable to move the browser tab",
+        title: t("Unable to move the browser tab"),
         description: error instanceof Error ? error.message : "An error occurred.",
       });
       return;
@@ -551,7 +551,7 @@ export function PreviewView({
     void operation(runtimeTabId).catch((error) => {
       toastManager.add({
         type: "error",
-        title: "Unable to update popped-out preview",
+        title: t("Unable to update popped-out preview"),
         description: error instanceof Error ? error.message : "An error occurred.",
       });
     });
@@ -573,8 +573,8 @@ export function PreviewView({
                 toastId,
                 stackedThreadToast({
                   type: "error",
-                  title: "Unable to copy recording path",
-                  description: "Clipboard API unavailable.",
+                  title: t("Unable to copy recording path"),
+                  description: t("Clipboard API unavailable."),
                   actionProps: revealAction,
                 }),
               );
@@ -595,7 +595,7 @@ export function PreviewView({
                   toastId,
                   stackedThreadToast({
                     type: "error",
-                    title: "Unable to copy recording path",
+                    title: t("Unable to copy recording path"),
                     description: error instanceof Error ? error.message : "An error occurred.",
                     actionProps: revealAction,
                   }),
@@ -613,7 +613,7 @@ export function PreviewView({
               toastId,
               stackedThreadToast({
                 type: "success",
-                title: "Recording saved",
+                title: t("Recording saved"),
                 actionProps: revealAction,
                 data: {
                   secondaryActionProps: {
@@ -630,7 +630,7 @@ export function PreviewView({
           toastId = toastManager.add(
             stackedThreadToast({
               type: "success",
-              title: "Recording saved",
+              title: t("Recording saved"),
               actionProps: revealAction,
               data: {
                 secondaryActionProps: {
@@ -645,7 +645,7 @@ export function PreviewView({
         (error) => {
           toastManager.add({
             type: "error",
-            title: "Unable to stop recording",
+            title: t("Unable to stop recording"),
             description: error instanceof Error ? error.message : "An error occurred.",
           });
         },
@@ -658,7 +658,7 @@ export function PreviewView({
         if (isBrowserRecordingStartCancelledError(error)) return;
         toastManager.add({
           type: "error",
-          title: "Unable to start recording",
+          title: t("Unable to start recording"),
           description,
         });
       });
@@ -762,7 +762,7 @@ export function PreviewView({
         toastId = toastManager.add(
           stackedThreadToast({
             type: "success",
-            title: "Screenshot saved",
+            title: t("Screenshot saved"),
             actionProps: {
               children: "Copy image",
               onClick: copyImage,
@@ -788,7 +788,7 @@ export function PreviewView({
       (error) => {
         toastManager.add({
           type: "error",
-          title: "Unable to capture screenshot",
+          title: t("Unable to capture screenshot"),
           description: error instanceof Error ? error.message : "An error occurred.",
         });
       },
@@ -867,8 +867,8 @@ export function PreviewView({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not capture the picked element",
-            description: "The annotation was kept without the screenshot.",
+            title: t("Could not capture the picked element"),
+            description: t("The annotation was kept without the screenshot."),
           }),
         );
       }

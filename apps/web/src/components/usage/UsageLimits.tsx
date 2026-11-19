@@ -42,12 +42,27 @@ import { Button } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { UsageLimitsPooled } from "./UsageLimitsPooled";
 import { PROVIDER_PRESENTATION } from "./usageProviders";
-import { Var, T } from "gt-react";
+import { Var, T, t } from "gt-react";
 
 const PACE: Record<LimitPace, { readonly label: string; readonly icon: typeof GaugeIcon }> = {
-  ahead: { label: "Ahead of pace: spending faster than the window elapses", icon: TrendingUpIcon },
-  on: { label: "On pace with the window", icon: GaugeIcon },
-  under: { label: "Under pace: headroom left for the rest of the window", icon: TrendingDownIcon },
+  ahead: {
+    get label() {
+      return t("Ahead of pace: spending faster than the window elapses");
+    },
+    icon: TrendingUpIcon,
+  },
+  on: {
+    get label() {
+      return t("On pace with the window");
+    },
+    icon: GaugeIcon,
+  },
+  under: {
+    get label() {
+      return t("Under pace: headroom left for the rest of the window");
+    },
+    icon: TrendingDownIcon,
+  },
 };
 
 export function barColor(driver: ServerProvider["driver"]): string {
@@ -347,7 +362,7 @@ export function ResetCredits({
               disabled={busy || !canManageProviders}
               onClick={() => confirm(choice)}
             >
-              {busy ? "Using…" : choice.actionLabel}
+              {busy ? t("Using…") : choice.actionLabel}
             </Button>
           ) : null}
         </div>

@@ -24,7 +24,7 @@ import { Spinner } from "../ui/spinner";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { SecretInput } from "./SecretInput";
 import { classifySecretProvider } from "./SecretProviderDialog.logic";
-import { useGT } from "gt-react";
+import { useGT, t } from "gt-react";
 
 export interface SecretSource {
   readonly id: SecretProviderId;
@@ -305,14 +305,14 @@ export function SecretSourceInput({
             <SecretCheckButton
               environmentId={environmentId}
               secret={secret}
-              label={`Check ${label}`}
+              label={t`Check ${label}`}
               disabled={input.disabled}
             />
           ) : null}
         </div>
         {rejectedReference !== null ? (
           <p className="text-2xs text-destructive">
-            {definition?.invalidReferenceMessage ?? "Enter a valid secret reference."}
+            {definition?.invalidReferenceMessage ?? t("Enter a valid secret reference.")}
           </p>
         ) : null}
       </div>

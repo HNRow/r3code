@@ -115,7 +115,7 @@ import { toastManager } from "../ui/toast";
 import { WorkspacePageHeader } from "../WorkspacePageHeader";
 import { cn } from "../../lib/utils";
 import { formatRelativeTime } from "../../timestampFormat";
-import { T, Var, useGT } from "gt-react";
+import { T, Var, useGT, t } from "gt-react";
 
 const AGENT_ONBOARDING_THREAD_ID = ThreadId.make("onboarding-agent-setup");
 const SCAN_LIMIT_MESSAGE = "Scan limit reached. Some projects or conversations may be missing.";
@@ -168,8 +168,8 @@ export function WelcomePage({
       toastManager.add({
         id: "welcome-finishing",
         type: "info",
-        title: "Finishing setup",
-        description: "One moment.",
+        title: t("Finishing setup"),
+        description: t("One moment."),
       });
       return true;
     },
@@ -205,14 +205,14 @@ export function WelcomePage({
         if (importWarning) {
           toastManager.add({
             type: "warning",
-            title: "Some history was not imported",
+            title: t("Some history was not imported"),
             description: importWarning,
             timeout: 0,
           });
         } else if (importedThreadCount > 0) {
           toastManager.add({
             type: "success",
-            title: `Imported ${importedThreadCount} ${importedThreadCount === 1 ? "thread" : "threads"}`,
+            title: t`Imported ${importedThreadCount} ${importedThreadCount === 1 ? "thread" : "threads"}`,
           });
         }
         return true;
@@ -221,8 +221,8 @@ export function WelcomePage({
         holdPageRef.current = false;
         const errorToast = {
           type: "error",
-          title: "Could not finish setup",
-          description: "Your settings could not be saved. Try again.",
+          title: t("Could not finish setup"),
+          description: t("Your settings could not be saved. Try again."),
         } as const;
         if (completionErrorToastIdRef.current === null) {
           completionErrorToastIdRef.current = toastManager.add(errorToast);
@@ -316,13 +316,13 @@ export function WelcomePage({
                 <Button disabled={!agentReady || isImporting} onClick={start}>
                   {isImporting
                     ? selected.length > 0
-                      ? "Importing…"
-                      : "Starting…"
+                      ? t("Importing…")
+                      : t("Starting…")
                     : newCount > 0
                       ? `Import ${newCount} ${newCount === 1 ? "project" : "projects"} and start`
                       : selected.length > 0
-                        ? "Import threads and start"
-                        : "Start"}
+                        ? t("Import threads and start")
+                        : t("Start")}
                 </Button>
               </div>
             </div>
@@ -338,8 +338,8 @@ function TelemetryNotice({ environmentId }: { readonly environmentId: Environmen
   const telemetryOff = managedTelemetryOffMessage(useManagedPolicy(environmentId));
   return (
     <p className="mt-auto pt-12 text-2xs leading-relaxed text-muted-foreground/70">
-      {telemetryOff ?? "R3 Code collects anonymous usage data to improve the app."}{" "}
-      {telemetryOff === undefined ? "To opt out, see the" : "See the"}{" "}
+      {telemetryOff ?? t("R3 Code collects anonymous usage data to improve the app.")}{" "}
+      {telemetryOff === undefined ? t("To opt out, see the") : t("See the")}{" "}
       <a
         className="underline decoration-current/40 underline-offset-2 hover:text-muted-foreground"
         href={PRIVACY_POLICY_URL}
@@ -529,7 +529,7 @@ function AgentsSection({
         const cause = squashAtomCommandFailure(result);
         toastManager.add({
           type: "error",
-          title: `Could not turn on ${agentName(provider)}`,
+          title: t`Could not turn on ${agentName(provider)}`,
           ...(cause instanceof Error ? { description: cause.message } : {}),
         });
       }
@@ -657,7 +657,7 @@ function AgentsSection({
               found.length > 0 ? "text-muted-foreground" : "text-foreground",
             )}
           >
-            {found.length > 0 ? "Add more agents" : "Set up an agent"}
+            {found.length > 0 ? t("Add more agents") : t("Set up an agent")}
           </span>
           {showMore ? null : <AgentLogoStack providers={available} acp={acpAllowed} />}
           <ChevronDownIcon className="ml-auto size-4 text-muted-foreground group-data-panel-open:rotate-180" />
@@ -858,7 +858,7 @@ function ProjectsSection({
             <span className="block text-sm font-medium text-foreground">
               {canWrite && selected.length > 0
                 ? `Import ${selected.length} ${selected.length === 1 ? "project" : "projects"} and their threads`
-                : "Import projects and their threads"}
+                : t("Import projects and their threads")}
             </span>
             <span className="block text-xs text-muted-foreground">
               <T>
@@ -874,7 +874,7 @@ function ProjectsSection({
             aria-expanded={reviewing}
             onClick={() => setReviewing((open) => !open)}
           >
-            {reviewing ? "Hide" : `Review all ${candidates.length}`}
+            {reviewing ? t("Hide") : `Review all ${candidates.length}`}
             <ChevronDownIcon className={cn("size-3.5", reviewing && "rotate-180")} />
           </Button>
         ) : null}
@@ -957,7 +957,7 @@ function PhoneSection({ environmentId }: { readonly environmentId: EnvironmentId
             <T>Use R3 Code on your phone</T>
           </span>
           <CollapsibleTrigger render={<Button variant="ghost-muted" size="xs" />}>
-            {open ? "Hide" : "Set up"}
+            {open ? t("Hide") : t("Set up")}
             <ChevronDownIcon className={cn("size-3.5", open && "rotate-180")} />
           </CollapsibleTrigger>
         </div>
@@ -1066,8 +1066,8 @@ function PhoneConnectLink({ environmentId }: { readonly environmentId: Environme
       <>
         <p className="text-sm text-foreground">
           {shared
-            ? "R3 Connect is on, but the app cannot reach this computer."
-            : "Signed in. Share this computer so the app can reach it."}
+            ? t("R3 Connect is on, but the app cannot reach this computer.")
+            : t("Signed in. Share this computer so the app can reach it.")}
         </p>
         {settingsLink(shared ? "Check R3 Connect" : "Set up R3 Connect")}
       </>
@@ -1132,7 +1132,7 @@ function OnboardingCodexSetup({
           const cause = squashAtomCommandFailure(result);
           toastManager.add({
             type: "error",
-            title: "Could not save Codex setup",
+            title: t("Could not save Codex setup"),
             ...(cause instanceof Error ? { description: cause.message } : {}),
           });
         }
@@ -1374,7 +1374,7 @@ function AgentInstallTerminal({
       <div className="flex items-center justify-between border-b border-border/60 bg-background/60 px-3 py-1.5">
         <span className="text-2xs font-medium text-muted-foreground">
           {!canOperateTerminal ? (
-            "This connection cannot control terminals."
+            t("This connection cannot control terminals.")
           ) : setupState === "writeFailed" ? (
             <>
               <T>
@@ -1386,11 +1386,11 @@ function AgentInstallTerminal({
               </T>
             </>
           ) : setupState === "ready" ? (
-            "Review the command, then press Enter to run it."
+            t("Review the command, then press Enter to run it.")
           ) : setupState === "openFailed" ? (
-            "Could not open the setup terminal."
+            t("Could not open the setup terminal.")
           ) : (
-            "Preparing command..."
+            t("Preparing command...")
           )}
         </span>
         <div className="flex items-center gap-1">

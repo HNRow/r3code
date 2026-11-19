@@ -18,15 +18,31 @@ import {
 import { getMobileUniwindThemeName } from "../../../../lib/mobileThemeRuntime";
 import { cn } from "../../../../lib/cn";
 import { useAppearancePreferences } from "../AppearancePreferencesProvider";
-import { useGT, T } from "gt-react-native";
+import { useGT } from "gt-react-native";
+import { t } from "../../../../i18n/gt";
 
 const APPEARANCE_MODES: ReadonlyArray<{
   readonly id: MobileThemeMode;
   readonly label: string;
 }> = [
-  { id: "system", label: "System" },
-  { id: "light", label: "Light" },
-  { id: "dark", label: "Dark" },
+  {
+    id: "system",
+    get label() {
+      return t("System");
+    },
+  },
+  {
+    id: "light",
+    get label() {
+      return t("Light");
+    },
+  },
+  {
+    id: "dark",
+    get label() {
+      return t("Dark");
+    },
+  },
 ];
 
 const previewPercentage = (value: number) => `${value * 100}%`;
@@ -287,6 +303,7 @@ function SectionLabel({ children }: { readonly children: string }) {
 }
 
 export function ThemeAppearanceSection() {
+  const gt = useGT();
   const {
     isReady,
     setThemeIdForAppearance,
@@ -300,9 +317,7 @@ export function ThemeAppearanceSection() {
   return (
     <View className="gap-6">
       <View className="gap-2">
-        <SectionLabel>
-          <T>Color scheme</T>
-        </SectionLabel>
+        <SectionLabel>{gt("Color scheme")}</SectionLabel>
         <View accessibilityRole="radiogroup" className="flex-row gap-2">
           {APPEARANCE_MODES.map((mode) => (
             <ModeCard
@@ -319,9 +334,7 @@ export function ThemeAppearanceSection() {
       </View>
 
       <View className="gap-3">
-        <SectionLabel>
-          <T>Themes</T>
-        </SectionLabel>
+        <SectionLabel>{gt("Themes")}</SectionLabel>
         <View className="flex-row flex-wrap gap-3">
           {MOBILE_THEME_OPTIONS.filter(
             (theme) => theme.id !== "material-you" || systemColorsAvailable,

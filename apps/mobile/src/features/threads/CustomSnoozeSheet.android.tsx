@@ -39,6 +39,7 @@ import {
   snoozeDateToPickerDate,
 } from "./customSnoozeDate";
 import { T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 type Props = {
   readonly onClose: () => void;
@@ -48,13 +49,38 @@ type Props = {
 const roundedCorner = Shape.RoundedCorner;
 
 const modes = [
-  { value: "date", label: "Date and time" },
-  { value: "duration", label: "Duration" },
+  {
+    value: "date",
+    get label() {
+      return t("Date and time");
+    },
+  },
+  {
+    value: "duration",
+    get label() {
+      return t("Duration");
+    },
+  },
 ] as const;
 const units = [
-  { value: "minutes", label: "Minutes" },
-  { value: "hours", label: "Hours" },
-  { value: "days", label: "Days" },
+  {
+    value: "minutes",
+    get label() {
+      return t("Minutes");
+    },
+  },
+  {
+    value: "hours",
+    get label() {
+      return t("Hours");
+    },
+  },
+  {
+    value: "days",
+    get label() {
+      return t("Days");
+    },
+  },
 ] as const;
 
 function systemUses24HourClock() {

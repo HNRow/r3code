@@ -15,7 +15,7 @@ import {
   PullRequestMarkdownTextarea,
   type PullRequestCompletionScope,
 } from "./PullRequestMarkdownTextarea";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 export function PullRequestMarkdownEditor({
   value,
@@ -144,7 +144,7 @@ export function PullRequestMarkdownEditor({
             onSave(draft);
           }}
         >
-          {saving ? "Saving..." : "Save"}
+          {saving ? t("Saving...") : t("Save")}
         </Button>
       </div>
     </div>

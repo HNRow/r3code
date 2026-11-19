@@ -4,6 +4,7 @@ import { useEnvironment } from "~/state/environments";
 import { ContextChip, ContextChipLabel } from "./ContextChip";
 import { EnvironmentMachineIcon } from "./EnvironmentMachineIcon";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
+import { t } from "gt-react";
 
 /**
  * Inline chip for a mentioned machine, in the composer and in sent messages. Prefers the
@@ -33,7 +34,7 @@ export function EnvironmentContextChip(props: {
         }
       />
       <TooltipPopup side="top">
-        {environment ? "R3 Code environment" : "Machine not in this app"}
+        {environment ? t("R3 Code environment") : t("Machine not in this app")}
       </TooltipPopup>
     </Tooltip>
   );

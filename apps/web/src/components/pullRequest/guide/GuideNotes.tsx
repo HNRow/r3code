@@ -3,7 +3,7 @@ import type { PullRequestReviewGuideNote } from "@t3tools/contracts";
 import { cn } from "~/lib/utils";
 
 import { GuideProse } from "./GuideProse";
-import { Var, T } from "gt-react";
+import { Var, T, t } from "gt-react";
 
 export function GuideNoteMarker({ marker }: { marker: string }) {
   return (
@@ -30,7 +30,7 @@ export function GuideNotes({
         <T>
           Notes on this stop
           <span className="font-normal text-muted-foreground tabular-nums">
-            <Var>{notes.length === 1 ? "1 note" : `${notes.length} notes`}</Var>
+            <Var>{notes.length === 1 ? t("1 note") : `${notes.length} notes`}</Var>
           </span>
         </T>
       </h4>

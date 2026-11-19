@@ -12,6 +12,7 @@ import { LocalEnvironmentList } from "./LocalEnvironmentList";
 import { PullRequestRoutingSettings } from "./PullRequestRoutingSettings";
 import { LinkedEnvironmentsSection } from "./LinkedEnvironmentsSection";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function ConnectionsRouteScreen() {
   const gt = useGT();
@@ -37,7 +38,7 @@ export function ConnectionsRouteScreen() {
         closeAccessibilityLabel="Close environments"
         actions={[
           {
-            accessibilityLabel: "Add environment",
+            accessibilityLabel: t("Add environment"),
             icon: "plus",
             onPress: () => navigation.navigate("ConnectionsNew"),
           },

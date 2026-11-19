@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
 } from "./ui/alert-dialog";
 import { Button } from "./ui/button";
-import { T, useMessages } from "gt-react";
+import { T, useMessages, t } from "gt-react";
 
 type ConfirmationCopy = {
   readonly title: string;
@@ -47,7 +47,7 @@ function resolveConfirmDialogCopy(message: string): ConfirmationCopy {
   }
 
   return {
-    title: "Confirm action",
+    title: t("Confirm action"),
     description: normalizedMessage || "This action requires your confirmation.",
   };
 }

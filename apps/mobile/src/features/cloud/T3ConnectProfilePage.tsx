@@ -22,6 +22,7 @@ import {
   useManagedRelayEnvironments,
 } from "./managedRelayState";
 import { T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const linkedAtFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" });
 
@@ -97,15 +98,15 @@ export function T3ConnectProfilePage() {
       cause,
     });
     Dialog.alert(
-      "Could not deregister server",
+      t("Could not deregister server"),
       traceId ? `${message}\n\nTrace ID: ${traceId}` : message,
       traceId
         ? [
             {
-              text: "Copy trace ID",
+              text: t("Copy trace ID"),
               onPress: () => copyTextWithHaptic(traceId, { target: "connection-trace-id" }),
             },
-            { text: "OK", style: "cancel" },
+            { text: t("OK"), style: "cancel" },
           ]
         : undefined,
     );
@@ -135,9 +136,7 @@ export function T3ConnectProfilePage() {
         />
       }
     >
-      <ClerkSectionHeader>
-        <T>Registered servers</T>
-      </ClerkSectionHeader>
+      <ClerkSectionHeader>{gt("Registered servers")}</ClerkSectionHeader>
 
       {environmentsState.error ? (
         <>
@@ -216,7 +215,14 @@ export function T3ConnectProfilePage() {
 }
 
 const ENVIRONMENT_MENU_ACTIONS = [
-  { id: "deregister", title: "Deregister", image: "trash", attributes: { destructive: true } },
+  {
+    id: "deregister",
+    get title() {
+      return t("Deregister");
+    },
+    image: "trash",
+    attributes: { destructive: true },
+  },
 ] satisfies MenuAction[];
 
 function ClerkSectionHeader(props: { readonly children: string }) {

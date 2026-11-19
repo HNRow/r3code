@@ -1031,10 +1031,13 @@ describe("makeRelayDeviceRegistrationRequest", () => {
         yield* refreshActiveLiveActivityRemoteRegistration();
 
         expect(order).toEqual(["push-token", "widget-snapshot"]);
-        expect(publishWidgetMock).toHaveBeenLastCalledWith({
-          kind: "snapshot",
-          aggregate,
-        });
+        expect(publishWidgetMock).toHaveBeenLastCalledWith(
+          {
+            kind: "snapshot",
+            aggregate,
+          },
+          expect.any(Object),
+        );
       }).pipe(Effect.provide(relay));
     });
 
@@ -1062,10 +1065,13 @@ describe("makeRelayDeviceRegistrationRequest", () => {
         yield* Deferred.succeed(olderResponse, { aggregate });
         yield* Fiber.join(older);
 
-        expect(publishWidgetMock).toHaveBeenLastCalledWith({
-          kind: "snapshot",
-          aggregate: newer,
-        });
+        expect(publishWidgetMock).toHaveBeenLastCalledWith(
+          {
+            kind: "snapshot",
+            aggregate: newer,
+          },
+          expect.any(Object),
+        );
       }),
     );
 
@@ -1109,10 +1115,13 @@ describe("makeRelayDeviceRegistrationRequest", () => {
         yield* Deferred.succeed(response, { aggregate });
         yield* Fiber.join(refreshB);
 
-        expect(publishWidgetMock).toHaveBeenLastCalledWith({
-          kind: "snapshot",
-          aggregate,
-        });
+        expect(publishWidgetMock).toHaveBeenLastCalledWith(
+          {
+            kind: "snapshot",
+            aggregate,
+          },
+          expect.any(Object),
+        );
       }),
     );
 

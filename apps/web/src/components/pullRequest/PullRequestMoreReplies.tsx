@@ -1,5 +1,5 @@
 import type { PullRequestReplyAvailability } from "./pullRequestDetail.logic";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 export function PullRequestMoreReplies({
   moreReplies,
@@ -12,7 +12,7 @@ export function PullRequestMoreReplies({
       <span>
         {moreReplies > 0
           ? `${moreReplies.toLocaleString()} more ${moreReplies === 1 ? "reply" : "replies"}`
-          : "More replies"}
+          : t("More replies")}
       </span>
       {url ? (
         <a

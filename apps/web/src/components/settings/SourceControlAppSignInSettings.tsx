@@ -19,7 +19,7 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { Button, InlineButton } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import { RedactedSensitiveText } from "./RedactedSensitiveText";
-import { T, useGT, Var } from "gt-react";
+import { T, useGT, Var, t } from "gt-react";
 
 type SignInState =
   | { readonly status: "idle" }
@@ -205,7 +205,7 @@ export function SourceControlAppSignInSettings({
         onClick={() => void signIn()}
       >
         {state.status === "starting" ? <Spinner /> : null}
-        {state.status === "failed" ? "Try again" : "Sign in with GitHub"}
+        {state.status === "failed" ? t("Try again") : t("Sign in with GitHub")}
       </Button>
     );
   }

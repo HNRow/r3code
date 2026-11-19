@@ -12,6 +12,8 @@ import {
   RuntimeRequestId,
   NodeId,
   type ProjectId,
+  type ProviderDriverKind,
+  type ProviderInstanceId,
   ThreadId,
 } from "@t3tools/contracts";
 import * as ProviderCommitBatch from "./ProviderCommitBatch.ts";
@@ -251,6 +253,11 @@ export interface EventSinkV2Shape {
   readonly readByCommandId: (input: {
     readonly commandId: CommandId;
   }) => Stream.Stream<OrchestrationV2StoredEvent, EventSinkV2Error>;
+  /** Native ids a thread already owns, so an import can tell them from new sessions. */
+  readonly listOwnedNativeThreadIds: (
+    driver: ProviderDriverKind,
+    providerInstanceId: ProviderInstanceId,
+  ) => Effect.Effect<ReadonlyArray<string>, EventSinkV2Error>;
 }
 
 export class EventSinkV2 extends Context.Service<EventSinkV2, EventSinkV2Shape>()(
@@ -1256,6 +1263,10 @@ const layerBase: Layer.Layer<
               }),
           ),
         ),
+      listOwnedNativeThreadIds: (driver, providerInstanceId) =>
+        projectionStore
+          .listOwnedNativeThreadIds(driver, providerInstanceId)
+          .pipe(Effect.mapError((cause) => new EventSinkStreamError({ cause }))),
     } satisfies EventSinkV2Shape);
   }),
 );

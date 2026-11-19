@@ -62,7 +62,7 @@ import {
   workEntryIconName,
 } from "./TimelineWorkEntryRow.logic";
 import { formatWorkingTimerNow } from "./TimelineWorkGroupRows.logic";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 export const WorkGroupSection = memo(function WorkGroupSection({
   anchorKey,
@@ -430,7 +430,7 @@ function CompactingLabel({ createdAt }: { createdAt: string | null }) {
           </T>
         </span>
       ) : (
-        "Compacting…"
+        t("Compacting…")
       )}
     </span>
   );

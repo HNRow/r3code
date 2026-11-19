@@ -94,6 +94,7 @@ const unitTestProject = {
     hookTimeout: 15_000,
     testTimeout: 15_000,
     setupFiles: [
+      "./test/mockGt.ts",
       "../../packages/shared/src/testing/longTempDir.ts",
       "../../packages/shared/src/testing/providerEnv.ts",
     ],
@@ -135,7 +136,7 @@ const browserTestProject = {
     include: ["src/**/*.browser.test.{ts,tsx}"],
     hookTimeout: 15_000,
     testTimeout: 15_000,
-    setupFiles: ["./test/browserSetup.ts"],
+    setupFiles: ["./test/mockGt.ts", "./test/browserSetup.ts"],
     api: { port: browserTestApiPort, strictPort: false },
     browser: {
       enabled: true,

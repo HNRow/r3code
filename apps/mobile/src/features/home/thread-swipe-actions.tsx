@@ -45,6 +45,8 @@ import { useScaledTextRole } from "../settings/appearance/useScaledTextRole";
 import { SwipeRowActivationContext, type SwipeRowActivation } from "./swipe-row-activation";
 import { registerThreadDismissal } from "./thread-dismissal";
 
+import { t } from "../../i18n/gt";
+
 const ACTION_ITEM_WIDTH = 58;
 const ACTION_CIRCLE_SIZE = 36;
 const ACTION_ICON_SIZE = 15;
@@ -104,7 +106,7 @@ function resolveSecondaryAction(input: {
       accessibilityLabel: `Delete ${input.threadTitle}`,
       tone: "danger",
       icon: "trash",
-      label: "Delete",
+      label: t("Delete"),
       onPress: () => {
         input.close();
         input.onDelete();

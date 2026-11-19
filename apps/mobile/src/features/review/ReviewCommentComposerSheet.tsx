@@ -29,6 +29,7 @@ import { useAppearancePreferences } from "../settings/appearance/AppearancePrefe
 import { changeTone, DiffTokenText, ReviewChangeBar } from "./reviewDiffRendering";
 import { highlightReviewSelectedLines } from "./highlightReviewSelectedLines";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const REVIEW_COMMENT_PREVIEW_MAX_LINES = 5;
 const NO_LINES: ReturnType<typeof getSelectedReviewCommentLines> = [];
@@ -96,7 +97,7 @@ export function ReviewCommentComposerSheet(props: ReviewCommentComposerSheetProp
         if (result.attachments.length > 0) {
           setAttachments((current) => [...current, ...result.attachments]);
         }
-        if (result.error) Dialog.alert("Could not paste image", result.error);
+        if (result.error) Dialog.alert(t("Could not paste image"), result.error);
       } catch (error) {
         console.error("[review comment] error converting pasted images", error);
       }

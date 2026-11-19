@@ -29,10 +29,21 @@ import * as Dialog from "../../components/ui/Dialog";
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
 import { MOBILE_THEME_IDS } from "../../lib/mobileTheme";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const CHOICES = [
-  { value: "overview", label: "Overview" },
-  { value: "activity", label: "Activity" },
+  {
+    value: "overview",
+    get label() {
+      return t("Overview");
+    },
+  },
+  {
+    value: "activity",
+    get label() {
+      return t("Activity");
+    },
+  },
 ];
 
 export function ComponentCatalogScreen() {
@@ -52,8 +63,8 @@ export function ComponentCatalogScreen() {
   const announceAction = () => setNotice(true);
   const confirm = () => {
     Dialog.confirm({
-      title: "Discard changes?",
-      message: "This example only changes local catalog state.",
+      title: t("Discard changes?"),
+      message: t("This example only changes local catalog state."),
       confirmText: "Discard",
       destructive: true,
       onConfirm: () => setText(""),
@@ -85,8 +96,8 @@ export function ComponentCatalogScreen() {
           </View>
           <SegmentedControl
             options={[
-              { value: "light", label: "Light" },
-              { value: "dark", label: "Dark" },
+              { value: "light", label: t("Light") },
+              { value: "dark", label: t("Dark") },
             ]}
             selected={appearance.themeAppearance}
             onSelect={appearance.setThemeMode}
@@ -95,9 +106,9 @@ export function ComponentCatalogScreen() {
         </View>
         <SegmentedControl
           options={[
-            { value: "controls", label: "Controls" },
-            { value: "forms", label: "Forms" },
-            { value: "feedback", label: "Feedback" },
+            { value: "controls", label: t("Controls") },
+            { value: "forms", label: t("Forms") },
+            { value: "feedback", label: t("Feedback") },
           ]}
           selected={page}
           onSelect={setPage}
@@ -242,14 +253,14 @@ export function ComponentCatalogScreen() {
               <Button
                 label={gt("Alert")}
                 onPress={() =>
-                  Dialog.alert("Example alert", "Choose an action.", [
+                  Dialog.alert(t("Example alert"), t("Choose an action."), [
                     {
-                      text: "More info",
+                      text: t("More info"),
                       onPress: () =>
-                        Dialog.alert("More information", "This second alert stays open."),
+                        Dialog.alert(t("More information"), t("This second alert stays open.")),
                     },
-                    { text: "Cancel", style: "cancel" },
-                    { text: "Continue", onPress: announceAction },
+                    { text: t("Cancel"), style: "cancel" },
+                    { text: t("Continue"), onPress: announceAction },
                   ])
                 }
               />
@@ -257,7 +268,7 @@ export function ComponentCatalogScreen() {
                 label={gt("Prompt")}
                 onPress={() =>
                   Dialog.prompt({
-                    title: "Rename example",
+                    title: t("Rename example"),
                     initialValue: text,
                     confirmText: "Rename",
                     onConfirm: setText,
@@ -267,8 +278,8 @@ export function ComponentCatalogScreen() {
               <Menu
                 title={gt("Example menu")}
                 actions={[
-                  { id: "copy", title: "Copy", image: "doc.on.doc" },
-                  { id: "discard", title: "Discard", attributes: { destructive: true } },
+                  { id: "copy", title: t("Copy"), image: "doc.on.doc" },
+                  { id: "discard", title: t("Discard"), attributes: { destructive: true } },
                 ]}
                 onPressAction={({ nativeEvent }) =>
                   nativeEvent.event === "discard" ? confirm() : announceAction()
@@ -303,7 +314,7 @@ export function ComponentCatalogScreen() {
             tone="success"
             dismissMode="swipe"
             action={{
-              label: "Undo",
+              label: t("Undo"),
               onPress: () => {
                 setNotice(false);
                 setText("Restored example");

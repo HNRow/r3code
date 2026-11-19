@@ -3,6 +3,7 @@ import { Pressable, View } from "react-native";
 import { AppText } from "../../components/ui/AppText";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function DevicePreviewButton(props: {
   readonly count: number;
@@ -31,7 +32,7 @@ export function DevicePreviewButton(props: {
       />
       {!compact ? (
         <AppText className="font-t3-medium text-xs text-foreground">
-          {props.count === 1 ? "One device open" : `${props.count} devices open`}
+          {props.count === 1 ? t("One device open") : `${props.count} devices open`}
         </AppText>
       ) : props.count > 1 ? (
         <View className="absolute right-1.5 top-1.5 min-w-4 items-center rounded-full bg-primary px-1">

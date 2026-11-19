@@ -84,6 +84,7 @@ import {
   IDLE_COMPACTION_TITLES,
   IDLE_COMPACTING_LABELS,
 } from "@t3tools/client-runtime/user-message";
+import { t } from "../i18n/gt";
 
 export type PendingApproval = ThreadPendingApproval;
 export type PendingUserInput = ThreadPendingUserInput;
@@ -382,7 +383,7 @@ export function threadFeedCompactionLabels(feed: ReadonlyArray<ThreadFeedEntry>)
           (age === undefined
             ? undefined
             : {
-                title: `Context compacted after ${age} idle`,
+                title: t`Context compacted after ${age} idle`,
                 compacting: "Compacting…",
               });
         if (labels) labelsByEntryId.set(entry.id, labels);
@@ -1344,7 +1345,7 @@ function deriveThreadFeedRunFolds(
       runId: RunId.make(`deferred-work:${entry.id}`),
       createdAt: entry.createdAt,
       hiddenEntryIds: new Set([entry.id]),
-      label: "Earlier work",
+      label: t("Earlier work"),
       deferredWorkItemIds,
     });
   }
@@ -1999,7 +2000,7 @@ function liveRunFoldRow(runId: RunId, startedAt: string) {
       id: `run-fold:${runId}`,
       createdAt: startedAt,
       runId,
-      label: "Working",
+      label: t("Working"),
       expanded: false,
       workingSince: startedAt,
     };

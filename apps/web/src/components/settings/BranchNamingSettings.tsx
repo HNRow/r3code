@@ -12,12 +12,18 @@ import {
   useScopedSettingsMixed,
   useUpdateScopedSettings,
 } from "./useScopedSettings";
-import { msg, useGT, useMessages } from "gt-react";
+import { useGT, useMessages, t } from "gt-react";
 
 const MODES = {
-  static: msg("Static prefix"),
-  semantic: msg("Semantic prefix"),
-  custom: msg("Custom instructions"),
+  get static() {
+    return t("Static prefix");
+  },
+  get semantic() {
+    return t("Semantic prefix");
+  },
+  get custom() {
+    return t("Custom instructions");
+  },
 } satisfies Record<BranchNamingMode, string>;
 
 export function BranchNamingSettings() {

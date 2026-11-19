@@ -11,6 +11,7 @@ import * as Dialog from "../../components/ui/Dialog";
 import { composerPullRequests } from "../../state/pull-requests";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { pullRequestTarget, type PullRequestParams } from "./usePullRequestDiff";
+import { t } from "../../i18n/gt";
 
 export function usePullRequestMaintainerEdits(
   params: PullRequestParams,
@@ -44,7 +45,7 @@ export function usePullRequestMaintainerEdits(
       setChoice(previousChoice);
       const cause = squashAtomCommandFailure(response);
       Dialog.alert(
-        "Could not save maintainer access",
+        t("Could not save maintainer access"),
         cause instanceof Error ? cause.message : "Try again.",
       );
       return;

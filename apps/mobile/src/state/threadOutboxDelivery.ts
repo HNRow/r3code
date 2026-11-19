@@ -100,6 +100,7 @@ import {
 } from "./use-thread-outbox";
 import { clearThreadComposerError, setThreadComposerError } from "./thread-composer-error";
 import { workspaceConnections } from "./workspace";
+import { t } from "../i18n/gt";
 
 const threadOutboxDebug = createDebugLogger("thread-outbox");
 
@@ -1568,11 +1569,13 @@ function loadThreadOutbox(isActive: () => boolean): void {
   void threadOutboxManager.load().then((loaded) => {
     if (loaded || !isActive()) return;
     Dialog.alert(
-      "Some queued messages could not be loaded",
-      "Unreadable records and attachment files are still saved. Other messages can still be sent.",
+      t("Some queued messages could not be loaded"),
+      t(
+        "Unreadable records and attachment files are still saved. Other messages can still be sent.",
+      ),
       [
-        { text: "Dismiss", style: "cancel" },
-        { text: "Retry", onPress: () => loadThreadOutbox(isActive) },
+        { text: t("Dismiss"), style: "cancel" },
+        { text: t("Retry"), onPress: () => loadThreadOutbox(isActive) },
       ],
     );
   });

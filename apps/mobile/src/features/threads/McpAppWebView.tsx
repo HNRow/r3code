@@ -46,6 +46,7 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
 import { MCP_APP_INLINE_MAX_HEIGHT, mcpAppInlineHeight } from "./mcpAppSizing";
 import { Var, T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const ROW_BOTTOM_MARGIN = 8;
 
@@ -83,7 +84,7 @@ const confirm = (title: string, message: string, action: string) =>
       title,
       message,
       [
-        { text: "Cancel", style: "cancel", onPress: () => resolve(false) },
+        { text: t("Cancel"), style: "cancel", onPress: () => resolve(false) },
         { text: action, onPress: () => resolve(true) },
       ],
       // Android dismisses earlier alerts when showing another; decline dismissed requests to release their slots.
@@ -327,16 +328,16 @@ export function ThreadMcpApp(props: {
         const info = await latest.current.toolInfo({ environmentId, input: { ...input, name } });
         if (info._tag !== "Success") throw commandFailure(info);
         if (!info.value.callable)
-          throw new McpAppHostRefusal({ message: "This app cannot call that tool." });
+          throw new McpAppHostRefusal({ message: t("This app cannot call that tool.") });
         if (
           !info.value.readOnly &&
           !(await confirm(
-            `Allow ${app.server} to run ${info.value.title ?? name}?`,
+            t`Allow ${app.server} to run ${info.value.title ?? name}?`,
             JSON.stringify(args, null, 2),
             "Allow",
           ))
         ) {
-          throw new McpAppHostRefusal({ message: "Declined by the user." });
+          throw new McpAppHostRefusal({ message: t("Declined by the user.") });
         }
         const result = await latest.current.callTool({
           environmentId,
@@ -356,16 +357,16 @@ export function ThreadMcpApp(props: {
       },
       openLink: async (url) => {
         // WebViews cannot prove user activation; confirm links to prevent timer-driven navigation out of T3.
-        if (!(await confirm(`Open a link from ${app.server}?`, url, "Open"))) {
-          throw new McpAppHostRefusal({ message: "Declined by the user." });
+        if (!(await confirm(t`Open a link from ${app.server}?`, url, t("Open")))) {
+          throw new McpAppHostRefusal({ message: t("Declined by the user.") });
         }
         if (!(await tryOpenExternalUrl(url, "mcp-app"))) {
-          throw new McpAppHostRefusal({ message: "The link could not be opened." });
+          throw new McpAppHostRefusal({ message: t("The link could not be opened.") });
         }
       },
       sendMessage: async (text) => {
-        if (!(await confirm(`Send this message from ${app.server}?`, text, "Send"))) {
-          throw new McpAppHostRefusal({ message: "Declined by the user." });
+        if (!(await confirm(t`Send this message from ${app.server}?`, text, "Send"))) {
+          throw new McpAppHostRefusal({ message: t("Declined by the user.") });
         }
         await enqueueThreadOutboxMessage({
           environmentId: latest.current.props.environmentId,
@@ -430,8 +431,8 @@ export function ThreadMcpApp(props: {
       },
       downloadFile: async (files) => {
         const names = files.map((file) => file.name).join(", ");
-        if (!(await confirm(`Save a file from ${app.server}?`, names, "Save"))) {
-          throw new McpAppHostRefusal({ message: "Declined by the user." });
+        if (!(await confirm(t`Save a file from ${app.server}?`, names, "Save"))) {
+          throw new McpAppHostRefusal({ message: t("Declined by the user.") });
         }
         for (const file of files) {
           let bytes: Uint8Array | undefined;
@@ -461,7 +462,7 @@ export function ThreadMcpApp(props: {
             signal: new AbortController().signal,
           });
           if (!shared)
-            throw new McpAppHostRefusal({ message: "Sharing is not available on this device." });
+            throw new McpAppHostRefusal({ message: t("Sharing is not available on this device.") });
         }
       },
       onRequestTeardown: () => {

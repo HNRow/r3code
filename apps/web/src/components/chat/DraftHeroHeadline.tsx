@@ -47,7 +47,7 @@ import { InlineButton } from "../ui/button";
 import { DraftProjectName } from "./DraftProjectName";
 import { DraftHeroProjectHeading } from "./DraftHeroProjectHeading";
 import { TriageDraftHero } from "./TriageDraftHero";
-import { useGT, T, Var } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 const ADD_PROJECT_VALUE = "add-project";
 
@@ -145,7 +145,7 @@ export function DraftHeroHeadline({
   const pickerItems: readonly PickerItem[] = useOrderWhileOpen(
     [
       ...menuEntries.map(({ group }) => ({ value: group.projectKey, label: group.displayName })),
-      { value: ADD_PROJECT_VALUE, label: "Add project" },
+      { value: ADD_PROJECT_VALUE, label: t("Add project") },
     ],
     (item) => item.value,
     pickerOpen,

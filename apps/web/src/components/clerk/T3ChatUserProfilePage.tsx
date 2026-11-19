@@ -11,7 +11,7 @@ import {
   ClerkUserProfileRow,
 } from "./ClerkUserProfilePage";
 import { useT3ChatLink } from "./useT3ChatLink";
-import { T, Var, useGT } from "gt-react";
+import { T, Var, useGT, t } from "gt-react";
 
 const upgradeLink = (
   <a className="underline" href={T3CHAT_SUBSCRIPTION_URL} target="_blank" rel="noopener noreferrer">
@@ -56,7 +56,7 @@ export function T3ChatUserProfilePage() {
   return (
     <ClerkUserProfilePage
       title={gt("T3 Chat")}
-      description={`Link a paid T3 Chat account for more R3 Connect tunnels: up to ${T3CHAT_PLAN_TUNNEL_LIMITS.pro} with Pro, ${T3CHAT_PLAN_TUNNEL_LIMITS.premier} with Premier.`}
+      description={t`Link a paid T3 Chat account for more R3 Connect tunnels: up to ${T3CHAT_PLAN_TUNNEL_LIMITS.pro} with Pro, ${T3CHAT_PLAN_TUNNEL_LIMITS.premier} with Premier.`}
       action={
         <ClerkUserProfileRefreshButton
           disabled={pending !== null}
@@ -82,7 +82,7 @@ export function T3ChatUserProfilePage() {
             <div className="flex items-start gap-4">
               <div className="min-w-0 flex-1">
                 <h3 className="truncate text-sm leading-4.5 font-medium text-foreground">
-                  {link ? link.email : "Not linked"}
+                  {link ? link.email : t("Not linked")}
                 </h3>
                 <p className="mt-1 text-xs leading-4.5 text-muted-foreground">
                   {link ? (
@@ -103,7 +103,7 @@ export function T3ChatUserProfilePage() {
                       </T>
                     </>
                   ) : (
-                    "You confirm the link on t3.chat."
+                    t("You confirm the link on t3.chat.")
                   )}
                 </p>
               </div>
@@ -114,11 +114,11 @@ export function T3ChatUserProfilePage() {
                   disabled={pending !== null}
                   onClick={() => void handleUnlink()}
                 >
-                  {pending === "unlink" ? "Unlinking…" : "Unlink"}
+                  {pending === "unlink" ? t("Unlinking…") : t("Unlink")}
                 </Button>
               ) : (
                 <Button size="sm" disabled={pending !== null} onClick={() => void handleLink()}>
-                  {pending === "link" ? "Opening…" : "Link T3 Chat"}
+                  {pending === "link" ? t("Opening…") : t("Link T3 Chat")}
                 </Button>
               )}
             </div>

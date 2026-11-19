@@ -20,6 +20,7 @@ import { environmentThreadShells, threadEnvironment } from "../../state/threads"
 import { useAtomCommand } from "../../state/use-atom-command";
 import { waitForThreadShell } from "./threadForkNavigation";
 import { useOpenLinkedThread } from "./useOpenLinkedThread";
+import { t } from "../../i18n/gt";
 
 /**
  * Forks `source` at its latest stable point into a side chat, sends `prompt` there, and opens
@@ -39,7 +40,7 @@ export function useStartSideChat() {
   ) => {
     if (isAtomCommandInterrupted(failure)) return;
     const error = squashAtomCommandFailure(failure);
-    Dialog.alert("Side chat not started", error instanceof Error ? error.message : fallback);
+    Dialog.alert(t("Side chat not started"), error instanceof Error ? error.message : fallback);
   };
 
   return async (
@@ -53,7 +54,7 @@ export function useStartSideChat() {
       input: {
         sourceThreadId: source.threadId,
         targetThreadId,
-        title: "Side chat",
+        title: t("Side chat"),
         creationSource: "mobile",
       },
     });
@@ -70,15 +71,15 @@ export function useStartSideChat() {
     const targetRef = scopeThreadRef(source.environmentId, targetThreadId);
     if (!(await waitForThreadShell(targetRef))) {
       Dialog.alert(
-        "Side chat not started",
-        "The side chat was created, but it did not reach this device.",
+        t("Side chat not started"),
+        t("The side chat was created, but it did not reach this device."),
       );
       discard();
       return false;
     }
     const sideChat = appAtomRegistry.get(environmentThreadShells.threadShellAtom(targetRef));
     if (sideChat === null) {
-      Dialog.alert("Side chat not started", "The side chat is no longer available.");
+      Dialog.alert(t("Side chat not started"), t("The side chat is no longer available."));
       discard();
       return false;
     }

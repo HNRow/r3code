@@ -9,7 +9,7 @@ import { Button } from "./ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "./ui/empty";
 import { SidebarInset } from "./ui/sidebar";
 import { WorkspacePageHeader } from "./WorkspacePageHeader";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 export function NoProjectsHero() {
   const contentArea = workspaceAreaProps("home", 1, "Home");
@@ -34,8 +34,8 @@ export function NoProjectsHero() {
               </EmptyTitle>
               <EmptyDescription>
                 {scratchTargetEnvironmentId === null
-                  ? "Add a project to start your first thread."
-                  : "Add a project, or start without one."}
+                  ? t("Add a project to start your first thread.")
+                  : t("Add a project, or start without one.")}
               </EmptyDescription>
               <div className="mt-6 flex justify-center gap-2">
                 <Button size="sm" onClick={() => openCommandPalette({ open: "add-project" })}>

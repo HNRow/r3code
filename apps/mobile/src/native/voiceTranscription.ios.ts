@@ -10,6 +10,7 @@ import {
   type VoiceTranscriber,
   type VoiceTranscriptionOptions,
 } from "@t3tools/client-runtime/voice-input";
+import { t } from "../i18n/gt";
 
 const isVoiceTranscriptionError = Schema.is(VoiceTranscriptionError);
 
@@ -59,7 +60,7 @@ async function prepareVoiceTranscription(
   if (!AppleTranscription.isAvailable(locales[0]!)) {
     throw new VoiceTranscriptionError({
       code: "unavailable",
-      message: "Voice transcription requires a supported device with iOS 26 or later.",
+      message: t("Voice transcription requires a supported device with iOS 26 or later."),
     });
   }
 
@@ -120,7 +121,7 @@ async function prepareLocale(locale: string, signal: AbortSignal): Promise<strin
     if (getNativeErrorCode(error) === "AppleTranscriptionUnsupportedLocale") {
       throw new VoiceTranscriptionError({
         code: "unsupported-locale",
-        message: "Voice transcription does not support any of your languages.",
+        message: t("Voice transcription does not support any of your languages."),
         cause: error,
       });
     }

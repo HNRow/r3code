@@ -17,7 +17,7 @@ import { toastManager } from "../ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { HtmlRenderDialog } from "./HtmlRenderDialog";
 import { observeResize } from "~/lib/observeResize";
-import { useGT, T, Var } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 const MIN_URL_LIFE_MS = 5 * 60_000;
 
@@ -97,8 +97,8 @@ export function HtmlRenderFrame(props: {
                       else
                         toastManager.add({
                           type: "error",
-                          title: "Page unavailable",
-                          description: "Reconnect to the environment and try again.",
+                          title: t("Page unavailable"),
+                          description: t("Reconnect to the environment and try again."),
                         });
                     }}
                   />

@@ -28,7 +28,7 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { ThreadDetailsControl } from "./ThreadDetailsControl";
 import { ThreadDetailsSection } from "./ThreadDetailsSection";
 import { THREAD_DETAILS_PANEL_ICON_CLASS } from "./threadDetailsPanelStyles";
-import { useGT, Var, T } from "gt-react";
+import { useGT, Var, T, t } from "gt-react";
 
 const SERVER_PAGE_COUNT = 4;
 
@@ -202,7 +202,9 @@ function ThreadServersList(props: ThreadServersPanelProps) {
           ) : (
             <ChevronUpIcon aria-hidden className="size-4 shrink-0" />
           )}
-          {hiddenCount > 0 ? `Show ${Math.min(hiddenCount, SERVER_PAGE_COUNT)} more` : "Show less"}
+          {hiddenCount > 0
+            ? `Show ${Math.min(hiddenCount, SERVER_PAGE_COUNT)} more`
+            : t("Show less")}
         </ThreadDetailsControl>
       ) : null}
     </ThreadDetailsSection>

@@ -8,6 +8,7 @@ import type {
   FilePreviewViewerProps,
 } from "./FilePreviewModal.types";
 import { FilePreviewSession } from "./FilePreviewSession";
+import { t } from "../../i18n/gt";
 
 export type {
   FilePreviewItem,
@@ -46,7 +47,11 @@ function NativeFilePreview(props: FilePreviewViewerProps) {
   const onPresent = useEffectEvent((isFinished: () => boolean) => props.onPresent?.(isFinished));
   const onOpenError = useEffectEvent((error: unknown) => {
     if (props.onOpenError) props.onOpenError(error);
-    else Dialog.alert("Could not open preview", "The file could not be loaded. Please try again.");
+    else
+      Dialog.alert(
+        t("Could not open preview"),
+        t("The file could not be loaded. Please try again."),
+      );
   });
 
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- presents the native file preview and dismisses it on cleanup

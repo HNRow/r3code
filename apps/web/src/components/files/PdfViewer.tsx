@@ -28,7 +28,7 @@ import {
   visiblePdfPages,
 } from "./pdfLayout";
 import "./pdfViewer.css";
-import { useGT } from "gt-react";
+import { useGT, t } from "gt-react";
 
 const MAX_PAGES = 2000;
 const MAX_FIND_TEXT = 4 * 1024 * 1024;
@@ -353,7 +353,7 @@ export default function PdfViewer(props: {
     <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <div className="flex min-h-10 shrink-0 flex-wrap items-center gap-1 border-b border-border/60 px-2 py-1 text-xs">
         <span className="mr-auto px-1 tabular-nums" aria-live="polite">
-          {pdf ? `${current + 1} / ${pdf.numPages} page${pdf.numPages === 1 ? "" : "s"}` : "PDF"}
+          {pdf ? `${current + 1} / ${pdf.numPages} page${pdf.numPages === 1 ? "" : "s"}` : t("PDF")}
         </span>
         <FileSurfaceAction
           label={gt("Previous page")}
@@ -377,7 +377,7 @@ export default function PdfViewer(props: {
           <MinusIcon className="size-3.5" />
         </FileSurfaceAction>
         <span className="min-w-14 text-center tabular-nums">
-          {zoom === null ? "Fit width" : `${Math.round(scale * 100)}%`}
+          {zoom === null ? t("Fit width") : `${Math.round(scale * 100)}%`}
         </span>
         <FileSurfaceAction
           label={gt("Zoom in")}
@@ -414,7 +414,7 @@ export default function PdfViewer(props: {
           <>
             <span role="status">
               {finding
-                ? "Searching…"
+                ? t("Searching…")
                 : (findError ?? `${matches.length ? match + 1 : 0}/${matches.length}`)}
             </span>
             <FileSurfaceAction

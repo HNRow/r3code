@@ -1,4 +1,5 @@
 import { isWorkspaceCatalogPending, type WorkspaceState } from "../../state/workspaceModel";
+import { t } from "../../i18n/gt";
 
 export interface HomeEmptyState {
   readonly title: string;
@@ -24,7 +25,7 @@ function deriveEmptyState(
 ): Omit<HomeEmptyState, "showsAddEnvironment"> {
   if (catalogState.isLoadingConnections) {
     return {
-      title: "Loading environments",
+      title: t("Loading environments"),
       detail: "Checking saved environments on this device.",
       loading: true,
     };
@@ -32,7 +33,7 @@ function deriveEmptyState(
 
   if (!catalogState.hasConnections) {
     return {
-      title: "No environments connected",
+      title: t("No environments connected"),
       detail: "Add an environment to load projects and start coding sessions.",
       loading: false,
     };
@@ -67,14 +68,14 @@ function deriveEmptyState(
 
   if (projectCount === 0 && catalogState.hasLoadedShellSnapshot) {
     return {
-      title: "No projects found",
+      title: t("No projects found"),
       detail: "The connected environment did not report any projects.",
       loading: false,
     };
   }
 
   return {
-    title: "No threads yet",
+    title: t("No threads yet"),
     detail: "Create a task to start a new coding runtime in one of your connected projects.",
     loading: false,
   };

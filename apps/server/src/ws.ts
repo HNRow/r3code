@@ -81,6 +81,11 @@ import {
   ProjectMutationError,
   ProviderUploadFeedbackError,
   ProviderSetupError,
+  PluginInventoryConflictError,
+  PluginMutationError,
+  SkillInventoryConflictError,
+  SkillInventoryListError,
+  SkillMutationError,
   RelayClientInstallFailedError,
   type RelayClientInstallProgressEvent,
   type ServerConfig as ClientServerConfig,
@@ -175,6 +180,9 @@ import * as ThreadSearch from "./orchestration-v2/ThreadSearch.ts";
 import * as OrchestrationEventStore from "./persistence/OrchestrationEventStore.ts";
 import { userFacingDispatchErrorMessage } from "./orchestration-v2/UserFacingErrors.ts";
 import * as ProviderRegistry from "./provider/ProviderRegistry.ts";
+import * as SkillInventoryService from "./provider/SkillInventoryService.ts";
+import * as PluginManager from "./provider/PluginManager.ts";
+import * as SkillManager from "./provider/SkillManager.ts";
 import * as SecretCheck from "./secrets/SecretCheck.ts";
 import * as AcpRegistrySessions from "./provider/AcpRegistrySessions.ts";
 import * as ProviderInstanceRegistry from "./provider/ProviderInstanceRegistry.ts";
@@ -1427,6 +1435,44 @@ export const subscribeOrchestrationV2Shell = Effect.fn("ws.orchestrationV2.subsc
   },
 );
 
+const toSkillMutationError = (
+  cause: SkillManager.SkillManagerError | SkillInventoryService.SkillInventoryConflictError,
+) =>
+  cause._tag === "SkillInventoryConflictError"
+    ? new SkillInventoryConflictError({
+        ...(cause.instanceId === undefined ? {} : { instanceId: cause.instanceId }),
+        cwd: cause.cwd,
+        expectedRevision: cause.expectedRevision,
+        actualRevision: cause.actualRevision,
+      })
+    : new SkillMutationError({
+        operation: cause.operation,
+        instanceId: cause.instanceId,
+        cwd: cause.cwd,
+        nativeId: cause.nativeId,
+        reason: cause.reason,
+        ...(cause.path === undefined ? {} : { path: cause.path }),
+        ...(cause.cause === undefined ? {} : { cause: cause.cause }),
+      });
+
+const toPluginMutationError = (
+  cause: PluginManager.PluginManagerError | PluginManager.PluginManagerConflictError,
+) =>
+  cause._tag === "PluginManagerConflictError"
+    ? new PluginInventoryConflictError({
+        instanceId: cause.instanceId,
+        cwd: cause.cwd,
+        expectedRevision: cause.expectedRevision,
+        actualRevision: cause.actualRevision,
+      })
+    : new PluginMutationError({
+        operation: cause.operation,
+        instanceId: cause.instanceId,
+        cwd: cause.cwd,
+        pluginId: cause.pluginId,
+        reason: cause.reason,
+      });
+
 export const layerWsRpc = (
   currentSession: EnvironmentAuth.AuthenticatedSession,
   clientAnalyticsProps: Readonly<Record<string, unknown>>,
@@ -1537,6 +1583,9 @@ export const layerWsRpc = (
       const previewManager = yield* PreviewManager.PreviewManager;
       const portDiscovery = yield* PortScanner.PortDiscovery;
       const providerRegistry = yield* ProviderRegistry.ProviderRegistry;
+      const skillInventory = yield* SkillInventoryService.SkillInventoryService;
+      const skillManager = yield* SkillManager.SkillManager;
+      const pluginManager = yield* PluginManager.PluginManager;
       const providerInstances = yield* ProviderInstanceRegistry.ProviderInstanceRegistry;
       const acpRegistryCatalog = yield* AcpRegistrySupport.AcpRegistryCatalog;
       const acpRegistryRuntimeCoordinator =
@@ -2616,6 +2665,28 @@ export const layerWsRpc = (
                 ),
               ),
           ),
+        [WS_METHODS.skillsList]: (input) =>
+          skillInventory
+            .list({
+              cwd: input.cwd,
+              ...(input.instanceId === undefined ? {} : { instanceId: input.instanceId }),
+            })
+            .pipe(
+              Effect.mapError((cause) => new SkillInventoryListError({ cwd: input.cwd, cause })),
+            ),
+        [WS_METHODS.skillsInstall]: (input) =>
+          skillManager.installSkill(input).pipe(Effect.mapError(toSkillMutationError)),
+        [WS_METHODS.skillsSetEnabled]: (input) =>
+          skillManager.setSkillEnabled(input).pipe(Effect.mapError(toSkillMutationError)),
+        [WS_METHODS.skillsUninstall]: (input) =>
+          skillManager.uninstallSkill(input).pipe(Effect.mapError(toSkillMutationError)),
+        [WS_METHODS.skillsSync]: (input) =>
+          skillManager.syncClaudeSkills(input).pipe(Effect.mapError(toSkillMutationError)),
+        [WS_METHODS.pluginsList]: (input) => pluginManager.list({ cwd: input.cwd }),
+        [WS_METHODS.pluginsSetEnabled]: (input) =>
+          pluginManager.setEnabled(input).pipe(Effect.mapError(toPluginMutationError)),
+        [WS_METHODS.pluginsUninstall]: (input) =>
+          pluginManager.uninstall(input).pipe(Effect.mapError(toPluginMutationError)),
         [WS_METHODS.serverUpdateProvider]: (input) =>
           providerMaintenanceRunner.updateProvider(input),
         [WS_METHODS.providerConsumeResetCredit]:
@@ -3053,6 +3124,8 @@ export const layerWsRpc = (
         [WS_METHODS.attachmentsCreateUploadUrl]: (input) => issueAttachmentUploadUrl(input),
         [WS_METHODS.attachmentsDelete]: (input) => deletePendingAttachment(input.attachmentId),
         [WS_METHODS.agentSessionsScan]: () => agentSessionScanner.scan,
+        [WS_METHODS.agentSessionsList]: (input) =>
+          agentSessionImporter.listRecentAgentThreads(input),
         [WS_METHODS.agentSessionsImport]: (input) =>
           agentSessionImporter.importRecentAgentThreads(input),
         [WS_METHODS.assetsCreateUrl]:

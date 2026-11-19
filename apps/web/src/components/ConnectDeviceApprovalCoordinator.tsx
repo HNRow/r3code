@@ -16,6 +16,7 @@ import { useAtomCommand } from "../state/use-atom-command";
 import { describeConnectDeviceClient } from "./settings/ConnectionsSettings.logic";
 import { toastManager } from "./ui/toast";
 import { stackedThreadToast } from "./ui/toastHelpers";
+import { t } from "gt-react";
 
 /** Asks whoever can approve to look at R3 Connect devices waiting on an environment. */
 export function ConnectDeviceApprovalCoordinator() {
@@ -115,8 +116,8 @@ function ConnectDeviceRequestToasts({
       };
       const options = stackedThreadToast({
         type: "info",
-        title: `A device wants to connect to ${environmentLabel}`,
-        description: `${device}. Approve only if it shows code ${request.verificationCode}.`,
+        title: t`A device wants to connect to ${environmentLabel}`,
+        description: t`${device}. Approve only if it shows code ${request.verificationCode}.`,
         timeout: remainingMs,
         actionProps: {
           children: "Approve",

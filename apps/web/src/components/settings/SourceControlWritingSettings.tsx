@@ -44,26 +44,37 @@ import {
 } from "./settingsLayout";
 import { AdvancedSettings } from "./AdvancedSettings";
 import { searchableSetting } from "./settingsSearch";
-import { msg, T, useGT, useMessages } from "gt-react";
+import { T, useGT, useMessages, t } from "gt-react";
 
 const MODE_OPTIONS: Record<SourceControlWritingStyleMode, { label: string; description: string }> =
   {
     repo_conventions: {
-      label: msg("Repository conventions"),
-      description: msg(
-        "Commit messages and pull request titles and descriptions match each project's history.",
-      ),
+      get label() {
+        return t("Repository conventions");
+      },
+      get description() {
+        return t(
+          "Commit messages and pull request titles and descriptions match each project's history.",
+        );
+      },
     },
     conventional_commits: {
-      label: msg("Conventional Commits"),
-      description: msg(
-        "Conventional Commit prefixes, with short pull request titles and descriptions.",
-      ),
+      get label() {
+        return t("Conventional Commits");
+      },
+      get description() {
+        return t("Conventional Commit prefixes, with short pull request titles and descriptions.");
+      },
     },
     custom: {
-      label: msg("Custom instructions"),
-      description:
-        "Your instructions shape commit messages and pull request titles and descriptions.",
+      get label() {
+        return t("Custom instructions");
+      },
+      get description() {
+        return t(
+          "Your instructions shape commit messages and pull request titles and descriptions.",
+        );
+      },
     },
   };
 
@@ -373,7 +384,7 @@ export function SourceControlWritingSettingsSection() {
                         if (reason) {
                           toastManager.add({
                             type: "error",
-                            title: "Review guide model not saved",
+                            title: t("Review guide model not saved"),
                             description: reason,
                           });
                           return;
@@ -427,7 +438,7 @@ export function SourceControlWritingSettingsSection() {
                       if (reason) {
                         toastManager.add({
                           type: "error",
-                          title: "Review guide model not saved",
+                          title: t("Review guide model not saved"),
                           description: reason,
                         });
                         return;
@@ -580,7 +591,7 @@ export function SourceControlWritingSettingsSection() {
                       if (reason) {
                         toastManager.add({
                           type: "error",
-                          title: "Source control writer model not saved",
+                          title: t("Source control writer model not saved"),
                           description: reason,
                         });
                         return;
@@ -630,7 +641,7 @@ export function SourceControlWritingSettingsSection() {
                       if (reason) {
                         toastManager.add({
                           type: "error",
-                          title: "Writer model not saved",
+                          title: t("Writer model not saved"),
                           description: reason,
                         });
                         return;

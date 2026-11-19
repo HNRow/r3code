@@ -28,7 +28,7 @@ import { Button } from "../ui/button";
 import { Dialog } from "../ui/dialog";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
 import { WizardFooter, WizardHeader, WizardPanel, WizardPopup } from "../ui/wizard";
-import { Var, T, useGT } from "gt-react";
+import { Var, T, useGT, t } from "gt-react";
 
 export function VoiceInputSetup(props: {
   environmentId: EnvironmentId | null;
@@ -143,9 +143,9 @@ export function VoiceInputSetup(props: {
                       </div>
                       <p className="text-xs text-muted-foreground tabular-nums">
                         {model.state === "verifying"
-                          ? "Verifying…"
+                          ? t("Verifying…")
                           : progress === null
-                            ? "Starting download…"
+                            ? t("Starting download…")
                             : `${progress}% downloaded`}
                       </p>
                     </div>
@@ -240,7 +240,7 @@ export function VoiceInputSetup(props: {
           <WizardFooter
             leading={
               <Button variant="ghost" onClick={() => openSettings("speech-models")}>
-                {model ? "Other models" : "Choose a model"}
+                {model ? t("Other models") : t("Choose a model")}
               </Button>
             }
           >
@@ -260,12 +260,12 @@ export function VoiceInputSetup(props: {
                 onClick={props.onDownload}
               >
                 {props.downloading
-                  ? "Downloading…"
+                  ? t("Downloading…")
                   : props.error
-                    ? "Try again"
+                    ? t("Try again")
                     : canManage
-                      ? "Download model"
-                      : "Needs an admin to download"}
+                      ? t("Download model")
+                      : t("Needs an admin to download")}
               </Button>
             ) : null}
           </WizardFooter>

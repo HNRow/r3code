@@ -45,7 +45,7 @@ import {
   FileSurfaceLoading,
   FileSurfaceNotice,
 } from "./fileSurfaceChrome";
-import { T, Var, useGT } from "gt-react";
+import { T, Var, useGT, t } from "gt-react";
 
 const LargeTextViewer = lazy(() => import("./LargeTextViewer"));
 
@@ -268,7 +268,7 @@ export function AttachmentFilePreview(props: {
         const cause = Cause.squash(result.cause);
         toastManager.add({
           type: "error",
-          title: "Could not save file",
+          title: t("Could not save file"),
           description: cause instanceof Error ? cause.message : "Please try again.",
         });
       }
@@ -399,7 +399,7 @@ export function AttachmentFilePreview(props: {
       <div className={cn(FILE_SURFACE_SUBHEADER_CLASS)} data-surface-subheader>
         <div className="flex min-w-0 flex-1 items-center text-xs">
           <span className="shrink-0 px-0.5 text-muted-foreground">
-            {props.origin ?? "Attachment"}
+            {props.origin ?? t("Attachment")}
           </span>
           <ChevronRightIcon className="mx-1 size-3.5 shrink-0 text-muted-foreground/60" />
           <span aria-current="page" className="min-w-0 truncate px-0.5 font-medium text-foreground">
@@ -447,8 +447,8 @@ export function AttachmentFilePreview(props: {
               if (!copy) {
                 toastManager.add({
                   type: "error",
-                  title: "Could not copy file",
-                  description: "Wait for the file to finish loading before copying.",
+                  title: t("Could not copy file"),
+                  description: t("Wait for the file to finish loading before copying."),
                 });
                 return;
               }
@@ -457,7 +457,7 @@ export function AttachmentFilePreview(props: {
                 .catch((cause: unknown) =>
                   toastManager.add({
                     type: "error",
-                    title: "Could not copy file",
+                    title: t("Could not copy file"),
                     description: cause instanceof Error ? cause.message : "Try again.",
                   }),
                 );

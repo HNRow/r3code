@@ -52,6 +52,7 @@ import {
   stepPendingPromptLink,
   withoutPromptLinkParams,
 } from "./prompt-link-model";
+import { t } from "../../i18n/gt";
 
 // Found at any depth, both in the parsed link and on the live stack, so the two never disagree on
 // whether the link has landed.
@@ -225,7 +226,10 @@ async function openProjectDraft(project: EnvironmentProject, request: LinkedDraf
   try {
     await waitForComposerDraftsLoaded();
   } catch {
-    Dialog.alert("Could not open link", "Drafts could not be loaded, so the prompt was not added.");
+    Dialog.alert(
+      t("Could not open link"),
+      t("Drafts could not be loaded, so the prompt was not added."),
+    );
     return;
   }
   const draftKey = createNewTaskDraft({
@@ -295,8 +299,8 @@ async function openScratchDraft(request: LinkedDraftRequest) {
   );
   if (environmentId === null) {
     Dialog.alert(
-      "Could not start without a project",
-      "No connected environment offers threads without a project.",
+      t("Could not start without a project"),
+      t("No connected environment offers threads without a project."),
     );
     return;
   }
@@ -310,7 +314,7 @@ async function openScratchDraft(request: LinkedDraftRequest) {
     if (!isAtomCommandInterrupted(result)) {
       const error = squashAtomCommandFailure(result);
       Dialog.alert(
-        "Could not start without a project",
+        t("Could not start without a project"),
         error instanceof Error
           ? error.message
           : "The folder for threads without a project could not be created.",
@@ -328,7 +332,7 @@ function cloneRepository(repository: PromptLinkRepository, request: LinkedDraftR
     appAtomRegistry.get(workspaceConnections.environmentsAtom)[0]?.environmentId ??
     null;
   if (environmentId === null) {
-    Dialog.alert("Could not clone", "Connect an environment first.");
+    Dialog.alert(t("Could not clone"), t("Connect an environment first."));
     return;
   }
   const prompt =
@@ -364,7 +368,7 @@ function resolveLink(linkSearch: string) {
   const threads = appAtomRegistry.get(environmentThreadShells.threadShellsAtom);
   const parsed = parseNewThreadLink(linkSearch);
   if (!parsed.ok) {
-    Dialog.alert("Could not open link", parsed.error);
+    Dialog.alert(t("Could not open link"), parsed.error);
     return;
   }
   const link = parsed.value;
@@ -409,11 +413,11 @@ function resolveLink(linkSearch: string) {
     })();
     return;
   }
-  Dialog.alert(`You don't have ${promptLinkRepositoryName(repository)}`, undefined, [
-    { text: "Cancel", style: "cancel" },
+  Dialog.alert(t`You don't have ${promptLinkRepositoryName(repository)}`, undefined, [
+    { text: t("Cancel"), style: "cancel" },
     ...(request.prompt
-      ? [{ text: "Use without project", onPress: () => void openScratchDraft(request) }]
+      ? [{ text: t("Use without project"), onPress: () => void openScratchDraft(request) }]
       : []),
-    { text: "Clone", onPress: () => cloneRepository(repository, request) },
+    { text: t("Clone"), onPress: () => cloneRepository(repository, request) },
   ]);
 }

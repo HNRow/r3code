@@ -22,6 +22,7 @@ import { usePullRequestPermissions } from "./usePullRequestPermissions";
 import { PullRequestCompletionSuggestions } from "./PullRequestCompletionSuggestions";
 import { usePullRequestCompletions } from "./usePullRequestCompletions";
 import { Var, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 function useActionSubmission(params: PullRequestParams) {
   const navigation = useNavigation();
@@ -56,11 +57,23 @@ function useActionSubmission(params: PullRequestParams) {
 }
 
 const VERDICTS = [
-  { value: "comment", title: "Comment" },
-  { value: "approve", title: "Approve" },
+  {
+    value: "comment",
+    get title() {
+      return t("Comment");
+    },
+  },
+  {
+    value: "approve",
+    get title() {
+      return t("Approve");
+    },
+  },
   {
     value: "request-changes",
-    title: "Request changes",
+    get title() {
+      return t("Request changes");
+    },
   },
 ] as const;
 
@@ -177,7 +190,7 @@ export function PullRequestReviewSheet({
         />
       ) : null}
       <Text className="px-4 text-xs text-foreground-muted">
-        {reviewing ? "Summary" : "Comment"}
+        {reviewing ? t("Summary") : t("Comment")}
       </Text>
       <PullRequestCompletionSuggestions completions={completions} />
       <TextInput
@@ -243,8 +256,8 @@ export function PullRequestReviewSheet({
               </Text>
               <Text className="text-2xs text-foreground-muted">
                 {draft.headSha !== result.data?.headSha
-                  ? "Branch changed · Tap to choose a new line"
-                  : "Tap to edit"}
+                  ? t("Branch changed · Tap to choose a new line")
+                  : t("Tap to edit")}
               </Text>
             </Pressable>
           ))}

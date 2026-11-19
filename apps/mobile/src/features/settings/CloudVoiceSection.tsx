@@ -42,6 +42,7 @@ import {
   runSpeech,
 } from "../voice-input/voiceDestination";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 type CloudDestination = Extract<VoiceTranscriptionDestination, { kind: "cloud" }>;
 type Props = { environment: EnvironmentPresentation; active: CloudDestination | null };
@@ -160,7 +161,7 @@ function ModelPicker({
       ) : matches.length > shown.length ? (
         <Separated>
           <ListActionRow
-            label={`Show all ${matches.length} models`}
+            label={t`Show all ${matches.length} models`}
             onPress={() => setShowAll(true)}
           />
         </Separated>
@@ -210,8 +211,8 @@ function CloudChoices({ environment, active, onClose }: Props & { onClose: () =>
       commit();
     } catch {
       Dialog.alert(
-        "Could not enable cloud dictation",
-        "Check device storage and choose the provider again.",
+        t("Could not enable cloud dictation"),
+        t("Check device storage and choose the provider again."),
       );
     }
   };
@@ -247,8 +248,8 @@ function CloudChoices({ environment, active, onClose }: Props & { onClose: () =>
     } catch {
       setSaving(false);
       Dialog.alert(
-        "Could not update the API key",
-        "Check the environment connection and your settings permissions.",
+        t("Could not update the API key"),
+        t("Check the environment connection and your settings permissions."),
       );
       return;
     }
@@ -322,8 +323,8 @@ function CloudChoices({ environment, active, onClose }: Props & { onClose: () =>
                     return;
                   }
                   Dialog.confirm({
-                    title: `Use ${label} for dictation?`,
-                    message: `${cloudSpeechDisclosure(provider, environment.label)} Select This device to stop sharing.`,
+                    title: t`Use ${label} for dictation?`,
+                    message: t`${cloudSpeechDisclosure(provider, environment.label)} Select This device to stop sharing.`,
                     confirmText: `Use ${label}`,
                     onConfirm: () => enable(pendingCloudVoiceChoice(id, provider)),
                   });
@@ -490,8 +491,8 @@ function CloudChoices({ environment, active, onClose }: Props & { onClose: () =>
                   disabled={saving}
                   onPress={() =>
                     Dialog.confirm({
-                      title: `Remove the ${label} key from ${environment.label}?`,
-                      message: "Everyone using it for dictation will lose access.",
+                      title: t`Remove the ${label} key from ${environment.label}?`,
+                      message: t("Everyone using it for dictation will lose access."),
                       confirmText: "Remove key",
                       destructive: true,
                       onConfirm: () => void changeKey(provider, null),

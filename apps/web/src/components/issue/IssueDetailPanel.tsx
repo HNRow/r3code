@@ -74,7 +74,7 @@ import { IssueDetailGhost } from "./IssueDetailGhost";
 import { ReactionBar } from "../pullRequest/PullRequestReactions";
 import { PullRequestsUnavailableState } from "../pullRequest/PullRequestsUnavailableState";
 import { issueTrackerPresentation, issueStatePresentation } from "./issuePresentation";
-import { useGT, T, Var } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 /**
  * Links or unlinks the issue to the thread it is shown beside. Dispatches the orchestration
@@ -144,7 +144,9 @@ function IssueThreadLinkButton({
           <Link2Icon aria-hidden className="size-3.5" />
         )}
       </TooltipTrigger>
-      <TooltipPopup>{linked ? "Unlink from this thread" : "Link to this thread"}</TooltipPopup>
+      <TooltipPopup>
+        {linked ? t("Unlink from this thread") : t("Link to this thread")}
+      </TooltipPopup>
     </Tooltip>
   );
 }
@@ -237,7 +239,7 @@ function IssueLabelPicker({
       setPicks((latest) => issuePicksAfterFailedWrite(latest, sent));
       toastManager.add({
         type: "error",
-        title: "Could not change labels",
+        title: t("Could not change labels"),
         description: readableFailure(squashAtomCommandFailure(result), "The tracker refused it."),
       });
     });
@@ -347,7 +349,7 @@ function IssueAssigneePicker({
       setPicks((latest) => issuePicksAfterFailedWrite(latest, sent));
       toastManager.add({
         type: "error",
-        title: "Could not change assignees",
+        title: t("Could not change assignees"),
         description: readableFailure(squashAtomCommandFailure(result), "The tracker refused it."),
       });
     });
@@ -522,7 +524,7 @@ export function IssueDetailPanel({
     });
     setLoadingOlder(false);
     if (result._tag === "Failure") {
-      toastManager.add({ type: "error", title: "Older comments could not be read" });
+      toastManager.add({ type: "error", title: t("Older comments could not be read") });
       return;
     }
     setOlder({
@@ -539,7 +541,7 @@ export function IssueDetailPanel({
     if (result._tag === "Failure") {
       toastManager.add({
         type: "error",
-        title: "The issue could not be updated",
+        title: t("The issue could not be updated"),
         description: readableFailure(squashAtomCommandFailure(result), "The tracker refused it."),
       });
       return;
@@ -559,7 +561,7 @@ export function IssueDetailPanel({
     if (result._tag === "Failure") {
       toastManager.add({
         type: "error",
-        title: "The state could not be changed",
+        title: t("The state could not be changed"),
         description: readableFailure(squashAtomCommandFailure(result), "The tracker refused it."),
       });
       return;
@@ -872,7 +874,7 @@ export function IssueDetailPanel({
                 disabled={loadingOlder}
                 onClick={() => void loadOlder()}
               >
-                {loadingOlder ? "Loading…" : "Load older comments"}
+                {loadingOlder ? t("Loading…") : t("Load older comments")}
               </Button>
             ) : null}
             {timeline.length === 0 ? (

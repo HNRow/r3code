@@ -31,6 +31,7 @@ import {
   reportRelayClientInstallProgress,
   requestRelayClientInstallConfirmation,
 } from "./relayClientInstallDialog";
+import { t } from "gt-react";
 
 function relayUrl(): string | null {
   return resolveCloudPublicConfig().relayUrl;
@@ -64,7 +65,7 @@ const ensureRelayClientAvailable = Effect.fn("linkEnvironment.ensureRelayClientA
     if (status.status === "available") return;
     if (status.status === "unsupported") {
       return yield* new CloudEnvironmentLinkError({
-        message: `R3 Code cannot install the relay client automatically on ${status.platform}-${status.arch}.`,
+        message: t`R3 Code cannot install the relay client automatically on ${status.platform}-${status.arch}.`,
       });
     }
 
@@ -74,7 +75,7 @@ const ensureRelayClientAvailable = Effect.fn("linkEnvironment.ensureRelayClientA
     });
     if (!confirmed) {
       return yield* new CloudEnvironmentLinkError({
-        message: "Relay client installation was cancelled.",
+        message: t("Relay client installation was cancelled."),
       });
     }
 
@@ -92,7 +93,7 @@ const ensureRelayClientAvailable = Effect.fn("linkEnvironment.ensureRelayClientA
       );
     if (Option.isNone(installed) || installed.value.type !== "complete") {
       return yield* new CloudEnvironmentLinkError({
-        message: "The relay client install completed without a final status.",
+        message: t("The relay client install completed without a final status."),
       });
     }
     const installedStatus = installed.value.status;
@@ -169,12 +170,12 @@ function ensureLinkedEnvironmentMatches(input: {
 }): Effect.Effect<void, CloudEnvironmentLinkError> {
   if (input.link.environmentId !== input.expectedEnvironmentId) {
     return new CloudEnvironmentLinkError({
-      message: "Relay returned credentials for a different environment.",
+      message: t("Relay returned credentials for a different environment."),
     });
   }
   if (input.link.endpoint.providerKind !== input.expectedProviderKind) {
     return new CloudEnvironmentLinkError({
-      message: "Relay returned credentials for a different endpoint provider.",
+      message: t("Relay returned credentials for a different endpoint provider."),
     });
   }
   return Effect.void;
@@ -224,7 +225,7 @@ const preparedEndpoint = (target: CloudLinkTarget) =>
       Option.match({
         onNone: () =>
           Effect.fail(
-            new CloudEnvironmentLinkError({ message: "The environment is not connected." }),
+            new CloudEnvironmentLinkError({ message: t("The environment is not connected.") }),
           ),
         onSome: ({ httpBaseUrl, target }) =>
           Effect.succeed({
@@ -357,7 +358,7 @@ export const linkEnvironmentToCloud: (input: {
   const configuredRelayUrl = relayUrl();
   if (!configuredRelayUrl) {
     return yield* new CloudEnvironmentLinkError({
-      message: "T3CODE_RELAY_URL is not configured.",
+      message: t("T3CODE_RELAY_URL is not configured."),
     });
   }
   const managedTunnelsEnabled = (input.mode ?? "managed") === "managed";

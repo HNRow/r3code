@@ -16,6 +16,7 @@ import { Button } from "../../components/ui/Button";
 import { uuidv4 } from "../../lib/uuid";
 import { insertComposerDraftContext } from "../../state/use-composer-drafts";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function TerminalContextSheet(props: {
   text: string;
@@ -52,7 +53,10 @@ export function TerminalContextSheet(props: {
         context: { version: 1, records: [record] },
       })
     ) {
-      Dialog.alert("Too many context items", "Remove some context from the draft and try again.");
+      Dialog.alert(
+        t("Too many context items"),
+        t("Remove some context from the draft and try again."),
+      );
       return;
     }
     props.onAttach();

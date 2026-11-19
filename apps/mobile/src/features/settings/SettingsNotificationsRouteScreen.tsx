@@ -51,6 +51,7 @@ import { SettingsSwitchRow } from "./components/SettingsSwitchRow";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { resolveAgentAwarenessPlatformPresentation } from "./SettingsRouteScreen.logic";
 import { useGT, T } from "gt-react-native";
+import { msg, t } from "../../i18n/gt";
 
 /**
  * A policy that turns Connect off refuses relay links and preferences, which would fail the
@@ -70,13 +71,13 @@ type NotificationStatus = "checking" | "enabled" | "disabled" | "unsupported";
 type LiveActivityStatus = "checking" | "enabled" | "disabled" | "signed-out" | "linking";
 
 const notificationStatusAtom = makePermissionStatusAtom<NotificationStatus>({
-  label: "mobile:notification-permission",
+  label: msg("mobile:notification-permission"),
   initial: "checking",
   read: async () => {
     if (Platform.OS !== "ios" && Platform.OS !== "android") return "unsupported";
     const result = await settlePromise(() => Notifications.getPermissionsAsync());
     if (result._tag === "Failure") {
-      reportAtomCommandResult(result, { label: "notification permission refresh" });
+      reportAtomCommandResult(result, { label: t("notification permission refresh") });
       return "disabled";
     }
     return result.value.granted ? "enabled" : "disabled";
@@ -197,7 +198,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       if (!isAtomCommandInterrupted(result)) {
         const error = squashAtomCommandFailure(result);
         Dialog.alert(
-          "Notifications unavailable",
+          t("Notifications unavailable"),
           error instanceof Error ? error.message : "Could not request notification permission.",
         );
       }
@@ -207,8 +208,10 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       setNotificationStatus("enabled");
       if (!agentAwarenessNotificationsReady()) {
         Dialog.alert(
-          "Couldn't finish enabling notifications",
-          "Notification access was granted, but this device could not be registered with R3 Connect. Notifications will start once registration succeeds.",
+          t("Couldn't finish enabling notifications"),
+          t(
+            "Notification access was granted, but this device could not be registered with R3 Connect. Notifications will start once registration succeeds.",
+          ),
         );
       }
       return;
@@ -216,34 +219,34 @@ function ConfiguredSettingsNotificationsRouteScreen() {
     if (result.value.type === "unsupported") {
       setNotificationStatus("unsupported");
       Dialog.alert(
-        "Notifications unavailable",
-        "Agent notifications are unavailable on this platform.",
+        t("Notifications unavailable"),
+        t("Agent notifications are unavailable on this platform."),
       );
       return;
     }
     setNotificationStatus("disabled");
     if (result.value.canAskAgain) {
-      Dialog.alert("Notifications disabled", "Notifications were not enabled.");
+      Dialog.alert(t("Notifications disabled"), t("Notifications were not enabled."));
       return;
     }
     Dialog.alert(
-      "Notifications disabled",
-      "Notifications were denied for this app. Open Settings to enable them.",
+      t("Notifications disabled"),
+      t("Notifications were denied for this app. Open Settings to enable them."),
       [
-        { text: "Cancel", style: "cancel" },
-        { text: "Open Settings", onPress: () => void Linking.openSettings() },
+        { text: t("Cancel"), style: "cancel" },
+        { text: t("Open Settings"), onPress: () => void Linking.openSettings() },
       ],
     );
   };
 
   const promptSignIn = () => {
     Dialog.alert(
-      "Sign in to R3 Connect",
-      "Live Activity updates require R3 Connect so relay can deliver updates to this device.",
+      t("Sign in to R3 Connect"),
+      t("Live Activity updates require R3 Connect so relay can deliver updates to this device."),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("Cancel"), style: "cancel" },
         {
-          text: "Continue",
+          text: t("Continue"),
           onPress: () => navigation.navigate("SettingsAuth"),
         },
       ],
@@ -265,7 +268,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
         setLiveActivityStatus("disabled");
         const error = squashAtomCommandFailure(permission);
         Dialog.alert(
-          "Ongoing activity unavailable",
+          t("Ongoing activity unavailable"),
           error instanceof Error ? error.message : "Could not enable agent notifications.",
         );
         return;
@@ -273,11 +276,11 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       if (permission.value.type !== "granted") {
         setLiveActivityStatus("disabled");
         Dialog.alert(
-          "Notification permission needed",
-          "Enable notifications in system Settings to show ongoing agent activity.",
+          t("Notification permission needed"),
+          t("Enable notifications in system Settings to show ongoing agent activity."),
           [
-            { text: "Cancel", style: "cancel" },
-            { text: "Open Settings", onPress: () => void Linking.openSettings() },
+            { text: t("Cancel"), style: "cancel" },
+            { text: t("Open Settings"), onPress: () => void Linking.openSettings() },
           ],
         );
         return;
@@ -338,8 +341,10 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       );
     } else {
       Dialog.alert(
-        "Couldn't finish enabling activity updates",
-        "This device could not be registered with R3 Connect, so activity updates won't appear yet. They'll start once registration succeeds.",
+        t("Couldn't finish enabling activity updates"),
+        t(
+          "This device could not be registered with R3 Connect, so activity updates won't appear yet. They'll start once registration succeeds.",
+        ),
       );
     }
   };
@@ -355,11 +360,11 @@ function ConfiguredSettingsNotificationsRouteScreen() {
     }
 
     Dialog.alert(
-      "Disable notifications",
-      "Open system Settings to disable notifications for R3 Code.",
+      t("Disable notifications"),
+      t("Open system Settings to disable notifications for R3 Code."),
       [
-        { text: "Cancel", style: "cancel" },
-        { text: "Open Settings", onPress: () => void Linking.openSettings() },
+        { text: t("Cancel"), style: "cancel" },
+        { text: t("Open Settings"), onPress: () => void Linking.openSettings() },
       ],
     );
   };
@@ -371,7 +376,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       if (tokenResult._tag === "Failure") {
         setLiveActivityStatus("enabled");
         reportAtomCommandResult(tokenResult, {
-          label: "live activity disable token lookup",
+          label: t("live activity disable token lookup"),
         });
         return;
       }
@@ -392,7 +397,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
     if (updateResult._tag === "Failure") {
       setLiveActivityStatus(isSignedIn ? "enabled" : "signed-out");
       reportAtomCommandResult(updateResult, {
-        label: "live activity disable",
+        label: t("live activity disable"),
       });
       return;
     }
@@ -487,8 +492,10 @@ function ConfiguredSettingsNotificationsRouteScreen() {
               onPress={() => {
                 void openAndroidLiveUpdateSettings().catch(() => {
                   Dialog.alert(
-                    "Couldn't open Settings",
-                    "Open Android Settings, select R3 Code, then enable Live Updates in Notifications.",
+                    t("Couldn't open Settings"),
+                    t(
+                      "Open Android Settings, select R3 Code, then enable Live Updates in Notifications.",
+                    ),
                   );
                 });
               }}

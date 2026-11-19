@@ -6,11 +6,13 @@ import {
 } from "../layout/AdaptiveWorkspaceLayout";
 import type { ThreadInspectorMode } from "./thread-inspector-navigation";
 import { useWorkspaceBackNavigation } from "../layout/workspace/useAndroidWorkspaceNavigation";
+
 import {
   threadTerminalMenu,
   useThreadGitMenuDefinition,
   type ThreadGitControlsProps,
 } from "./ThreadGitControls";
+import { t } from "../../i18n/gt";
 
 export function ThreadHeader(props: {
   readonly title: string;
@@ -51,7 +53,7 @@ export function ThreadHeader(props: {
       backInSplitView={
         props.onReturnToThread
           ? {
-              accessibilityLabel: "Return to chat",
+              accessibilityLabel: t("Return to chat"),
               icon: "chevron.left",
               onPress: props.onReturnToThread,
             }

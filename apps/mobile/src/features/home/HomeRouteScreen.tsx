@@ -41,6 +41,7 @@ import { WorkspaceListEmptyDetail } from "../layout/workspace/WorkspaceListEmpty
 import { WorkspaceListHeader } from "../layout/workspace/WorkspaceListHeader";
 import { buildHomeListFilterMenuItems, homeListFilterEnvironments } from "./home-list-filter-menu";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function HomeRouteScreen() {
   const gt = useGT();
@@ -165,8 +166,8 @@ export function HomeRouteScreen() {
           search={{
             value: searchQuery,
             onChangeText: setSearchQuery,
-            placeholder: "Search",
-            accessibilityLabel: "Search threads",
+            placeholder: t("Search"),
+            accessibilityLabel: t("Search threads"),
           }}
           filter={{
             customized: selectedEnvironmentId !== null || selectedProjectKey !== null,

@@ -72,7 +72,7 @@ import {
   resolveDeviceMiniPlayerSourceSize,
   resolvePreviewMiniPlayerSourceSize,
 } from "./previewMiniPlayerLayout";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 interface Props {
   readonly threadRef: ScopedThreadRef;
@@ -304,7 +304,7 @@ function BrowserMiniPlayer({ threadRef, tabId, miniPlayer }: Props & { readonly 
               <PictureInPicture2 />
             </TooltipTrigger>
             <TooltipPopup side="top">
-              {poppedOut ? "Close separate window" : "Pop into separate window"}
+              {poppedOut ? t("Close separate window") : t("Pop into separate window")}
             </TooltipPopup>
           </Tooltip>
         ) : null

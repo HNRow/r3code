@@ -281,7 +281,10 @@ provider. On mobile, both are also available before starting a thread on
 **New task**.
 
 The slash menu also includes skills unless you turn off **Settings → Chat →
-Show skills in slash menu**, under Advanced. Only skills enabled for the provider are listed.
+Show skills in slash menu**, under Advanced. Both menus list only skills enabled
+for the selected provider, so disabling a skill in **Settings → Skills** removes
+it from `$` until you enable it again. See [Claude skills](./providers-claude.md#skills)
+for installing, copying, linking, and uninstalling skills.
 
 After you add or change skills, plugins, or MCP servers, use **Restart agent
 session** in the command palette on web and desktop. The conversation continues,

@@ -24,7 +24,7 @@ import { InlineButton } from "../ui/button";
 import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
 import { ComposerServerUpdateIcon } from "./ComposerServerUpdateStatus";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 export function useAutoBalanceUpdateBanner(
   environments: readonly EnvironmentPresentation[],
@@ -115,7 +115,7 @@ export function useAutoBalanceUpdateBanner(
                   <div className="text-muted-foreground">
                     {machine.connected
                       ? `Ready to update to ${machine.targetVersion}`
-                      : "Reconnect this machine to update"}
+                      : t("Reconnect this machine to update")}
                   </div>
                 )}
               </div>

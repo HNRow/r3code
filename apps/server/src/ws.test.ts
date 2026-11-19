@@ -10,6 +10,8 @@ import {
   AuthAccessReadScope,
   AuthOrchestrationOperateScope,
   AuthOrchestrationReadScope,
+  AuthFilesystemWriteScope,
+  AuthProvidersManageScope,
   AuthSessionId,
   AuthSourceControlWriteScope,
   ORCHESTRATION_PROTOCOL_VERSION,
@@ -159,6 +161,9 @@ import * as Keybindings from "./keybindings.ts";
 import { USAGE_LIMITS_COMMAND } from "@t3tools/shared/usageLimits";
 import * as ServerSettings from "./serverSettings.ts";
 import * as ManagedPolicy from "./policy/ManagedPolicy.ts";
+import * as PluginManager from "./provider/PluginManager.ts";
+import * as SkillInventoryService from "./provider/SkillInventoryService.ts";
+import * as SkillManager from "./provider/SkillManager.ts";
 
 import * as EventStore from "./orchestration-v2/EventStore.ts";
 import * as ThreadManagement from "./orchestration-v2/ThreadManagementService.ts";
@@ -855,6 +860,9 @@ const layerUnusedConfigRpcServices = Layer.mergeAll(
   Layer.mock(ProviderAuthService.ProviderAuthService)({}),
   Layer.mock(ProviderInstallation.ProviderInstallation)({}),
   Layer.mock(ProviderInstanceRegistry.ProviderInstanceRegistry)({}),
+  Layer.mock(PluginManager.PluginManager)({}),
+  Layer.mock(SkillInventoryService.SkillInventoryService)({}),
+  Layer.mock(SkillManager.SkillManager)({}),
   Layer.mock(ProviderLatestVersions.ProviderLatestVersions)({}),
   Layer.mock(ProviderMaintenanceRunner.ProviderMaintenanceRunner)({}),
   Layer.mock(ProviderSessionManager.ProviderSessionManagerV2)({}),
@@ -891,6 +899,205 @@ const layerUnusedConfigRpcServices = Layer.mergeAll(
   Layer.mock(WorkspaceEntries.WorkspaceEntries)({}),
   Layer.mock(WorkspaceFileSystem.WorkspaceFileSystem)({}),
   Layer.mock(WorktreeSetupTracker.WorktreeSetupTracker)({}),
+);
+
+const skillRpcTags = [
+  WS_METHODS.skillsList,
+  WS_METHODS.skillsInstall,
+  WS_METHODS.skillsSetEnabled,
+  WS_METHODS.skillsUninstall,
+  WS_METHODS.skillsSync,
+] as const;
+const skillRpcs = WsRpcGroup.omit(
+  ...[...WsRpcGroup.requests.keys()].filter(
+    (
+      tag,
+    ): tag is Exclude<
+      keyof typeof RpcAuthorization.RPC_REQUIRED_SCOPES,
+      (typeof skillRpcTags)[number]
+    > => !(skillRpcTags as ReadonlyArray<string>).includes(tag),
+  ),
+);
+
+it.effect("skill RPCs delegate to their services and map mutation errors", () =>
+  Effect.gen(function* () {
+    const requested: Array<
+      Parameters<SkillInventoryService.SkillInventoryService["Service"]["list"]>[0]
+    > = [];
+    const mutations: Array<{ readonly method: string; readonly input: unknown }> = [];
+    const inventory = {
+      checkedAt: "2026-11-17T00:00:00.000Z",
+      revision: "revision-1",
+      entries: [],
+      diagnostics: ["scan issue"],
+    };
+    let failUninstall = false;
+    let failList = false;
+    let conflictSync = false;
+    const record = (method: string, input: unknown) =>
+      Effect.sync(() => {
+        mutations.push({ method, input });
+        return { requiresSessionRestart: true as const };
+      });
+    const services = Layer.mergeAll(
+      layerUnusedConfigRpcServices,
+      Layer.fresh(layerConfigSources),
+      Layer.succeed(SqlClient.SqlClient, {} as SqlClient.SqlClient),
+      Layer.mock(ExternalLauncher.ExternalLauncher)({}),
+      Layer.mock(ProviderRegistry.ProviderRegistry)({}),
+      Layer.mock(UsageLimitSources.UsageLimitSources)({}),
+      Layer.mock(RemoteOpenTargets.RemoteOpenTargets)({}),
+      Layer.mock(DirectEndpoints.DirectEndpoints)({}),
+      Layer.mock(ManagedProjectFolders.ManagedProjectFolders)({ namedProjectsRoot: "/unused" }),
+      Layer.mock(ScratchThreadPromotion.ScratchThreadPromotion)({}),
+      Layer.mock(ServerEnvironment.ServerEnvironment)({}),
+      Layer.mock(EnvironmentAuth.EnvironmentAuth)({}),
+      Layer.mock(SkillInventoryService.SkillInventoryService)({
+        list: (input) =>
+          failList
+            ? Effect.fail(
+                new SkillInventoryService.SkillInventoryConflictError({
+                  cwd: input.cwd,
+                  expectedRevision: input.expectedRevision ?? "missing",
+                  actualRevision: "revision-2",
+                }),
+              )
+            : Effect.sync(() => requested.push(input)).pipe(Effect.as(inventory)),
+      }),
+      Layer.mock(SkillManager.SkillManager)({
+        installSkill: (input) => record("install", input),
+        setSkillEnabled: (input) => record("setEnabled", input),
+        uninstallSkill: (input) =>
+          failUninstall
+            ? Effect.fail(
+                new SkillManager.SkillManagerError({
+                  operation: "uninstall",
+                  instanceId: input.instanceId,
+                  cwd: input.cwd,
+                  nativeId: input.nativeId,
+                  reason: "invalid-install-marker",
+                }),
+              )
+            : record("uninstall", input),
+        syncClaudeSkills: (input) =>
+          conflictSync
+            ? Effect.fail(
+                new SkillInventoryService.SkillInventoryConflictError({
+                  instanceId: input.targetInstanceId,
+                  cwd: input.cwd,
+                  expectedRevision: input.expectedRevision,
+                  actualRevision: "revision-2",
+                }),
+              )
+            : Effect.as(record("sync", input), {
+                requiresSessionRestart: true as const,
+                backups: [{ nativeId: "review", path: "/backup/review" }],
+              }),
+      }),
+    );
+    const client = yield* RpcTest.makeClient(skillRpcs).pipe(
+      Effect.provide(
+        layerWsRpc(
+          {
+            sessionId: AuthSessionId.make("skills-test"),
+            subject: "skills-test",
+            method: "browser-session-cookie",
+            scopes: [],
+          },
+          {},
+          yield* ServerBrowser.ServerBrowser,
+          () => Effect.void,
+          { secretReferences: true },
+        ).pipe(
+          Layer.provide(services),
+          Layer.merge(
+            RpcAuthorization.layer([
+              AuthOrchestrationReadScope,
+              AuthProvidersManageScope,
+              AuthFilesystemWriteScope,
+            ]),
+          ),
+        ),
+      ),
+    );
+
+    const result = yield* client[WS_METHODS.skillsList]({
+      instanceId: ProviderInstanceId.make("claude"),
+      cwd: "/repo",
+    });
+    const withoutInstance = yield* client[WS_METHODS.skillsList]({ cwd: "/other" });
+    const base = {
+      instanceId: ProviderInstanceId.make("claude"),
+      cwd: "/repo",
+      nativeId: "project:review",
+      expectedRevision: "revision-1",
+    };
+    yield* client[WS_METHODS.skillsInstall]({ ...base, sourceFolder: "/source/review" });
+    yield* client[WS_METHODS.skillsSetEnabled]({ ...base, enabled: false });
+    yield* client[WS_METHODS.skillsUninstall](base);
+    const synced = yield* client[WS_METHODS.skillsSync]({
+      sourceInstanceId: ProviderInstanceId.make("claude-a"),
+      targetInstanceId: ProviderInstanceId.make("claude-b"),
+      cwd: "/repo",
+      mode: "link",
+      nativeIds: ["review"],
+      expectedRevision: "revision-1",
+      onConflict: "backup",
+    });
+    failUninstall = true;
+    const mapped = yield* client[WS_METHODS.skillsUninstall](base).pipe(Effect.flip);
+
+    assert.deepEqual(result, inventory);
+    assert.deepEqual(withoutInstance, inventory);
+    assert.deepEqual(requested, [
+      { instanceId: ProviderInstanceId.make("claude"), cwd: "/repo" },
+      { cwd: "/other" },
+    ]);
+    assert.deepEqual(mutations, [
+      { method: "install", input: { ...base, sourceFolder: "/source/review" } },
+      { method: "setEnabled", input: { ...base, enabled: false } },
+      { method: "uninstall", input: base },
+      {
+        method: "sync",
+        input: {
+          sourceInstanceId: "claude-a",
+          targetInstanceId: "claude-b",
+          cwd: "/repo",
+          mode: "link",
+          nativeIds: ["review"],
+          expectedRevision: "revision-1",
+          onConflict: "backup",
+        },
+      },
+    ]);
+    assert.deepEqual(synced, {
+      requiresSessionRestart: true,
+      backups: [{ nativeId: "review", path: "/backup/review" }],
+    });
+    assert.include(mapped, { _tag: "SkillMutationError", reason: "invalid-install-marker" });
+
+    conflictSync = true;
+    const conflict = yield* client[WS_METHODS.skillsSync]({
+      sourceInstanceId: ProviderInstanceId.make("claude-a"),
+      targetInstanceId: ProviderInstanceId.make("claude-b"),
+      cwd: "/repo",
+      mode: "link",
+      nativeIds: ["review"] as [string],
+      expectedRevision: "revision-1",
+      onConflict: "backup",
+    }).pipe(Effect.flip);
+    assert.include(conflict, {
+      _tag: "SkillInventoryConflictError",
+      instanceId: ProviderInstanceId.make("claude-b"),
+      cwd: "/repo",
+      expectedRevision: "revision-1",
+      actualRevision: "revision-2",
+    });
+
+    failList = true;
+    const listError = yield* client[WS_METHODS.skillsList]({ cwd: "/repo" }).pipe(Effect.flip);
+    assert.include(listError, { _tag: "SkillInventoryListError", cwd: "/repo" });
+  }).pipe(Effect.provide(Layer.mock(ServerBrowser.ServerBrowser)({}))),
 );
 
 const layerConfigSources = Layer.mergeAll(

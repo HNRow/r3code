@@ -12,7 +12,7 @@ import {
 import { EnvironmentMachineIcon } from "./EnvironmentMachineIcon";
 import { ProjectFavicon } from "./ProjectFavicon";
 import { COMMAND_PALETTE_META_ICON_CLASS, CommandPaletteMetaDot } from "./ThreadCommandSubtitle";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 export interface CommandPaletteProjectLocation {
   readonly kind: "local" | "remote";
@@ -22,7 +22,9 @@ export interface CommandPaletteProjectLocation {
 
 const UNKNOWN_PROJECT_LOCATION: CommandPaletteProjectLocation = {
   kind: "remote",
-  label: "Remote",
+  get label() {
+    return t("Remote");
+  },
   machine: "server",
 };
 

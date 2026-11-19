@@ -27,6 +27,7 @@ import {
 } from "./claude-accounts";
 import type { SettingsTarget } from "./settings-environment-filter";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 function useProviderInstanceMutation(environment: SettingsTarget) {
   const mutate = useAtomCommand(serverEnvironment.mutateProviderInstance, {
@@ -85,12 +86,12 @@ export function ClaudeAccount({
       `providerInstances.${provider.instanceId}`,
     );
   const actions: MenuAction[] = [
-    { id: "edit", title: "Edit", image: "pencil" },
+    { id: "edit", title: t("Edit"), image: "pencil" },
     ...(removable
       ? [
           {
             id: "remove",
-            title: "Remove",
+            title: t("Remove"),
             image: "trash",
             attributes: { destructive: true },
           } satisfies MenuAction,
@@ -99,12 +100,12 @@ export function ClaudeAccount({
   ];
   function remove() {
     Dialog.alert(
-      `Remove ${name}?`,
-      `It leaves the model picker on ${environment.label}. The config folder and its sign-in stay on the server.`,
+      t`Remove ${name}?`,
+      t`It leaves the model picker on ${environment.label}. The config folder and its sign-in stay on the server.`,
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("Cancel"), style: "cancel" },
         {
-          text: "Remove",
+          text: t("Remove"),
           style: "destructive",
           onPress: () => {
             void run({ operation: "remove", instanceId: provider.instanceId });
@@ -232,7 +233,7 @@ function ClaudeAccountForm({
   return (
     <View className="gap-2 px-4 py-3">
       <Text textRole="footnote" className="text-foreground-muted">
-        {`Point at a CLAUDE_CONFIG_DIR folder on ${environment.label} where Claude Code is already signed in. Sign in there with the Claude CLI first.`}
+        {t`Point at a CLAUDE_CONFIG_DIR folder on ${environment.label} where Claude Code is already signed in. Sign in there with the Claude CLI first.`}
       </Text>
       {field("name", "Account name", "Name, e.g. Work")}
       {field("configDir", "Claude config folder", "Config folder, e.g. ~/.claude-work")}

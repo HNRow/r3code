@@ -11,6 +11,8 @@ import type { ColorValue, PressableProps } from "react-native";
 import { withUniwind } from "uniwind";
 import { useAppearancePreferences } from "../../features/settings/appearance/AppearancePreferencesProvider";
 import { withMenuActionIconColors } from "../../lib/menu-action-colors";
+import { translateMenuActions } from "../../lib/menu-action-translation";
+import { useMessages } from "gt-react-native";
 import type { MenuProps } from "./Menu.types";
 
 const ThemedMenuView = withUniwind(
@@ -42,12 +44,13 @@ const ThemedMenuView = withUniwind(
 );
 
 export function Menu(props: MenuProps) {
+  const m = useMessages();
   const { themeAppearance } = useAppearancePreferences();
   const isDarkMode = themeAppearance === "dark";
   const menuPress = useRef({ isPreparing: false, isOpen: false, suppressPress: false });
   const pendingPress = useRef<(() => void) | null>(null);
 
-  const { className: _className, ...menuProps } = props;
+  const { className: _className, actions, ...menuProps } = props;
   let children = menuProps.children;
   if (props.shouldOpenOnLongPress && isValidElement(children)) {
     const child = children as ReactElement<Pick<PressableProps, "onTouchStart" | "onPress">>;
@@ -99,9 +102,11 @@ export function Menu(props: MenuProps) {
       }
     };
   }
+  const translatedActions = translateMenuActions(actions, m);
   return (
     <ThemedMenuView
       {...menuProps}
+      actions={translatedActions}
       iconColorClassName="accent-icon"
       destructiveIconColorClassName="accent-danger-foreground"
       themeVariant={isDarkMode ? "dark" : "light"}

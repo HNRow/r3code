@@ -175,7 +175,7 @@ const makeWorkspaceRescanHarness = Effect.gen(function* () {
   } as const satisfies ServerProvider;
   const scans = yield* Queue.unbounded<{
     readonly cwd: string;
-    readonly result: Deferred.Deferred<ProviderWorkspaceSnapshot>;
+    readonly result: Deferred.Deferred<ProviderWorkspaceSnapshot, ProviderDriverError>;
   }>();
   const makeInstance = Effect.gen(function* () {
     const rescans = yield* Queue.unbounded<string>();
@@ -205,7 +205,7 @@ const makeWorkspaceRescanHarness = Effect.gen(function* () {
       ),
       snapshotForCwd: (cwd) =>
         Effect.gen(function* () {
-          const result = yield* Deferred.make<ProviderWorkspaceSnapshot>();
+          const result = yield* Deferred.make<ProviderWorkspaceSnapshot, ProviderDriverError>();
           yield* Queue.offer(scans, { cwd, result });
           return yield* Deferred.await(result);
         }),
@@ -248,6 +248,8 @@ const makeWorkspaceRescanHarness = Effect.gen(function* () {
   });
   const refresh = (cwd: string, fresh = false) =>
     registry.refreshWorkspaceSnapshot({ instanceId, cwd, fresh });
+  const refreshStrict = (cwd: string, fresh = false) =>
+    registry.refreshWorkspaceSnapshotStrict({ instanceId, cwd, fresh });
   const seed = Effect.fnUntraced(function* (cwd: string) {
     const pending = yield* refresh(cwd).pipe(Effect.forkChild);
     const complete = yield* nextScan(cwd);
@@ -279,6 +281,7 @@ const makeWorkspaceRescanHarness = Effect.gen(function* () {
     scans,
     nextScan,
     refresh,
+    refreshStrict,
     seed,
     drainRescans,
     skillsOf,
@@ -2424,6 +2427,56 @@ it.layer(
             assert.strictEqual(yield* Ref.get(scans), 1);
           }).pipe(Effect.provide(runtimeServices));
         }),
+    );
+
+    it.effect("keeps returning the cached workspace snapshot from the public refresh API", () =>
+      Effect.gen(function* () {
+        const h = yield* makeWorkspaceRescanHarness;
+        yield* h.seed("/workspace");
+        const owner = yield* h.refresh("/workspace", true).pipe(Effect.forkChild);
+        const scan = yield* Queue.take(h.scans);
+        const error = new ProviderDriverError({
+          driver: h.first.instance.driverKind,
+          instanceId: h.first.instance.instanceId,
+          detail: "workspace scan failed",
+        });
+
+        yield* Deferred.fail(scan.result, error);
+        const providers = yield* Fiber.join(owner);
+
+        assert.deepStrictEqual(
+          providers[0]?.workspaceSnapshots
+            ?.find((snapshot) => snapshot.cwd === "/workspace")
+            ?.skills.map((skill) => skill.name),
+          ["initial"],
+        );
+      }),
+    );
+
+    it.effect("fails strict refresh owners and concurrent waiters with the same scan error", () =>
+      Effect.gen(function* () {
+        const h = yield* makeWorkspaceRescanHarness;
+        yield* h.seed("/workspace");
+        yield* TestClock.adjust(PROVIDER_WORKSPACE_SNAPSHOT_TTL_MS);
+        const owner = yield* h.refreshStrict("/workspace").pipe(Effect.forkChild);
+        const scan = yield* Queue.take(h.scans);
+        const waiter = yield* h
+          .refreshStrict("/workspace")
+          .pipe(Effect.forkChild({ startImmediately: true }));
+        const error = new ProviderDriverError({
+          driver: h.first.instance.driverKind,
+          instanceId: h.first.instance.instanceId,
+          detail: "workspace scan failed",
+        });
+
+        yield* Deferred.fail(scan.result, error);
+        const ownerError = yield* Fiber.join(owner).pipe(Effect.flip);
+        const waiterError = yield* Fiber.join(waiter).pipe(Effect.flip);
+
+        assert.strictEqual(ownerError, error);
+        assert.strictEqual(waiterError, error);
+        assert.deepStrictEqual(yield* h.skillsOf("/workspace"), ["initial"]);
+      }),
     );
 
     it.effect(

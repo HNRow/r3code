@@ -33,6 +33,7 @@ import { ThreadSwipeable } from "../home/thread-swipe-actions";
 import type { ArchivedThreadGroup, ArchivedThreadSortOrder } from "./archivedThreadList";
 import { SettingsScreenContent } from "../settings/components/SettingsScreen";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export interface ArchivedThreadsHeaderEnvironment {
   readonly environmentId: EnvironmentId;
@@ -60,25 +61,25 @@ function ArchivedThreadsHeader(props: {
       search={{
         value: props.searchQuery,
         onChangeText: props.onSearchQueryChange,
-        placeholder: "Search archived threads",
+        placeholder: t("Search archived threads"),
         compactPlaceholder: "Search",
         mode: "inline",
         compactToolbar: width < 700,
       }}
       menus={[
         {
-          title: "Archived thread options",
+          title: t("Archived thread options"),
           icon: hasCustomFilter
             ? "line.3.horizontal.decrease.circle.fill"
             : "line.3.horizontal.decrease.circle",
           items: [
             {
               id: "environment",
-              title: "Environment",
+              title: t("Environment"),
               items: [
                 {
                   id: "environment:all",
-                  title: "All environments",
+                  title: t("All environments"),
                   selected: props.selectedEnvironmentId === null,
                   onPress: () => props.onEnvironmentChange(null),
                 },
@@ -92,17 +93,17 @@ function ArchivedThreadsHeader(props: {
             },
             {
               id: "sort",
-              title: "Sort by archived date",
+              title: t("Sort by archived date"),
               items: [
                 {
                   id: "sort:newest",
-                  title: "Newest first",
+                  title: t("Newest first"),
                   selected: props.sortOrder === "newest",
                   onPress: () => props.onSortOrderChange("newest"),
                 },
                 {
                   id: "sort:oldest",
-                  title: "Oldest first",
+                  title: t("Oldest first"),
                   selected: props.sortOrder === "oldest",
                   onPress: () => props.onSortOrderChange("oldest"),
                 },
@@ -110,7 +111,7 @@ function ArchivedThreadsHeader(props: {
             },
             {
               id: "refresh",
-              title: "Refresh archived threads",
+              title: t("Refresh archived threads"),
               onPress: props.onRefresh,
             },
           ],
@@ -153,6 +154,7 @@ function ProjectGroupLabel(props: {
         workspaceRoot={props.project.workspaceRoot}
       />
       <Text
+        translate={false}
         className="flex-1 text-xs font-t3-medium tracking-[0.5px] uppercase text-foreground-muted"
         numberOfLines={1}
       >
@@ -165,7 +167,11 @@ function ProjectGroupLabel(props: {
             size={10}
             tintColorClassName="accent-foreground-tertiary"
           />
-          <Text className="shrink text-2xs text-foreground-tertiary" numberOfLines={1}>
+          <Text
+            translate={false}
+            className="shrink text-2xs text-foreground-tertiary"
+            numberOfLines={1}
+          >
             {props.environmentLabel}
           </Text>
         </View>
@@ -210,6 +216,7 @@ function ArchivedThreadRow(props: {
       <View className="min-w-0 flex-1 gap-1">
         <View className="flex-row items-center gap-2">
           <Text
+            translate={false}
             className="min-w-0 flex-1 text-base font-t3-bold leading-snug text-foreground"
             numberOfLines={1}
           >
@@ -260,7 +267,7 @@ function ArchivedThreadRow(props: {
       primaryAction={{
         accessibilityLabel: `Unarchive ${props.thread.title}`,
         icon: "arrow.uturn.backward",
-        label: "Unarchive",
+        label: t("Unarchive"),
         onPress: props.onUnarchive,
       }}
       simultaneousWith={props.simultaneousSwipeGesture}

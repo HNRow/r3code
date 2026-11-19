@@ -46,6 +46,7 @@ import {
   resolveThreadQueueRowControls,
 } from "./threadQueueControlPresentation";
 import { T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const REMOVE_ACTION_WIDTH = 76;
 const THUMBNAIL_LIMIT = 3;
@@ -100,7 +101,7 @@ function QueuedRunSender(props: {
             label: senderShell?.title.trim() || linkedSender?.title.trim() || "Agent",
           }
         : attribution === "t3code"
-          ? { icon: null, label: "Sent by R3 Code" }
+          ? { icon: null, label: t("Sent by R3 Code") }
           : null;
   if (sender === null) return null;
   return (
@@ -141,7 +142,7 @@ export function ThreadQueueSheet({ route }: StaticScreenProps<QueueTarget>) {
   const cancel = useAtomCommand(threadEnvironment.cancelQueuedRun, "remove queued message");
   const resume = useAtomCommand(threadEnvironment.resumeThreadQueue, "resume queue");
   const resumeHeldQueue = useAtomCommand(threadEnvironment.resumeThreadQueue, {
-    label: "resume queue",
+    label: t("resume queue"),
     reportFailure: false,
   });
   const [resuming, setResuming] = useState(false);
@@ -213,7 +214,7 @@ export function ThreadQueueSheet({ route }: StaticScreenProps<QueueTarget>) {
     if (action === "steer" && result?._tag === "Failure" && !isAtomCommandInterrupted(result)) {
       const error = squashAtomCommandFailure(result);
       Dialog.alert(
-        "Could not send queued message",
+        t("Could not send queued message"),
         error instanceof Error ? error.message : "Try again.",
       );
     }
@@ -250,7 +251,7 @@ export function ThreadQueueSheet({ route }: StaticScreenProps<QueueTarget>) {
               if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
                 const error = squashAtomCommandFailure(result);
                 Dialog.alert(
-                  "Could not resume queue",
+                  t("Could not resume queue"),
                   error instanceof Error ? error.message : "Try again.",
                 );
               }
@@ -298,7 +299,7 @@ export function ThreadQueueSheet({ route }: StaticScreenProps<QueueTarget>) {
                       ? [
                           {
                             id: "steer",
-                            title: "Send now",
+                            title: t("Send now"),
                             attributes: { disabled: !controls.canSend },
                             image: "arrow.up",
                           },
@@ -306,13 +307,13 @@ export function ThreadQueueSheet({ route }: StaticScreenProps<QueueTarget>) {
                       : []),
                     {
                       id: "edit",
-                      title: "Edit",
+                      title: t("Edit"),
                       attributes: { disabled: !controls.canEdit },
                       image: "pencil",
                     },
                     {
                       id: "remove",
-                      title: "Remove",
+                      title: t("Remove"),
                       attributes: { disabled: !controls.canDismiss, destructive: true },
                     },
                   ]}
@@ -350,7 +351,10 @@ export function ThreadQueueSheet({ route }: StaticScreenProps<QueueTarget>) {
                         numberOfLines={1}
                       >
                         {context?.guest === undefined ? null : (
-                          <Text className="font-t3-medium text-adaptive-fuchsia-600-300">
+                          <Text
+                            translate={false}
+                            className="font-t3-medium text-adaptive-fuchsia-600-300"
+                          >
                             {`${context.guest.name}  `}
                           </Text>
                         )}

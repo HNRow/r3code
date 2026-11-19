@@ -50,6 +50,7 @@ import {
 } from "../connection/ConnectionDiagnosisDetails";
 import { environmentStatusText } from "../connection/environmentStatusText";
 import { Var, T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const BRANCH_SEARCH_DEBOUNCE_MS = 150;
 
@@ -286,7 +287,7 @@ export function NewTaskBranchPickerRouteScreen() {
       if (navigation.isFocused() && !isAtomCommandInterrupted(result)) {
         const error = squashAtomCommandFailure(result);
         Dialog.alert(
-          "Could not switch branch",
+          t("Could not switch branch"),
           error instanceof Error ? error.message : "The branch could not be checked out.",
         );
       }
@@ -362,7 +363,7 @@ export function BranchPickerScreen(props: {
   const search: AppBarSearch = {
     value: props.query,
     onChangeText: props.onQueryChange,
-    placeholder: "Find a branch",
+    placeholder: t("Find a branch"),
     clearAccessibilityLabel: "Clear branch search",
     mode: "inline",
     compactToolbar: true,
@@ -430,12 +431,12 @@ export function BranchPickerScreen(props: {
           {props.loading ? <AppActivityIndicator /> : null}
           <Text className="text-center text-sm text-foreground-muted">
             {props.loading
-              ? "Loading branches…"
+              ? t("Loading branches…")
               : props.error
                 ? props.error
                 : props.query
-                  ? "No matching branches"
-                  : "No branches available"}
+                  ? t("No matching branches")
+                  : t("No branches available")}
           </Text>
           {!props.loading && props.error ? (
             <View className="self-center">

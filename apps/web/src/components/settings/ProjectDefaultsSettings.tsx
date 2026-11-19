@@ -42,7 +42,7 @@ import {
   useScopedSettingSource,
   useUpdateScopedSettings,
 } from "./useScopedSettings";
-import { msg, T, useGT, useMessages } from "gt-react";
+import { T, useGT, useMessages, t } from "gt-react";
 
 const WORKTREE_SUBMODULES_OPTIONS = ["recursive", "top-level", "none"] as const;
 function isWorktreeSubmodules(value: string | null): value is WorktreeSubmodules {
@@ -122,7 +122,7 @@ export function ProjectDefaultsSettings({ category }: { category: ProjectSetting
   const setModel = (value: ModelSelection | null) => {
     const reason = value ? modelDisabledReason(value.instanceId, value.model) : null;
     if (reason) {
-      toastManager.add({ type: "error", title: "Default model not saved", description: reason });
+      toastManager.add({ type: "error", title: t("Default model not saved"), description: reason });
       return;
     }
     updateSettings({ defaultModelSelection: value });
@@ -137,12 +137,10 @@ export function ProjectDefaultsSettings({ category }: { category: ProjectSetting
       title={gt("Model")}
       description={
         isProjectScope
-          ? msg("Model for new threads in this project.")
+          ? t("Model for new threads in this project.")
           : !unavailable && modelSource !== "project" && automaticModel
-            ? msg(
-                "Default model for new threads, selected automatically. Projects can override it.",
-              )
-            : msg("Default model for new threads. Projects can override it.")
+            ? t("Default model for new threads, selected automatically. Projects can override it.")
+            : t("Default model for new threads. Projects can override it.")
       }
       status={
         mixedModel
@@ -196,7 +194,7 @@ export function ProjectDefaultsSettings({ category }: { category: ProjectSetting
           </div>
         ) : (
           <span className="text-sm text-muted-foreground">
-            {mixedModel ? "Mixed" : "No providers available"}
+            {mixedModel ? t("Mixed") : t("No providers available")}
           </span>
         )
       }
@@ -211,8 +209,8 @@ export function ProjectDefaultsSettings({ category }: { category: ProjectSetting
       title={gt("Workspace")}
       description={
         isProjectScope
-          ? msg("Where new threads in this project start.")
-          : msg("Where new threads start. Projects and their t3.json can override it.")
+          ? t("Where new threads in this project start.")
+          : t("Where new threads start. Projects and their t3.json can override it.")
       }
       resetAction={
         !isProjectScope && settings.defaultThreadEnvMode !== null ? (
@@ -288,7 +286,7 @@ export function ProjectDefaultsSettings({ category }: { category: ProjectSetting
                 if (reason) {
                   toastManager.add({
                     type: "error",
-                    title: "Fallback model not saved",
+                    title: t("Fallback model not saved"),
                     description: reason,
                   });
                   return;
@@ -334,7 +332,7 @@ export function ProjectDefaultsSettings({ category }: { category: ProjectSetting
   return (
     <SettingsSection
       id={category === "source-control" ? "source-control-defaults" : "project-defaults"}
-      title={category === "source-control" ? msg("Repositories") : msg("New threads")}
+      title={category === "source-control" ? t("Repositories") : t("New threads")}
     >
       {category === "project" ? (
         <>
@@ -353,8 +351,8 @@ export function ProjectDefaultsSettings({ category }: { category: ProjectSetting
             {...searchableSetting("default-permissions")}
             description={
               isProjectScope
-                ? msg("Permissions for new threads in this project.")
-                : msg("Default permissions for new threads. Projects can override them.")
+                ? t("Permissions for new threads in this project.")
+                : t("Default permissions for new threads. Projects can override them.")
             }
             resetAction={
               settings.defaultRuntimeMode !== DEFAULT_SERVER_SETTINGS.defaultRuntimeMode ? (
@@ -381,7 +379,7 @@ export function ProjectDefaultsSettings({ category }: { category: ProjectSetting
                   )}
                   <SelectValue>
                     {mixedPermissions
-                      ? "Mixed"
+                      ? t("Mixed")
                       : m(runtimeModeConfig[settings.defaultRuntimeMode].label)}
                   </SelectValue>
                 </SelectTrigger>
@@ -430,10 +428,10 @@ export function ProjectDefaultsSettings({ category }: { category: ProjectSetting
             title={gt("Automatically pull")}
             description={
               isProjectScope
-                ? msg(
+                ? t(
                     "Keeps this project's default branch current when the checkout has no local changes or commits.",
                   )
-                : msg(
+                : t(
                     "Keeps the default branch current when the checkout has no local changes or commits. Projects can override it.",
                   )
             }
@@ -490,8 +488,8 @@ export function ProjectDefaultsSettings({ category }: { category: ProjectSetting
             {...searchableSetting("pull-request-merge-method")}
             description={
               isProjectScope
-                ? msg("Pull requests in this project start with this method.")
-                : msg(
+                ? t("Pull requests in this project start with this method.")
+                : t(
                     "Pull requests start with this method. Last selected reuses whatever you chose most recently on this device.",
                   )
             }
@@ -561,8 +559,8 @@ export function WorktreeSubmodulesRow() {
       {...searchableSetting("worktree-submodules")}
       description={
         isProjectScope
-          ? msg("How new worktrees in this project populate git submodules.")
-          : msg(
+          ? t("How new worktrees in this project populate git submodules.")
+          : t(
               "How new worktrees populate git submodules. Projects and their t3.json can override it.",
             )
       }

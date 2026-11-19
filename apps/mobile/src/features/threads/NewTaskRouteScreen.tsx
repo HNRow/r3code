@@ -43,6 +43,7 @@ import {
 } from "./new-task-project-selection";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 type NewTaskRouteParams = {
   readonly incomingShareId?: string | string[];
@@ -62,16 +63,16 @@ function deriveProjectEmptyState(catalogState: WorkspaceState): {
 } {
   if (catalogState.isLoadingConnections) {
     return {
-      title: "Loading environments",
-      detail: "Checking saved environments on this device.",
+      title: t("Loading environments"),
+      detail: t("Checking saved environments on this device."),
       loading: true,
     };
   }
 
   if (!catalogState.hasConnections) {
     return {
-      title: "No environments connected",
-      detail: "Add an environment before creating a task.",
+      title: t("No environments connected"),
+      detail: t("Add an environment before creating a task."),
       loading: false,
     };
   }
@@ -101,15 +102,15 @@ function deriveProjectEmptyState(catalogState: WorkspaceState): {
     catalogState.connectionError === null
   ) {
     return {
-      title: "Connecting to environment",
-      detail: "Loading projects from the saved environment.",
+      title: t("Connecting to environment"),
+      detail: t("Loading projects from the saved environment."),
       loading: true,
     };
   }
 
   return {
-    title: "No projects found",
-    detail: "The connected environment did not report any projects.",
+    title: t("No projects found"),
+    detail: t("The connected environment did not report any projects."),
     loading: false,
   };
 }
@@ -137,7 +138,7 @@ function NewTaskHeader(props: {
           props.canAddProject
             ? [
                 {
-                  accessibilityLabel: "Add project",
+                  accessibilityLabel: t("Add project"),
                   icon: "plus",
                   onPress: () => navigation.dispatch(StackActions.push("AddProject")),
                 },
@@ -147,7 +148,7 @@ function NewTaskHeader(props: {
         search={{
           value: props.searchText,
           onChangeText: props.onSearchTextChange,
-          placeholder: "Search projects",
+          placeholder: t("Search projects"),
         }}
       />
     </>
@@ -223,7 +224,7 @@ export function NewTaskRouteScreen({ route }: StaticScreenProps<NewTaskRoutePara
         await releaseShareReservation(incomingShare.id, incomingShare.destination);
       } catch (error) {
         Dialog.alert(
-          "Could not change project",
+          t("Could not change project"),
           error instanceof Error
             ? error.message
             : "The shared content reservation could not be updated.",
@@ -253,7 +254,10 @@ export function NewTaskRouteScreen({ route }: StaticScreenProps<NewTaskRoutePara
             () => null,
           );
     if (retargeted === null) {
-      Dialog.alert("Could not change project", "Saved drafts could not be loaded. Try again.");
+      Dialog.alert(
+        t("Could not change project"),
+        t("Saved drafts could not be loaded. Try again."),
+      );
       return;
     }
     const draftId = retargeted ? routeDraftId : undefined;
@@ -280,7 +284,7 @@ export function NewTaskRouteScreen({ route }: StaticScreenProps<NewTaskRoutePara
       if (!isAtomCommandInterrupted(result)) {
         const error = squashAtomCommandFailure(result);
         Dialog.alert(
-          "Could not start without a project",
+          t("Could not start without a project"),
           error instanceof Error
             ? error.message
             : "The folder for threads without a project could not be created.",

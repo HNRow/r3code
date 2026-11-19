@@ -95,7 +95,7 @@ export function useSystemComposerBanners(input: SystemComposerBannersInput) {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not reconnect environment",
+          title: t("Could not reconnect environment"),
           description: error instanceof Error ? error.message : "Failed to reconnect.",
         }),
       );
@@ -123,7 +123,7 @@ export function useSystemComposerBanners(input: SystemComposerBannersInput) {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not disconnect server",
+            title: t("Could not disconnect server"),
             description: error instanceof Error ? error.message : "Failed to disconnect.",
           }),
         );
@@ -213,7 +213,7 @@ export function useSystemComposerBanners(input: SystemComposerBannersInput) {
                   )
                 }
               >
-                {environmentReconnecting ? "Retry now" : "Reconnect"}
+                {environmentReconnecting ? t("Retry now") : t("Reconnect")}
               </Button>
             ) : null}
             {disconnectAction}

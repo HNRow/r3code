@@ -31,6 +31,7 @@ import {
   uniformMobileSetting,
 } from "./settings-scoped-server";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function SettingsLabsRouteScreen() {
   const gt = useGT();
@@ -287,7 +288,7 @@ function MachineBetaSection({
   if (supported.length === 0) return null;
   return (
     <View className="gap-3">
-      <SettingsSection title={`Beta: ${title}`}>
+      <SettingsSection title={t`Beta: ${title}`}>
         {supported.map((environment) => {
           const policy = environment.serverConfig?.managedPolicy;
           const managed = isManagedSettingPath(policy, setting);
@@ -296,7 +297,7 @@ function MachineBetaSection({
               key={environment.environmentId}
               icon={icon}
               label={environment.label}
-              {...(managed ? { subtitle: `Managed by ${policy?.organization}.` } : {})}
+              {...(managed ? { subtitle: t`Managed by ${policy?.organization}.` } : {})}
               value={environment.serverConfig?.settings[setting] === true}
               disabled={managed || !writable.has(environment.environmentId)}
               onValueChange={(value) =>

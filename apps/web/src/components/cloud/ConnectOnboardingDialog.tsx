@@ -40,7 +40,7 @@ import { Dialog } from "../ui/dialog";
 import { Switch } from "../ui/switch";
 import { toastManager } from "../ui/toast";
 import { WizardSteps, WizardPopup, WizardHeader, WizardPanel, WizardFooter } from "../ui/wizard";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 export function ConnectOnboardingDialog() {
   if (!hasCloudPublicConfig()) return null;
@@ -211,7 +211,7 @@ function ConfiguredConnectOnboardingDialog() {
     if (!ok) return;
     toastManager.add({
       type: "success",
-      title: "R3 Connect enabled",
+      title: t("R3 Connect enabled"),
       description: exposeEnvironment
         ? "This environment is available to your other devices through R3 Connect."
         : "This environment publishes agent activity to your mobile clients.",
@@ -323,7 +323,7 @@ function ConfiguredConnectOnboardingDialog() {
                 disabled={isApplying || !canManageRelay || linkStateData === null}
                 onClick={() => void applyPublishSelection()}
               >
-                {isApplying ? "Enabling…" : "Continue"}
+                {isApplying ? t("Enabling…") : t("Continue")}
               </Button>
             </>
           ) : (

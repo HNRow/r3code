@@ -12,6 +12,7 @@ import { SymbolView } from "../../../components/ui/AppSymbol";
 import { isLegalDocumentUrl, LEGAL_URL } from "../lib/legal-document-url";
 import { webViewDecelerationRate } from "../../../lib/webViewDecelerationRate";
 import { useGT, Var, T } from "gt-react-native";
+import { t } from "../../../i18n/gt";
 
 interface SettingsLegalDocumentRouteScreenProps {
   readonly documentName: string;
@@ -36,7 +37,7 @@ export function SettingsLegalDocumentRouteScreen({
       onClose={() => navigation.goBack()}
       actions={[
         {
-          accessibilityLabel: "Open legal documents in external browser",
+          accessibilityLabel: t("Open legal documents in external browser"),
           icon: "safari",
           onPress: () => void Linking.openURL(safeExternalUrl).catch(() => undefined),
         },

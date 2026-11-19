@@ -229,14 +229,18 @@ function CrashRow(props: { readonly record: StartupCrashRecord; readonly first: 
   const { record } = props;
   return (
     <View className={props.first ? "gap-1.5 p-4" : "gap-1.5 border-t border-border-subtle p-4"}>
-      <Text className="text-xs text-foreground-muted">
+      <Text translate={false} className="text-xs text-foreground-muted">
         {new Date(record.timestamp).toLocaleString()}
       </Text>
-      <Text selectable className="text-base leading-snug text-danger-foreground">
+      <Text translate={false} selectable className="text-base leading-snug text-danger-foreground">
         {record.description}
       </Text>
       {record.frames.length > 0 ? (
-        <Text selectable className="font-mono text-xs leading-snug text-foreground-muted">
+        <Text
+          translate={false}
+          selectable
+          className="font-mono text-xs leading-snug text-foreground-muted"
+        >
           {record.frames.slice(0, 4).join("\n")}
         </Text>
       ) : null}

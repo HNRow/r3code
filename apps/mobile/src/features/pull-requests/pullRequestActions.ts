@@ -10,6 +10,7 @@ import type {
 } from "@t3tools/contracts";
 import type { AppSymbolName } from "../../components/ui/AppSymbol";
 import { PullRequestGlyph } from "./pullRequestGlyphs";
+import { t } from "../../i18n/gt";
 
 type ActionDetail = Pick<
   PullRequestDetail,
@@ -27,15 +28,37 @@ type ActionDetail = Pick<
 };
 
 export const MERGE_METHODS = {
-  squash: { title: "Squash and merge", description: "Combine the commits into one commit." },
-  merge: {
-    title: "Create a merge commit",
-    description: "Keep the commits and add a merge commit.",
+  squash: {
+    get title() {
+      return t("Squash and merge");
+    },
+    get description() {
+      return t("Combine the commits into one commit.");
+    },
   },
-  rebase: { title: "Rebase and merge", description: "Add the commits without a merge commit." },
+  merge: {
+    get title() {
+      return t("Create a merge commit");
+    },
+    get description() {
+      return t("Keep the commits and add a merge commit.");
+    },
+  },
+  rebase: {
+    get title() {
+      return t("Rebase and merge");
+    },
+    get description() {
+      return t("Add the commits without a merge commit.");
+    },
+  },
   "fast-forward": {
-    title: "Fast-forward merge",
-    description: "Add the commits as they are. Needs the branch to contain the base.",
+    get title() {
+      return t("Fast-forward merge");
+    },
+    get description() {
+      return t("Add the commits as they are. Needs the branch to contain the base.");
+    },
   },
 } as const satisfies Record<PullRequestMergeMethod, { title: string; description: string }>;
 

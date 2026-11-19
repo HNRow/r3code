@@ -14,7 +14,7 @@ import {
 } from "../ui/alert-dialog";
 import { Button, InlineButton } from "../ui/button";
 import { useT3ConnectAccountPage } from "./T3ConnectAccountPages";
-import { T, Var } from "gt-react";
+import { T, Var, t } from "gt-react";
 
 export function RemoveT3ConnectEnvironmentDialog({
   environmentLabel,
@@ -81,7 +81,7 @@ export function RemoveT3ConnectEnvironmentDialog({
                   </T>
                 </>
               ) : shown.registration === "unregistered" ? (
-                "It's no longer on your R3 Connect account."
+                t("It's no longer on your R3 Connect account.")
               ) : (
                 <>
                   <T>

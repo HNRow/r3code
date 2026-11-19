@@ -135,6 +135,7 @@ import {
   sourceControlClients,
 } from "@t3tools/client-runtime/source-control-clients";
 import { T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 function usePullRequestActivityRows(params: PullRequestParams, filter: ActivityFilter) {
   const navigation = useNavigation();
@@ -224,13 +225,13 @@ function PullRequestIdentity(props: {
           <View className="h-3 w-12 rounded bg-subtle-strong" />
         )}
       </View>
-      <Text selectable className="text-xl font-t3-bold leading-7">
+      <Text translate={false} selectable className="text-xl font-t3-bold leading-7">
         {pr.title}
       </Text>
       <View className="flex-row items-center gap-2">
         <PullRequestAvatar actor={pr.author ?? null} size={20} />
         <Text className="min-w-0 flex-1 text-xs font-t3-medium" numberOfLines={1}>
-          {pr.author?.login ?? "Unknown author"}
+          {pr.author?.login ?? t("Unknown author")}
         </Text>
         <Text className="shrink text-right text-2xs text-foreground-muted" numberOfLines={1}>
           <T>
@@ -246,7 +247,9 @@ function PullRequestIdentity(props: {
           className="min-w-0 shrink active:opacity-70"
           hitSlop={8}
         >
-          <Text className="font-mono text-2xs text-foreground-muted">{pr.baseBranch}</Text>
+          <Text translate={false} className="font-mono text-2xs text-foreground-muted">
+            {pr.baseBranch}
+          </Text>
         </Pressable>
         <View className="pt-0.5">
           <SymbolView name="arrow.left" size={11} tintColorClassName="accent-icon-muted" />
@@ -258,7 +261,9 @@ function PullRequestIdentity(props: {
           className="min-w-0 shrink active:opacity-70"
           hitSlop={8}
         >
-          <Text className="font-mono text-2xs text-foreground-muted">{pr.headBranch}</Text>
+          <Text translate={false} className="font-mono text-2xs text-foreground-muted">
+            {pr.headBranch}
+          </Text>
         </Pressable>
       </View>
     </View>
@@ -534,7 +539,7 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
     action.confirm(
       "delete-branch",
       pullRequestActionLabel("delete-branch", terminology),
-      `Delete ${pr.headBranch} from ${pr.headRepositoryNameWithOwner ?? pr.repository}? Local branches and worktrees are not changed.`,
+      t`Delete ${pr.headBranch} from ${pr.headRepositoryNameWithOwner ?? pr.repository}? Local branches and worktrees are not changed.`,
     );
   const stack = usePullRequestStack(params, pr);
   const refreshActivity = useAtomRefresh(composerPullRequests.activity(requestTarget(params)));
@@ -588,7 +593,7 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
                   ? [
                       {
                         id: "submit-review",
-                        title: "Submit review",
+                        title: t("Submit review"),
                         icon: "text.bubble",
                         onPress: () =>
                           navigation.navigate("PullRequestReview", { ...params, mode: "review" }),
@@ -599,7 +604,7 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
                   ? [
                       {
                         id: "add-comment",
-                        title: "Add comment",
+                        title: t("Add comment"),
                         icon: "plus.bubble",
                         onPress: () =>
                           navigation.navigate("PullRequestReview", { ...params, mode: "comment" }),
@@ -610,14 +615,14 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
                   ? [
                       {
                         id: "edit-title",
-                        title: "Edit title",
+                        title: t("Edit title"),
                         icon: "pencil",
                         onPress: () =>
                           navigation.navigate("PullRequestEdit", { ...params, field: "title" }),
                       },
                       {
                         id: "edit-description",
-                        title: "Edit description",
+                        title: t("Edit description"),
                         icon: "doc.text",
                         disabled: description.pending,
                         subtitle: description.pending ? "Saving…" : undefined,
@@ -630,7 +635,7 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
                   ? [
                       {
                         id: "maintainer-edits",
-                        title: "Allow edits from maintainers",
+                        title: t("Allow edits from maintainers"),
                         icon: "pencil",
                         selected: maintainerEdits.value,
                         disabled: maintainerEdits.saving,
@@ -649,13 +654,13 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
                       },
                       {
                         id: "copy-link",
-                        title: "Copy link",
+                        title: t("Copy link"),
                         icon: "link",
                         onPress: () => copyPullRequestLink(identity),
                       },
                       {
                         id: "share",
-                        title: "Share…",
+                        title: t("Share…"),
                         icon: "square.and.arrow.up",
                         onPress: () => sharePullRequestLink(identity),
                       },
@@ -906,11 +911,11 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
                           {Platform.OS !== "ios" || section === tab ? (
                             <SegmentedControl
                               options={[
-                                { value: "overview", label: "Overview" },
+                                { value: "overview", label: t("Overview") },
                                 ...(guidesEnabled
-                                  ? [{ value: "guide" as const, label: "Guide" }]
+                                  ? [{ value: "guide" as const, label: t("Guide") }]
                                   : []),
-                                { value: "activity", label: "Activity" },
+                                { value: "activity", label: t("Activity") },
                               ]}
                               selected={section}
                               onSelect={selectSection}
@@ -1211,14 +1216,14 @@ function PullRequestFileRouteContent({ route }: PullRequestFileRouteProps) {
         onBack={() => navigation.goBack()}
         menus={[
           {
-            title: "Diff options",
+            title: t("Diff options"),
             icon: "ellipsis",
             items: [
               ...(permissions.verdicts.length
                 ? [
                     {
                       id: "submit-review",
-                      title: "Submit review",
+                      title: t("Submit review"),
                       icon: "text.bubble",
                       onPress: () =>
                         navigation.navigate("PullRequestReview", {
@@ -1232,7 +1237,7 @@ function PullRequestFileRouteContent({ route }: PullRequestFileRouteProps) {
                 ? [
                     {
                       id: "comment-on-pr",
-                      title: "Add comment",
+                      title: t("Add comment"),
                       icon: "plus.bubble",
                       onPress: () =>
                         navigation.navigate("PullRequestReview", {
@@ -1244,14 +1249,14 @@ function PullRequestFileRouteContent({ route }: PullRequestFileRouteProps) {
                 : []),
               {
                 id: "word-wrap",
-                title: "Word wrap",
+                title: t("Word wrap"),
                 icon: "text.alignleft",
                 selected: appearance.codeWordBreak,
                 onPress: () => setCodeWordBreak(!appearance.codeWordBreak),
               },
               {
                 id: "hide-tests",
-                title: "Hide test files",
+                title: t("Hide test files"),
                 icon: "line.3.horizontal.decrease",
                 selected: filter.hideTestFiles,
                 onPress: toggleTestFiles,
@@ -1272,7 +1277,7 @@ function PullRequestFileRouteContent({ route }: PullRequestFileRouteProps) {
                 ? [
                     {
                       id: "copy",
-                      title: "Copy line",
+                      title: t("Copy line"),
                       icon: "document.on.document",
                       onPress: () => void Clipboard.setStringAsync(selectedRow.content ?? ""),
                     },

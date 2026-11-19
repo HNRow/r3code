@@ -20,61 +20,251 @@ import { Toggle, ToggleGroup } from "~/components/ui/toggle-group";
 import { cn } from "~/lib/utils";
 import type { DeviceControls } from "./useDeviceControls";
 import { deviceEventLogAtom } from "./deviceHubAtoms";
-import { T, useGT } from "gt-react";
+import { T, useGT, t } from "gt-react";
 
 const TEXT_SIZES: ReadonlyArray<{ value: DeviceTextSize; label: string }> = [
-  { value: "small", label: "Small" },
-  { value: "default", label: "Default" },
-  { value: "large", label: "Large" },
-  { value: "extra-large", label: "Extra large" },
+  {
+    value: "small",
+    get label() {
+      return t("Small");
+    },
+  },
+  {
+    value: "default",
+    get label() {
+      return t("Default");
+    },
+  },
+  {
+    value: "large",
+    get label() {
+      return t("Large");
+    },
+  },
+  {
+    value: "extra-large",
+    get label() {
+      return t("Extra large");
+    },
+  },
 ];
 
 const COLOR_FILTERS = [
-  { value: "none", label: "None" },
-  { value: "grayscale", label: "Grayscale" },
-  { value: "red-green", label: "Red / green (protanopia)" },
-  { value: "green-red", label: "Green / red (deuteranopia)" },
-  { value: "blue-yellow", label: "Blue / yellow (tritanopia)" },
+  {
+    value: "none",
+    get label() {
+      return t("None");
+    },
+  },
+  {
+    value: "grayscale",
+    get label() {
+      return t("Grayscale");
+    },
+  },
+  {
+    value: "red-green",
+    get label() {
+      return t("Red / green (protanopia)");
+    },
+  },
+  {
+    value: "green-red",
+    get label() {
+      return t("Green / red (deuteranopia)");
+    },
+  },
+  {
+    value: "blue-yellow",
+    get label() {
+      return t("Blue / yellow (tritanopia)");
+    },
+  },
 ] as const;
 
 const ORIENTATIONS = [
-  { value: "portrait", label: "Portrait" },
-  { value: "landscape_left", label: "Landscape left" },
-  { value: "portrait_upside_down", label: "Upside down" },
-  { value: "landscape_right", label: "Landscape right" },
+  {
+    value: "portrait",
+    get label() {
+      return t("Portrait");
+    },
+  },
+  {
+    value: "landscape_left",
+    get label() {
+      return t("Landscape left");
+    },
+  },
+  {
+    value: "portrait_upside_down",
+    get label() {
+      return t("Upside down");
+    },
+  },
+  {
+    value: "landscape_right",
+    get label() {
+      return t("Landscape right");
+    },
+  },
 ] as const;
 
 const IOS_PERMISSIONS: ReadonlyArray<{ value: DevicePermission; label: string }> = [
-  { value: "camera", label: "Camera" },
-  { value: "microphone", label: "Microphone" },
-  { value: "photos", label: "Photos" },
-  { value: "contacts", label: "Contacts" },
-  { value: "calendar", label: "Calendar" },
-  { value: "reminders", label: "Reminders" },
-  { value: "location", label: "Location" },
-  { value: "notifications", label: "Notifications" },
-  { value: "motion", label: "Motion" },
-  { value: "media-library", label: "Media library" },
-  { value: "faceid", label: "Face ID" },
+  {
+    value: "camera",
+    get label() {
+      return t("Camera");
+    },
+  },
+  {
+    value: "microphone",
+    get label() {
+      return t("Microphone");
+    },
+  },
+  {
+    value: "photos",
+    get label() {
+      return t("Photos");
+    },
+  },
+  {
+    value: "contacts",
+    get label() {
+      return t("Contacts");
+    },
+  },
+  {
+    value: "calendar",
+    get label() {
+      return t("Calendar");
+    },
+  },
+  {
+    value: "reminders",
+    get label() {
+      return t("Reminders");
+    },
+  },
+  {
+    value: "location",
+    get label() {
+      return t("Location");
+    },
+  },
+  {
+    value: "notifications",
+    get label() {
+      return t("Notifications");
+    },
+  },
+  {
+    value: "motion",
+    get label() {
+      return t("Motion");
+    },
+  },
+  {
+    value: "media-library",
+    get label() {
+      return t("Media library");
+    },
+  },
+  {
+    value: "faceid",
+    get label() {
+      return t("Face ID");
+    },
+  },
 ];
 
 const ANDROID_PERMISSIONS: ReadonlyArray<{ value: DevicePermission; label: string }> = [
-  { value: "camera", label: "Camera" },
-  { value: "microphone", label: "Microphone" },
-  { value: "photos", label: "Photos" },
-  { value: "contacts", label: "Contacts" },
-  { value: "calendar", label: "Calendar" },
-  { value: "location", label: "Location" },
-  { value: "notifications", label: "Notifications" },
-  { value: "motion", label: "Physical activity" },
+  {
+    value: "camera",
+    get label() {
+      return t("Camera");
+    },
+  },
+  {
+    value: "microphone",
+    get label() {
+      return t("Microphone");
+    },
+  },
+  {
+    value: "photos",
+    get label() {
+      return t("Photos");
+    },
+  },
+  {
+    value: "contacts",
+    get label() {
+      return t("Contacts");
+    },
+  },
+  {
+    value: "calendar",
+    get label() {
+      return t("Calendar");
+    },
+  },
+  {
+    value: "location",
+    get label() {
+      return t("Location");
+    },
+  },
+  {
+    value: "notifications",
+    get label() {
+      return t("Notifications");
+    },
+  },
+  {
+    value: "motion",
+    get label() {
+      return t("Physical activity");
+    },
+  },
 ];
 
 const LOCATION_PRESETS = [
-  { label: "San Francisco", latitude: 37.7749, longitude: -122.4194 },
-  { label: "New York", latitude: 40.7128, longitude: -74.006 },
-  { label: "London", latitude: 51.5074, longitude: -0.1278 },
-  { label: "Stockholm", latitude: 59.3293, longitude: 18.0686 },
-  { label: "Tokyo", latitude: 35.6762, longitude: 139.6503 },
+  {
+    get label() {
+      return t("San Francisco");
+    },
+    latitude: 37.7749,
+    longitude: -122.4194,
+  },
+  {
+    get label() {
+      return t("New York");
+    },
+    latitude: 40.7128,
+    longitude: -74.006,
+  },
+  {
+    get label() {
+      return t("London");
+    },
+    latitude: 51.5074,
+    longitude: -0.1278,
+  },
+  {
+    get label() {
+      return t("Stockholm");
+    },
+    latitude: 59.3293,
+    longitude: 18.0686,
+  },
+  {
+    get label() {
+      return t("Tokyo");
+    },
+    latitude: 35.6762,
+    longitude: 139.6503,
+  },
 ] as const;
 
 export function DeviceToolsPanel(props: {
@@ -402,7 +592,7 @@ function ChoiceSelect<V extends string>(props: {
           {current ? (
             current.label
           ) : (
-            <span className="text-muted-foreground">{props.placeholder ?? "Unknown"}</span>
+            <span className="text-muted-foreground">{props.placeholder ?? t("Unknown")}</span>
           )}
         </SelectValue>
       </SelectTrigger>

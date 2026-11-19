@@ -41,7 +41,7 @@ import { useDirectoryEntries } from "./useDirectoryEntries";
 import { useProjectPathSearch } from "~/state/queries";
 import { isMacPlatform } from "~/lib/utils";
 import { type PreviewAction, subscribePreviewAction } from "../preview/previewActionBus";
-import { useGT, Var, T } from "gt-react";
+import { useGT, Var, T, t } from "gt-react";
 
 interface FileBrowserPanelProps {
   environmentId: EnvironmentId;
@@ -79,7 +79,7 @@ function RefreshFilesButton(props: { isPending: boolean; onRefresh: () => void }
       >
         <RefreshIcon refreshing={props.isPending} />
       </TooltipTrigger>
-      <TooltipPopup>{props.isPending ? "Refreshing…" : "Refresh files"}</TooltipPopup>
+      <TooltipPopup>{props.isPending ? t("Refreshing…") : t("Refresh files")}</TooltipPopup>
     </Tooltip>
   );
 }
@@ -215,8 +215,8 @@ export default function FileBrowserPanel({
         const clicked = await api.contextMenu.show(
           [
             ...fileMenuItems,
-            { id: "copy-mention", label: "Copy mention" },
-            { id: "add-to-chat", label: "Add to chat" },
+            { id: "copy-mention", label: t("Copy mention") },
+            { id: "add-to-chat", label: t("Add to chat") },
           ],
           position,
         );
@@ -234,7 +234,7 @@ export default function FileBrowserPanel({
           } catch (error) {
             toastManager.add({
               type: "error",
-              title: "Failed to copy mention",
+              title: t("Failed to copy mention"),
               description: error instanceof Error ? error.message : "An error occurred.",
             });
           }
@@ -245,8 +245,8 @@ export default function FileBrowserPanel({
           if (!composer) {
             toastManager.add({
               type: "error",
-              title: "Unable to add to chat",
-              description: "Open a chat for this project and try again.",
+              title: t("Unable to add to chat"),
+              description: t("Open a chat for this project and try again."),
             });
             return;
           }
@@ -254,8 +254,8 @@ export default function FileBrowserPanel({
           if (!inserted) {
             toastManager.add({
               type: "error",
-              title: "Unable to add to chat",
-              description: "The chat isn't ready to accept input right now.",
+              title: t("Unable to add to chat"),
+              description: t("The chat isn't ready to accept input right now."),
             });
           }
         }
@@ -302,7 +302,7 @@ export default function FileBrowserPanel({
       row.kind === "directory" &&
       row.isExpanded &&
       loadingDirectoriesRef.current.has(item.path.replace(/\/$/, ""))
-        ? { icon: "t3-tree-icon-loading", title: "Loading…" }
+        ? { icon: "t3-tree-icon-loading", title: t("Loading…") }
         : null,
     search: false,
     onSearchChange: (value) => setQuery(value ?? ""),
@@ -577,7 +577,9 @@ export default function FileBrowserPanel({
               )}
             </TooltipTrigger>
             <TooltipPopup>
-              {expandAll || allDirectoriesExpanded ? "Collapse all folders" : "Expand all folders"}
+              {expandAll || allDirectoriesExpanded
+                ? t("Collapse all folders")
+                : t("Expand all folders")}
             </TooltipPopup>
           </Tooltip>
         ) : null}

@@ -37,6 +37,7 @@ import { pullRequestTarget, type PullRequestParams } from "./usePullRequestDiff"
 import { usePullRequestAction } from "./usePullRequestAction";
 import { usePullRequestAgentActions } from "./usePullRequestAgentActions";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 type RowProps = { readonly pr: PullRequestDetail; readonly params: PullRequestParams };
 const STATUS_ACTIONS: readonly PullRequestAction[] = [
@@ -94,7 +95,7 @@ export function PullRequestStatusMenu(props: RowProps) {
           action.confirm(
             selected,
             pullRequestActionLabel("revert", terminology),
-            `Open a new ${terminology.singular} that reverses these changes?`,
+            t`Open a new ${terminology.singular} that reverses these changes?`,
           );
         else void action.perform(selected);
       }}
@@ -147,7 +148,7 @@ export function PullRequestChecksRow(props: RowProps) {
                 action.confirm(
                   "approve-workflows",
                   "Approve workflows",
-                  `Allow this ${definition.changeRequest.singular}'s workflows to run? Review the workflow changes first.`,
+                  t`Allow this ${definition.changeRequest.singular}'s workflows to run? Review the workflow changes first.`,
                 )
               }
             />
@@ -234,7 +235,7 @@ export function PullRequestBranchRow(props: RowProps) {
       title={gt("Branch")}
       actions={[
         ...(canResolve ? [agent.menuAction("conflicts")] : []),
-        ...methods.map((id) => ({ id, title: `Update with ${id}`, image: "arrow.up.circle" })),
+        ...methods.map((id) => ({ id, title: t`Update with ${id}`, image: "arrow.up.circle" })),
       ]}
       onPressAction={({ nativeEvent }) => {
         const method = methods.find((id) => id === nativeEvent.event);
@@ -310,7 +311,7 @@ export function PullRequestReviewersRow(props: RowProps) {
               />
               <PullRequestAvatar actor={review.author} size={32} />
               <Text className="min-w-0 flex-1 text-sm font-t3-medium" numberOfLines={1}>
-                {review.author?.login ?? "Unknown reviewer"}
+                {review.author?.login ?? t("Unknown reviewer")}
               </Text>
             </View>
           ))}

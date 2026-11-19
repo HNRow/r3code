@@ -1,12 +1,19 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { assert, it } from "@effect/vitest";
+import { ProviderInstanceId } from "@t3tools/contracts";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
+import * as PlatformError from "effect/PlatformError";
 import * as HostProcess from "@t3tools/shared/HostProcess";
 
-import { discoverClaudeSkills as discoverSkills } from "./ClaudeSkills.ts";
+import {
+  discoverClaudeSkillInventory,
+  discoverClaudeSkills as discoverSkills,
+} from "./ClaudeSkills.ts";
 import { planClaudeSkillDispatch } from "./ClaudeSkillDispatch.ts";
+
+const claudeInstanceId = ProviderInstanceId.make("claude_dp41sf");
 
 // Windows makes the managed directory fixture-controlled without reading host policy or skills.
 const discoverClaudeSkills = (
@@ -89,7 +96,10 @@ it.layer(NodeServices.layer)("discoverClaudeSkills", (it) => {
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
-      const tempDir = yield* fs.makeTempDirectoryScoped({ prefix: "t3-claude-skills-" });
+      // Real path: macOS temp dirs sit behind a /var -> /private/var symlink.
+      const tempDir = yield* fs.realPath(
+        yield* fs.makeTempDirectoryScoped({ prefix: "t3-claude-skills-" }),
+      );
       const configDir = path.join(tempDir, "claude-home");
       const workspace = path.join(tempDir, "workspace");
       const nestedWorkspace = path.join(workspace, "packages", "app");
@@ -481,12 +491,12 @@ it.layer(NodeServices.layer)("discoverClaudeSkills", (it) => {
       const bucketName = "11111111-2222-4333-8444-555555555555_unbound";
       const synced = path.join(configDir, "plugins", "synced");
       const bucket = path.join(synced, bucketName);
+      // "PSTACK" 目录在大小写不敏感的 macOS 上会撞上 "pstack"；它的 manifest 行已覆盖同名去重。
       for (const [directory, prefix, skill] of [
         ["pstack", "pstack", "poteto-mode"],
         ["pstack-copy", "pstack", "copied"],
         ["tools", "tools", "synced-tool"],
         ["a_b", undefined, "renamed"],
-        ["PSTACK", "PSTACK", "shouted"],
       ] as const) {
         yield* writeSkill(path.join(bucket, directory, "skills"), skill, "# Synced");
         if (prefix === undefined) continue;
@@ -954,6 +964,163 @@ it.layer(NodeServices.layer)("discoverClaudeSkills", (it) => {
         ["no-frontmatter"],
       );
       assert.equal(skills[0]?.description, undefined);
+
+      const inventory = yield* discoverClaudeSkillInventory(
+        { homePath: configDir },
+        undefined,
+        undefined,
+        claudeInstanceId,
+      ).pipe(Effect.provideService(HostProcess.Platform, "win32"));
+      assert.deepEqual(
+        inventory.entries.map((entry) => entry.name),
+        ["no-frontmatter"],
+      );
+      assert.deepEqual(
+        inventory.diagnostics,
+        ["broken-quoted", "broken-tools", "broken-yaml"].map(
+          (name) =>
+            `Malformed frontmatter in Claude skill file '${path.join(skillsDir, name, "SKILL.md")}'.`,
+        ),
+      );
+    }),
+  );
+
+  it.effect("reports local read failures in inventory without changing $ discovery tolerance", () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const tempDir = yield* fs.makeTempDirectoryScoped({ prefix: "t3-claude-skills-" });
+      const configDir = path.join(tempDir, "claude-home");
+      const workspace = path.join(tempDir, "workspace");
+      const projectSkills = path.join(workspace, ".claude", "skills");
+      yield* writeSkill(path.join(configDir, "skills"), "good", "# Good");
+      yield* writeSkill(path.join(configDir, "skills"), "broken", "# Broken");
+      const brokenFile = path.join(configDir, "skills", "broken", "SKILL.md");
+      const denied = (method: string, target: string) =>
+        PlatformError.systemError({
+          _tag: "PermissionDenied",
+          module: "FileSystem",
+          method,
+          pathOrDescriptor: target,
+        });
+      const injectedFileSystem: FileSystem.FileSystem = {
+        ...fs,
+        readDirectory: (target, options) =>
+          target === projectSkills
+            ? Effect.fail(denied("readDirectory", target))
+            : fs.readDirectory(target, options),
+        readFileString: (target, options) =>
+          target === brokenFile
+            ? Effect.fail(denied("readFileString", target))
+            : fs.readFileString(target, options),
+      };
+
+      const inventory = yield* discoverClaudeSkillInventory(
+        { homePath: configDir },
+        workspace,
+        {},
+        claudeInstanceId,
+      ).pipe(
+        Effect.provideService(FileSystem.FileSystem, injectedFileSystem),
+        Effect.provideService(HostProcess.Platform, "win32"),
+      );
+
+      assert.deepEqual(
+        inventory.entries.map((entry) => entry.name),
+        ["good"],
+      );
+      assert.deepEqual(inventory.diagnostics, [
+        `Could not read Claude skill file '${brokenFile}'.`,
+        `Could not read Claude skill directory '${projectSkills}'.`,
+      ]);
+      assert.deepEqual(
+        (yield* discoverClaudeSkills({ homePath: configDir }, workspace).pipe(
+          Effect.provideService(FileSystem.FileSystem, injectedFileSystem),
+        )).map((skill) => skill.name),
+        ["good"],
+      );
+    }),
+  );
+
+  it.effect("reports malformed settings JSONC while preserving ordinary entries", () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const tempDir = yield* fs.makeTempDirectoryScoped({ prefix: "t3-claude-skills-" });
+      const configDir = path.join(tempDir, "claude-home");
+      const settingsPath = path.join(configDir, "settings.json");
+      yield* writeSkill(path.join(configDir, "skills"), "kept", "# Kept");
+      yield* fs.writeFileString(settingsPath, '{"skillOverrides":{"kept":"off"},');
+
+      const inventory = yield* discoverClaudeSkillInventory(
+        { homePath: configDir },
+        undefined,
+        {},
+        claudeInstanceId,
+      ).pipe(Effect.provideService(HostProcess.Platform, "win32"));
+
+      assert.deepEqual(
+        inventory.entries.map((entry) => [entry.name, entry.state]),
+        [["kept", "enabled"]],
+      );
+      assert.deepEqual(inventory.diagnostics, [
+        `Could not parse Claude settings file '${settingsPath}'.`,
+      ]);
+      assert.deepEqual(
+        (yield* discoverClaudeSkills({ homePath: configDir })).map((skill) => skill.name),
+        ["kept"],
+      );
+    }),
+  );
+
+  it.effect("reports plugin registry read failures while preserving ordinary entries", () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const tempDir = yield* fs.makeTempDirectoryScoped({ prefix: "t3-claude-skills-" });
+      const configDir = path.join(tempDir, "claude-home");
+      const registryPath = path.join(configDir, "plugins", "installed_plugins.json");
+      yield* writeSkill(path.join(configDir, "skills"), "kept", "# Kept");
+      yield* fs.makeDirectory(path.dirname(registryPath), { recursive: true });
+      yield* fs.writeFileString(registryPath, "{}");
+      const injectedFileSystem: FileSystem.FileSystem = {
+        ...fs,
+        readFileString: (target, options) =>
+          target === registryPath
+            ? Effect.fail(
+                PlatformError.systemError({
+                  _tag: "PermissionDenied",
+                  module: "FileSystem",
+                  method: "readFileString",
+                  pathOrDescriptor: target,
+                }),
+              )
+            : fs.readFileString(target, options),
+      };
+
+      const inventory = yield* discoverClaudeSkillInventory(
+        { homePath: configDir },
+        undefined,
+        {},
+        claudeInstanceId,
+      ).pipe(
+        Effect.provideService(FileSystem.FileSystem, injectedFileSystem),
+        Effect.provideService(HostProcess.Platform, "win32"),
+      );
+
+      assert.deepEqual(
+        inventory.entries.map((entry) => entry.name),
+        ["kept"],
+      );
+      assert.deepEqual(inventory.diagnostics, [
+        `Could not read Claude plugin registry '${registryPath}'.`,
+      ]);
+      assert.deepEqual(
+        (yield* discoverClaudeSkills({ homePath: configDir }).pipe(
+          Effect.provideService(FileSystem.FileSystem, injectedFileSystem),
+        )).map((skill) => skill.name),
+        ["kept"],
+      );
     }),
   );
 
@@ -1311,6 +1478,158 @@ it.layer(NodeServices.layer)("discoverClaudeSkills", (it) => {
           ["plain-off", false, false],
           ["user-only-yes", true, false],
         ],
+      );
+    }),
+  );
+
+  it.effect("keeps disabled, shadowed, managed and plugin entries in the full inventory", () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const tempDir = yield* fs.makeTempDirectoryScoped({ prefix: "t3-claude-skills-" });
+      const configDir = path.join(tempDir, "claude-home");
+      const workspace = path.join(tempDir, "workspace");
+      const managed = path.join(tempDir, "Program Files");
+      const plugin = path.join(configDir, "plugins", "review-plugin");
+      yield* writeSkill(
+        path.join(managed, "ClaudeCode", ".claude", "skills"),
+        "review",
+        "# Managed",
+      );
+      yield* writeSkill(path.join(configDir, "skills"), "review", "# User");
+      yield* writeSkill(path.join(workspace, ".claude", "skills"), "review", "# Project");
+      yield* writeSkill(path.join(configDir, "skills"), "disabled", "# Disabled");
+      yield* writeSkill(
+        path.join(workspace, ".claude", "skills"),
+        "project-only",
+        "# Project only",
+      );
+      yield* writeSkill(path.join(plugin, "skills"), "plugin-skill", "# Plugin");
+      yield* fs.writeFileString(
+        path.join(configDir, "plugins", "installed_plugins.json"),
+        JSON.stringify({ plugins: { "tools@shop": [{ scope: "user", installPath: plugin }] } }),
+      );
+      yield* fs.writeFileString(
+        path.join(configDir, "settings.json"),
+        '{"enabledPlugins":{"tools@shop":true},"skillOverrides":{"disabled":"off","review":"off"}}',
+      );
+      const environment = { ProgramFiles: managed };
+
+      const snapshot = yield* discoverClaudeSkills({ homePath: configDir }, workspace, environment);
+      const inventory = yield* discoverClaudeSkillInventory(
+        { homePath: configDir },
+        workspace,
+        environment,
+        claudeInstanceId,
+      ).pipe(Effect.provideService(HostProcess.Platform, "win32"));
+
+      assert.deepEqual(
+        snapshot.map((skill) => [skill.name, skill.enabled, skill.path]),
+        [
+          ["disabled", false, path.join(configDir, "skills", "disabled", "SKILL.md")],
+          [
+            "project-only",
+            true,
+            path.join(workspace, ".claude", "skills", "project-only", "SKILL.md"),
+          ],
+          [
+            "review",
+            false,
+            path.join(managed, "ClaudeCode", ".claude", "skills", "review", "SKILL.md"),
+          ],
+          ["tools:plugin-skill", true, path.join(plugin, "skills", "plugin-skill", "SKILL.md")],
+        ],
+      );
+      const byId = new Map(inventory.entries.map((entry) => [entry.nativeId, entry]));
+      assert.strictEqual(byId.get("user:review")?.state, "shadowed");
+      assert.strictEqual(byId.get("project:review")?.state, "shadowed");
+      assert.strictEqual(byId.get("user:disabled")?.state, "disabled");
+      assert.strictEqual(byId.get("project:project-only")?.state, "enabled");
+      assert.strictEqual(
+        byId.get("project:project-only")?.source.path,
+        path.join(workspace, ".claude", "skills", "project-only"),
+      );
+      assert.isTrue(byId.get("project:project-only")?.actions.canSetEnabled);
+      const managedEntry = inventory.entries.find((entry) => entry.source.kind === "managed");
+      assert.strictEqual(managedEntry?.state, "disabled");
+      assert.isFalse(managedEntry?.actions.canSetEnabled);
+      assert.isFalse(managedEntry?.actions.canUninstall);
+      const pluginEntry = inventory.entries.find((entry) => entry.source.kind === "plugin");
+      assert.strictEqual(pluginEntry?.source.containerId, "tools");
+      assert.strictEqual(pluginEntry?.source.path, path.join(plugin, "skills", "plugin-skill"));
+      assert.isFalse(pluginEntry?.actions.canSetEnabled);
+      assert.isFalse(pluginEntry?.actions.canUninstall);
+      assert.isFalse(byId.get("project:review")?.actions.canSetEnabled);
+      assert.strictEqual(inventory.entries.length, 6);
+    }),
+  );
+
+  it.effect("allows uninstall only for directories with a valid R3 install marker", () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const tempDir = yield* fs.makeTempDirectoryScoped({ prefix: "t3-claude-skills-" });
+      const configDir = path.join(tempDir, "claude-home");
+      const skillsDir = path.join(configDir, "skills");
+      yield* writeSkill(skillsDir, "plain", "# Plain");
+      yield* writeSkill(skillsDir, "installed", "# Installed");
+      yield* writeSkill(skillsDir, "other-instance", "# Other instance");
+      yield* fs.writeFileString(
+        path.join(skillsDir, "installed", ".t3-skill-install.json"),
+        JSON.stringify({
+          version: 1,
+          instanceId: "claude_dp41sf",
+          nativeId: "installed",
+          installedBy: "r3-code",
+        }),
+      );
+      yield* fs.writeFileString(
+        path.join(skillsDir, "other-instance", ".t3-skill-install.json"),
+        JSON.stringify({
+          version: 1,
+          instanceId: "other",
+          nativeId: "other-instance",
+          installedBy: "r3-code",
+        }),
+      );
+      const linkedSource = path.join(tempDir, "linked-source");
+      yield* writeSkill(tempDir, "linked-source", "# Linked");
+      yield* fs.writeFileString(
+        path.join(linkedSource, ".t3-skill-install.json"),
+        JSON.stringify({
+          version: 1,
+          instanceId: "claude_dp41sf",
+          nativeId: "linked",
+          installedBy: "r3-code",
+        }),
+      );
+      yield* fs.symlink(linkedSource, path.join(skillsDir, "linked"));
+
+      const inventory = yield* discoverClaudeSkillInventory(
+        { homePath: configDir },
+        undefined,
+        undefined,
+        claudeInstanceId,
+      ).pipe(Effect.provideService(HostProcess.Platform, "win32"));
+      const plain = inventory.entries.find((entry) => entry.nativeId === "user:plain");
+      const installed = inventory.entries.find((entry) => entry.nativeId === "user:installed");
+      const otherInstance = inventory.entries.find(
+        (entry) => entry.nativeId === "user:other-instance",
+      );
+      const linked = inventory.entries.find((entry) => entry.nativeId === "user:linked");
+
+      assert.isTrue(plain?.actions.canSetEnabled);
+      assert.isFalse(plain?.actions.canUninstall);
+      assert.isNotEmpty(plain?.actions.reason);
+      assert.isTrue(installed?.actions.canSetEnabled);
+      assert.isTrue(installed?.actions.canUninstall);
+      assert.isTrue(otherInstance?.actions.canSetEnabled);
+      assert.isFalse(otherInstance?.actions.canUninstall);
+      assert.isFalse(linked?.actions.canSetEnabled);
+      assert.isFalse(linked?.actions.canUninstall);
+      assert.strictEqual(
+        linked?.actions.reason,
+        "Linked skills are read-only in the first version.",
       );
     }),
   );

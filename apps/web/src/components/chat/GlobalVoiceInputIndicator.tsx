@@ -7,6 +7,7 @@ import {
 } from "../../speech/voiceInputSession";
 import { Button } from "../ui/button";
 import { ComposerSpeechRecordingPill } from "./ComposerSpeechButton";
+import { t } from "gt-react";
 
 /**
  * Keeps the chosen destination's dictation alive across navigation and, while the draft it
@@ -34,7 +35,7 @@ export function GlobalVoiceInputIndicator({ hidden = false }: { hidden?: boolean
           onClick={() => target.open?.()}
           className="min-w-0 shrink"
         >
-          <span className="truncate">{target.label ?? "Untitled thread"}</span>
+          <span className="truncate">{target.label ?? t("Untitled thread")}</span>
         </Button>
         <ComposerSpeechRecordingPill
           state={state}

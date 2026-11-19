@@ -12,6 +12,7 @@ import { useAtomCommand } from "~/state/use-atom-command";
 
 import { Button } from "../ui/button";
 import { toastManager } from "../ui/toast";
+import { t } from "gt-react";
 
 /**
  * Resolves or unresolves a thread from the conversation, so threads without a diff line (such as
@@ -46,7 +47,7 @@ export function PullRequestResolveThreadButton({
     });
     setPending(false);
     if (result._tag === "Failure") {
-      toastManager.add({ type: "error", title: "The conversation could not be updated" });
+      toastManager.add({ type: "error", title: t("The conversation could not be updated") });
       return;
     }
     onRefresh();
@@ -60,7 +61,7 @@ export function PullRequestResolveThreadButton({
       disabled={pending}
       onClick={() => void toggle()}
     >
-      {thread.isResolved ? "Unresolve" : "Resolve"}
+      {thread.isResolved ? t("Unresolve") : t("Resolve")}
     </Button>
   );
 }

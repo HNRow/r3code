@@ -4,7 +4,7 @@ import { ExpandedImageDialog } from "~/components/chat/ExpandedImageDialog";
 import { observeResize } from "~/lib/observeResize";
 import { AttachmentImage } from "../media/AttachmentImage";
 import { FileSurfaceAction, FileSurfaceFailure } from "./fileSurfaceChrome";
-import { useGT } from "gt-react";
+import { useGT, t } from "gt-react";
 
 export default function PreviewImageContent(props: {
   readonly src: string;
@@ -43,7 +43,7 @@ export default function PreviewImageContent(props: {
         <span className="tabular-nums">
           {natural.width
             ? `${natural.width.toLocaleString()} × ${natural.height.toLocaleString()}`
-            : "Loading image…"}
+            : t("Loading image…")}
         </span>
         <div className="flex items-center gap-1">
           <FileSurfaceAction

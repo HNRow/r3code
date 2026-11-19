@@ -84,7 +84,7 @@ import {
   getProviderSummary,
   getProviderVersionLabel,
 } from "./providerStatus";
-import { useGT, useMessages, T, Var } from "gt-react";
+import { useGT, useMessages, T, Var, t } from "gt-react";
 
 const ENVIRONMENT_VARIABLE_NAME_PATTERN = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
@@ -529,7 +529,7 @@ export function ProviderEnvironmentSection(props: {
                     }
                   />
                   <TooltipPopup side="top">
-                    {variable.sensitive ? "Sensitive, stored separately" : "Plain text"}
+                    {variable.sensitive ? t("Sensitive, stored separately") : t("Plain text")}
                   </TooltipPopup>
                 </Tooltip>
               ) : null;
@@ -593,7 +593,7 @@ export function ProviderEnvironmentSection(props: {
               Sensitive values are stored separately and never returned to the app.
               <Var>
                 {rows.some((row) => row.valueRedacted === true)
-                  ? " Enter a new value to rename a saved one or make it plain text."
+                  ? t(" Enter a new value to rename a saved one or make it plain text.")
                   : null}
               </Var>
             </T>
@@ -613,8 +613,8 @@ function ProjectOverrideInheritance({
 }) {
   const gt = useGT();
   const layers = [
-    { key: "project", label: "Project", enabled: projectEnabled, effective: true },
-    { key: "device", label: "Device", enabled: deviceEnabled, effective: false },
+    { key: "project", label: t("Project"), enabled: projectEnabled, effective: true },
+    { key: "device", label: t("Device"), enabled: deviceEnabled, effective: false },
   ];
   return (
     <Popover>
@@ -662,7 +662,7 @@ function ProjectOverrideInheritance({
                   layer.effective ? "text-foreground" : "text-muted-foreground",
                 )}
               >
-                {layer.enabled ? "On" : "Off"}
+                {layer.enabled ? t("On") : t("Off")}
                 {layer.effective ? (
                   <CheckIcon aria-hidden className="size-3.5 shrink-0 text-primary" />
                 ) : (
@@ -859,14 +859,14 @@ export function ProviderInstanceCard({
       toastManager.add({
         type: "success",
         title: `${providerName} update command copied`,
-        description: "Run it in a terminal when you are ready to update.",
+        description: t("Run it in a terminal when you are ready to update."),
       });
     },
     onError: (error, { providerName }) => {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: `Could not copy ${providerName} update command`,
+          title: t`Could not copy ${providerName} update command`,
           description: error.message,
         }),
       );
@@ -1066,7 +1066,7 @@ export function ProviderInstanceCard({
           }
         />
         <TooltipPopup side="top">
-          {updateProgress ? "Updating" : versionAdvisory.title}
+          {updateProgress ? t("Updating") : versionAdvisory.title}
         </TooltipPopup>
       </Tooltip>
       <PopoverPopup side="bottom" align="end" width="md" aria-label={versionAdvisory.title}>
@@ -1095,10 +1095,10 @@ export function ProviderInstanceCard({
             >
               {isUpdating ? <Spinner /> : <DownloadIcon />}
               {isUpdating
-                ? "Updating"
+                ? t("Updating")
                 : versionAdvisory.targetVersion
                   ? `Install ${getProviderVersionLabel(versionAdvisory.targetVersion)}`
-                  : "Update now"}
+                  : t("Update now")}
             </Button>
           ) : null}
           {updateProgress || updateProblem ? (

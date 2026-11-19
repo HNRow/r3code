@@ -22,6 +22,7 @@ import { issueParamsKey, issueTarget, type IssueParams } from "./issueParams";
 import { issueLabelPicksFamily } from "./issuePicks";
 import { issueCommandError, useIssueAccess } from "./issuePresentation";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function IssueLabelsScreen({ route }: StaticScreenProps<IssueParams>) {
   const gt = useGT();
@@ -68,7 +69,7 @@ export function IssueLabelsScreen({ route }: StaticScreenProps<IssueParams>) {
           if (failure === null) return refreshIssueLists(target.environmentId);
           // Picks made after this write was sent are kept.
           setStored((latest) => issuePicksAfterFailedWrite(latest, sent));
-          Dialog.alert("Couldn't change labels", failure);
+          Dialog.alert(t("Couldn't change labels"), failure);
         });
       }),
     [navigation, detail, draft, current, setStored, update, target],

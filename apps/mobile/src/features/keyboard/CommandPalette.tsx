@@ -76,6 +76,7 @@ import { openSettings } from "../settings/settings-navigation";
 import { useSelectWorkspaceTab } from "../layout/workspace/useSelectWorkspaceTab";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const PALETTE_COMMANDS: ReadonlyArray<HardwareKeyboardCommand> = [
   "commandPalette",
@@ -157,10 +158,15 @@ function PaletteRow(props: {
       </View>
       <View className="flex-1">
         <View className="flex-row items-baseline gap-2">
-          <Text numberOfLines={1} className={cn("shrink text-base", foregroundClassName)}>
+          <Text
+            translate={false}
+            numberOfLines={1}
+            className={cn("shrink text-base", foregroundClassName)}
+          >
             {props.item.titleRanges?.length
               ? splitSearchText(props.item.title, props.item.titleRanges).map((part) => (
                   <Text
+                    translate={false}
                     key={part.start}
                     className={cn("text-base", part.highlighted && "font-t3-bold")}
                   >
@@ -177,6 +183,7 @@ function PaletteRow(props: {
               props.item.matchHint.label !== "Environment")) &&
           props.item.detail ? (
             <Text
+              translate={false}
               numberOfLines={1}
               className={cn("max-w-[45%] shrink-0 text-sm", mutedForegroundClassName)}
             >
@@ -195,13 +202,21 @@ function PaletteRow(props: {
           <Text numberOfLines={1} className={cn("text-sm", mutedForegroundClassName)}>
             {props.item.matchHint.label}:{" "}
             {splitSearchText(props.item.matchHint.text, props.item.matchHint.ranges).map((part) => (
-              <Text key={part.start} className={cn("text-sm", part.highlighted && "font-t3-bold")}>
+              <Text
+                translate={false}
+                key={part.start}
+                className={cn("text-sm", part.highlighted && "font-t3-bold")}
+              >
                 {part.text}
               </Text>
             ))}
           </Text>
         ) : props.item.detail ? (
-          <Text numberOfLines={1} className={cn("text-sm", mutedForegroundClassName)}>
+          <Text
+            translate={false}
+            numberOfLines={1}
+            className={cn("text-sm", mutedForegroundClassName)}
+          >
             {props.item.detail}
           </Text>
         ) : null}
@@ -298,56 +313,56 @@ export function CommandPalette(props: {
       {
         key: "newTask",
         kind: "action",
-        title: "New thread in…",
+        title: t("New thread in…"),
         searchTerms: ["new task", "chat", "create", "project"],
         run: () => runCommand("newTask"),
       },
       {
         key: "addProject",
         kind: "action",
-        title: "Add project",
+        title: t("Add project"),
         searchTerms: ["folder", "clone", "repository", "git"],
         run: () => navigation.navigate("AddProject"),
       },
       {
         key: "settings",
         kind: "action",
-        title: "Open settings",
+        title: t("Open settings"),
         searchTerms: ["preferences", "configuration"],
         run: () => selectTab("settings"),
       },
       {
         key: "appearance",
         kind: "action",
-        title: "Appearance",
+        title: t("Appearance"),
         searchTerms: ["theme", "colors", "dark", "light"],
         run: () => openSettings(navigation, "SettingsAppearance"),
       },
       {
         key: "environments",
         kind: "action",
-        title: "Manage environments",
+        title: t("Manage environments"),
         searchTerms: ["connections", "server", "remote"],
         run: () => openSettings(navigation, "SettingsEnvironments"),
       },
       {
         key: "scheduledTasks",
         kind: "action",
-        title: "Scheduled tasks",
+        title: t("Scheduled tasks"),
         searchTerms: ["schedule", "automations", "recurring"],
         run: () => openSettings(navigation, "SettingsScheduledTasks"),
       },
       {
         key: "usage",
         kind: "action",
-        title: "Usage",
+        title: t("Usage"),
         searchTerms: ["limits", "accounts", "quota"],
         run: () => openSettings(navigation, "SettingsUsage"),
       },
       {
         key: "archive",
         kind: "action",
-        title: "Archived threads",
+        title: t("Archived threads"),
         searchTerms: ["restore", "history"],
         run: () => openSettings(navigation, "SettingsArchive"),
       },
@@ -356,7 +371,7 @@ export function CommandPalette(props: {
       actions.push({
         key: "triage",
         kind: "action",
-        title: "Triage an issue",
+        title: t("Triage an issue"),
         // Mobile has no triage hero, so name the machine before it starts.
         detail: `On ${savedConnectionsById[triageEnvironmentId]?.environmentLabel ?? "this machine"}`,
         searchTerms: ["triage", "bug", "issue", "report", "broken", "debug", "help", "support"],
@@ -373,7 +388,7 @@ export function CommandPalette(props: {
       actions.unshift({
         key: "newThread",
         kind: "action",
-        title: `New thread in ${activeProject.title}`,
+        title: t`New thread in ${activeProject.title}`,
         searchTerms: ["new task", "chat", "create"],
         run: () =>
           selectDetail({
@@ -696,7 +711,7 @@ export function CommandPalette(props: {
                 contentContainerStyle={{ paddingBottom: 8 }}
                 ListEmptyComponent={
                   <Text className="p-5 text-center text-foreground-muted">
-                    {search.isPending ? "Searching…" : "No results"}
+                    {search.isPending ? t("Searching…") : t("No results")}
                   </Text>
                 }
                 // Message results from slower environments may still arrive below.

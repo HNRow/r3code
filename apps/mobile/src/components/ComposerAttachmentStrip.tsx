@@ -29,6 +29,7 @@ import {
   retryComposerAttachmentUpload,
   useComposerAttachmentUploadState,
 } from "../state/composer-attachment-uploads";
+import { t } from "../i18n/gt";
 
 export interface ComposerAttachmentStripProps {
   readonly environmentId?: EnvironmentId;
@@ -88,7 +89,7 @@ export function ComposerAttachmentThumbnail(props: ComposerAttachmentThumbnailPr
           />
           {!props.compact ? (
             <Text className="text-2xs text-white">
-              {upload.status === "failed" ? "Retry" : `${Math.floor(upload.progress * 100)}%`}
+              {upload.status === "failed" ? t("Retry") : `${Math.floor(upload.progress * 100)}%`}
             </Text>
           ) : null}
         </Pressable>
@@ -234,7 +235,11 @@ function ComposerFileAttachment(
         >
           <PierreEntryIcon path={attachment.name} kind="file" size={props.compact ? 15 : 22} />
           {!props.compact ? (
-            <Text className="w-full text-center text-2xs text-foreground" numberOfLines={1}>
+            <Text
+              translate={false}
+              className="w-full text-center text-2xs text-foreground"
+              numberOfLines={1}
+            >
               {attachment.name}
             </Text>
           ) : null}

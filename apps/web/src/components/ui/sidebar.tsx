@@ -26,7 +26,7 @@ import {
 import { resolveSidebarState, type ResponsiveSidebarState } from "./sidebarState";
 import * as Schema from "effect/Schema";
 import { announceSidebarVisibility } from "~/lib/accessibilityAnnouncements";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "calc(100vw - var(--spacing) * 3)";
@@ -352,7 +352,7 @@ function Sidebar({
             }
           >
             <SheetHeader className="sr-only">
-              <SheetTitle>{props["aria-label"] ?? "Sidebar"}</SheetTitle>
+              <SheetTitle>{props["aria-label"] ?? t("Sidebar")}</SheetTitle>
               <SheetDescription>
                 <T>Displays the mobile sidebar.</T>
               </SheetDescription>

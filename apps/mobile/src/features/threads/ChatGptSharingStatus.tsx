@@ -5,6 +5,7 @@ import { Linking, Pressable, View } from "react-native";
 import { AppText as Text } from "../../components/ui/AppText";
 import { ProviderIcon } from "../../components/ProviderIcon";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function ChatGptSharingStatus({ provider }: { provider: ServerProvider | null }) {
   const gt = useGT();
@@ -17,7 +18,7 @@ export function ChatGptSharingStatus({ provider }: { provider: ServerProvider | 
         className="min-h-11 flex-row items-center gap-2"
         onPress={() => {
           Dialog.alert(
-            "ChatGPT sharing is on",
+            t("ChatGPT sharing is on"),
             [
               provider?.auth.email,
               "Eligible usage uses your ChatGPT plan. Credit settings and limits are managed in ChatGPT.",

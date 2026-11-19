@@ -43,7 +43,7 @@ export function extensionStatusBannerItem(
     id: "pi-extension-status",
     variant: "default",
     icon: <span>▸</span>,
-    title: <output>{`Pi · ${statuses.map((status) => status.text).join(" · ")}`}</output>,
+    title: <output>{t`Pi · ${statuses.map((status) => status.text).join(" · ")}`}</output>,
   };
 }
 
@@ -82,7 +82,7 @@ export function childInputNowItem(input: {
     )),
     actions: (
       <InlineButton onClick={() => onOpenThread(first.id, first.environmentId)}>
-        {first.hasPendingApprovals ? "Open approval" : "Open question"}
+        {first.hasPendingApprovals ? t("Open approval") : t("Open question")}
       </InlineButton>
     ),
   };
@@ -168,7 +168,7 @@ export function runStopNowItem(input: {
         />
         {unresponsive && input.canForceStop ? (
           <InlineButton disabled={input.forceStopping} onClick={input.onForceStop}>
-            {input.forceStopping ? "Force stopping..." : "Force stop"}
+            {input.forceStopping ? t("Force stopping...") : t("Force stop")}
           </InlineButton>
         ) : null}
       </>
@@ -227,7 +227,7 @@ export function backgroundWorkNowItem(input: {
     title:
       only && typeof only.label !== "string" && only.task.label !== only.task.kind ? (
         <>
-          {presentation.waiting ? "Waiting" : "Running"} · {only.label}
+          {presentation.waiting ? t("Waiting") : t("Running")} · {only.label}
         </>
       ) : (
         presentation.title
@@ -265,7 +265,7 @@ export function backgroundWorkNowItem(input: {
           onOpenThread={onOpenThread}
         />
         <InlineButton disabled={input.stopDisabled} onClick={() => void input.onStop()}>
-          {input.stopping ? "Stopping..." : "Stop"}
+          {input.stopping ? t("Stopping...") : t("Stop")}
         </InlineButton>
       </>
     ),
@@ -311,7 +311,7 @@ export function branchMismatchBannerItem(input: {
     ),
     actions: (
       <Button size="xs" variant="ghost" disabled={input.restoreDisabled} onClick={input.onRestore}>
-        {input.restoring ? "Restoring..." : "Restore branch"}
+        {input.restoring ? t("Restoring...") : t("Restore branch")}
       </Button>
     ),
     dismissLabel: "Dismiss branch change notice",

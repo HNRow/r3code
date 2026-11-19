@@ -34,6 +34,7 @@ import {
   type ProjectOverrideEntry,
   type ScopedSettingsPatch,
 } from "./scopedSettings";
+import { t } from "gt-react";
 
 const readSettings = (environmentId: EnvironmentId) =>
   readEnvironment(environmentId)?.serverConfig?.settings ?? null;
@@ -67,7 +68,7 @@ function useRunScopedPlan() {
     if (plan.unavailableReason) {
       toastManager.add({
         type: "warning",
-        title: "Setting not saved",
+        title: t("Setting not saved"),
         description: plan.unavailableReason,
       });
       onFailed?.();
@@ -99,7 +100,7 @@ function useRunScopedPlan() {
               Cause.fail(
                 new EnvironmentAuthorizationError({
                   requiredScope: missing,
-                  message: "This connection lacks permission to change these settings.",
+                  message: t("This connection lacks permission to change these settings."),
                 }),
               ),
             )

@@ -29,7 +29,7 @@ import { Button } from "../ui/button";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "../ui/input-group";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
 import { Spinner } from "../ui/spinner";
-import { T, useGT, Var } from "gt-react";
+import { T, useGT, Var, t } from "gt-react";
 
 const DOWNLOAD_FORMAT = new Intl.NumberFormat(undefined, {
   notation: "compact",
@@ -37,10 +37,30 @@ const DOWNLOAD_FORMAT = new Intl.NumberFormat(undefined, {
 });
 const SUGGESTED_SEARCHES = ["Dracula", "Catppuccin", "Nord", "Tokyo Night"];
 const SORT_OPTIONS: ReadonlyArray<{ value: OpenVsxThemeSort; label: string }> = [
-  { value: "downloadCount", label: "Most downloaded" },
-  { value: "rating", label: "Best rated" },
-  { value: "timestamp", label: "Newest" },
-  { value: "relevance", label: "Most relevant" },
+  {
+    value: "downloadCount",
+    get label() {
+      return t("Most downloaded");
+    },
+  },
+  {
+    value: "rating",
+    get label() {
+      return t("Best rated");
+    },
+  },
+  {
+    value: "timestamp",
+    get label() {
+      return t("Newest");
+    },
+  },
+  {
+    value: "relevance",
+    get label() {
+      return t("Most relevant");
+    },
+  },
 ];
 const SEARCH_DEBOUNCE_MS = 350;
 
@@ -376,7 +396,7 @@ export function ThemeSearchSection({
 
       <div className="sr-only" role="status">
         {isSearching
-          ? "Searching themes..."
+          ? t("Searching themes...")
           : results
             ? `${results.length} supported ${results.length === 1 ? "theme" : "themes"} found.`
             : ""}
@@ -435,7 +455,7 @@ export function ThemeSearchSection({
                     </div>
                   </div>
                   <p className="line-clamp-2 min-h-8 text-muted-foreground text-xs leading-4">
-                    {extension.description || "A community color theme for your editor."}
+                    {extension.description || t("A community color theme for your editor.")}
                   </p>
                   <div className="mt-auto flex items-center justify-between gap-2">
                     <div className="flex min-w-0 items-center gap-2">

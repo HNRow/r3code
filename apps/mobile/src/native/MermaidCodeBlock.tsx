@@ -13,6 +13,7 @@ import { themeColorWithAlpha } from "../lib/mobileTheme";
 import { CodeBlockFrame, CodeBlockHeaderButton } from "./CodeBlockFrame";
 import type { NativeMarkdownTextStyle } from "./SelectableMarkdownText.types";
 import { useGT, Var, T } from "gt-react-native";
+import { t } from "../i18n/gt";
 
 type Pele = typeof import("pele/lazy");
 type Diagram =
@@ -56,7 +57,7 @@ async function renderDiagram(source: string): Promise<Diagram> {
     // Not cached, so the next mount tries again.
     peleLoad = null;
     diagramLoads.delete(source);
-    return { status: "error", message: "The diagram renderer failed to load." };
+    return { status: "error", message: t("The diagram renderer failed to load.") };
   }
   let type: DiagramType | null = null;
   try {
@@ -76,7 +77,7 @@ async function renderDiagram(source: string): Promise<Diagram> {
     if (!(await load)) {
       typeLoads.delete(type);
       diagramLoads.delete(source);
-      return { status: "error", message: "The diagram renderer failed to load." };
+      return { status: "error", message: t("The diagram renderer failed to load.") };
     }
   }
   try {

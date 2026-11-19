@@ -45,6 +45,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 import {
   ORCHESTRATION_V2_WORKSPACE_PREPARATION_FAILURE_CODE,
   type EnvironmentId,
+  type OrchestrationV2RestartCancelledBackgroundWork,
   type RunId,
   type ThreadId,
   type ToolActivityIcon,
@@ -75,9 +76,11 @@ import {
 } from "../../lib/threadActivity";
 import {
   isJsonToolText,
+  restartNoticeForItem,
   toolCallLines,
   turnItemOutputImages,
   turnItemOutputText,
+  type RestartNotice,
 } from "@t3tools/client-runtime/work-log/item-detail";
 import { useTurnItemDetail } from "../../state/queries";
 import {
@@ -109,7 +112,8 @@ import { useAssetUrl } from "../../state/assets";
 import { PullRequestGlyph } from "../pull-requests/pullRequestGlyphs";
 import { useOpenLinkedThread } from "./useOpenLinkedThread";
 import { startShimmerSteps } from "./work-shimmer-steps";
-import { useGT, T, Var } from "gt-react-native";
+import { useGT, useMessages, msg, T, Var } from "gt-react-native";
+import { translateServerNotice } from "../../lib/timelineText";
 
 const SHIMMER_WIDTH = 72;
 const SHIMMER_ICON_AND_GAP_WIDTH = 30;
@@ -117,6 +121,70 @@ export const THREAD_DISCLOSURE_TRANSITION_MS = 180;
 const WORK_LOG_LAYOUT_TRANSITION = LinearTransition.duration(THREAD_DISCLOSURE_TRANSITION_MS);
 const WORK_LOG_DETAIL_ENTER_TRANSITION = FadeIn.duration(140);
 const WORK_LOG_DETAIL_EXIT_TRANSITION = FadeOut.duration(120);
+
+const RESTART_CANCELLED_WORK_KIND_TEXT: Record<
+  OrchestrationV2RestartCancelledBackgroundWork["kind"],
+  string
+> = {
+  subagent: msg("Subagent"),
+  shell: msg("Shell"),
+  monitor: msg("Monitor"),
+  task: msg("Task"),
+};
+
+/** The restart note's detail is the prompt sent to the agent, so the restarted server's list stands alone. */
+function RestartContinuationBody(props: {
+  readonly notice: RestartNotice;
+  readonly detail: string | undefined;
+}) {
+  const m = useMessages();
+  const [showSource, setShowSource] = useState(false);
+  const { notice } = props;
+  return (
+    <View className="gap-1">
+      <Text className="text-2xs leading-normal text-foreground-muted">
+        {notice.state === "legacy"
+          ? m("R3 Code restarted.")
+          : notice.settled
+            ? m("R3 Code restarted. Its background tasks stopped.")
+            : notice.cancelledWork.length === 0
+              ? m("R3 Code restarted and continued this turn automatically.")
+              : m(
+                  "R3 Code restarted. These background tasks were cancelled and will not report back. Run them again if you still need them:",
+                )}
+      </Text>
+      {notice.state === "structured" && notice.cancelledWork.length > 0
+        ? notice.cancelledWork.map((work, index) => (
+            <Text
+              key={`${work.kind}:${work.id ?? index}`}
+              className="ml-3 text-2xs leading-normal text-foreground-muted"
+            >
+              {`${m(RESTART_CANCELLED_WORK_KIND_TEXT[work.kind])}: ${work.label}`}
+            </Text>
+          ))
+        : null}
+      {props.detail === undefined ? null : (
+        <>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setShowSource((current) => !current)}
+            className="mt-0.5 self-start"
+          >
+            <Text className="text-2xs font-t3-medium text-foreground-subtle">
+              {m("Original message sent to the agent")}
+            </Text>
+          </Pressable>
+          {showSource ? (
+            <Text selectable className="font-mono text-2xs leading-normal text-foreground-muted">
+              {props.detail}
+            </Text>
+          ) : null}
+        </>
+      )}
+    </View>
+  );
+}
+
 type WorkContentIcon =
   | AppSymbolName
   | "browser"
@@ -883,7 +951,9 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
   },
 ) {
   const gt = useGT();
+  const m = useMessages();
   const { row, expanded } = props;
+  const restartNotice = restartNoticeForItem(row.projectedItem.item);
   const openLinkedThread = useOpenLinkedThread();
   const streamsOutput =
     useCommandOutputStreaming(props.environmentId) &&
@@ -952,7 +1022,7 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
             </Text>
           </View>
           {!warning ? (
-            <Text selectable className="ml-7 text-sm text-foreground">
+            <Text translate={false} selectable className="ml-7 text-sm text-foreground">
               {failureItem.failure.message}
             </Text>
           ) : null}
@@ -991,11 +1061,13 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
     call && shownItem.type === "command_execution" && shownItem.exitCode
       ? shownItem.exitCode
       : null;
+  const translateDetail = (text: string | null): string | null =>
+    text === null ? null : translateServerNotice(text, m);
   const fullDetail =
     expanded && !reasoning && !call && !row.workEntry.questionAnswer
       ? fetchedItem && !isRead
-        ? formatItemFullDetail(row.projectedItem, fetchedItem)
-        : row.getFullDetail()
+        ? translateDetail(formatItemFullDetail(row.projectedItem, fetchedItem))
+        : translateDetail(row.getFullDetail())
       : null;
   const outputImages = expanded && fetchedItem ? turnItemOutputImages(fetchedItem) : [];
   const viewedImagePath = workEntryViewedImagePath(row.workEntry);
@@ -1023,12 +1095,18 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
       </Text>
     );
   const toolPresentation = resolveWorkEntryToolPresentation(row.workEntry);
-  const previewText = row.groupStandIn?.label ?? workEntryRowLabel(row.workEntry);
+  const previewText = translateServerNotice(
+    row.groupStandIn?.label ?? workEntryRowLabel(row.workEntry),
+    m,
+  );
   const answerPreview = row.workEntry.questionAnswer
     ? getQuestionAnswerPreview(row.workEntry.questionAnswer)
     : null;
   const accessiblePreview = [previewText, answerPreview].filter(Boolean).join(": ");
-  const displayText = row.groupStandIn?.label ?? workEntryRowLabel(row.workEntry, expanded);
+  const displayText = translateServerNotice(
+    row.groupStandIn?.label ?? workEntryRowLabel(row.workEntry, expanded),
+    m,
+  );
   const isSystemNotice = row.projectedItem.item.type === "system_notice";
   const isUsageLimit =
     row.projectedItem.item.type === "error" &&
@@ -1166,6 +1244,7 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
       {expanded &&
       (reasoning ||
         fullDetail ||
+        restartNotice !== null ||
         call ||
         fetchedOutput ||
         viewedImagePath ||
@@ -1272,6 +1351,11 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
                       line
                     ) /* oxlint-enable react/no-array-index-key */,
                 )
+            ) : restartNotice !== null ? (
+              <RestartContinuationBody
+                notice={restartNotice}
+                detail={shownItem.type === "notification" ? shownItem.detail : undefined}
+              />
             ) : fullDetail ? (
               <Text selectable className="font-mono text-2xs leading-normal text-foreground-muted">
                 {isJsonToolText(fullDetail) ? (

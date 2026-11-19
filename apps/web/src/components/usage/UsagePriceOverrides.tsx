@@ -40,7 +40,7 @@ import {
   type UsagePriceTarget,
   type UsagePriceWriteResult,
 } from "./usagePriceTargets";
-import { T, useGT, Var } from "gt-react";
+import { T, useGT, useMessages, Var, t } from "gt-react";
 
 const priceTargetsAtom = Atom.make((get): readonly UsagePriceTarget[] =>
   [...get(environmentPresentations.presentationsAtom)].map(([environmentId, environment]) => {
@@ -103,6 +103,7 @@ export function UsagePriceOverrides({
   readonly onOpenChange: (open: boolean) => void;
 }) {
   const gt = useGT();
+  const m = useMessages();
   const environments = useAtomValue(priceTargetsAtom);
   const [selectedIds, setSelectedIds] = useState(initialSelectedEnvironmentIds);
   const selected = environments.filter(
@@ -351,8 +352,8 @@ export function UsagePriceOverrides({
           {selected.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               {environments.length === 0
-                ? "Connect an environment to set model prices."
-                : "Select an environment to see and change its model prices."}
+                ? t("Connect an environment to set model prices.")
+                : t("Select an environment to see and change its model prices.")}
             </p>
           ) : (
             <>
@@ -400,8 +401,8 @@ export function UsagePriceOverrides({
                         <TableCell colSpan={7} className="text-center whitespace-normal">
                           <p className="py-6 text-muted-foreground">
                             {selected.some((environment) => environment.prices === null)
-                              ? "Some environment prices are unavailable."
-                              : "No custom prices or mappings. Add a row to set one."}
+                              ? t("Some environment prices are unavailable.")
+                              : t("No custom prices or mappings. Add a row to set one.")}
                           </p>
                         </TableCell>
                       </TableRow>
@@ -467,7 +468,9 @@ export function UsagePriceOverrides({
                                   value={row.alias ?? aliasCell.value}
                                   aria-label={`Map ${row.model || "new model"} to model`}
                                   list="usage-alias-models"
-                                  placeholder={row.isNew ? "Optional" : aliasCell.placeholder}
+                                  placeholder={
+                                    row.isNew ? gt("Optional") : m(aliasCell.placeholder)
+                                  }
                                   autoComplete="off"
                                   spellCheck={false}
                                   disabled={locked}
@@ -500,7 +503,7 @@ export function UsagePriceOverrides({
                                           ? field.optional
                                             ? "Input rate"
                                             : "0.00"
-                                          : cell.placeholder
+                                          : m(cell.placeholder)
                                       }
                                       autoComplete="off"
                                       disabled={locked}
@@ -544,10 +547,10 @@ export function UsagePriceOverrides({
                                 </TooltipTrigger>
                                 <TooltipPopup>
                                   {row.removed
-                                    ? "Undo reset"
+                                    ? t("Undo reset")
                                     : row.isNew
-                                      ? "Remove row"
-                                      : "Reset to automatic"}
+                                      ? t("Remove row")
+                                      : t("Reset to automatic")}
                                 </TooltipPopup>
                               </Tooltip>
                             </TableCell>
@@ -582,7 +585,7 @@ export function UsagePriceOverrides({
                   usage counts as the model it maps to.
                   <Var>
                     {selected.length > 1
-                      ? " Mixed cells keep each environment’s rate until you edit them."
+                      ? t(" Mixed cells keep each environment’s rate until you edit them.")
                       : ""}
                   </Var>
                 </T>
@@ -606,8 +609,8 @@ export function UsagePriceOverrides({
                       {result?.status === "failed"
                         ? `Not saved · ${result.error}`
                         : result?.status === "saved"
-                          ? "Saved"
-                          : "Saving…"}
+                          ? t("Saved")
+                          : t("Saving…")}
                     </span>
                   </div>
                 );
@@ -622,7 +625,9 @@ export function UsagePriceOverrides({
           <div className="flex w-full flex-wrap justify-end gap-2 sm:w-auto">
             {hasChanges ? (
               <Button variant="ghost" disabled={pending} onClick={discard}>
-                {failedDestinations.length > 0 ? "Discard pending changes" : "Discard changes"}
+                {failedDestinations.length > 0
+                  ? t("Discard pending changes")
+                  : t("Discard changes")}
               </Button>
             ) : null}
             <Button
@@ -634,10 +639,10 @@ export function UsagePriceOverrides({
               onClick={() => void save(failedDestinations.length > 0)}
             >
               {pending
-                ? "Saving…"
+                ? t("Saving…")
                 : failedDestinations.length > 0
-                  ? "Retry failed saves"
-                  : "Save changes"}
+                  ? t("Retry failed saves")
+                  : t("Save changes")}
             </Button>
           </div>
         </DialogFooter>

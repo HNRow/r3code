@@ -11,20 +11,42 @@ import { ComposerPendingApprovalActions } from "./ComposerPendingApprovalActions
 import { ToolActivityIconView, type WorkEntryIconName } from "./TimelineToolActivityIcon";
 import { TimelineRowCtx } from "./timelineRowContext";
 import { WorkLogRow } from "./WorkLog";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 const APPROVAL_PRESENTATION = {
-  command: { icon: "terminal", label: "Command approval", detailLabel: "Command" },
-  "file-change": { icon: "square-pen", label: "File change approval", detailLabel: "File change" },
-  "file-read": { icon: "eye", label: "File read approval", detailLabel: "File to read" },
+  command: {
+    icon: "terminal",
+    get label() {
+      return t("Command approval");
+    },
+    detailLabel: "Command",
+  },
+  "file-change": {
+    icon: "square-pen",
+    get label() {
+      return t("File change approval");
+    },
+    detailLabel: "File change",
+  },
+  "file-read": {
+    icon: "eye",
+    get label() {
+      return t("File read approval");
+    },
+    detailLabel: "File to read",
+  },
   permission: {
     icon: "wrench",
-    label: "App permission approval",
+    get label() {
+      return t("App permission approval");
+    },
     detailLabel: "Permission request",
   },
   "mcp-elicitation": {
     icon: "hammer",
-    label: "App access approval",
+    get label() {
+      return t("App access approval");
+    },
     detailLabel: "App access request",
   },
 } satisfies Record<

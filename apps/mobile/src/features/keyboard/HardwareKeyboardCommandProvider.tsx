@@ -34,6 +34,8 @@ import {
 } from "./hardwareKeyboardCommands";
 import { selectWorkspaceDetail } from "../layout/workspace/workspace-detail-selection";
 
+import { t } from "../../i18n/gt";
+
 const EMPTY_COPY_FEEDBACK: GitActionProgress = {
   phase: "idle",
   label: null,
@@ -147,7 +149,7 @@ export function HardwareKeyboardCommandProvider({
               : {
                   phase: "error",
                   label: copyTarget.failureTitle,
-                  description: "Try again.",
+                  description: t("Try again."),
                 },
           );
         });

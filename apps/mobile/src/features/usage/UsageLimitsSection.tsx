@@ -38,6 +38,7 @@ import {
 } from "./usageLimitsRefresh";
 import { usageProviderKind, useProviderColors } from "./usageProviders";
 import { Var, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const PACE_LABEL = { ahead: "ahead of pace", on: "on pace", under: "under pace" } as const;
 
@@ -88,7 +89,9 @@ function WindowRow(props: {
   return (
     <View className="gap-1">
       <View className="flex-row items-baseline justify-between gap-3">
-        <Text className="text-sm text-foreground">{window.label}</Text>
+        <Text translate={false} className="text-sm text-foreground">
+          {window.label}
+        </Text>
         <Text className="text-sm font-t3-medium tabular-nums text-foreground">
           <T>
             <Var>{remaining}</Var>% left
@@ -268,9 +271,9 @@ export function ResetCredits(props: {
 
   const confirm = (choice: ResetCreditChoice) => {
     if (!readEnvironmentScope(environmentId, AuthProvidersManageScope)) return;
-    Dialog.alert("Use a reset credit?", choice.confirmDescription, [
-      { text: "Cancel", style: "cancel" },
-      { text: "Use credit", onPress: () => void redeem(choice) },
+    Dialog.alert(t("Use a reset credit?"), choice.confirmDescription, [
+      { text: t("Cancel"), style: "cancel" },
+      { text: t("Use credit"), onPress: () => void redeem(choice) },
     ]);
   };
 
@@ -298,7 +301,7 @@ export function ResetCredits(props: {
                     : "text-sm font-t3-medium text-foreground"
                 }
               >
-                {busy ? "Using…" : choice.actionLabel}
+                {busy ? t("Using…") : choice.actionLabel}
               </Text>
             </Pressable>
           ) : null}

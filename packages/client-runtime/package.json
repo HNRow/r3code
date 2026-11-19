@@ -151,6 +151,14 @@
       "types": "./src/providerSkills.ts",
       "default": "./src/providerSkills.ts"
     },
+    "./pluginInventory": {
+      "types": "./src/pluginInventory.ts",
+      "default": "./src/pluginInventory.ts"
+    },
+    "./skillInventory": {
+      "types": "./src/skillInventory.ts",
+      "default": "./src/skillInventory.ts"
+    },
     "./providerUpdateRequiredModels": {
       "types": "./src/providerUpdateRequiredModels.ts",
       "default": "./src/providerUpdateRequiredModels.ts"

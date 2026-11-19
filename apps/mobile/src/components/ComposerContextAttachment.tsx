@@ -18,6 +18,7 @@ import { useAssetUrlState, useRefreshAssetUrl } from "../state/assets";
 import { AppText as Text } from "./ui/AppText";
 import { FilePreviewModal } from "./ui/FilePreviewModal";
 import { PresentationSource } from "./ui/NativePresentation";
+import { t } from "../i18n/gt";
 
 export function ComposerContextAttachment(props: {
   record: Extract<ComposerContextRecord, { attachmentId: string }>;
@@ -73,7 +74,7 @@ export function ComposerContextAttachment(props: {
     if (AsyncResult.isFailure(result)) {
       const cause = squashAtomCommandFailure(result);
       Dialog.alert(
-        "Could not open attachment",
+        t("Could not open attachment"),
         cause instanceof Error ? cause.message : "Try again.",
       );
     }
@@ -100,7 +101,7 @@ export function ComposerContextAttachment(props: {
       ) : null}
       {error || (!local && asset._tag === "Failure") ? (
         <Text className="text-foreground-muted">
-          {error ?? "Attachment unavailable. Reconnect and try again."}
+          {error ?? t("Attachment unavailable. Reconnect and try again.")}
         </Text>
       ) : null}
       <PresentationSource identifier={shareSourceIdentifier}>

@@ -29,6 +29,7 @@ import type { EnvironmentRuntimeState } from "../../state/remote-runtime-types";
 import { useEnvironmentScope } from "../../state/session";
 import { threadEnvironment } from "../../state/threads";
 import { useAtomCommand } from "../../state/use-atom-command";
+import { t } from "../../i18n/gt";
 
 type MenuAction = MenuProps["actions"][number];
 
@@ -87,9 +88,9 @@ export function useLinkedPullRequestActions(input: {
   const promptLink = () => {
     const { singular } = terminology;
     Dialog.prompt({
-      title: `Link ${singular}`,
-      message: `Paste a ${singular} URL, or enter 123 / #123 for this thread's repository.`,
-      placeholder: `${capitalizeTerm(singular)} URL or #42`,
+      title: t`Link ${singular}`,
+      message: t`Paste a ${singular} URL, or enter 123 / #123 for this thread's repository.`,
+      placeholder: t`${capitalizeTerm(singular)} URL or #42`,
       initialValue: "",
       confirmText: "Link",
       onConfirm: (reference) => {
@@ -99,11 +100,11 @@ export function useLinkedPullRequestActions(input: {
           hasProject: () => true,
         });
         if (resolved === null) {
-          Dialog.alert(`Couldn't link this ${singular}`, `Use a ${singular} URL, 123, or #123.`);
+          Dialog.alert(t`Couldn't link this ${singular}`, t`Use a ${singular} URL, 123, or #123.`);
           return;
         }
         if ("error" in resolved) {
-          Dialog.alert(`Couldn't link this ${singular}`, resolved.error);
+          Dialog.alert(t`Couldn't link this ${singular}`, resolved.error);
           return;
         }
         setLinked(resolved.link, true);
@@ -115,8 +116,8 @@ export function useLinkedPullRequestActions(input: {
     const open = link.snapshot === null || link.snapshot.state === "open";
     const watching = link.watch !== undefined;
     return [
-      { id: "copy", title: "Copy link", image: "link" },
-      { id: "browser", title: "Open in browser", image: "safari" },
+      { id: "copy", title: t("Copy link"), image: "link" },
+      { id: "browser", title: t("Open in browser"), image: "safari" },
       ...((watching ? canWatch : canStartWatch) && open
         ? [
             {
@@ -148,7 +149,7 @@ export function useLinkedPullRequestActions(input: {
             sourceControlClients.findByChangeRequestUrl(link.url) ??
             sourceControlClients.get(undefined)
           ).changeRequest;
-          Dialog.alert(`Unable to open ${shortLabel}`, `The ${singular} could not be opened.`);
+          Dialog.alert(t`Unable to open ${shortLabel}`, t`The ${singular} could not be opened.`);
         }
       });
     else if (action === "watch" && thread !== null)

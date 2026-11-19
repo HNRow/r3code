@@ -57,7 +57,7 @@ import {
 } from "./pullRequestList.logic";
 import { PullRequestActorAvatar } from "./pullRequestPresentation";
 import { PullRequestGlyph } from "./pullRequestIcons";
-import { T, useGT, Var } from "gt-react";
+import { T, useGT, Var, t } from "gt-react";
 
 export interface PullRequestFilterOption<Value extends string> {
   readonly value: Value;
@@ -150,23 +150,89 @@ export const pullRequestProjectKey = (project: {
 }) => JSON.stringify([project.environmentId, project.id]);
 
 const DRAFT_OPTIONS = [
-  { value: UNFILTERED_VALUE, label: "All", Icon: LayersIcon },
-  { value: "only", label: "Drafts only", Icon: PullRequestGlyph.draft },
-  { value: "hide", label: "Hide drafts", Icon: EyeOffIcon },
+  {
+    value: UNFILTERED_VALUE,
+    get label() {
+      return t("All");
+    },
+    Icon: LayersIcon,
+  },
+  {
+    value: "only",
+    get label() {
+      return t("Drafts only");
+    },
+    Icon: PullRequestGlyph.draft,
+  },
+  {
+    value: "hide",
+    get label() {
+      return t("Hide drafts");
+    },
+    Icon: EyeOffIcon,
+  },
 ] as const satisfies ReadonlyArray<PullRequestFilterOption<string>>;
 
 const REVIEW_OPTIONS = [
-  { value: UNFILTERED_VALUE, label: "All", Icon: LayersIcon },
-  { value: "approved", label: "Approved", Icon: CircleCheckIcon },
-  { value: "changes-requested", label: "Changes requested", Icon: CircleXIcon },
-  { value: "review-required", label: "Review required", Icon: CircleDashedIcon },
-  { value: "none", label: "No reviews", Icon: CircleSlashIcon },
+  {
+    value: UNFILTERED_VALUE,
+    get label() {
+      return t("All");
+    },
+    Icon: LayersIcon,
+  },
+  {
+    value: "approved",
+    get label() {
+      return t("Approved");
+    },
+    Icon: CircleCheckIcon,
+  },
+  {
+    value: "changes-requested",
+    get label() {
+      return t("Changes requested");
+    },
+    Icon: CircleXIcon,
+  },
+  {
+    value: "review-required",
+    get label() {
+      return t("Review required");
+    },
+    Icon: CircleDashedIcon,
+  },
+  {
+    value: "none",
+    get label() {
+      return t("No reviews");
+    },
+    Icon: CircleSlashIcon,
+  },
 ] as const satisfies ReadonlyArray<PullRequestFilterOption<string>>;
 
 const CHECKS_OPTIONS = [
-  { value: UNFILTERED_VALUE, label: "All", Icon: LayersIcon },
-  { value: "passing", label: "Passing", Icon: CircleCheckIcon },
-  { value: "failing", label: "Failing", Icon: CircleXIcon },
+  {
+    value: UNFILTERED_VALUE,
+    get label() {
+      return t("All");
+    },
+    Icon: LayersIcon,
+  },
+  {
+    value: "passing",
+    get label() {
+      return t("Passing");
+    },
+    Icon: CircleCheckIcon,
+  },
+  {
+    value: "failing",
+    get label() {
+      return t("Failing");
+    },
+    Icon: CircleXIcon,
+  },
 ] as const satisfies ReadonlyArray<PullRequestFilterOption<string>>;
 
 function PullRequestFilterRadioGroup<Value extends string>({
@@ -338,7 +404,9 @@ function PullRequestAuthorChoices({
         ))}
         {visible.length === 0 && !hosted.isPending ? (
           <MenuItem disabled>
-            {hosted.error === null ? "No authors found" : "Couldn't search authors on the host"}
+            {hosted.error === null
+              ? t("No authors found")
+              : t("Couldn't search authors on the host")}
           </MenuItem>
         ) : null}
       </MenuRadioGroup>
@@ -365,7 +433,7 @@ function PullRequestAuthorFilter({
           <T>Author</T>
         </span>
         <span className="min-w-0 max-w-32 truncate text-xs text-muted-foreground">
-          {value ?? "Anyone"}
+          {value ?? t("Anyone")}
         </span>
       </MenuSubTrigger>
       <MenuSubPopup>
@@ -414,7 +482,7 @@ function PullRequestLabelChoices({
       />
       {visible.length === 0 && !hosted.isPending ? (
         <MenuItem disabled>
-          {hosted.error === null ? "No labels found" : "Couldn't search labels on the host"}
+          {hosted.error === null ? t("No labels found") : t("Couldn't search labels on the host")}
         </MenuItem>
       ) : null}
       {visible.map((option) => {
@@ -471,7 +539,7 @@ function PullRequestLabelFilter({
           <T>Labels</T>
         </span>
         <span className="text-xs text-muted-foreground">
-          {value.length === 0 ? "Any" : `${value.length} selected`}
+          {value.length === 0 ? t("Any") : `${value.length} selected`}
         </span>
       </MenuSubTrigger>
       <MenuSubPopup>
@@ -564,7 +632,7 @@ export function PullRequestFiltersMenu({
       ? ALL_PROJECTS_VALUE
       : pullRequestProjectKey({ id: projectId, environmentId: projectEnvironmentId });
   const projectOptions: ReadonlyArray<PullRequestFilterOption<string>> = [
-    { value: ALL_PROJECTS_VALUE, label: "All projects", Icon: LayersIcon },
+    { value: ALL_PROJECTS_VALUE, label: t("All projects"), Icon: LayersIcon },
     ...projects
       .toSorted(
         (left, right) =>

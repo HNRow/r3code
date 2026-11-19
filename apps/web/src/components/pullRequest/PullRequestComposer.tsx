@@ -17,7 +17,7 @@ import {
   usePullRequestReviewStore,
 } from "./pullRequestReviewStore";
 import { pullRequestCompletionScope } from "./PullRequestMarkdownTextarea";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 export function PullRequestComposer({
   environmentId,
@@ -123,7 +123,7 @@ export function PullRequestComposer({
                 <T>Comment</T>
               </Toggle>
               <Toggle value="review">
-                {pendingComments.length > 0 ? `Review (${pendingComments.length})` : "Review"}
+                {pendingComments.length > 0 ? `Review (${pendingComments.length})` : t("Review")}
               </Toggle>
             </ToggleGroup>
           ) : (

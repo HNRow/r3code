@@ -16,6 +16,7 @@ import type {
   AgentActivityProps,
   AgentActivityRowProps,
 } from "./AgentActivity";
+import { DEFAULT_AGENT_ACTIVITY_LABELS, formatLabelCount } from "./agentActivityLabels";
 
 // Home-screen and Lock Screen counterpart of the AgentActivity Live Activity.
 // It shares the Live Activity's name, but expo-widgets stores widget and Live
@@ -28,6 +29,7 @@ export function AgentActivityWidget(
   // The extension evaluates this function without the app's module scope.
   // Before the app's first publish, the embedded layout renders with no props.
   const props = publishedProps ?? {};
+  const labels = props.labels ?? DEFAULT_AGENT_ACTIVITY_LABELS;
   const family = environment.widgetFamily;
   const accessory = family === "accessoryRectangular";
   const small = family === "systemSmall";
@@ -79,20 +81,27 @@ export function AgentActivityWidget(
   ).length;
   const summary =
     attentionCount > 0
-      ? `${attentionCount} need${attentionCount === 1 ? "s" : ""} ${small ? "you" : "attention"}`
+      ? formatLabelCount(
+          small
+            ? attentionCount === 1
+              ? labels.needYouOne
+              : labels.needYouMany
+            : attentionCount === 1
+              ? labels.needAttentionOne
+              : labels.needAttentionMany,
+          attentionCount,
+        )
       : workingCount > 0
-        ? `${props.activeCount ?? workingCount} active`
+        ? formatLabelCount(labels.active, props.activeCount ?? workingCount)
         : rows.some((row) => row.phase === "stale")
-          ? "Out of date"
+          ? labels.outOfDate
           : rows.some((row) => row.phase === "failed")
-            ? "Failed"
+            ? labels.failed
             : rows.length > 0
-              ? "Done"
+              ? labels.done
               : "";
   const summaryTint = rows[0] ? phaseTint(rows[0].phase) : secondaryForeground;
-  const emptyMessage = loaded
-    ? (props.subtitle ?? "No active agents")
-    : "Open R3 Code to load agent activity";
+  const emptyMessage = loaded ? (props.subtitle ?? labels.noActiveAgents) : labels.loadActivity;
 
   // Widget taps open the containing app, and every build accepts the prod
   // scheme as a link prefix, so dev and preview builds route this too.

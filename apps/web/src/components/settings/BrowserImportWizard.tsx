@@ -37,7 +37,7 @@ import {
   type WizardTargetSelection,
   type WizardStep,
 } from "./browserImportWizard.logic";
-import { Var, T, useGT } from "gt-react";
+import { Var, T, useGT, t } from "gt-react";
 
 export type { WizardTarget } from "./browserImportWizard.logic";
 
@@ -299,8 +299,8 @@ function FullDiskAccessStep({
                   aria-hidden="true"
                 />
               ),
-              title: "Full Disk Access",
-              description: `Read ${source.name}'s cookies for this import.`,
+              title: t("Full Disk Access"),
+              description: t`Read ${source.name}'s cookies for this import.`,
               granted: permission.status.fullDiskAccess,
               onAllow: () => void allow(),
             },
@@ -314,8 +314,12 @@ function FullDiskAccessStep({
         {!permission.isReady(["fullDiskAccess"]) ? (
           <p className="mt-3 text-xs text-muted-foreground">
             {stillRequired
-              ? "Access is still required. Quit and reopen R3 Code if you just allowed it, then retry the import."
-              : "If access doesn't update after you allow it, quit and reopen R3 Code, then retry the import."}
+              ? t(
+                  "Access is still required. Quit and reopen R3 Code if you just allowed it, then retry the import.",
+                )
+              : t(
+                  "If access doesn't update after you allow it, quit and reopen R3 Code, then retry the import.",
+                )}
           </p>
         ) : null}
       </DialogPanel>
@@ -520,15 +524,15 @@ function CheckingStep({
         </DialogTitle>
         <DialogDescription>
           {check === "fullDiskAccess"
-            ? "Checking Full Disk Access."
-            : "Checking whether the browser has closed."}
+            ? t("Checking Full Disk Access.")
+            : t("Checking whether the browser has closed.")}
         </DialogDescription>
       </DialogHeader>
       <DialogPanel>
         <div className="flex items-center gap-3 py-2">
           <Spinner size="md" tone="muted" />
           <span className="text-sm text-muted-foreground">
-            {check === "fullDiskAccess" ? "Checking access…" : "Checking…"}
+            {check === "fullDiskAccess" ? t("Checking access…") : t("Checking…")}
           </span>
         </div>
       </DialogPanel>
@@ -559,7 +563,7 @@ function DoneStep({
             ? `Imported ${cookieResultCount(imported)}`
             : skipped > 0
               ? `Skipped ${cookieResultCount(skipped)}`
-              : "No cookies found"}
+              : t("No cookies found")}
         </DialogTitle>
         <DialogDescription>
           {imported > 0

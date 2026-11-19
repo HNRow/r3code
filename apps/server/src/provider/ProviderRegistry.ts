@@ -15,6 +15,7 @@ import * as Duration from "effect/Duration";
 import * as Deferred from "effect/Deferred";
 import * as Effect from "effect/Effect";
 import * as Equal from "effect/Equal";
+import * as Exit from "effect/Exit";
 import * as Fiber from "effect/Fiber";
 import * as FileSystem from "effect/FileSystem";
 import * as Layer from "effect/Layer";
@@ -46,6 +47,7 @@ import type {
   ProviderInstance,
   ProviderWorkspaceSnapshot,
 } from "@t3tools/provider-core/server/driver";
+import type { ProviderDriverError } from "@t3tools/provider-core/server/errors";
 import {
   makeManualOnlyProviderMaintenanceCapabilities,
   type ProviderMaintenanceCapabilities,
@@ -93,6 +95,14 @@ export class ProviderRegistry extends Context.Service<
       readonly scanCwd?: string;
       readonly fresh?: boolean;
     }) => Effect.Effect<ReadonlyArray<ServerProvider>>;
+
+    /** Shares the same scan but returns its failure instead of restoring cached providers. */
+    readonly refreshWorkspaceSnapshotStrict: (input: {
+      readonly instanceId: ProviderInstanceId;
+      readonly cwd: string;
+      readonly scanCwd?: string;
+      readonly fresh?: boolean;
+    }) => Effect.Effect<ReadonlyArray<ServerProvider>, ProviderDriverError>;
 
     /**
      * Drop T3-owned model caches before an explicit model refresh. Pass the
@@ -492,7 +502,10 @@ export const layer = Layer.effect(
       bootProviders.map((provider) => classifyCompatibility(provider, initialManifest)),
     );
     const workspaceRefreshesRef = yield* Ref.make<
-      ReadonlyMap<ProviderInstance, ReadonlyMap<string, Deferred.Deferred<void>>>
+      ReadonlyMap<
+        ProviderInstance,
+        ReadonlyMap<string, Deferred.Deferred<void, ProviderDriverError>>
+      >
     >(new Map());
     const workspaceRescans = yield* Queue.unbounded<{
       readonly instance: ProviderInstance;
@@ -1138,7 +1151,7 @@ export const layer = Layer.effect(
       if (input.rescan && (input.rescan !== instance || (!runningScan && !scannedFrom))) {
         return providers;
       }
-      const token = yield* Deferred.make<void>();
+      const token = yield* Deferred.make<void, ProviderDriverError>();
       // A machine refresh can change this cwd's snapshot, so the scan publishes against the result.
       const refreshMachineSnapshot = input.fresh
         ? (instance.invalidateCaches ?? Effect.void).pipe(
@@ -1197,7 +1210,7 @@ export const layer = Layer.effect(
             }),
           ),
         ),
-        Effect.ensuring(
+        Effect.onExit((exit) =>
           Ref.update(workspaceRefreshesRef, (refreshes) => {
             const current = refreshes.get(instance);
             if (current?.get(input.cwd) !== token) return refreshes;
@@ -1207,7 +1220,7 @@ export const layer = Layer.effect(
             if (nextCwds.size) next.set(instance, nextCwds);
             else next.delete(instance);
             return next;
-          }).pipe(Effect.andThen(Deferred.succeed(token, undefined))),
+          }).pipe(Effect.andThen(Deferred.done(token, Exit.asVoid(exit)))),
         ),
       );
       // The claim and the fork happen together, so the token is always completed. The scan is
@@ -1224,7 +1237,7 @@ export const layer = Layer.effect(
           });
           if (inFlight) return { inFlight } as const;
           return {
-            // Starting now attaches the scan's `ensuring` before anything can close the scope.
+            // Starting now attaches the scan's `onExit` before anything can close the scope.
             scan: yield* Effect.forkIn(runScan, serviceScope, { startImmediately: true }),
           } as const;
         }),
@@ -1292,6 +1305,7 @@ export const layer = Layer.effect(
         applySecretAndRefresh(reference, value).pipe(Effect.catchCause(recoverRefreshFailure)),
       refreshWorkspaceSnapshot: (input) =>
         refreshWorkspaceSnapshot(input).pipe(Effect.catchCause(recoverRefreshFailure)),
+      refreshWorkspaceSnapshotStrict: refreshWorkspaceSnapshot,
       refreshAfterUpdate,
       invalidateModelCaches,
       refreshModelCatalog: refreshModelCatalog().pipe(

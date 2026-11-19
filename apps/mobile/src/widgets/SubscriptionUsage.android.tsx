@@ -21,14 +21,16 @@ import {
 } from "@expo/ui/jetpack-compose/modifiers";
 import { createWidget, type WidgetEnvironment } from "expo-widgets";
 
-import type {
-  SubscriptionUsageSnapshot as SubscriptionUsageProps,
-  WidgetLimitAccount,
+import {
+  DEFAULT_SUBSCRIPTION_USAGE_LABELS,
+  type SubscriptionUsageSnapshot as SubscriptionUsageProps,
+  type WidgetLimitAccount,
 } from "./subscriptionUsageSnapshot";
 
 export function SubscriptionUsage(props: SubscriptionUsageProps, environment: WidgetEnvironment) {
   "widget";
   // The widget runtime evaluates this function without the app's module scope.
+  const labels = props.labels ?? DEFAULT_SUBSCRIPTION_USAGE_LABELS;
   const now = Date.now();
   const mode = props.theme?.mode;
   const appearance =
@@ -55,8 +57,8 @@ export function SubscriptionUsage(props: SubscriptionUsageProps, environment: Wi
         error: material.error,
       };
   const providers = props.providers ?? [
-    { name: "Codex", detail: "Open T3 to connect", windows: [], expiresAt: 0, totalWindows: 0 },
-    { name: "Claude", detail: "Open T3 to connect", windows: [], expiresAt: 0, totalWindows: 0 },
+    { name: "Codex", detail: labels.openToConnect, windows: [], expiresAt: 0, totalWindows: 0 },
+    { name: "Claude", detail: labels.openToConnect, windows: [], expiresAt: 0, totalWindows: 0 },
   ];
 
   const pad = 14;
@@ -327,7 +329,7 @@ export function SubscriptionUsage(props: SubscriptionUsageProps, environment: Wi
           {shown.map(row)}
           {hidden > 0 ? (
             <Text color={colors.muted} maxLines={1} style={{ fontSize: 10 }}>
-              {`${hidden} more in T3`}
+              {labels.moreInT3.replace("%count%", String(hidden))}
             </Text>
           ) : null}
         </Column>
@@ -338,8 +340,16 @@ export function SubscriptionUsage(props: SubscriptionUsageProps, environment: Wi
           modifiers={[height(footer)]}
         >
           {props.checkedAt
-            ? `As of ${new Date(props.checkedAt).toLocaleString(undefined, { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })}`
-            : "Tap to connect in T3"}
+            ? labels.asOf.replace(
+                "%time%",
+                new Date(props.checkedAt).toLocaleString(undefined, {
+                  hour: "numeric",
+                  minute: "2-digit",
+                  month: "short",
+                  day: "numeric",
+                }),
+              )
+            : labels.tapToConnect}
         </Text>
       </Column>
     </Button>

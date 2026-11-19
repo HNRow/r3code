@@ -1,4 +1,4 @@
-import { msg } from "gt-react";
+import { t } from "gt-react";
 import type {
   ServerProvider,
   ServerProviderVersionAdvisory,
@@ -94,7 +94,7 @@ export function getProviderSummary(provider: ServerProvider | undefined) {
   if (provider.auth.status === "authenticated") {
     const authLabel = provider.auth.label ?? provider.auth.type;
     return {
-      headline: authLabel ? `Authenticated · ${authLabel}` : msg("Authenticated"),
+      headline: authLabel ? `Authenticated · ${authLabel}` : t("Authenticated"),
       detail: provider.message ?? null,
     };
   }

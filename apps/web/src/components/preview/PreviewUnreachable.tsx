@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 
 import { describePreviewError } from "./errorCodeMessages";
-import { T, Var } from "gt-react";
+import { T, Var, t } from "gt-react";
 
 interface Props {
   url: string;
@@ -108,7 +108,7 @@ export function PreviewUnreachable({ url, code, description, onReload, move }: P
             size="sm"
             onClick={() => setShowDetails((value) => !value)}
           >
-            {showDetails ? "Hide details" : "Details"}
+            {showDetails ? t("Hide details") : t("Details")}
           </Button>
           <div className="flex-1" />
           {move ? (

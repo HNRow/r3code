@@ -56,7 +56,7 @@ import { Label } from "./ui/label";
 import { MiddleTruncate } from "./ui/middle-truncate";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "./ui/select";
 import { Toggle, ToggleGroup } from "./ui/toggle-group";
-import { T, Var, useGT } from "gt-react";
+import { T, Var, useGT, t } from "gt-react";
 
 interface AddProjectToMachineRequest {
   readonly projectRef: ScopedProjectRef;
@@ -274,7 +274,7 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
                     kind={resolveEnvironmentMachineKind(source?.serverConfig ?? null)}
                     className="size-3.5 shrink-0"
                   />
-                  <span className="truncate">{source?.label ?? "This machine"}</span>
+                  <span className="truncate">{source?.label ?? t("This machine")}</span>
                 </span>
                 <span className="flex min-w-0 font-mono text-muted-foreground text-xs">
                   <MiddleTruncate value={project?.workspaceRoot ?? ""} />
@@ -325,7 +325,7 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
                     {target ? (
                       <EnvironmentMachineIcon kind={target.machine} className="size-3.5 shrink-0" />
                     ) : null}
-                    <span className="truncate">{target?.label ?? "No machine available"}</span>
+                    <span className="truncate">{target?.label ?? t("No machine available")}</span>
                   </span>
                 )}
                 <span className="flex min-w-0 font-mono text-muted-foreground text-xs">
@@ -391,7 +391,7 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
                         </T>
                       </span>
                       <Button type="button" variant="ghost" size="xs" onClick={toggleShownFiles}>
-                        {allCopyableSelected ? "None" : "All"}
+                        {allCopyableSelected ? t("None") : t("All")}
                       </Button>
                     </>
                   ) : null}
@@ -418,10 +418,10 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
                 ) : files.length === 0 ? (
                   <p className="text-muted-foreground text-xs">
                     {!ignoredFiles.isSuccess
-                      ? "Finding ignored files…"
+                      ? t("Finding ignored files…")
                       : searching
-                        ? "No ignored files match."
-                        : "No ignored files to copy."}
+                        ? t("No ignored files match.")
+                        : t("No ignored files to copy.")}
                   </p>
                 ) : (
                   <div className="max-h-52 overflow-y-auto rounded-md border">
@@ -440,7 +440,7 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
                   <p className="text-muted-foreground text-xs">
                     <T>
                       Showing the first <Var>{files.length}</Var> files.
-                      <Var>{canSearchFiles ? " Search to find the rest." : ""}</Var>
+                      <Var>{canSearchFiles ? t(" Search to find the rest.") : ""}</Var>
                     </T>
                   </p>
                 ) : null}
@@ -460,7 +460,7 @@ function AddProjectToMachineDialog({ request }: { request: AddProjectToMachineRe
               <T>Cancel</T>
             </Button>
             <Button type="submit" disabled={unavailable || submitting}>
-              {submitting ? "Starting…" : `Clone to ${target?.label ?? "machine"}`}
+              {submitting ? t("Starting…") : `Clone to ${target?.label ?? "machine"}`}
             </Button>
           </DialogFooter>
         </form>
@@ -515,7 +515,7 @@ function IgnoredFileRow({
       />
       <span className="min-w-0 flex-1 truncate font-mono text-xs">{file.path}</span>
       <span className="shrink-0 text-muted-foreground text-xs tabular-nums">
-        {tooLarge ? "Over 1 MB" : formatBytes(file.byteLength)}
+        {tooLarge ? t("Over 1 MB") : formatBytes(file.byteLength)}
       </span>
     </label>
   );

@@ -48,6 +48,27 @@ export const AgentSessionScanResult = Schema.Struct({
 });
 export type AgentSessionScanResult = typeof AgentSessionScanResult.Type;
 
+export const AgentSessionListInput = Schema.Struct({
+  projectId: ProjectId,
+});
+export type AgentSessionListInput = typeof AgentSessionListInput.Type;
+
+export const AgentSessionRecentSession = Schema.Struct({
+  source: AgentSessionSource,
+  providerSessionId: TrimmedNonEmptyString,
+  /** Null for sessions imported earlier; their title lives on the imported thread. */
+  title: Schema.NullOr(Schema.String),
+  lastActiveAt: Schema.NullOr(IsoDateTime),
+  alreadyImported: Schema.Boolean,
+});
+export type AgentSessionRecentSession = typeof AgentSessionRecentSession.Type;
+
+export const AgentSessionListResult = Schema.Struct({
+  sessions: Schema.Array(AgentSessionRecentSession),
+  scannedAt: IsoDateTime,
+});
+export type AgentSessionListResult = typeof AgentSessionListResult.Type;
+
 export const AgentSessionImportInput = Schema.Struct({
   projectId: ProjectId,
   expectedWorkspaceRoot: Schema.optional(TrimmedNonEmptyString),

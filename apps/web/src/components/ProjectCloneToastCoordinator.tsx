@@ -27,6 +27,7 @@ import { useAtomCommand } from "../state/use-atom-command";
 import { type DraftId, useComposerDraftStore } from "../composerDraftStore";
 import { toastManager } from "./ui/toast";
 import { stackedThreadToast } from "./ui/toastHelpers";
+import { t } from "gt-react";
 
 export function ProjectCloneToastCoordinator() {
   const { environments } = useEnvironments();
@@ -120,7 +121,7 @@ function EnvironmentCloneToasts({ environmentId }: { environmentId: EnvironmentI
       if (clone.phase === "running") {
         const options = stackedThreadToast({
           type: "loading",
-          title: `Cloning ${name}`,
+          title: t`Cloning ${name}`,
           description: projectCloneProgressSummary(clone),
           timeout: 0,
           actionProps: {
@@ -146,7 +147,7 @@ function EnvironmentCloneToasts({ environmentId }: { environmentId: EnvironmentI
       if (clone.phase === "done") {
         const options = stackedThreadToast({
           type: "success",
-          title: `Cloned ${name}`,
+          title: t`Cloned ${name}`,
           description: clone.destinationPath,
           timeout: 8_000,
           actionProps: {

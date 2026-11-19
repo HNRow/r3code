@@ -60,7 +60,7 @@ import { readProject } from "../state/entities";
 import { getDesktopSnapShotBridge } from "../lib/desktopSnapShot";
 import { isChunkLoadError } from "../lib/chunkReloadGuard";
 import { shouldResumeSnapShotSetupOnStartup } from "../lib/snapShotSetupResume";
-import { T, Var, useGT } from "gt-react";
+import { T, Var, useGT, t } from "gt-react";
 
 export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
@@ -286,7 +286,7 @@ function CopyErrorButton({ report }: { report: string }) {
   return (
     <Button size="sm" variant="outline" onClick={() => copyToClipboard(report)}>
       {isCopied ? <CheckIcon className="text-success" /> : <CopyIcon />}
-      {isCopied ? "Copied" : "Copy error"}
+      {isCopied ? t("Copied") : t("Copy error")}
     </Button>
   );
 }

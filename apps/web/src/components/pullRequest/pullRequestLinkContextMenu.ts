@@ -8,6 +8,7 @@ import { writeTextToClipboard } from "~/hooks/useCopyToClipboard";
 import { readLocalApi } from "~/localApi";
 
 import { toastManager } from "../ui/toast";
+import { t } from "gt-react";
 
 export type PullRequestLinkContextMenuAction = "copy-link" | "open-external";
 
@@ -18,7 +19,7 @@ function pullRequestLinkContextMenuItems(
   openLabel: string,
 ): readonly ContextMenuItem<PullRequestLinkContextMenuAction>[] {
   return [
-    { id: "copy-link", label: "Copy link", icon: "copy" },
+    { id: "copy-link", label: t("Copy link"), icon: "copy" },
     { id: "open-external", label: openLabel },
   ];
 }

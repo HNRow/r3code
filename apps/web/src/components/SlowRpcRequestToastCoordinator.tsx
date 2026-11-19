@@ -1,6 +1,6 @@
 import { type SlowRpcAckRequest, subscribeSlowRpcAckRequests } from "../rpc/requestLatencyState";
 import { toastManager } from "./ui/toast";
-import { Var, T } from "gt-react";
+import { Var, T, t } from "gt-react";
 
 function describeSlowRequests(requests: ReadonlyArray<SlowRpcAckRequest>): string {
   const count = requests.length;
@@ -52,7 +52,7 @@ export function startSlowRpcRequestToasts(): () => void {
       },
       description: describeSlowRequests(slowRequests),
       timeout: 0,
-      title: "Some requests are slow",
+      title: t("Some requests are slow"),
       type: "warning" as const,
     };
 

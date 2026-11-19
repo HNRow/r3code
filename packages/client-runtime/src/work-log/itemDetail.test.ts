@@ -2,7 +2,12 @@ import { describe, expect, it } from "vite-plus/test";
 import { ThreadId, TurnItemId, type OrchestrationV2TurnItem } from "@t3tools/contracts";
 import * as DateTime from "effect/DateTime";
 
-import { isJsonToolText, turnItemOutputImages, turnItemOutputText } from "./itemDetail.ts";
+import {
+  isJsonToolText,
+  restartNoticeForItem,
+  turnItemOutputImages,
+  turnItemOutputText,
+} from "./itemDetail.ts";
 
 describe("isJsonToolText", () => {
   it.each([
@@ -180,5 +185,53 @@ describe("MCP app tool output", () => {
       ],
     });
     expect(turnItemOutputText(bounded)).toBe("chart\n[image]");
+  });
+});
+
+describe("restartNoticeForItem", () => {
+  const restart = {
+    cancelledWork: [{ kind: "shell" as const, label: "pnpm run check:changed" }],
+    settled: false,
+  };
+
+  it("reads the server's structured list instead of walking runs", () => {
+    expect(
+      restartNoticeForItem({ type: "notification", source: { kind: "system" }, restart }),
+    ).toEqual({ state: "structured", ...restart });
+  });
+
+  it("keeps a settled restart distinct from a resume", () => {
+    expect(
+      restartNoticeForItem({
+        type: "notification",
+        source: { kind: "system" },
+        restart: { cancelledWork: [{ kind: "monitor", label: "PR watch" }], settled: true },
+      }),
+    ).toEqual({
+      state: "structured",
+      cancelledWork: [{ kind: "monitor", label: "PR watch" }],
+      settled: true,
+    });
+  });
+
+  it("recognises a notification written before the restart field existed", () => {
+    expect(
+      restartNoticeForItem({
+        type: "notification",
+        source: { kind: "system" },
+        summary: "R3 Code restarted and resumed this turn",
+      }),
+    ).toEqual({ state: "legacy" });
+    expect(
+      restartNoticeForItem({ type: "notification", source: { kind: "system" }, summary: "Other" }),
+    ).toBeNull();
+    expect(
+      restartNoticeForItem({
+        type: "notification",
+        source: { kind: "background_command" },
+        restart,
+      }),
+    ).toBeNull();
+    expect(restartNoticeForItem({ type: "system_notice", source: { kind: "system" } })).toBeNull();
   });
 });

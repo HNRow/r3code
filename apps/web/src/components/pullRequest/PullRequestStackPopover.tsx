@@ -6,7 +6,7 @@ import { Menu, MenuTrigger, MenuPopup, MenuGroup, MenuGroupLabel, MenuItem } fro
 import { PullRequestStackLayers } from "./PullRequestStackLayers";
 import { PullRequestStackHeader } from "./PullRequestStackHeader";
 import { PullRequestGlyph } from "./pullRequestIcons";
-import { T, Var } from "gt-react";
+import { T, Var, t } from "gt-react";
 
 // Mount only on open to avoid per-row stack fetches.
 function StackBody({
@@ -43,7 +43,7 @@ function StackBody({
       <PullRequestStackHeader number={stackNumber} />
       <MenuGroupLabel>
         {query.error ??
-          (query.isPending ? "Loading stack…" : "This pull request is no longer in a stack.")}
+          (query.isPending ? t("Loading stack…") : t("This pull request is no longer in a stack."))}
       </MenuGroupLabel>
     </>
   );

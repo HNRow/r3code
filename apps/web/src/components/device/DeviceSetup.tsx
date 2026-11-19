@@ -14,7 +14,7 @@ import { deviceEnvironment, deviceHostProbeAtom, NO_DEVICE_PROBE_ATOM } from "~/
 import { useAtomCommand } from "~/state/use-atom-command";
 import { readEnvironmentScope, useEnvironmentScope } from "~/state/session";
 import { cn } from "~/lib/utils";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 const platformName = (platform: DevicePlatform) => (platform === "ios" ? "iOS" : "Android");
 
@@ -90,7 +90,7 @@ export function platformSetupStatus(state: DeviceServiceState, platform: DeviceP
   if (platform === "android" && !hasDevices && isAndroidDiscoveryUncertain(state)) {
     return {
       ready: false,
-      message: "The Android device list may be incomplete. Check the device host and try again.",
+      message: t("The Android device list may be incomplete. Check the device host and try again."),
     };
   }
   const availabilities = state.hosts.flatMap((host) =>
@@ -120,7 +120,7 @@ export function platformSetupStatus(state: DeviceServiceState, platform: DeviceP
     ) {
       return {
         ready: false,
-        message: `No ${platformName(platform)} devices were listed because device discovery reported a problem.`,
+        message: t`No ${platformName(platform)} devices were listed because device discovery reported a problem.`,
       };
     }
     return {
@@ -291,7 +291,7 @@ export function DeviceSetup(props: {
             disabled={!canConfigure || !ready || pending !== null}
             onClick={() => void update("complete", { onboardingCompleted: true })}
           >
-            {pending === "complete" ? "Saving…" : "Done"}
+            {pending === "complete" ? t("Saving…") : t("Done")}
           </Button>
         )}
       </WizardFooter>
@@ -315,16 +315,16 @@ export function DeviceHubSetupStatus({
       {pending
         ? state.hostStatus === "installing"
           ? compact
-            ? "Installing…"
-            : "Installing device hub…"
+            ? t("Installing…")
+            : t("Installing device hub…")
           : state.hostStatus === "starting"
             ? compact
-              ? "Starting…"
-              : "Starting device hub…"
+              ? t("Starting…")
+              : t("Starting device hub…")
             : compact
-              ? "Updating…"
-              : "Updating device hub…"
-        : "Device hub is ready."}
+              ? t("Updating…")
+              : t("Updating device hub…")
+        : t("Device hub is ready.")}
     </p>
   );
 }
@@ -345,7 +345,7 @@ function DevicePlatformSetup(props: {
       </p>
       <Button size="compact" variant="outline" disabled={props.disabled} onClick={props.onCheck}>
         {props.checking ? <Spinner size="xs" /> : null}
-        {props.checking ? "Checking…" : "Check again"}
+        {props.checking ? t("Checking…") : t("Check again")}
       </Button>
     </div>
   );
@@ -410,7 +410,7 @@ function PlatformStatus(props: {
       <div className={cn(props.compact && props.status.ready && "flex items-center gap-2")}>
         <p className="font-medium">{props.platform}</p>
         <p className="text-xs text-muted-foreground">
-          {props.compact && props.status.ready ? "Ready" : props.status.message}
+          {props.compact && props.status.ready ? t("Ready") : props.status.message}
         </p>
       </div>
     </div>

@@ -43,6 +43,7 @@ import { useThreadListNow } from "./use-thread-list-now";
 import { useThreadListV2ShelfPreferences } from "./use-thread-list-v2-shelf-preferences";
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const keyOf = (thread: EnvironmentThreadShell) => scopedThreadKey(thread.environmentId, thread.id);
 type Section = "pinned" | "active" | "snoozed" | "settled";
@@ -137,8 +138,8 @@ function DragHandle(props: {
         accessibilityState={{ disabled: props.disabled }}
         accessibilityActions={[
           ...props.sectionActions,
-          ...(props.canMoveUp ? [{ name: "decrement", label: "Move up" }] : []),
-          ...(props.canMoveDown ? [{ name: "increment", label: "Move down" }] : []),
+          ...(props.canMoveUp ? [{ name: "decrement", label: t("Move up") }] : []),
+          ...(props.canMoveDown ? [{ name: "increment", label: t("Move down") }] : []),
         ]}
         onAccessibilityAction={({ nativeEvent }) => {
           if (props.disabled) return;
@@ -487,7 +488,7 @@ function ThreadArrangementSheet(props: { onClose: () => void }) {
                       >
                         {thread ? (
                           <>
-                            <Text numberOfLines={2} className="flex-1 text-base">
+                            <Text translate={false} numberOfLines={2} className="flex-1 text-base">
                               {thread.title}
                             </Text>
                             <DragHandle
@@ -544,9 +545,9 @@ function ThreadArrangementSheet(props: { onClose: () => void }) {
                           >
                             <Text className="text-sm text-foreground-muted">
                               {olderSettledShelf.loading
-                                ? "Loading"
+                                ? t("Loading")
                                 : olderSettledShelf.failed
-                                  ? "Could not load older threads. Retry"
+                                  ? t("Could not load older threads. Retry")
                                   : `Show more (${settledCount - visibleSettled.length} settled hidden)`}
                             </Text>
                           </Pressable>
@@ -580,6 +581,7 @@ function ThreadArrangementSheet(props: { onClose: () => void }) {
                     style={{ top: 0, height: rowHeight, transform: [{ translateY }] }}
                   >
                     <Text
+                      translate={false}
                       numberOfLines={visiblePreview.destination?.section ? 1 : 2}
                       className="text-base font-t3-medium"
                     >

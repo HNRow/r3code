@@ -10,7 +10,7 @@ import { FileMarkdownPreview } from "./FileMarkdownPreview";
 import { FilePreviewLoading, FilePreviewNotice } from "./FilePreviewFeedback";
 import { SourceFileSurface } from "./SourceFileSurface";
 import { WorkspaceFileWebPreview } from "./WorkspaceFileWebPreview";
-import { useGT, T } from "gt-react-native";
+import { useGT } from "gt-react-native";
 
 export function nativeViewerKind(kind: ReturnType<typeof useAttachmentDocument>["kind"]) {
   if (kind === "image") return "image" as const;
@@ -66,7 +66,7 @@ export function AttachmentDocumentBody(props: {
       <View className="flex-1 bg-sheet">
         {content.truncated ? (
           <FilePreviewNotice title={gt("Partial file")}>
-            <T>Preview limited to the first 1 MB. Save or share the file to read it in full.</T>
+            {gt("Preview limited to the first 1 MB. Save or share the file to read it in full.")}
           </FilePreviewNotice>
         ) : null}
         {table && document.activeMode === "table" ? (

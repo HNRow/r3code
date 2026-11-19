@@ -21,6 +21,7 @@ import { SubagentRow } from "./SubagentRow";
 import { WorkLogBlock } from "./work-log-layout";
 import { useOpenLinkedThread } from "./useOpenLinkedThread";
 import { T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const FOLDED_SCRIPT_LINES = 10;
 
@@ -194,7 +195,7 @@ function WorkflowScript(props: { readonly script: string }) {
           className="self-start py-1 active:opacity-70"
         >
           <Text className="font-t3-medium text-xs text-foreground-muted">
-            {expanded ? "Show less" : "Show full script"}
+            {expanded ? t("Show less") : t("Show full script")}
           </Text>
         </Pressable>
       ) : null}

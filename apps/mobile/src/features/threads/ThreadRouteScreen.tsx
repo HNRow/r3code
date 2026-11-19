@@ -132,6 +132,7 @@ import { useThreadStatusAnnouncements } from "./useThreadStatusAnnouncements";
 import type { ThreadInspectorMode, ThreadInspectorTarget } from "./thread-inspector-navigation";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 function firstRouteParam(value: string | string[] | undefined): string | null {
   const first = Array.isArray(value) ? value[0] : value;
@@ -413,23 +414,23 @@ function ThreadRouteContent(
   });
   const interruptThreadTurn = useAtomCommand(threadEnvironment.interruptTurn, "thread interrupt");
   const resumeThreadQueue = useAtomCommand(threadEnvironment.resumeThreadQueue, {
-    label: "resume queue",
+    label: t("resume queue"),
     reportFailure: false,
   });
   const continueThreadRun = useAtomCommand(threadEnvironment.startTurn, {
-    label: "continue thread",
+    label: t("continue thread"),
     reportFailure: false,
   });
   const setThreadRuntimeMode = useAtomCommand(threadEnvironment.setRuntimeMode, {
-    label: "set thread runtime mode",
+    label: t("set thread runtime mode"),
     reportFailure: false,
   });
   const setThreadInteractionMode = useAtomCommand(threadEnvironment.setInteractionMode, {
-    label: "set thread interaction mode",
+    label: t("set thread interaction mode"),
     reportFailure: false,
   });
   const loadEarlierHistory = useAtomCommand(threadEnvironment.loadEarlierHistory, {
-    label: "load earlier thread history",
+    label: t("load earlier thread history"),
     reportFailure: false,
   });
   const historyControls = (() => {
@@ -709,7 +710,7 @@ function ThreadRouteContent(
     if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
       const error = squashAtomCommandFailure(result);
       Dialog.alert(
-        "Could not resume thread",
+        t("Could not resume thread"),
         error instanceof Error ? error.message : "Try again.",
       );
     }
@@ -846,7 +847,7 @@ function ThreadRouteContent(
       await recoverFailedThreadDraft(creation);
     } catch (error) {
       Dialog.alert(
-        "Could not restore draft",
+        t("Could not restore draft"),
         error instanceof Error ? error.message : String(error),
       );
       return;

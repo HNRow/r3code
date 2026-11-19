@@ -4,6 +4,7 @@ import {
 } from "@t3tools/client-runtime/state/composer-dispatch";
 
 import type { FollowUpBehavior } from "../../lib/followUpBehavior";
+import { t } from "../../i18n/gt";
 
 export interface ComposerSendPresentation {
   readonly label: string;
@@ -33,7 +34,7 @@ export function resolveComposerSendPresentation(input: {
 }): ComposerSendPresentation {
   if (input.editingQueuedMessage) {
     return {
-      label: "Update queued message",
+      label: t("Update queued message"),
       icon: "checkmark",
       action: null,
       alternate: null,

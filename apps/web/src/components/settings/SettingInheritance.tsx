@@ -22,7 +22,7 @@ import { useOptionalSettingsScope } from "./SettingsScopeContext";
 import type { ProjectOverrideEntry, ScopedSettingsTarget } from "./scopedSettings";
 import { isProjectScopedSettingKey } from "./scopedSettings";
 import { settingsScopeEnvironmentLabels } from "./settingsScopeAxis";
-import { msg, T, useMessages, Var } from "gt-react";
+import { T, useMessages, Var, t } from "gt-react";
 
 interface InheritanceLayer {
   readonly key: "project" | "environment" | "t3.json" | "built-in";
@@ -33,22 +33,36 @@ interface InheritanceLayer {
 }
 
 const WRITING_STYLE_LABELS: Record<string, string> = {
-  repo_conventions: msg("Repository conventions"),
-  conventional_commits: msg("Conventional Commits"),
-  custom: msg("Custom instructions"),
+  get repo_conventions() {
+    return t("Repository conventions");
+  },
+  get conventional_commits() {
+    return t("Conventional Commits");
+  },
+  get custom() {
+    return t("Custom instructions");
+  },
 };
 
 const BACKGROUND_ACTIVITY_PROFILE_LABELS: Record<string, string> = {
-  balanced: msg("Balanced"),
-  performance: msg("Performance"),
-  "battery-saver": msg("Battery saver"),
-  custom: msg("Advanced"),
+  get balanced() {
+    return t("Balanced");
+  },
+  get performance() {
+    return t("Performance");
+  },
+  get "battery-saver"() {
+    return t("Battery saver");
+  },
+  get custom() {
+    return t("Advanced");
+  },
 };
 
 function formatValue(key: keyof ServerSettings, value: unknown): string {
   if (value === null || value === undefined) {
     return key === "pullRequestMergeMethod"
-      ? msg("Last selected")
+      ? t("Last selected")
       : key === "sidebarAutoSettleAfterDays"
         ? "Never"
         : key === "defaultModelSelection"
@@ -111,7 +125,7 @@ export function settingInheritanceLayers(
   if (target.projectId !== null && isProjectScopedSettingKey(key)) {
     layers.push({
       key: "project",
-      label: "Project",
+      label: t("Project"),
       value: source === "project" ? formatValue(key, target.settings[key]) : "Inherits",
       effective: source === "project",
       set: source === "project",
@@ -139,7 +153,7 @@ export function settingInheritanceLayers(
     : DEFAULT_SERVER_SETTINGS[key];
   layers.push({
     key: "built-in",
-    label: "Default",
+    label: t("Default"),
     value: formatValue(key, builtIn),
     effective: source === "environment" && !environmentSet,
     set: true,
@@ -292,7 +306,7 @@ export function SettingInheritance({
                         layer.effective ? "font-medium text-foreground" : "text-muted-foreground",
                       )}
                     >
-                      {layer.key === "environment" ? "Environment" : layer.label}
+                      {layer.key === "environment" ? t("Environment") : layer.label}
                     </span>
                     <span
                       className={cn(
@@ -345,7 +359,7 @@ export function SettingInheritance({
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {winningLayer?.key === "environment"
-                              ? "Environment"
+                              ? t("Environment")
                               : winningLayer?.label}
                           </span>
                           <ChevronRightIcon

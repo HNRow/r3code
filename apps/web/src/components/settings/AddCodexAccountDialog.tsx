@@ -20,7 +20,7 @@ import { Input } from "../ui/input";
 import { WizardFooter, WizardHeader, WizardPanel, WizardPopup } from "../ui/wizard";
 import { MultipleAccountsNote } from "./MultipleAccountsNote";
 import { SettingsRow } from "./settingsLayout";
-import { useGT, T, msg } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 const CODEX_DRIVER_KIND = ProviderDriverKind.make("codex");
 
@@ -92,7 +92,7 @@ export function AddCodexAccountDialog({
     >
       <WizardPopup size="wide">
         <WizardHeader
-          title={instanceId ? displayName : msg("Add ChatGPT account")}
+          title={instanceId ? displayName : t("Add ChatGPT account")}
           description={gt(
             "Each account has its own Codex instance and sign-in. Choose the other account on the sign-in page.",
           )}
@@ -148,7 +148,7 @@ export function AddCodexAccountDialog({
                 form="add-codex-account"
                 disabled={pending || !name.trim() || !canManageProviders}
               >
-                {pending ? "Adding account…" : "Continue"}
+                {pending ? t("Adding account…") : t("Continue")}
               </Button>
             </>
           )}

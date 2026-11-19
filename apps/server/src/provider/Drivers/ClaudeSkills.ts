@@ -1,4 +1,12 @@
-import type { ClaudeSettings, ServerProviderSkill } from "@t3tools/contracts";
+import {
+  ProviderDriverKind,
+  type ClaudeSettings,
+  type ProviderInstanceId,
+  type ServerProviderSkill,
+  type SkillInventory,
+  type SkillInventoryEntry,
+} from "@t3tools/contracts";
+import { applyEdits, modify } from "jsonc-parser";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
@@ -11,8 +19,10 @@ import { SKILL_MENTION_PATTERN } from "@t3tools/shared/composerInlineTokens";
 import { parse as parseYamlDocument } from "yaml";
 
 import { expandHomePath } from "@t3tools/provider-core/server/pathExpansion";
+import { randomUuidV4 } from "@t3tools/provider-core/server/randomUuid";
 
 import { claudeAccountConfigPath, readClaudeOauthAccount } from "../claudeResetCredits.ts";
+import { ProviderDriverError } from "../Errors.ts";
 
 type ClaudeSkillScope = "user" | "project";
 
@@ -20,6 +30,8 @@ type ClaudeSkillRoot = {
   readonly directory: string;
   readonly scope: ClaudeSkillScope;
   readonly prefix?: string;
+  readonly managed?: boolean;
+  readonly manageable?: boolean;
 };
 
 const FRONTMATTER_PATTERN = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/;
@@ -273,6 +285,7 @@ const readSkillSettings = Effect.fn("readSkillSettings")(function* (
   const enabledPlugins = new Map<string, boolean>();
   const managedPluginNames = new Set<string>();
   const managedPaths = new Set(claudeManagedSettingsPaths(path, platform, environment));
+  const diagnostics: string[] = [];
   let syncedPluginsHidden = false;
   const repositoryRoot = cwd === undefined ? undefined : yield* findRepositoryRoot(cwd);
   const projectSettingsPath =
@@ -286,26 +299,27 @@ const readSkillSettings = Effect.fn("readSkillSettings")(function* (
     environment,
     repositoryRoot,
   )) {
-    const contents = yield* fileSystem
-      .readFileString(settingsPath)
-      .pipe(Effect.orElseSucceed(() => undefined));
-    if (contents === undefined) {
+    const contents = yield* fileSystem.readFileString(settingsPath).pipe(Effect.result);
+    if (contents._tag === "Failure") {
+      if (contents.failure.reason._tag !== "NotFound") {
+        diagnostics.push(`Could not read Claude settings file '${settingsPath}'.`);
+      }
       continue;
     }
 
-    const parsed = yield* decodeSkillSettings(contents).pipe(
-      Effect.tapError((cause) =>
-        Effect.logDebug("claude settings file is unreadable; ignoring skill settings", {
-          path: settingsPath,
-          cause,
-        }),
-      ),
-      Effect.orElseSucceed(() => undefined),
-    );
-    for (const [name, value] of Object.entries(parsed?.skillOverrides ?? {})) {
+    const parsed = yield* decodeSkillSettings(contents.success).pipe(Effect.result);
+    if (parsed._tag === "Failure") {
+      diagnostics.push(`Could not parse Claude settings file '${settingsPath}'.`);
+      yield* Effect.logDebug("claude settings file is unreadable; ignoring skill settings", {
+        path: settingsPath,
+        cause: parsed.failure,
+      });
+      continue;
+    }
+    for (const [name, value] of Object.entries(parsed.success.skillOverrides ?? {})) {
       overridesByName.set(name, parseSkillOverride(value));
     }
-    for (const [key, enabled] of Object.entries(parsed?.enabledPlugins ?? {})) {
+    for (const [key, enabled] of Object.entries(parsed.success.enabledPlugins ?? {})) {
       if (typeof enabled === "boolean") {
         enabledPlugins.set(key, enabled);
         if (managedPaths.has(settingsPath) && key.includes("@")) {
@@ -317,7 +331,7 @@ const readSkillSettings = Effect.fn("readSkillSettings")(function* (
       }
     }
     // Claude ignores this switch in shared project settings, and honors only false.
-    if (parsed?.syncClaudeAiPlugins === false && settingsPath !== projectSettingsPath) {
+    if (parsed.success.syncClaudeAiPlugins === false && settingsPath !== projectSettingsPath) {
       syncedPluginsHidden = true;
     }
   }
@@ -327,12 +341,14 @@ const readSkillSettings = Effect.fn("readSkillSettings")(function* (
     enabledPlugins,
     managedPluginNames,
     syncedPluginsHidden,
+    diagnostics,
   };
 });
 
 const InstalledPlugins = Schema.fromJsonString(
   Schema.Struct({ plugins: Schema.Record(Schema.String, Schema.Array(Schema.Unknown)) }),
 );
+const decodeInstalledPlugins = Schema.decodeEffect(InstalledPlugins);
 const decodeInstalledPlugin = Schema.decodeUnknownOption(
   Schema.Struct({
     scope: Schema.Literals(["user", "project", "local", "managed"]),
@@ -535,12 +551,22 @@ const discoverPluginSkillRoots = Effect.fn("discoverPluginSkillRoots")(function*
   const pluginsPath = pluginDirectory
     ? path.resolve(cwd ?? ".", expandHomePath(pluginDirectory, home))
     : path.join(configDirPath, "plugins");
-  const installed = yield* fileSystem
-    .readFileString(path.join(pluginsPath, "installed_plugins.json"))
-    .pipe(
-      Effect.flatMap(Schema.decodeUnknownEffect(InstalledPlugins)),
-      Effect.orElseSucceed(() => undefined),
-    );
+  const registryPath = path.join(pluginsPath, "installed_plugins.json");
+  const registryContents = yield* fileSystem.readFileString(registryPath).pipe(Effect.result);
+  const diagnostics: string[] = [];
+  let installed: typeof InstalledPlugins.Type | undefined;
+  if (registryContents._tag === "Failure") {
+    if (registryContents.failure.reason._tag !== "NotFound") {
+      diagnostics.push(`Could not read Claude plugin registry '${registryPath}'.`);
+    }
+  } else {
+    const decoded = yield* decodeInstalledPlugins(registryContents.success).pipe(Effect.result);
+    if (decoded._tag === "Failure") {
+      diagnostics.push(`Could not parse Claude plugin registry '${registryPath}'.`);
+    } else {
+      installed = decoded.success;
+    }
+  }
   const roots: Array<ClaudeSkillRoot> = [];
   // An enabled inline plugin replaces installed and synced plugins of the same name.
   const claimedPluginNames = new Set(inlinePluginNames);
@@ -588,7 +614,7 @@ const discoverPluginSkillRoots = Effect.fn("discoverPluginSkillRoots")(function*
     if (Option.isSome(existing)) claimedPluginNames.add(pluginNameKey(prefix));
     roots.push(...(yield* pluginSkillRoots(installPath, scope, prefix, manifest)));
   }
-  if (syncedBucket === undefined) return roots;
+  if (syncedBucket === undefined) return { roots, diagnostics };
 
   const syncedPath = path.join(configDirPath, "plugins", "synced");
   const bucketPath = path.join(syncedPath, syncedBucket);
@@ -600,7 +626,7 @@ const discoverPluginSkillRoots = Effect.fn("discoverPluginSkillRoots")(function*
   const hasBucketMarker = yield* fileSystem
     .exists(path.join(syncedPath, `.bucket-${syncedBucket}`))
     .pipe(Effect.orElseSucceed(() => false));
-  if (!hasBucketMarker) return roots;
+  if (!hasBucketMarker) return { roots, diagnostics };
   const synced = yield* fileSystem.readFileString(path.join(bucketPath, "manifest.json")).pipe(
     Effect.flatMap(Schema.decodeUnknownEffect(SyncedPlugins)),
     Effect.orElseSucceed(() => undefined),
@@ -624,7 +650,7 @@ const discoverPluginSkillRoots = Effect.fn("discoverPluginSkillRoots")(function*
     claimedPluginNames.add(key);
     roots.push(...(yield* pluginSkillRoots(pluginPath, "user", prefix, manifest)));
   }
-  return roots;
+  return { roots, diagnostics };
 });
 
 const resolveClaudeConfigDirPath = Effect.fn("resolveClaudeConfigDirPath")(function* (
@@ -717,17 +743,22 @@ export function claudeLaunchArgDirectories(launchArgs?: string): ReadonlyArray<s
   return directories;
 }
 
-/** First name wins: managed skills, then user skills, then project skills. */
-export const discoverClaudeSkills = Effect.fn("discoverClaudeSkills")(function* (
+type ScannedClaudeSkill = {
+  readonly skill: ServerProviderSkill;
+  readonly directory: string;
+  readonly root: ClaudeSkillRoot;
+};
+
+const claudeSkillDiscoveryRoots = Effect.fn("claudeSkillDiscoveryRoots")(function* (
   config: Pick<ClaudeSettings, "homePath"> & Partial<Pick<ClaudeSettings, "launchArgs">>,
   cwd?: string,
   environment?: NodeJS.ProcessEnv,
-): Effect.fn.Return<ReadonlyArray<ServerProviderSkill>, never, FileSystem.FileSystem | Path.Path> {
+) {
   const fileSystem = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
   const env = environment ?? process.env;
   const configDirPath = yield* resolveClaudeConfigDirPath(config, env, cwd);
-  const { skillOverrides, enabledPlugins, managedPluginNames, syncedPluginsHidden } =
+  const { skillOverrides, enabledPlugins, managedPluginNames, syncedPluginsHidden, diagnostics } =
     yield* readSkillSettings(configDirPath, cwd, env);
   const managedDirectory = claudeManagedDirectory(path, yield* HostProcess.Platform, env);
   // Most installs have no synced folder; skip reading `.claude.json` for them.
@@ -748,13 +779,35 @@ export const discoverClaudeSkills = Effect.fn("discoverClaudeSkills")(function* 
     enabledPlugins,
     managedPluginNames,
   );
+  const pluginSkills = yield* discoverPluginSkillRoots(
+    configDirPath,
+    cwd,
+    enabledPlugins,
+    inlinePlugins.names,
+    syncedBucket,
+    env,
+  );
 
   const roots: ReadonlyArray<ClaudeSkillRoot> = [
     ...(managedDirectory
-      ? [{ directory: path.join(managedDirectory, ".claude", "skills"), scope: "user" as const }]
+      ? [
+          {
+            directory: path.join(managedDirectory, ".claude", "skills"),
+            scope: "user" as const,
+            managed: true,
+          },
+        ]
       : []),
-    { directory: path.join(configDirPath, "skills"), scope: "user" },
-    ...(cwd ? [{ directory: path.join(cwd, ".claude", "skills"), scope: "project" as const }] : []),
+    { directory: path.join(configDirPath, "skills"), scope: "user", manageable: true },
+    ...(cwd
+      ? [
+          {
+            directory: path.join(cwd, ".claude", "skills"),
+            scope: "project" as const,
+            manageable: true,
+          },
+        ]
+      : []),
     ...claudeLaunchArgDirectories(config.launchArgs)
       .filter((directory) => directory && (cwd || path.isAbsolute(directory)))
       .map((directory) => ({
@@ -762,42 +815,80 @@ export const discoverClaudeSkills = Effect.fn("discoverClaudeSkills")(function* 
         scope: "project" as const,
       })),
     ...inlinePlugins.roots,
-    ...(yield* discoverPluginSkillRoots(
-      configDirPath,
-      cwd,
-      enabledPlugins,
-      inlinePlugins.names,
-      syncedBucket,
-      env,
-    )),
+    ...pluginSkills.roots,
   ];
+  return {
+    roots,
+    skillOverrides,
+    diagnostics: [...diagnostics, ...pluginSkills.diagnostics],
+  };
+});
 
-  const skillsByName = new Map<string, ServerProviderSkill>();
+const scanClaudeSkills = Effect.fn("scanClaudeSkills")(function* (
+  config: Pick<ClaudeSettings, "homePath"> & Partial<Pick<ClaudeSettings, "launchArgs">>,
+  cwd?: string,
+  environment?: NodeJS.ProcessEnv,
+): Effect.fn.Return<
+  {
+    readonly skills: ReadonlyArray<ScannedClaudeSkill>;
+    readonly diagnostics: ReadonlyArray<string>;
+  },
+  never,
+  FileSystem.FileSystem | Path.Path
+> {
+  const fileSystem = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
+  const discovery = yield* claudeSkillDiscoveryRoots(config, cwd, environment);
+  const { roots, skillOverrides } = discovery;
+  const skills: ScannedClaudeSkill[] = [];
+  const diagnostics = [...discovery.diagnostics];
   for (const root of roots) {
-    const singleSkill =
-      root.prefix !== undefined &&
-      (yield* fileSystem
-        .exists(path.join(root.directory, "SKILL.md"))
-        .pipe(Effect.orElseSucceed(() => false)));
+    const rootSkillPath = path.join(root.directory, "SKILL.md");
+    const rootSkillInfo =
+      root.prefix === undefined
+        ? undefined
+        : yield* fileSystem.stat(rootSkillPath).pipe(Effect.result);
+    if (rootSkillInfo?._tag === "Failure" && rootSkillInfo.failure.reason._tag !== "NotFound") {
+      diagnostics.push(`Could not read Claude skill file '${rootSkillPath}'.`);
+    }
+    const singleSkill = rootSkillInfo?._tag === "Success" && rootSkillInfo.success.type === "File";
+    const entriesResult = singleSkill
+      ? undefined
+      : yield* fileSystem.readDirectory(root.directory).pipe(Effect.result);
+    if (entriesResult?._tag === "Failure" && entriesResult.failure.reason._tag !== "NotFound") {
+      diagnostics.push(`Could not read Claude skill directory '${root.directory}'.`);
+    }
     const entries = singleSkill
       ? [path.basename(root.directory)]
-      : yield* fileSystem
-          .readDirectory(root.directory)
-          .pipe(Effect.orElseSucceed((): ReadonlyArray<string> => []));
+      : entriesResult?._tag === "Success"
+        ? entriesResult.success
+        : [];
 
     for (const entry of [...entries].sort()) {
-      const skillPath = singleSkill
-        ? path.join(root.directory, "SKILL.md")
-        : path.join(root.directory, entry, "SKILL.md");
-      const contents = yield* fileSystem
-        .readFileString(skillPath)
-        .pipe(Effect.orElseSucceed(() => undefined));
-      if (contents === undefined) {
+      const directory = singleSkill ? root.directory : path.join(root.directory, entry);
+      if (!singleSkill) {
+        const directoryInfo = yield* fileSystem.stat(directory).pipe(Effect.result);
+        if (directoryInfo._tag === "Failure") {
+          if (directoryInfo.failure.reason._tag !== "NotFound") {
+            diagnostics.push(`Could not read Claude skill directory '${directory}'.`);
+          }
+          continue;
+        }
+        if (directoryInfo.success.type !== "Directory") continue;
+      }
+      const skillPath = path.join(directory, "SKILL.md");
+      const contentsResult = yield* fileSystem.readFileString(skillPath).pipe(Effect.result);
+      if (contentsResult._tag === "Failure") {
+        if (contentsResult.failure.reason._tag !== "NotFound") {
+          diagnostics.push(`Could not read Claude skill file '${skillPath}'.`);
+        }
         continue;
       }
+      const contents = contentsResult.success;
 
       const frontmatter = parseSkillFrontmatter(contents);
       if (frontmatter.kind === "malformed") {
+        diagnostics.push(`Malformed frontmatter in Claude skill file '${skillPath}'.`);
         continue;
       }
 
@@ -816,29 +907,319 @@ export const discoverClaudeSkills = Effect.fn("discoverClaudeSkills")(function* 
         if (mention?.[2] !== name) continue;
       }
 
-      if (skillsByName.has(name)) {
-        continue;
-      }
-
       const override = root.prefix ? undefined : skillOverrides.get(name);
       const userInvocationOnly =
         (frontmatter.kind === "parsed" && frontmatter.userInvocationOnly === true) ||
         override?.userInvocationOnly === true;
-      skillsByName.set(name, {
-        name,
-        path: skillPath,
-        enabled: override?.enabled ?? true,
-        scope: root.scope,
-        ...(frontmatter.kind === "parsed" && frontmatter.description
-          ? { description: frontmatter.description }
-          : {}),
-        ...(userInvocationOnly ? { userInvocationOnly: true } : {}),
-        ...(frontmatter.kind === "parsed" && frontmatter.userInvocable === false
-          ? { userInvocable: false }
-          : {}),
+      skills.push({
+        directory,
+        root,
+        skill: {
+          name,
+          path: skillPath,
+          enabled: override?.enabled ?? true,
+          scope: root.scope,
+          ...(frontmatter.kind === "parsed" && frontmatter.description
+            ? { description: frontmatter.description }
+            : {}),
+          ...(userInvocationOnly ? { userInvocationOnly: true } : {}),
+          ...(frontmatter.kind === "parsed" && frontmatter.userInvocable === false
+            ? { userInvocable: false }
+            : {}),
+        },
       });
     }
   }
+  return { skills, diagnostics };
+});
 
+/** First name wins: managed skills, then user skills, then project skills. */
+export const discoverClaudeSkills = Effect.fn("discoverClaudeSkills")(function* (
+  config: Pick<ClaudeSettings, "homePath"> & Partial<Pick<ClaudeSettings, "launchArgs">>,
+  cwd?: string,
+  environment?: NodeJS.ProcessEnv,
+): Effect.fn.Return<ReadonlyArray<ServerProviderSkill>, never, FileSystem.FileSystem | Path.Path> {
+  const skillsByName = new Map<string, ServerProviderSkill>();
+  const { skills } = yield* scanClaudeSkills(config, cwd, environment);
+  for (const { skill } of skills) {
+    if (!skillsByName.has(skill.name)) skillsByName.set(skill.name, skill);
+  }
   return [...skillsByName.values()].sort((left, right) => left.name.localeCompare(right.name));
+});
+
+const ClaudeInstallMarker = Schema.fromJsonString(
+  Schema.Struct({
+    version: Schema.Literal(1),
+    instanceId: Schema.String,
+    nativeId: Schema.String,
+    installedBy: Schema.Literal("r3-code"),
+  }),
+);
+const decodeClaudeInstallMarker = Schema.decodeUnknownEffect(ClaudeInstallMarker);
+
+// Untraced: full discovery may check a marker for every writable file skill.
+const hasValidClaudeInstallMarker = Effect.fnUntraced(function* (
+  directory: string,
+  name: string,
+  instanceId: ProviderInstanceId,
+) {
+  const fileSystem = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
+  const markerPath = path.join(directory, ".t3-skill-install.json");
+  const info = yield* fileSystem.lstat(markerPath).pipe(Effect.option);
+  if (info._tag === "None" || info.value.type !== "File") return false;
+  const marker = yield* fileSystem.readFileString(markerPath).pipe(
+    Effect.flatMap(decodeClaudeInstallMarker),
+    Effect.orElseSucceed(() => undefined),
+  );
+  return marker?.nativeId === name && marker.instanceId === instanceId;
+});
+
+export const discoverClaudeSkillInventory = Effect.fn("discoverClaudeSkillInventory")(function* (
+  config: Pick<ClaudeSettings, "homePath"> & Partial<Pick<ClaudeSettings, "launchArgs">>,
+  cwd?: string,
+  environment?: NodeJS.ProcessEnv,
+  instanceId?: ProviderInstanceId,
+): Effect.fn.Return<
+  Pick<SkillInventory, "entries" | "diagnostics">,
+  never,
+  FileSystem.FileSystem | Path.Path
+> {
+  const fileSystem = yield* FileSystem.FileSystem;
+  const entries: SkillInventoryEntry[] = [];
+  const names = new Set<string>();
+  const scanned = yield* scanClaudeSkills(config, cwd, environment);
+  for (const { skill, directory, root } of scanned.skills) {
+    const shadowed = names.has(skill.name);
+    names.add(skill.name);
+    const kind = root.prefix !== undefined ? "plugin" : root.managed === true ? "managed" : "file";
+    const fileEntry = kind === "file" && root.manageable === true && !shadowed;
+    const directoryType = fileEntry
+      ? yield* fileSystem.lstat(directory).pipe(
+          Effect.map((info) => info.type),
+          Effect.orElseSucceed(() => undefined),
+        )
+      : undefined;
+    const linked = directoryType === "SymbolicLink";
+    const canSetEnabled = fileEntry && directoryType === "Directory";
+    const canUninstall =
+      canSetEnabled &&
+      instanceId !== undefined &&
+      (yield* hasValidClaudeInstallMarker(directory, skill.name, instanceId));
+    const reason = shadowed
+      ? "A higher-precedence skill uses this name."
+      : linked
+        ? "Linked skills are read-only in the first version."
+        : canSetEnabled && !canUninstall
+          ? "Only skills installed by R3 Code can be uninstalled."
+          : "This source is read-only.";
+    entries.push({
+      instanceId: "claude",
+      cwd: cwd ?? "",
+      nativeId: root.manageable === true ? `${root.scope}:${skill.name}` : `${kind}:${skill.path}`,
+      name: skill.name,
+      ...(skill.description === undefined ? {} : { description: skill.description }),
+      source: {
+        kind,
+        scope: root.managed === true ? "managed" : root.scope,
+        path: directory,
+        ...(root.prefix === undefined ? {} : { containerId: root.prefix }),
+      },
+      state: shadowed ? "shadowed" : skill.enabled ? "enabled" : "disabled",
+      actions: {
+        canSetEnabled,
+        canUninstall,
+        ...(canSetEnabled && canUninstall ? {} : { reason }),
+      },
+    });
+  }
+  return { entries, diagnostics: scanned.diagnostics };
+});
+
+const CLAUDE_SKILL_NAME = /^[a-zA-Z0-9_-]+$/;
+
+const parseClaudeSkillNativeId = (nativeId: string) => {
+  const match = /^(user|project):([^:]+)$/.exec(nativeId);
+  const scope = match?.[1];
+  const name = match?.[2];
+  if ((scope !== "user" && scope !== "project") || !name || !CLAUDE_SKILL_NAME.test(name)) {
+    return undefined;
+  }
+  return { scope, name } as const;
+};
+
+const skillManagementError = (instanceId: ProviderInstanceId, detail: string, cause?: unknown) =>
+  new ProviderDriverError({
+    driver: ProviderDriverKind.make("claudeAgent"),
+    instanceId,
+    detail,
+    ...(cause === undefined ? {} : { cause }),
+  });
+
+export const makeClaudeSkillManagement = Effect.fn("makeClaudeSkillManagement")(function* (input: {
+  readonly instanceId: ProviderInstanceId;
+  readonly config: Pick<ClaudeSettings, "homePath"> & Partial<Pick<ClaudeSettings, "launchArgs">>;
+  readonly environment: NodeJS.ProcessEnv;
+}) {
+  const fileSystem = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
+  const resolveTarget = Effect.fn("ClaudeSkillManagement.resolveTarget")(function* (targetInput: {
+    readonly cwd: string;
+    readonly nativeId: string;
+  }) {
+    const parsed = parseClaudeSkillNativeId(targetInput.nativeId);
+    if (parsed === undefined) {
+      return yield* skillManagementError(input.instanceId, "Invalid Claude skill native id.");
+    }
+    const configRoot =
+      parsed.scope === "user"
+        ? yield* resolveClaudeConfigDirPath(input.config, input.environment, targetInput.cwd)
+        : yield* Effect.gen(function* () {
+            const realCwd = yield* fileSystem.realPath(path.resolve(targetInput.cwd));
+            const candidate = path.join(realCwd, ".claude");
+            const existing = yield* fileSystem.realPath(candidate).pipe(
+              Effect.catchIf(
+                (error) => error.reason._tag === "NotFound",
+                () => Effect.undefined,
+              ),
+            );
+            if (existing !== undefined && !isInsideDirectory(path, realCwd, existing)) {
+              return yield* skillManagementError(
+                input.instanceId,
+                "Project Claude directory escapes the workspace.",
+              );
+            }
+            return existing ?? candidate;
+          });
+    const root = path.join(configRoot, "skills");
+    return {
+      root,
+      directory: path.join(root, parsed.name),
+      quarantineRoot: path.join(configRoot, ".t3-code", "uninstalled-skills"),
+      name: parsed.name,
+    };
+  });
+
+  const resolveSyncRoots = Effect.fn("ClaudeSkillManagement.resolveSyncRoots")(function* (
+    cwd: string,
+  ) {
+    const configRoot = yield* resolveClaudeConfigDirPath(input.config, input.environment, cwd);
+    return {
+      configRoot,
+      skillsRoot: path.join(configRoot, "skills"),
+      backupRoot: path.join(configRoot, ".t3-code", "skill-sync-backups"),
+      rollbackRoot: path.join(configRoot, ".t3-code", "skill-sync-rollbacks"),
+    };
+  });
+
+  const validate = Effect.fn("ClaudeSkillManagement.validate")(function* (validateInput: {
+    readonly directory: string;
+  }) {
+    const contents = yield* fileSystem.readFileString(
+      path.join(validateInput.directory, "SKILL.md"),
+    );
+    if (parseSkillFrontmatter(contents).kind === "malformed") {
+      return yield* skillManagementError(input.instanceId, "Invalid Claude skill frontmatter.");
+    }
+  });
+
+  const setEnabled = Effect.fn("ClaudeSkillManagement.setEnabled")(function* (enabledInput: {
+    readonly cwd: string;
+    readonly nativeId: string;
+    readonly enabled: boolean;
+  }) {
+    const parsed = parseClaudeSkillNativeId(enabledInput.nativeId);
+    if (parsed === undefined) {
+      return yield* skillManagementError(input.instanceId, "Invalid Claude skill native id.");
+    }
+    const settingsPath =
+      parsed.scope === "user"
+        ? path.join(
+            yield* resolveClaudeConfigDirPath(input.config, input.environment, enabledInput.cwd),
+            "settings.json",
+          )
+        : path.join(enabledInput.cwd, ".claude", "settings.local.json");
+    const existingInfo = yield* fileSystem.lstat(settingsPath).pipe(Effect.option);
+    if (existingInfo._tag === "Some" && existingInfo.value.type !== "File") {
+      return yield* skillManagementError(input.instanceId, "Claude settings path is not a file.");
+    }
+    const contents = yield* fileSystem.readFileString(settingsPath).pipe(
+      Effect.catchIf(
+        (error) => error.reason._tag === "NotFound",
+        () => Effect.succeed(""),
+      ),
+    );
+    const updated = yield* Effect.try({
+      try: () =>
+        applyEdits(
+          contents,
+          modify(contents, ["skillOverrides", parsed.name], enabledInput.enabled ? "on" : "off", {
+            formattingOptions: {
+              insertSpaces: true,
+              tabSize: 2,
+              eol: contents.includes("\r\n") ? "\r\n" : "\n",
+            },
+          }),
+        ),
+      catch: (cause) =>
+        skillManagementError(input.instanceId, "Could not update Claude settings.", cause),
+    });
+    yield* fileSystem.makeDirectory(path.dirname(settingsPath), { recursive: true });
+    const staging = path.join(
+      path.dirname(settingsPath),
+      `.${path.basename(settingsPath)}.${yield* randomUuidV4}.t3-staging`,
+    );
+    yield* fileSystem
+      .writeFileString(staging, updated, {
+        mode: existingInfo._tag === "Some" ? existingInfo.value.mode : 0o600,
+      })
+      .pipe(
+        Effect.andThen(fileSystem.rename(staging, settingsPath)),
+        Effect.ensuring(fileSystem.remove(staging, { force: true }).pipe(Effect.ignore)),
+      );
+  });
+
+  return {
+    listDiscoveryRoots: (cwd: string) =>
+      claudeSkillDiscoveryRoots(input.config, cwd, input.environment).pipe(
+        Effect.map(({ roots }) => roots.map((root) => root.directory)),
+        Effect.provideService(FileSystem.FileSystem, fileSystem),
+        Effect.provideService(Path.Path, path),
+      ),
+    resolveTarget: (targetInput: Parameters<typeof resolveTarget>[0]) =>
+      resolveTarget(targetInput).pipe(
+        Effect.provideService(FileSystem.FileSystem, fileSystem),
+        Effect.provideService(Path.Path, path),
+        Effect.mapError((cause) =>
+          cause._tag === "ProviderDriverError"
+            ? cause
+            : skillManagementError(input.instanceId, "Could not resolve the skill target.", cause),
+        ),
+      ),
+    resolveSyncRoots: (cwd: string) =>
+      resolveSyncRoots(cwd).pipe(
+        Effect.provideService(FileSystem.FileSystem, fileSystem),
+        Effect.provideService(Path.Path, path),
+      ),
+    validate: (validateInput: Parameters<typeof validate>[0]) =>
+      validate(validateInput).pipe(
+        Effect.provideService(FileSystem.FileSystem, fileSystem),
+        Effect.provideService(Path.Path, path),
+        Effect.mapError((cause) =>
+          cause._tag === "ProviderDriverError"
+            ? cause
+            : skillManagementError(input.instanceId, "Could not validate the skill.", cause),
+        ),
+      ),
+    setEnabled: (enabledInput: Parameters<typeof setEnabled>[0]) =>
+      setEnabled(enabledInput).pipe(
+        Effect.provideService(FileSystem.FileSystem, fileSystem),
+        Effect.provideService(Path.Path, path),
+        Effect.mapError((cause) =>
+          cause._tag === "ProviderDriverError"
+            ? cause
+            : skillManagementError(input.instanceId, "Could not update Claude settings.", cause),
+        ),
+      ),
+  };
 });

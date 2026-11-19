@@ -7,6 +7,7 @@ import type {
   HomeListFilterMenuProject,
 } from "./home-list-filter-menu";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function ThreadListFilters(props: {
   readonly environments: ReadonlyArray<HomeListFilterMenuEnvironment>;
@@ -39,7 +40,7 @@ export function ThreadListFilters(props: {
         actions={[
           {
             id: "all",
-            title: "All environments",
+            title: t("All environments"),
             state: props.selectedEnvironmentId === null ? "on" : "off",
           },
           ...props.environments.map((environment) => ({
@@ -68,7 +69,7 @@ export function ThreadListFilters(props: {
         actions={[
           {
             id: "all",
-            title: "All projects",
+            title: t("All projects"),
             state: props.selectedProjectKey === null ? "on" : "off",
           },
           ...props.projects.map((project) => ({

@@ -146,7 +146,7 @@ import {
   type ConnectDeviceRevokeRequest,
   RevokeConnectDeviceDialog,
 } from "./RevokeConnectDeviceDialog";
-import { T, useGT, Var, msg, useMessages } from "gt-react";
+import { T, useGT, Var, useMessages, t } from "gt-react";
 
 // Sessions R3 Connect minted for a device signed in to the linked account.
 const CLOUD_CONNECT_SESSION_SUBJECT = "cloud-connect";
@@ -496,7 +496,7 @@ function ConnectionsSettingsContent({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not update network access",
+          title: t("Could not update network access"),
           description: message,
         }),
       );
@@ -536,7 +536,7 @@ function ConnectionsSettingsContent({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not set up Tailscale HTTPS",
+          title: t("Could not set up Tailscale HTTPS"),
           description: message,
         }),
       );
@@ -575,7 +575,7 @@ function ConnectionsSettingsContent({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not disable Tailscale HTTPS",
+          title: t("Could not disable Tailscale HTTPS"),
           description: message,
         }),
       );
@@ -603,7 +603,7 @@ function ConnectionsSettingsContent({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not revoke pairing link",
+          title: t("Could not revoke pairing link"),
           description: message,
         }),
       );
@@ -629,7 +629,7 @@ function ConnectionsSettingsContent({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not revoke client access",
+          title: t("Could not revoke client access"),
           description: message,
         }),
       );
@@ -650,7 +650,7 @@ function ConnectionsSettingsContent({
       toastManager.add({
         type: "success",
         title: result.value === 1 ? "Revoked 1 other client" : `Revoked ${result.value} clients`,
-        description: "Other paired clients will need a new pairing link before reconnecting.",
+        description: t("Other paired clients will need a new pairing link before reconnecting."),
       });
     } else if (!isAtomCommandInterrupted(result)) {
       const error = squashAtomCommandFailure(result);
@@ -659,7 +659,7 @@ function ConnectionsSettingsContent({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not revoke other clients",
+          title: t("Could not revoke other clients"),
           description: message,
         }),
       );
@@ -680,7 +680,7 @@ function ConnectionsSettingsContent({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: `Could not switch backend ${enabled ? "on" : "off"}`,
+          title: t`Could not switch backend ${enabled ? "on" : "off"}`,
           description: message,
         }),
       );
@@ -700,7 +700,7 @@ function ConnectionsSettingsContent({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not remove backend",
+          title: t("Could not remove backend"),
           description: message,
         }),
       );
@@ -846,7 +846,7 @@ function ConnectionsSettingsContent({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not change WSL backend",
+          title: t("Could not change WSL backend"),
           description: message,
         }),
       );
@@ -954,7 +954,7 @@ function ConnectionsSettingsContent({
                 onClick={loadWslState}
                 disabled={isLoadingWslState}
               >
-                {isLoadingWslState ? "Retrying…" : "Retry"}
+                {isLoadingWslState ? t("Retrying…") : t("Retry")}
               </Button>
             }
           />
@@ -1081,7 +1081,7 @@ function ConnectionsSettingsContent({
         tailscaleHttpsEndpoint
           ? tailscaleHttpsEndpoint.status === "available"
             ? tailscaleHttpsEndpoint.httpBaseUrl
-            : msg("Use Tailscale Serve to expose this backend through a MagicDNS HTTPS URL.")
+            : t("Use Tailscale Serve to expose this backend through a MagicDNS HTTPS URL.")
           : missingTailscaleEndpointDescription(desktopServerExposureState)
       }
       control={
@@ -1156,9 +1156,9 @@ function ConnectionsSettingsContent({
             }
           />
         ) : desktopServerExposureState ? (
-          msg("Limited to this machine.")
+          t("Limited to this machine.")
         ) : (
-          msg("Loading…")
+          t("Loading…")
         )
       }
       status={
@@ -1175,16 +1175,16 @@ function ConnectionsSettingsContent({
       title={m(searchableSetting("network-access").title)}
       description={
         desktopBridge
-          ? msg("This connection cannot view or change network exposure.")
+          ? t("This connection cannot view or change network exposure.")
           : isLocalBackendNetworkAccessible
-            ? msg(
+            ? t(
                 "Remote access is already configured. Change network exposure where the server starts.",
               )
             : currentAuthPolicy === "loopback-browser"
-              ? msg(
+              ? t(
                   "Only this machine can connect. Restart with a non-loopback host for remote pairing.",
                 )
-              : msg("Network exposure information is unavailable.")
+              : t("Network exposure information is unavailable.")
       }
       control={
         !desktopBridge &&
@@ -1427,13 +1427,17 @@ function ConnectionsSettingsContent({
               <AlertDialogHeader>
                 <AlertDialogTitle>
                   {pendingDesktopServerExposureMode === "network-accessible"
-                    ? "Enable network access?"
-                    : "Disable network access?"}
+                    ? gt("Enable network access?")
+                    : gt("Disable network access?")}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   {pendingDesktopServerExposureMode === "network-accessible"
-                    ? "Let your other devices connect to R3 Code over the network. Pair devices to give them access. R3 Code will restart."
-                    : "Devices connected over your local network will disconnect. Existing tunnels, such as R3 Connect or Tailscale HTTPS, keep working. R3 Code will restart."}
+                    ? gt(
+                        "Let your other devices connect to R3 Code over the network. Pair devices to give them access. R3 Code will restart.",
+                      )
+                    : gt(
+                        "Devices connected over your local network will disconnect. Existing tunnels, such as R3 Connect or Tailscale HTTPS, keep working. R3 Code will restart.",
+                      )}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -1457,10 +1461,10 @@ function ConnectionsSettingsContent({
                   {isUpdatingDesktopServerExposure && <Spinner size="sm" />}
                   <span className="[text-box:trim-both_cap_alphabetic]">
                     {isUpdatingDesktopServerExposure
-                      ? "Restarting…"
+                      ? gt("Restarting…")
                       : pendingDesktopServerExposureMode === "network-accessible"
-                        ? "Restart and enable"
-                        : "Restart and disable"}
+                        ? gt("Restart and enable")
+                        : gt("Restart and disable")}
                   </span>
                 </Button>
               </AlertDialogFooter>
@@ -1478,28 +1482,40 @@ function ConnectionsSettingsContent({
                 <AlertDialogTitle>
                   {pendingWslChange?.kind === "disable"
                     ? pendingWslChange.wasWslOnly
-                      ? "Turn off WSL and switch back to Windows?"
-                      : "Disable WSL backend?"
+                      ? gt("Turn off WSL and switch back to Windows?")
+                      : gt("Disable WSL backend?")
                     : pendingWslChange?.kind === "distro"
-                      ? "Switch WSL distro?"
+                      ? gt("Switch WSL distro?")
                       : pendingWslChange?.kind === "enable"
-                        ? "Start the WSL backend"
+                        ? gt("Start the WSL backend")
                         : pendingWslChange?.nextValue
-                          ? "Run only the WSL backend?"
-                          : "Re-enable the Windows backend?"}
+                          ? gt("Run only the WSL backend?")
+                          : gt("Re-enable the Windows backend?")}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   {pendingWslChange?.kind === "disable"
                     ? pendingWslChange.wasWslOnly
-                      ? "R3 Code will restart on the Windows backend. Threads and projects opened against WSL stay safe inside the distro and become available again when you re-enable WSL."
-                      : "The WSL backend will stop. Threads and projects opened against WSL stay safe inside the distro, but they'll be unavailable in R3 Code until you re-enable WSL."
+                      ? gt(
+                          "R3 Code will restart on the Windows backend. Threads and projects opened against WSL stay safe inside the distro and become available again when you re-enable WSL.",
+                        )
+                      : gt(
+                          "The WSL backend will stop. Threads and projects opened against WSL stay safe inside the distro, but they'll be unavailable in R3 Code until you re-enable WSL.",
+                        )
                     : pendingWslChange?.kind === "distro"
-                      ? "R3 Code will restart the WSL backend on the new distro. Sessions still running on the current distro will be interrupted."
+                      ? gt(
+                          "R3 Code will restart the WSL backend on the new distro. Sessions still running on the current distro will be interrupted.",
+                        )
                       : pendingWslChange?.kind === "enable"
-                        ? "Run the WSL backend alongside the Windows one, or stop the Windows backend and use only WSL? You can change this later from Settings."
+                        ? gt(
+                            "Run the WSL backend alongside the Windows one, or stop the Windows backend and use only WSL? You can change this later from Settings.",
+                          )
                         : pendingWslChange?.nextValue
-                          ? "R3 Code will restart and start only the WSL backend. Your Windows-side projects won't be accessible until you turn this off again."
-                          : "R3 Code will restart and bring the Windows backend back up alongside WSL."}
+                          ? gt(
+                              "R3 Code will restart and start only the WSL backend. Your Windows-side projects won't be accessible until you turn this off again.",
+                            )
+                          : gt(
+                              "R3 Code will restart and bring the Windows backend back up alongside WSL.",
+                            )}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -1524,7 +1540,7 @@ function ConnectionsSettingsContent({
                           </T>
                         </>
                       ) : (
-                        "Use only WSL"
+                        gt("Use only WSL")
                       )}
                     </Button>
                     <Button
@@ -1540,7 +1556,7 @@ function ConnectionsSettingsContent({
                           </T>
                         </>
                       ) : (
-                        "Run both backends"
+                        gt("Run both backends")
                       )}
                     </Button>
                   </>
@@ -1564,16 +1580,16 @@ function ConnectionsSettingsContent({
                       </>
                     ) : pendingWslChange?.kind === "disable" ? (
                       pendingWslChange.wasWslOnly ? (
-                        "Switch to Windows"
+                        gt("Switch to Windows")
                       ) : (
-                        "Disable WSL"
+                        gt("Disable WSL")
                       )
                     ) : pendingWslChange?.kind === "distro" ? (
-                      "Switch distro"
+                      gt("Switch distro")
                     ) : pendingWslChange?.nextValue ? (
-                      "Restart and enable"
+                      gt("Restart and enable")
                     ) : (
-                      "Restart and disable"
+                      gt("Restart and disable")
                     )}
                   </Button>
                 )}
@@ -1616,7 +1632,7 @@ function ConnectionsSettingsContent({
                       </T>
                     </>
                   ) : (
-                    "Restart and disable"
+                    gt("Restart and disable")
                   )}
                 </Button>
               </AlertDialogFooter>
@@ -1671,7 +1687,7 @@ function ConnectionsSettingsContent({
                     <TooltipTrigger
                       render={
                         <p className="mt-1 truncate text-sm text-foreground">
-                          {pendingTailscaleServeBaseUrl ?? "Pending MagicDNS endpoint"}
+                          {pendingTailscaleServeBaseUrl ?? t("Pending MagicDNS endpoint")}
                         </p>
                       }
                     />
@@ -1700,7 +1716,7 @@ function ConnectionsSettingsContent({
                       </T>
                     </>
                   ) : (
-                    "Enable"
+                    t("Enable")
                   )}
                 </Button>
               </DialogFooter>

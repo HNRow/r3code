@@ -75,7 +75,11 @@ export function ThreadStatusLine(props: {
   const body = (
     <>
       <SymbolView name={line.icon} size={13} tintColor={props.iconColor} type="monochrome" />
-      <Text className="shrink font-t3-medium text-xs text-foreground-muted" numberOfLines={1}>
+      <Text
+        translate={false}
+        className="shrink font-t3-medium text-xs text-foreground-muted"
+        numberOfLines={1}
+      >
         {line.label}
       </Text>
     </>

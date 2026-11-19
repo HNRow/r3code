@@ -334,10 +334,13 @@ export const continueRestartedRun = Effect.fn("RestartContinuation.continueResta
         notification: {
           source: { kind: "system" },
           outcome: "updated",
+          // 客户端按整句翻译，改文案要同步 apps/{web,mobile}/src/lib/timelineText.ts。
           summary: note.settled
             ? "R3 Code restarted and stopped background work"
             : "R3 Code restarted and resumed this turn",
           detail: text,
+          // 客户端只读这里，别在客户端重算合并链：它依赖 providerTurns 和 attempts。
+          restart: { cancelledWork: note.work, settled: note.settled },
         },
         attachments: [],
         modelSelection: source.modelSelection,

@@ -30,6 +30,7 @@ import { environmentPresentations } from "../../state/presentation";
 import { ResetCredits } from "./UsageLimitsSection";
 import { usageProviderKind, useProviderColors } from "./usageProviders";
 import { T, useGT, Var } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const PACE_LABEL = { ahead: "Ahead of pace", on: "On pace", under: "Under pace" } as const;
 
@@ -198,7 +199,9 @@ function PoolWindowCard({
       <View className={wide ? "gap-1" : "flex-row items-start justify-between gap-3"}>
         <View className="gap-1">
           {label !== null ? (
-            <Text className="text-sm font-t3-medium text-foreground">{label ?? pool.label}</Text>
+            <Text translate={false} className="text-sm font-t3-medium text-foreground">
+              {label ?? pool.label}
+            </Text>
           ) : null}
           <View className="flex-row items-baseline gap-1.5">
             <Text className="text-3xl font-t3-bold tabular-nums text-foreground">
@@ -269,6 +272,7 @@ function PoolWindowCard({
                   {account.email ? <AccountChip email={account.email} /> : null}
                   {account.email && !(account.displayName && inlineName) ? null : (
                     <Text
+                      translate={false}
                       numberOfLines={1}
                       className="min-w-0 shrink text-xs font-t3-medium text-foreground"
                     >
@@ -349,6 +353,7 @@ function PoolWindowCard({
               </Text>
             </View>
             <Text
+              translate={false}
               numberOfLines={1}
               className="min-w-0 flex-1 text-sm font-t3-medium text-foreground"
             >
@@ -433,8 +438,8 @@ export function UsageLimitsSection({
       externalLinks.length === 0 ? (
         <Text className="py-12 text-center text-base text-foreground-muted">
           {selected.size === 0
-            ? "Select an environment to see limits."
-            : "No provider on the selected environments reports subscription limits."}
+            ? t("Select an environment to see limits.")
+            : t("No provider on the selected environments reports subscription limits.")}
         </Text>
       ) : null}
       {pools.map((pool) => {
@@ -444,7 +449,7 @@ export function UsageLimitsSection({
             <View className="gap-3">
               <View className="flex-row items-center gap-2 px-1">
                 <ProviderIcon provider={pool.driver} size={18} />
-                <Text className="text-base font-t3-medium text-foreground">
+                <Text translate={false} className="text-base font-t3-medium text-foreground">
                   {providerClients.get(pool.driver)?.label ?? pool.driver}
                 </Text>
               </View>
@@ -565,7 +570,7 @@ export function UsageLimitAccountScreen({ route }: AccountScreenProps) {
             <View className="gap-2">
               <View className="flex-row items-center gap-2">
                 <ProviderIcon provider={account.driver} size={24} />
-                <Text className="flex-1 text-xl font-t3-bold text-foreground">
+                <Text translate={false} className="flex-1 text-xl font-t3-bold text-foreground">
                   {account.displayName ??
                     providerClients.get(account.driver)?.label ??
                     account.driver}
@@ -578,19 +583,21 @@ export function UsageLimitAccountScreen({ route }: AccountScreenProps) {
                   onPress={() => setRevealed((value) => !value)}
                   className="min-h-[44px] justify-center"
                 >
-                  <Text className="text-sm text-foreground-muted">
+                  <Text translate={false} className="text-sm text-foreground-muted">
                     {revealed ? account.email : "••••••@••••••"}
                   </Text>
                 </Pressable>
               ) : null}
               {account.plan ? (
-                <Text selectable className="text-sm text-foreground-muted">
+                <Text translate={false} selectable className="text-sm text-foreground-muted">
                   {account.plan}
                 </Text>
               ) : null}
             </View>
             <View className="gap-3 rounded-[24px] border-continuous bg-grouped-card p-4">
-              <Text className="text-sm font-t3-medium text-foreground">{window.label}</Text>
+              <Text translate={false} className="text-sm font-t3-medium text-foreground">
+                {window.label}
+              </Text>
               <Text className="text-3xl font-t3-bold tabular-nums text-foreground">
                 <T>
                   <Var>{remainingPercent(window)}</Var>% left
@@ -626,16 +633,22 @@ export function UsageLimitAccountScreen({ route }: AccountScreenProps) {
             </View>
             <View className="gap-2 rounded-[24px] border-continuous bg-grouped-card p-4">
               <Text className="text-sm font-t3-medium text-foreground">
-                {account.environments.length ? "Signed in" : "Source"}
+                {account.environments.length ? t("Signed in") : t("Source")}
               </Text>
               {account.environments.length ? (
                 account.environments.map((environment) => (
-                  <Text key={environment.environmentId} className="text-sm text-foreground-muted">
+                  <Text
+                    translate={false}
+                    key={environment.environmentId}
+                    className="text-sm text-foreground-muted"
+                  >
                     {environment.label}
                   </Text>
                 ))
               ) : (
-                <Text className="text-sm text-foreground-muted">{account.sourceLabel}</Text>
+                <Text translate={false} className="text-sm text-foreground-muted">
+                  {account.sourceLabel}
+                </Text>
               )}
             </View>
             {account.redeem && account.limits.resetCredits ? (

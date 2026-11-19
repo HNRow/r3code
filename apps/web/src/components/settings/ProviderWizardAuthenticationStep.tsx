@@ -8,7 +8,7 @@ import { WizardFooter, WizardPanel } from "../ui/wizard";
 import { ProviderAuthenticationSection } from "./ProviderAuthenticationSection";
 import { SettingsGroup } from "./SettingsGroup";
 import { SettingsRow } from "./settingsLayout";
-import { useGT, T, msg } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 export function ProviderWizardAuthenticationStep({
   environmentId,
@@ -61,7 +61,7 @@ export function ProviderWizardAuthenticationStep({
               title={gt("Account")}
               description={
                 isDiscovering
-                  ? msg("Discovering sign-in methods…")
+                  ? t("Discovering sign-in methods…")
                   : (query.error ??
                     auth?.message ??
                     "No in-app sign-in advertised. Follow the provider's docs to finish setup.")
@@ -94,7 +94,7 @@ export function ProviderWizardAuthenticationStep({
           disabled={active}
           onClick={onFinish}
         >
-          {signedIn ? "Done" : "Skip for now"}
+          {signedIn ? t("Done") : t("Skip for now")}
         </Button>
       </WizardFooter>
     </>

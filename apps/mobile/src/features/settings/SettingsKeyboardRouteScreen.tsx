@@ -14,6 +14,7 @@ import { ListChoiceRow as SettingsChoiceRow } from "../../components/ui/ListChoi
 import { SettingsScreen } from "./components/SettingsScreen";
 import { SettingsSection } from "./components/SettingsSection";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const SEND_MODIFIER = Platform.OS === "android" ? "Ctrl" : "Command";
 
@@ -24,13 +25,24 @@ const ENTER_BEHAVIOR_OPTIONS: ReadonlyArray<{
 }> = [
   {
     behavior: "send",
-    label: "Send message",
-    description: "Return sends the message. Shift-Return inserts a new line.",
+    get label() {
+      return t("Send message");
+    },
+    get description() {
+      return t("Return sends the message. Shift-Return inserts a new line.");
+    },
   },
   {
     behavior: "newline",
-    label: "Insert new line",
-    description: `Return inserts a new line. ${SEND_MODIFIER}-Return sends the message.`,
+    get label() {
+      return t("Insert new line");
+    },
+    // The modifier is part of the sentence, so each platform gets its own catalog entry.
+    get description() {
+      return SEND_MODIFIER === "Ctrl"
+        ? t("Return inserts a new line. Ctrl-Return sends the message.")
+        : t("Return inserts a new line. Command-Return sends the message.");
+    },
   },
 ];
 

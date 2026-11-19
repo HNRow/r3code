@@ -35,6 +35,7 @@ import { useAtomCommand } from "./use-atom-command";
 import { showGitActionResult } from "./use-vcs-action-state";
 import { useThreadSelection } from "./use-thread-selection";
 import { useSelectedThreadWorktree } from "./use-selected-thread-worktree";
+import { t } from "../i18n/gt";
 
 function refreshFailureMessage(cause: Cause.Cause<unknown>): string {
   const error = Cause.squash(cause);
@@ -100,7 +101,7 @@ export function useSelectedThreadGitActions() {
         Cause.fail(
           new EnvironmentAuthorizationError({
             requiredScope: AuthOrchestrationOperateScope,
-            message: "This connection cannot update the thread's branch.",
+            message: t("This connection cannot update the thread's branch."),
           }),
         ),
       );
@@ -141,7 +142,7 @@ export function useSelectedThreadGitActions() {
           target,
           {
             operation: "refresh_status",
-            label: "Refreshing source control status",
+            label: t("Refreshing source control status"),
           },
           execute,
         );
@@ -201,7 +202,7 @@ export function useSelectedThreadGitActions() {
       const error = Cause.squash(result.cause);
       const message = error instanceof Error ? error.message : "Git action failed.";
       setPendingConnectionError(message);
-      showGitActionResult({ type: "error", title: "Git action failed", description: message });
+      showGitActionResult({ type: "error", title: t("Git action failed"), description: message });
       return null;
     }
     return result.value;
@@ -217,7 +218,7 @@ export function useSelectedThreadGitActions() {
       const error = Cause.squash(result.cause);
       const message = error instanceof Error ? error.message : "Failed to refresh branches.";
       setPendingConnectionError(message);
-      showGitActionResult({ type: "error", title: "Git action failed", description: message });
+      showGitActionResult({ type: "error", title: t("Git action failed"), description: message });
       return null;
     }
     setPendingConnectionError(null);

@@ -342,6 +342,7 @@ export const make = Effect.gen(function* () {
           item.type === "subagent" && isAppOwnedDelegation(item) ? [item.subagentId] : [],
         ),
       ]);
+      // 客户端按整句翻译，改文案要同步 apps/{web,mobile}/src/lib/timelineText.ts。
       const detail = `Cancelled because the server ${trigger === "startup" ? "restarted" : "shut down"} before the provider work completed.`;
       const commandId = CommandId.make(
         `command:runtime-reconcile:${trigger}:${projection.thread.id}:${DateTime.formatIso(now)}`,

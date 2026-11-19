@@ -106,6 +106,7 @@ import {
 import { usePrepareTriage } from "../triage/usePrepareTriage";
 import { useEnvironmentShellReadiness } from "../../state/shell";
 import { useConnectionsReady, useWorkspaceEnvironments } from "../../state/workspace";
+import { t } from "../../i18n/gt";
 
 type WorkspaceMode = "local" | "worktree";
 
@@ -638,7 +639,7 @@ export function NewTaskFlowProvider(
     if (!isAtomCommandInterrupted(result)) {
       const error = squashAtomCommandFailure(result);
       Dialog.alert(
-        "Could not switch machine",
+        t("Could not switch machine"),
         error instanceof Error
           ? error.message
           : triage?._tag === "Failure"

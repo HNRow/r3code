@@ -35,27 +35,39 @@ import {
 import { IntervalSecondsField } from "./IntervalSecondsField";
 import { PolicyTooltip, SettingResetButton, SettingsRow } from "./settingsLayout";
 import { searchableSetting } from "./settingsSearch";
-import { msg, T, useGT, useMessages } from "gt-react";
+import { T, useGT, useMessages, t } from "gt-react";
 
 const BACKGROUND_ACTIVITY_PROFILE_LABELS: Record<BackgroundActivityProfile, string> = {
-  balanced: msg("Balanced"),
-  performance: msg("Performance"),
-  "battery-saver": msg("Battery saver"),
+  get balanced() {
+    return t("Balanced");
+  },
+  get performance() {
+    return t("Performance");
+  },
+  get "battery-saver"() {
+    return t("Battery saver");
+  },
 };
 
 type BackgroundActivityProfileOption = BackgroundActivityProfile | "advanced";
 
 const BACKGROUND_ACTIVITY_PROFILE_OPTION_LABELS: Record<BackgroundActivityProfileOption, string> = {
   ...BACKGROUND_ACTIVITY_PROFILE_LABELS,
-  advanced: msg("Advanced"),
+  get advanced() {
+    return t("Advanced");
+  },
 };
 
 const BACKGROUND_ACTIVITY_PROFILE_DESCRIPTIONS: Record<BackgroundActivityProfile, string> = {
-  balanced: msg("Pauses probes for idle clients, locked hosts, or low power mode."),
-  performance: msg(
-    "Allows scoped background probes while any subscribed client remains connected.",
-  ),
-  "battery-saver": msg("Also pauses background probes when the host or client is on battery."),
+  get balanced() {
+    return t("Pauses probes for idle clients, locked hosts, or low power mode.");
+  },
+  get performance() {
+    return t("Allows scoped background probes while any subscribed client remains connected.");
+  },
+  get "battery-saver"() {
+    return t("Also pauses background probes when the host or client is on battery.");
+  },
 };
 
 const ADVANCED_BACKGROUND_ACTIVITY_DESCRIPTION = "Uses custom intervals.";
@@ -68,10 +80,30 @@ const BACKGROUND_ACTIVITY_BOOLEAN_OVERRIDES: ReadonlyArray<{
     | "pauseWhenOnBattery";
   readonly label: string;
 }> = [
-  { key: "pauseWhenHostLocked", label: "Pause when host is locked" },
-  { key: "pauseWhenHostLowPower", label: "Pause on host low power" },
-  { key: "pauseWhenClientLowPower", label: "Pause on client low power" },
-  { key: "pauseWhenOnBattery", label: "Pause on battery" },
+  {
+    key: "pauseWhenHostLocked",
+    get label() {
+      return t("Pause when host is locked");
+    },
+  },
+  {
+    key: "pauseWhenHostLowPower",
+    get label() {
+      return t("Pause on host low power");
+    },
+  },
+  {
+    key: "pauseWhenClientLowPower",
+    get label() {
+      return t("Pause on client low power");
+    },
+  },
+  {
+    key: "pauseWhenOnBattery",
+    get label() {
+      return t("Pause on battery");
+    },
+  },
 ];
 
 function resetBackgroundActivitySettings() {

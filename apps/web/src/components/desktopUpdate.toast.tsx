@@ -6,7 +6,7 @@ import {
   getDesktopUpdateReleaseUrl,
 } from "./desktopUpdate.logic";
 import { toastManager } from "./ui/toast";
-import { T, Var } from "gt-react";
+import { T, Var, t } from "gt-react";
 
 type DesktopUpdateShell = Pick<DesktopBridge, "openExternal">;
 
@@ -17,7 +17,7 @@ export async function openDesktopUpdateReleaseNotes(
   try {
     if (shell && (await shell.openExternal(releaseUrl))) return;
   } catch {}
-  toastManager.add({ type: "error", title: "Unable to open release notes" });
+  toastManager.add({ type: "error", title: t("Unable to open release notes") });
 }
 
 function ReleaseNotesLink({
@@ -54,7 +54,7 @@ export function showDesktopUpdateDownloadedToast(
   const releaseUrl = getDesktopUpdateReleaseUrl(getDesktopUpdateDownloadedVersion(state));
   toastManager.add({
     type: "success",
-    title: "Update downloaded",
+    title: t("Update downloaded"),
     description: (
       <>
         <T>

@@ -43,6 +43,7 @@ import {
   localVoiceTranscriberAtom,
 } from "../voice-input/VoiceInputProvider";
 import { useGT, Var, T } from "gt-react-native";
+import { msg, t } from "../../i18n/gt";
 
 type MicrophonePermission = "checking" | "granted" | "ask" | "denied";
 
@@ -57,7 +58,7 @@ const readMicrophonePermission = () =>
   getRecordingPermissionsAsync().then(toMicrophonePermission, (): MicrophonePermission => "ask");
 
 const microphonePermissionAtom = makePermissionStatusAtom<MicrophonePermission>({
-  label: "mobile:microphone-permission",
+  label: msg("mobile:microphone-permission"),
   initial: "checking",
   read: readMicrophonePermission,
 });
@@ -82,46 +83,76 @@ const KINDS: Record<
   }
 > = {
   wired: {
-    label: "Wired",
-    row: "Other wired",
-    rowDescription: "Headsets and USB microphones not listed here",
+    get label() {
+      return t("Wired");
+    },
+    get row() {
+      return t("Other wired");
+    },
+    get rowDescription() {
+      return t("Headsets and USB microphones not listed here");
+    },
     icon: "cable.connector",
   },
   bluetooth: {
-    label: "Bluetooth",
-    row: "Other Bluetooth",
-    rowDescription:
-      Platform.OS === "android"
-        ? "Earbuds, headsets, and cars, including Android Auto, not listed here"
-        : "AirPods, headsets, and cars not listed here",
+    get label() {
+      return t("Bluetooth");
+    },
+    get row() {
+      return t("Other Bluetooth");
+    },
+    get rowDescription() {
+      return Platform.OS === "android"
+        ? t("Earbuds, headsets, and cars, including Android Auto, not listed here")
+        : t("AirPods, headsets, and cars not listed here");
+    },
     icon: "headphones",
   },
   builtIn: {
-    label: "Built-in",
-    row: "Built-in microphone",
-    rowDescription: "The microphone on this device",
+    get label() {
+      return t("Built-in");
+    },
+    get row() {
+      return t("Built-in microphone");
+    },
+    get rowDescription() {
+      return t("The microphone on this device");
+    },
     icon: "iphone",
   },
   carPlay: {
-    label: "CarPlay",
-    row: "CarPlay",
-    rowDescription: "The car’s microphone",
+    get label() {
+      return t("CarPlay");
+    },
+    get row() {
+      return t("CarPlay");
+    },
+    get rowDescription() {
+      return t("The car’s microphone");
+    },
     icon: "car",
   },
 };
 
-const UNAVAILABLE_EXPLANATION =
+// 平台不同文案不同，读取时再翻译，避免模块加载时锁定英文。
+const unavailableExplanation = () =>
   Platform.OS === "android"
-    ? "Dictation on this device needs Android 12 or later and Google speech services that support your language. Your keyboard’s voice typing is separate."
-    : "Dictation on this device needs iOS 26 or later, a supported device, and a supported language. Your keyboard’s dictation is separate.";
+    ? t(
+        "Dictation on this device needs Android 12 or later and Google speech services that support your language. Your keyboard’s voice typing is separate.",
+      )
+    : t(
+        "Dictation on this device needs iOS 26 or later, a supported device, and a supported language. Your keyboard’s dictation is separate.",
+      );
 
 function saveDestination(id: EnvironmentId | null) {
   try {
     chooseVoiceDestination(id);
   } catch {
     Dialog.alert(
-      "Could not save transcription choice",
-      "Dictation on an environment is off for this session. Save again before closing the app, or your previous choice may return when it restarts.",
+      t("Could not save transcription choice"),
+      t(
+        "Dictation on an environment is off for this session. Save again before closing the app, or your previous choice may return when it restarts.",
+      ),
     );
   }
 }
@@ -156,8 +187,8 @@ function EnvironmentChoice({
         if (selected) return;
         if (!local) return onCloudOnly();
         Dialog.confirm({
-          title: `Send microphone audio to ${environment.label}?`,
-          message: `Finished recordings will be sent to ${environment.displayUrl ?? environment.label} for transcription. You can switch back to This device at any time.`,
+          title: t`Send microphone audio to ${environment.label}?`,
+          message: t`Finished recordings will be sent to ${environment.displayUrl ?? environment.label} for transcription. You can switch back to This device at any time.`,
           confirmText: "Use environment",
           onConfirm: () => saveDestination(environment.environmentId),
         });
@@ -184,7 +215,7 @@ function EnvironmentMethodSection({
     environment.serverConfig?.environment.capabilities.cloudVoiceTranscription === true ||
     destination?.kind === "cloud";
   return (
-    <SettingsSection title={`Method on ${environment.label}`}>
+    <SettingsSection title={t`Method on ${environment.label}`}>
       <LocalModelChoice
         environmentId={id}
         label={environment.label}
@@ -323,14 +354,14 @@ export function SettingsVoiceRouteScreen() {
           />
         ) : null}
         {!grant && transcriber === null ? (
-          <Text className="px-2 text-sm text-foreground-muted">{UNAVAILABLE_EXPLANATION}</Text>
+          <Text className="px-2 text-sm text-foreground-muted">{unavailableExplanation()}</Text>
         ) : null}
         {permission === "ask" || permission === "denied" ? (
           <>
             <SettingsSection title={gt("Microphone access")}>
               <SettingsActionRow
                 icon="mic"
-                label={permission === "ask" ? "Allow microphone access" : "Open Settings"}
+                label={permission === "ask" ? t("Allow microphone access") : t("Open Settings")}
                 onPress={
                   permission === "ask" ? requestPermission : () => void Linking.openSettings()
                 }
@@ -338,8 +369,8 @@ export function SettingsVoiceRouteScreen() {
             </SettingsSection>
             <Text className="px-2 text-sm text-foreground-muted">
               {permission === "ask"
-                ? "Allow microphone access to record and to see your microphones."
-                : "Turn on microphone access for R3 Code in Settings to use voice input."}
+                ? t("Allow microphone access to record and to see your microphones.")
+                : t("Turn on microphone access for R3 Code in Settings to use voice input.")}
             </Text>
           </>
         ) : null}
@@ -384,7 +415,9 @@ export function SettingsVoiceRouteScreen() {
             falls under Other. Swipe left on a named microphone to forget it.
             <Var>
               {Platform.OS === "android"
-                ? " Android may still use a different microphone if the preferred one can’t be routed."
+                ? t(
+                    " Android may still use a different microphone if the preferred one can’t be routed.",
+                  )
                 : null}
             </Var>
           </T>
@@ -428,7 +461,7 @@ function MicrophoneRow(props: {
       <View
         accessible
         accessibilityLabel={`${title}, ${kind.label}, ${props.position} of ${props.count}`}
-        accessibilityActions={onForget ? [{ name: "forget", label: "Forget" }] : undefined}
+        accessibilityActions={onForget ? [{ name: "forget", label: t("Forget") }] : undefined}
         onAccessibilityAction={({ nativeEvent }) => {
           if (nativeEvent.actionName === "forget") onForget?.();
         }}
@@ -472,7 +505,7 @@ function MicrophoneRow(props: {
             accessibilityLabel: `Forget ${title}`,
             destructive: true,
             icon: "trash",
-            label: "Forget",
+            label: t("Forget"),
             onPress: onForget,
           }}
           secondaryAction={null}

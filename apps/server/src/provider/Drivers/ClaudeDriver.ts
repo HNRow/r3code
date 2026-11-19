@@ -34,8 +34,10 @@ import {
   makePendingClaudeProvider,
   probeClaudeCapabilities,
   probeClaudeWorkspaceSnapshot,
+  runClaudeCommand,
   type ClaudeCapabilitiesProbe,
 } from "../ClaudeProvider.ts";
+import { makeClaudePluginManagement } from "./ClaudePlugins.ts";
 import { makeManagedServerProvider } from "@t3tools/provider-core/server/managedProvider";
 import * as ModelCatalog from "@t3tools/provider-core/server/ModelCatalog";
 import { resolveClaudeModelCatalog } from "../ClaudeModelCatalog.ts";
@@ -63,6 +65,7 @@ import {
 } from "./ClaudeHome.ts";
 import * as HostProcess from "@t3tools/shared/HostProcess";
 import { makeClaudeMaintenanceResolution } from "./ClaudeMaintenance.ts";
+import { discoverClaudeSkillInventory, makeClaudeSkillManagement } from "./ClaudeSkills.ts";
 const decodeClaudeSettings = Schema.decodeSync(ClaudeSettings);
 
 const DRIVER_KIND = ProviderDriverKind.make("claudeAgent");
@@ -428,6 +431,47 @@ export const ClaudeDriver: ProviderDriver<ClaudeSettings, ClaudeDriverEnv, Path.
           Effect.provideService(FileSystem.FileSystem, fileSystem),
           Effect.provideService(Path.Path, path),
         ),
+      skillInventory: {
+        list: (cwd) =>
+          discoverClaudeSkillInventory(effectiveConfig, cwd, processEnv, instanceId).pipe(
+            Effect.provideService(FileSystem.FileSystem, fileSystem),
+            Effect.provideService(Path.Path, path),
+          ),
+      },
+      skillManagement: yield* makeClaudeSkillManagement({
+        instanceId,
+        config: effectiveConfig,
+        environment: processEnv,
+      }),
+      pluginManagement: makeClaudePluginManagement({
+        configHome: configDir,
+        instanceId,
+        run: (args, cwd) =>
+          runClaudeCommand(effectiveConfig, args, processEnv, cwd).pipe(
+            Effect.map((result) => ({
+              stdout: result.stdout,
+              stderr: result.stderr,
+              exitCode: result.code,
+            })),
+            Effect.mapError(
+              (cause) =>
+                new ProviderDriverError({
+                  driver: DRIVER_KIND,
+                  instanceId,
+                  detail: `claude ${args[0] ?? ""} failed.`,
+                  cause,
+                }),
+            ),
+            Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner),
+            Effect.provideService(Path.Path, path),
+          ),
+        listSkills: (cwd) =>
+          discoverClaudeSkillInventory(effectiveConfig, cwd, processEnv, instanceId).pipe(
+            Effect.map((inventory) => inventory.entries),
+            Effect.provideService(FileSystem.FileSystem, fileSystem),
+            Effect.provideService(Path.Path, path),
+          ),
+      }),
       orchestrationAdapter,
       textGeneration,
       consumeResetCredit,

@@ -17,7 +17,7 @@ import {
 } from "../ui/dialog";
 import { CommandOutputPanel, useCommandOutputStreaming } from "./CommandOutputPanel";
 import { ShellCommandBlock } from "./ShellCommandBlock";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 export function BackgroundWorkDetails(props: {
   readonly environmentId: EnvironmentId;
@@ -64,7 +64,7 @@ export function BackgroundWorkDetails(props: {
                   <div className="flex items-baseline justify-between gap-3">
                     <h3 className="font-medium">{title}</h3>
                     <span className="shrink-0 text-xs text-muted-foreground">
-                      {task.awaited ? "Waiting" : "Running"}
+                      {task.awaited ? t("Waiting") : t("Running")}
                     </span>
                   </div>
                   {command ? (

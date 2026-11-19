@@ -14,6 +14,7 @@ import * as Dialog from "../../components/ui/Dialog";
 import { composerPullRequests } from "../../state/pull-requests";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { pullRequestTarget, type PullRequestParams } from "./usePullRequestDiff";
+import { t } from "../../i18n/gt";
 
 /** The description with checkbox ticks shown before the host confirms them. */
 export function usePullRequestDescription(
@@ -42,7 +43,7 @@ export function usePullRequestDescription(
     if (AsyncResult.isFailure(response)) {
       const cause = squashAtomCommandFailure(response);
       Dialog.alert(
-        "Could not save the description",
+        t("Could not save the description"),
         cause instanceof Error ? cause.message : "Try again.",
       );
     }

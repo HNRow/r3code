@@ -277,6 +277,8 @@ it.effect.each(["completed", "waiting", "cancelled"] as const)(
       assert.equal(command.restartContinuationOfRunId, runId);
       assert.include(command.text, "- monitor: Watch CI run 42");
       assert.include(command.text, "- shell: vp run dev");
+      // 客户端只读结构化字段；note 文字在上下文预算内会被截断。
+      assert.deepEqual(command.notification?.restart, { cancelledWork: work, settled: true });
     }),
 );
 

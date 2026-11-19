@@ -40,6 +40,15 @@ app-server provider status,” set `T3CODE_CODEX_PROBE_TIMEOUT_MS=60000` in the
 T3 server's environment and restart it. See [Provider check timeouts](./install.md#provider-check-timeouts)
 for configuration and other providers.
 
+## Manage installed plugins
+
+**Settings → Plugins** lists the plugins your Codex configuration has installed,
+with their marketplace and enabled state. You can enable, disable, or uninstall
+one. Plugins installed by default can be disabled but not uninstalled, and
+plugins a workspace setting controls are read-only there. R3 Code cannot install
+new plugins: use `codex plugin add <id>`. Changes reach the next agent session,
+so use **Restart agent session** in the command palette afterwards.
+
 ## Generate images
 
 Codex can generate images directly in a R3 Code thread when your Codex version,

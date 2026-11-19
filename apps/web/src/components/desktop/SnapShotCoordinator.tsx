@@ -42,6 +42,7 @@ import {
 } from "../../questionAttachments";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { readComposerImageBytes } from "../chat/composerAttachmentFiles";
+import { t } from "gt-react";
 
 type CaptureTarget = DraftId | ScopedThreadRef;
 type CaptureFailure = "missing-project" | "delivery";
@@ -376,8 +377,8 @@ export function SnapShotCoordinator() {
               "missing-project",
               stackedThreadToast({
                 type: "error",
-                title: "Snapshot taken, but no project is available",
-                description: "Add a project, then capture the window again.",
+                title: t("Snapshot taken, but no project is available"),
+                description: t("Add a project, then capture the window again."),
               }),
             );
             continue;
@@ -400,8 +401,8 @@ export function SnapShotCoordinator() {
               "delivery",
               stackedThreadToast({
                 type: "error",
-                title: "Snapshot failed",
-                description: `Capture ${item.id}: ${
+                title: t("Snapshot failed"),
+                description: t`Capture ${item.id}: ${
                   error instanceof Error ? error.message : "Try the capture again."
                 }`,
               }),
@@ -416,7 +417,7 @@ export function SnapShotCoordinator() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Snapshot failed",
+            title: t("Snapshot failed"),
             description: error instanceof Error ? error.message : "Try the capture again.",
           }),
         );
@@ -485,7 +486,7 @@ export function SnapShotCoordinator() {
             toastManager.add(
               stackedThreadToast({
                 type: "error",
-                title: "Snapshot failed",
+                title: t("Snapshot failed"),
                 description: state.message ?? "Try the capture again.",
               }),
             );

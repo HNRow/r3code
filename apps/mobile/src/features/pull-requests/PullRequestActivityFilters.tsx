@@ -4,6 +4,7 @@ import { SymbolView } from "../../components/ui/AppSymbol";
 import { Menu } from "../../components/ui/Menu";
 import type { ActivityFilter } from "./pullRequestActivityFilter";
 import { useGT, Var, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function PullRequestActivityFilters({
   value,
@@ -16,9 +17,9 @@ export function PullRequestActivityFilters({
 }) {
   const gt = useGT();
   const kinds = [
-    { id: "all", title: "All activity" },
-    { id: "comments", title: "Comments" },
-    { id: "commits", title: "Commits" },
+    { id: "all", title: t("All activity") },
+    { id: "comments", title: t("Comments") },
+    { id: "commits", title: t("Commits") },
   ] as const;
   return (
     <View className="mb-4 flex-row items-center justify-between gap-3">
@@ -45,10 +46,10 @@ export function PullRequestActivityFilters({
         <Menu
           title={gt("Show in activity")}
           actions={[
-            { id: "bots", title: "Bot comments", state: value.bots ? "on" : "off" },
+            { id: "bots", title: t("Bot comments"), state: value.bots ? "on" : "off" },
             {
               id: "resolved",
-              title: "Resolved or dismissed",
+              title: t("Resolved or dismissed"),
               state: value.resolved ? "on" : "off",
             },
           ]}
@@ -88,7 +89,7 @@ export function PullRequestActivityFilters({
             tintColorClassName="accent-icon-muted"
           />
           <Text className="text-xs text-foreground-muted">
-            {value.newestFirst ? "Newest" : "Oldest"}
+            {value.newestFirst ? t("Newest") : t("Oldest")}
           </Text>
         </Pressable>
       </View>

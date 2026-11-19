@@ -7,7 +7,23 @@ import * as Path from "effect/Path";
 import * as Queue from "effect/Queue";
 import * as TestClock from "effect/testing/TestClock";
 
-import { makeKimiPromptOutcomeWatch } from "./kimiAcp.ts";
+import * as Schema from "effect/Schema";
+
+import { AcpRegistrySettings } from "../settings.ts";
+import { isKimiAcpSettings, makeKimiPromptOutcomeWatch } from "./kimiAcp.ts";
+
+it("treats a local agent as Kimi only by executable name", () => {
+  const settings = (patch: Record<string, unknown>) =>
+    decodeSettings({ source: "local", ...patch });
+
+  assert.isFalse(
+    isKimiAcpSettings(settings({ agentId: "kimi-code", commandPath: "/usr/bin/other-agent" })),
+  );
+  assert.isTrue(isKimiAcpSettings(settings({ commandPath: "/usr/local/bin/kimi" })));
+  assert.isTrue(isKimiAcpSettings(settings({ source: "registry", agentId: "kimi-code" })));
+});
+
+const decodeSettings = Schema.decodeSync(AcpRegistrySettings);
 
 const SESSION_ID = "session_06abd65a-ab8c-4f7a-a504-9b105fc7cd0d";
 const endTurn = { stopReason: "end_turn" } as const;

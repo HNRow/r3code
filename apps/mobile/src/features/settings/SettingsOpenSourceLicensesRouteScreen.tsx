@@ -21,6 +21,7 @@ import { SettingsScreen } from "./components/SettingsScreen";
 
 import { getMobileThirdPartyLicenses } from "./mobileThirdPartyLicenses";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 function useMobileThirdPartyLicenses() {
   return useMemo(() => {
@@ -55,8 +56,8 @@ export function SettingsOpenSourceLicensesRouteScreen() {
   const search = {
     value: query,
     onChangeText: setQuery,
-    placeholder: "Search packages",
-    accessibilityLabel: "Search open-source licenses",
+    placeholder: t("Search packages"),
+    accessibilityLabel: t("Search open-source licenses"),
     clearAccessibilityLabel: "Clear package search",
   };
   const searchInset = useSearchToolbarInset(search);
@@ -148,8 +149,10 @@ export function SettingsOpenSourceLicenseRouteScreen({ route }: LicenseDetailPro
         showsVerticalScrollIndicator={false}
       >
         <View className="gap-2 px-1">
-          <Text className="text-2xl font-t3-bold text-foreground">{entry.name}</Text>
-          <Text className="text-base leading-normal text-foreground-muted">
+          <Text translate={false} className="text-2xl font-t3-bold text-foreground">
+            {entry.name}
+          </Text>
+          <Text translate={false} className="text-base leading-normal text-foreground-muted">
             {[entry.version, entry.license, formatLicenseBundles(entry.bundles)]
               .filter((value): value is string => Boolean(value))
               .join(" · ")}
@@ -176,7 +179,11 @@ export function SettingsOpenSourceLicenseRouteScreen({ route }: LicenseDetailPro
         </View>
 
         <View className="overflow-hidden rounded-[24px] border-continuous bg-grouped-card p-4">
-          <Text selectable className="font-mono text-base leading-normal text-foreground">
+          <Text
+            translate={false}
+            selectable
+            className="font-mono text-base leading-normal text-foreground"
+          >
             {entry.noticeText}
           </Text>
         </View>

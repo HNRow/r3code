@@ -20,6 +20,7 @@ import { SettingsRow } from "./components/SettingsRow";
 import { SettingsSection } from "./components/SettingsSection";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function SettingsAboutRouteScreen() {
   const gt = useGT();
@@ -73,7 +74,7 @@ function AppSettingsSection() {
     await settlePromise(() =>
       runAppUpdateCheck({
         applyMode: "immediate",
-        onFailure: (message) => Dialog.alert("Update failed", message),
+        onFailure: (message) => Dialog.alert(t("Update failed"), message),
         onStateChange: (state) =>
           setCheckState({
             state,

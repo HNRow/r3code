@@ -11,10 +11,14 @@ import { View } from "react-native";
 import { hasCloudPublicConfig } from "../cloud/publicConfig";
 import { T3ConnectProfilePage } from "../cloud/T3ConnectProfilePage";
 
+import { t } from "../../i18n/gt";
+
 const USER_PROFILE_CUSTOM_PAGES = [
   {
     path: "t3-connect",
-    label: "R3 Connect",
+    get label() {
+      return t("R3 Connect");
+    },
     icon: "globe",
     content: <T3ConnectProfilePage />,
   },

@@ -35,32 +35,66 @@ import {
   useScopedSettingsMixed,
   useUpdateScopedSettings,
 } from "./useScopedSettings";
-import { useGT, T, Var } from "gt-react";
+import { useGT, useMessages, T, Var, t } from "gt-react";
+
+import { translateSnoozeLabel } from "../../lib/snoozeLabel";
 
 const UNIT_MINUTES = { minutes: 1, hours: 60, days: 24 * 60 } as const;
 type DurationUnit = keyof typeof UNIT_MINUTES;
 const UNIT_LABELS: Record<DurationUnit, string> = {
-  minutes: "minutes",
-  hours: "hours",
-  days: "days",
+  get minutes() {
+    return t("minutes");
+  },
+  get hours() {
+    return t("hours");
+  },
+  get days() {
+    return t("days");
+  },
 };
 const SINGULAR_UNIT_LABELS: Record<DurationUnit, string> = {
-  minutes: "minute",
-  hours: "hour",
-  days: "day",
+  get minutes() {
+    return t("minute");
+  },
+  get hours() {
+    return t("hour");
+  },
+  get days() {
+    return t("day");
+  },
 };
 
 const WHEN_LABELS: Record<"after" | SnoozePresetDay, string> = {
-  after: "In",
-  today: "Today",
-  tomorrow: "Tomorrow",
-  monday: "Monday",
-  tuesday: "Tuesday",
-  wednesday: "Wednesday",
-  thursday: "Thursday",
-  friday: "Friday",
-  saturday: "Saturday",
-  sunday: "Sunday",
+  get after() {
+    return t("In");
+  },
+  get today() {
+    return t("Today");
+  },
+  get tomorrow() {
+    return t("Tomorrow");
+  },
+  get monday() {
+    return t("Monday");
+  },
+  get tuesday() {
+    return t("Tuesday");
+  },
+  get wednesday() {
+    return t("Wednesday");
+  },
+  get thursday() {
+    return t("Thursday");
+  },
+  get friday() {
+    return t("Friday");
+  },
+  get saturday() {
+    return t("Saturday");
+  },
+  get sunday() {
+    return t("Sunday");
+  },
 };
 const WHEN_VALUES = ["after", ...SnoozePresetDay.literals] as const;
 
@@ -234,6 +268,7 @@ function SnoozePresetList(props: {
   onAdd: () => void;
   onSettle: () => void;
 }) {
+  const m = useMessages();
   const nowMinute = useNowMinute();
   const now = new Date(`${nowMinute}Z`);
   const formatTime = (date: Date) =>
@@ -242,16 +277,20 @@ function SnoozePresetList(props: {
   const seenWakes = new Set<string>();
   const previews = props.presets.map((preset) => {
     const resolved = resolveSnoozePreset(preset, now, formatTime);
-    if (resolved === null) return { tone: "muted", text: "Passed for today" } as const;
+    if (resolved === null) return { tone: "muted", text: t("Passed for today") } as const;
     if (seenIds.has(resolved.id)) {
-      return { tone: "muted", text: "Duplicate of an option above" } as const;
+      return { tone: "muted", text: t("Duplicate of an option above") } as const;
     }
     if (seenWakes.has(resolved.snoozedUntil)) {
-      return { tone: "muted", text: "Same time as an option above" } as const;
+      return { tone: "muted", text: t("Same time as an option above") } as const;
     }
     seenIds.add(resolved.id);
     seenWakes.add(resolved.snoozedUntil);
-    return { tone: "menu", label: resolved.label, when: resolved.whenLabel } as const;
+    return {
+      tone: "menu",
+      label: translateSnoozeLabel(resolved.label, m),
+      when: resolved.whenLabel,
+    } as const;
   });
 
   const menuPresets = resolveSnoozePresets(now, { presets: props.presets, formatTime });
@@ -260,9 +299,10 @@ function SnoozePresetList(props: {
       .map((preset) => preset.label)
       .filter((label, index, labels) => labels.indexOf(label) !== index),
   );
-  const menuOrder = menuPresets.map((preset) =>
-    repeatedLabels.has(preset.label) ? `${preset.label} ${preset.whenLabel}` : preset.label,
-  );
+  const menuOrder = menuPresets.map((preset) => {
+    const label = translateSnoozeLabel(preset.label, m);
+    return repeatedLabels.has(preset.label) ? `${label} ${preset.whenLabel}` : label;
+  });
 
   return (
     <div
@@ -311,7 +351,9 @@ function SnoozePresetList(props: {
         );
       })}
       <p className="text-xs text-muted-foreground">
-        {menuOrder.length === 0 ? "Menus offer only Custom…" : `Menu now: ${menuOrder.join(" · ")}`}
+        {menuOrder.length === 0
+          ? t("Menus offer only Custom…")
+          : `${m("Menu now")}: ${menuOrder.join(" · ")}`}
       </p>
       <div>
         <Button
@@ -342,6 +384,10 @@ function SnoozePresetFields(props: {
   onChange: (preset: SnoozePresetSetting) => void;
 }) {
   const gt = useGT();
+  const m = useMessages();
+  const whenLabels = Object.fromEntries(
+    Object.entries(WHEN_LABELS).map(([key, label]) => [key, m(label)]),
+  ) as Record<"after" | SnoozePresetDay, string>;
   const { preset, onChange } = props;
   const when = preset.kind === "after" ? "after" : preset.day;
   // Switching between a duration and a set time keeps the other kind's last value, so a
@@ -351,7 +397,7 @@ function SnoozePresetFields(props: {
     <div className="flex min-w-0 flex-wrap items-center gap-2">
       <Select
         value={when}
-        items={WHEN_LABELS}
+        items={whenLabels}
         onValueChange={(value) => {
           const next = value === null ? null : withWhen(preset, value, memory);
           if (!next) return;
@@ -371,7 +417,7 @@ function SnoozePresetFields(props: {
         <SelectPopup>
           {WHEN_VALUES.map((value) => (
             <SelectItem hideIndicator key={value} value={value}>
-              {WHEN_LABELS[value]}
+              {m(WHEN_LABELS[value])}
             </SelectItem>
           ))}
         </SelectPopup>
@@ -407,12 +453,19 @@ function SnoozePresetFields(props: {
 
 function DurationFields(props: { minutes: number; onChange: (minutes: number) => void }) {
   const gt = useGT();
+  const m = useMessages();
   // The chosen unit stays put while stepping, so 59 → 60 minutes does not jump to hours.
   const [chosenUnit, setChosenUnit] = useState(() => splitMinutes(props.minutes).unit);
   const unit =
     props.minutes % UNIT_MINUTES[chosenUnit] === 0 ? chosenUnit : splitMinutes(props.minutes).unit;
   const amount = props.minutes / UNIT_MINUTES[unit];
   const maxAmount = Math.floor(MAX_SNOOZE_PRESET_MINUTES / UNIT_MINUTES[unit]);
+  const unitLabels = Object.fromEntries(
+    Object.entries(amount === 1 ? SINGULAR_UNIT_LABELS : UNIT_LABELS).map(([key, label]) => [
+      key,
+      m(label),
+    ]),
+  ) as Record<DurationUnit, string>;
   // Typing stays local until the field commits (blur, Enter, or a step), so half-typed
   // values never reach the server.
   const [draft, setDraft] = useState<number | null>(amount);
@@ -458,7 +511,7 @@ function DurationFields(props: { minutes: number; onChange: (minutes: number) =>
       </NumberField>
       <Select
         value={unit}
-        items={amount === 1 ? SINGULAR_UNIT_LABELS : UNIT_LABELS}
+        items={unitLabels}
         onValueChange={(value) => {
           if (value === "minutes" || value === "hours" || value === "days") {
             setChosenUnit(value);
@@ -472,7 +525,7 @@ function DurationFields(props: { minutes: number; onChange: (minutes: number) =>
         <SelectPopup>
           {(Object.keys(UNIT_LABELS) as DurationUnit[]).map((value) => (
             <SelectItem hideIndicator key={value} value={value}>
-              {(amount === 1 ? SINGULAR_UNIT_LABELS : UNIT_LABELS)[value]}
+              {m((amount === 1 ? SINGULAR_UNIT_LABELS : UNIT_LABELS)[value])}
             </SelectItem>
           ))}
         </SelectPopup>

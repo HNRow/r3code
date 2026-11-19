@@ -12,6 +12,8 @@ import {
 } from "../../lib/menu-placement";
 import { WindowHingeContext } from "../../native/window-hinge-context";
 import { OverlayPortal } from "./OverlayPortal";
+import { translateMenuActions } from "../../lib/menu-action-translation";
+import { useMessages } from "gt-react-native";
 import { useAndroidControlSizing } from "./useAndroidControlSizing";
 import { MenuPopup } from "./MenuPopup";
 
@@ -44,6 +46,7 @@ export type AndroidAnchoredMenuProps = {
 };
 
 export function AndroidAnchoredMenu(props: AndroidAnchoredMenuProps) {
+  const m = useMessages();
   const { scale, menuWidth: desiredMenuWidth, menuItemHeight } = useAndroidControlSizing();
   const [anchor, setAnchor] = useState<AnchorSnapshot | null>(null);
   const [path, setPath] = useState<readonly MenuAction[]>([]);
@@ -90,8 +93,9 @@ export function AndroidAnchoredMenu(props: AndroidAnchoredMenuProps) {
   });
 
   const parent = path[path.length - 1] ?? null;
-  const levelActions = (parent?.subactions ?? props.actions).filter(
-    (action) => !(action.attributes?.hidden ?? false),
+  const levelActions = translateMenuActions(
+    (parent?.subactions ?? props.actions).filter((action) => !(action.attributes?.hidden ?? false)),
+    m,
   );
 
   const local =

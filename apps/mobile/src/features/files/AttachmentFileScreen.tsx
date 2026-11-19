@@ -22,6 +22,8 @@ import { useAppearancePreferences } from "../settings/appearance/AppearancePrefe
 import { isZipFile, ZipArchiveView } from "./ZipArchiveView";
 import { AttachmentDocumentBody, nativeViewerKind } from "./AttachmentDocumentBody";
 
+import { t } from "../../i18n/gt";
+
 export type AttachmentFileRouteParams = {
   readonly environmentId?: string;
   readonly threadId?: string;
@@ -90,7 +92,7 @@ export function AttachmentFileScreen(props: AttachmentFileScreenProps) {
     const message = pendingNativeError.current;
     pendingNativeError.current = null;
     if (nativeViewer === null) {
-      if (message) Dialog.alert("Could not open document", message);
+      if (message) Dialog.alert(t("Could not open document"), message);
       return;
     }
     if (message) {
@@ -120,7 +122,7 @@ export function AttachmentFileScreen(props: AttachmentFileScreenProps) {
     renderedMode
       ? ({
           id: "source",
-          title: "Source",
+          title: t("Source"),
           icon: "doc.text",
           inline: true,
           onPress: () => setRendered(false),
@@ -156,7 +158,7 @@ export function AttachmentFileScreen(props: AttachmentFileScreenProps) {
     uri
       ? ({
           id: "open-viewer",
-          title: "Open in file viewer",
+          title: t("Open in file viewer"),
           icon: "arrow.up.left.and.arrow.down.right",
           inline: false,
           onPress: () => {
@@ -168,7 +170,7 @@ export function AttachmentFileScreen(props: AttachmentFileScreenProps) {
     draftKey
       ? ({
           id: "remove",
-          title: "Remove from draft",
+          title: t("Remove from draft"),
           icon: "trash",
           inline: false,
           destructive: true,
@@ -178,7 +180,7 @@ export function AttachmentFileScreen(props: AttachmentFileScreenProps) {
   ].filter((action) => action !== null);
   const selectedAction = activeMode === "source" ? "source" : "preview";
   const fileMenu: AppBarMenu = {
-    title: "File actions",
+    title: t("File actions"),
     icon: "ellipsis",
     items: [
       ...(renderedMode

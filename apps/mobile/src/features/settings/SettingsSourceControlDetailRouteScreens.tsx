@@ -99,7 +99,7 @@ export function SettingsSourceControlProviderRouteScreen({
       ) : (
         <>
           {item ? (
-            <Text selectable className="px-2 text-sm text-foreground-muted">
+            <Text translate={false} selectable className="px-2 text-sm text-foreground-muted">
               {[Option.getOrNull(item.version), sourceControlProviderSummary(item)]
                 .filter(Boolean)
                 .join(" · ")}

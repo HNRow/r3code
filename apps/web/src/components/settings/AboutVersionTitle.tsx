@@ -3,7 +3,7 @@ import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
 import { InlineButton } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 export function AboutVersionTitle() {
   const { copyToClipboard } = useCopyToClipboard<void>({
@@ -12,7 +12,7 @@ export function AboutVersionTitle() {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not copy version",
+          title: t("Could not copy version"),
           description: error.message,
         }),
       );

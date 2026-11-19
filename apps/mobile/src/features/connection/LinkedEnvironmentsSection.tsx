@@ -13,6 +13,7 @@ import { peerLinkEnvironment } from "../../state/peerLinks";
 import { useEnvironmentQuery } from "../../state/query";
 import { useEnvironmentScope } from "../../state/session";
 import { SettingsSection } from "../settings/components/SettingsSection";
+import { t } from "../../i18n/gt";
 
 export function LinkedEnvironmentsSection(props: {
   readonly environmentId: EnvironmentId;
@@ -62,7 +63,7 @@ export function LinkedEnvironmentsSection(props: {
   const now = DateTime.makeUnsafe(nowMs);
   return (
     <View className="mt-5 gap-3">
-      <SettingsSection title={`Linked from ${props.environmentLabel}`}>
+      <SettingsSection title={t`Linked from ${props.environmentLabel}`}>
         {links.data.links.map((link) => {
           const health = peerLinkHealth(link, now);
           const status =
@@ -77,7 +78,9 @@ export function LinkedEnvironmentsSection(props: {
                     : "Reachable";
           return (
             <View key={link.environmentId} className="gap-0.5 p-4">
-              <Text className="text-base font-t3-bold text-foreground">{link.label}</Text>
+              <Text translate={false} className="text-base font-t3-bold text-foreground">
+                {link.label}
+              </Text>
               <Text
                 className={
                   health.kind === "reachable" && health.expiresInDays === null

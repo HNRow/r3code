@@ -23,7 +23,8 @@ import { formatUpcomingTimestamp } from "../../timestampFormat";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { formatContextWindowCompactionMessage } from "./compaction.logic";
 import { ThreadDetailsSection } from "./ThreadDetailsSection";
-import { useGT, Var, T } from "gt-react";
+import { useGT, useMessages, Var, T } from "gt-react";
+import "../usage/usageNoticeMessages";
 
 const PACE_LABEL: Record<LimitPace, string> = {
   ahead: "Ahead of pace",
@@ -47,6 +48,7 @@ export function ThreadDetailsUsage({
   sources,
 }: Omit<ThreadDetailsUsageInput, "contextWindow">) {
   const gt = useGT();
+  const m = useMessages();
   const nowMinute = useNowMinute();
   const now = Date.parse(`${nowMinute}:00Z`);
   const report =
@@ -73,8 +75,8 @@ export function ThreadDetailsUsage({
             label={gt("Limits")}
             fill={null}
             tone={null}
-            value="Unavailable"
-            tooltip={<span className="text-foreground">{notice}</span>}
+            value={m("Unavailable")}
+            tooltip={<span className="text-foreground">{m(notice)}</span>}
           />
         ) : (
           limits.windows.map((window) => <LimitRow key={window.id} window={window} now={now} />)

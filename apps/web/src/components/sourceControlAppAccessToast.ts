@@ -4,6 +4,7 @@ import { runAtomCommand } from "@t3tools/client-runtime/state/runtime";
 import { appAtomRegistry } from "../rpc/atomRegistry";
 import { sourceControlEnvironment } from "../state/sourceControl";
 import { toastManager } from "./ui/toast";
+import { t } from "gt-react";
 
 /**
  * After a clone, suggests installing the forge app on the repository's owner when the server is
@@ -25,8 +26,8 @@ export async function suggestAppAccessForRemote(
   const owner = target.input.repository.split("/")[0] ?? target.input.repository;
   const id = toastManager.add({
     type: "info",
-    title: `Give ${target.appSignIn.appName} access to ${owner}`,
-    description: `It isn't installed there, so GitHub requests for ${target.input.repository} use your own login and its lower rate limit.`,
+    title: t`Give ${target.appSignIn.appName} access to ${owner}`,
+    description: t`It isn't installed there, so GitHub requests for ${target.input.repository} use your own login and its lower rate limit.`,
     actionProps: {
       children: "Install",
       onClick: () => {

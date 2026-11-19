@@ -108,6 +108,7 @@ import {
   waitForComposerDraftsLoaded,
 } from "../../state/use-composer-drafts";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 interface EnvironmentOption {
   readonly environmentId: EnvironmentId;
@@ -248,9 +249,15 @@ function ListRow(props: {
           {props.icon}
         </View>
         <View className="flex-1 gap-0.5">
-          <Text className="text-base leading-snug font-t3-bold">{props.title}</Text>
+          <Text translate={false} className="text-base leading-snug font-t3-bold">
+            {props.title}
+          </Text>
           {props.subtitle ? (
-            <Text className="text-sm leading-snug text-foreground-muted" numberOfLines={2}>
+            <Text
+              translate={false}
+              className="text-sm leading-snug text-foreground-muted"
+              numberOfLines={2}
+            >
               {props.subtitle}
             </Text>
           ) : null}
@@ -584,9 +591,7 @@ export function AddProjectSourceScreen(props: { readonly environmentId?: string 
 
       {environmentOptions.length > 1 || (selectedEnvironment !== null && !isConnected) ? (
         <>
-          <SectionTitle>
-            <T>Environments</T>
-          </SectionTitle>
+          <SectionTitle>{gt("Environments")}</SectionTitle>
           <ListSection>
             {environmentOptions.map((environment, index) => (
               <ListRow
@@ -760,7 +765,7 @@ async function draftWithPrompt(
 function useOpenExistingProject(environment: EnvironmentOption | null) {
   const openNewTaskDraft = useOpenNewTaskDraft();
   const updateProject = useAtomCommand(projectEnvironment.update, {
-    label: "project unarchive",
+    label: t("project unarchive"),
   });
   const projects = useProjects();
 
@@ -795,7 +800,7 @@ function useOpenExistingProject(environment: EnvironmentOption | null) {
         })
       )._tag === "Success";
     Dialog.alert(
-      "Project already exists",
+      t("Project already exists"),
       unarchived ? existing.title : `${existing.title} is still archived. Try again later.`,
     );
     openNewTaskDraft(
@@ -833,8 +838,8 @@ function useCreateProject(environment: EnvironmentOption | null) {
       !readEnvironmentScope(environment.environmentId, AuthOrchestrationOperateScope)
     ) {
       Dialog.alert(
-        "Project not added",
-        `This connection cannot add projects right now. Any existing files remain at ${workspaceRoot}.`,
+        t("Project not added"),
+        t`This connection cannot add projects right now. Any existing files remain at ${workspaceRoot}.`,
       );
       return;
     }
@@ -864,8 +869,10 @@ function useCreateProject(environment: EnvironmentOption | null) {
     );
     if (project === null) {
       Dialog.alert(
-        "Project added",
-        "The project was created but has not reached this device yet. It will appear in the project list once the connection catches up.",
+        t("Project added"),
+        t(
+          "The project was created but has not reached this device yet. It will appear in the project list once the connection catches up.",
+        ),
       );
       return result;
     }
@@ -996,6 +1003,7 @@ function FolderBrowser(props: {
   readonly pinnedDirectoryName?: string;
   readonly cloning?: boolean;
 }) {
+  const gt = useGT();
   const browsePath = getFilesystemBrowsePath(props.pathInput, props.environment.platform);
   const browseInput =
     browsePath.directoryPath.length > 0 ? { partialPath: browsePath.directoryPath } : null;
@@ -1030,9 +1038,7 @@ function FolderBrowser(props: {
 
   return (
     <>
-      <SectionTitle>
-        <T>Browse folders</T>
-      </SectionTitle>
+      <SectionTitle>{gt("Browse folders")}</SectionTitle>
       {!canReadFiles && !fileAccess.isPending ? (
         <ErrorBanner message={fileAccess.error ?? "This connection cannot browse host folders."} />
       ) : null}
@@ -1201,7 +1207,7 @@ export function AddProjectNewScreen(props: { readonly environmentId?: string | s
     }
     const { projectId, workspaceRoot, commitError } = result.value;
     if (commitError !== undefined) {
-      Dialog.alert("Created without a first commit", commitError);
+      Dialog.alert(t("Created without a first commit"), commitError);
     }
     if (publishes && publishTarget !== null) {
       void publishRepository({
@@ -1215,7 +1221,7 @@ export function AddProjectNewScreen(props: { readonly environmentId?: string | s
       }).then((publishResult) => {
         if (AsyncResult.isFailure(publishResult)) {
           Dialog.alert(
-            `Could not create the ${publishTarget.definition.label} repository`,
+            t`Could not create the ${publishTarget.definition.label} repository`,
             errorMessage(Cause.squash(publishResult.cause)),
           );
         } else {
@@ -1279,7 +1285,7 @@ export function AddProjectNewScreen(props: { readonly environmentId?: string | s
           {publishTarget !== null ? (
             <ListSection>
               <ListRow
-                title={`Create private repository on ${publishTarget.definition.label}`}
+                title={t`Create private repository on ${publishTarget.definition.label}`}
                 subtitle={
                   trimmedName.length > 0 && pathPreview !== null
                     ? getNewProjectRepository(publishTarget, pathPreview)

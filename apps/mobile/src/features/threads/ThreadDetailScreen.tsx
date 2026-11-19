@@ -209,6 +209,7 @@ import { useOpenLinkedThread } from "./useOpenLinkedThread";
 import { useGlobalVoiceInput } from "../voice-input/VoiceInputProvider";
 import type { OrchestrationV2ProviderSession } from "@t3tools/contracts";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export interface ThreadDetailScreenProps {
   readonly header?: React.ReactNode;
@@ -575,17 +576,17 @@ function ThreadDetailBody(
     });
     setForceStoppingKey((current) => (current === threadKey ? null : current));
     if (result._tag === "Failure") {
-      if (!isAtomCommandInterrupted(result)) Dialog.alert("Could not force stop the agent");
+      if (!isAtomCommandInterrupted(result)) Dialog.alert(t("Could not force stop the agent"));
       return;
     }
     const others = result.value.sharedWithThreadIds.length;
     if (result.value.outcome === "releasing") {
-      Dialog.alert("Turn stopped; the agent is still shutting down");
+      Dialog.alert(t("Turn stopped; the agent is still shutting down"));
     }
     if (result.value.outcome === "shared") {
       Dialog.alert(
-        "Turn stopped; the agent process kept running",
-        `It is shared with ${others === 0 ? "other" : others} working ${others === 1 ? "thread" : "threads"}. Stop those to free it.`,
+        t("Turn stopped; the agent process kept running"),
+        t`It is shared with ${others === 0 ? "other" : others} working ${others === 1 ? "thread" : "threads"}. Stop those to free it.`,
       );
     }
   };
@@ -696,7 +697,7 @@ function ThreadDetailBody(
     if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
       const error = squashAtomCommandFailure(result);
       Dialog.alert(
-        "Could not update thread",
+        t("Could not update thread"),
         error instanceof Error ? error.message : "Try again.",
       );
     }
@@ -706,9 +707,9 @@ function ThreadDetailBody(
   );
   const extensionStatus = props.extensionStatuses?.length
     ? {
-        label: `Pi · ${props.extensionStatuses.map((status) => status.text).join(" · ")}`,
+        label: t`Pi · ${props.extensionStatuses.map((status) => status.text).join(" · ")}`,
         onPress: () =>
-          Dialog.alert("Pi", props.extensionStatuses?.map((status) => status.text).join("\n\n")),
+          Dialog.alert(t("Pi"), props.extensionStatuses?.map((status) => status.text).join("\n\n")),
       }
     : null;
   const backgroundLine = ((): ThreadStatusLineModel | null => {
@@ -729,7 +730,7 @@ function ThreadDetailBody(
       },
       action: {
         label: statusPending ? "Stopping..." : "Stop",
-        accessibilityLabel: "Stop background work",
+        accessibilityLabel: t("Stop background work"),
         disabled: !props.canOperateThread || statusPending,
         onPress: () => void runStatusAction("stop"),
       },
@@ -789,13 +790,14 @@ function ThreadDetailBody(
           unresponsive && canForceStop
             ? {
                 label: forceStoppingKey === selectedThreadKey ? "Force stopping..." : "Force stop",
-                accessibilityLabel: "Force stop the agent",
+                accessibilityLabel: t("Force stop the agent"),
                 disabled: forceStoppingKey === selectedThreadKey,
                 onPress: () =>
                   Dialog.confirm({
-                    title: "Force stop the agent?",
-                    message:
+                    title: t("Force stop the agent?"),
+                    message: t(
                       "It has not answered Stop. Force stop ends the turn and kills the agent's processes, unless other working threads share them.",
+                    ),
                     confirmText: "Force stop",
                     destructive: true,
                     onConfirm: () => void forceStop(runStop.runId),
@@ -810,7 +812,7 @@ function ThreadDetailBody(
     if (props.creationState?.kind === "preparing") {
       // The feed shows worktree setup in place, so only a plain start needs the pill.
       if (props.worktreeSetup || props.creationState.preparingWorktree) return null;
-      return { kind: "preparing", label: "Starting…" };
+      return { kind: "preparing", label: t("Starting…") };
     }
     if (props.creationState?.kind === "failed") {
       return null;
@@ -1229,8 +1231,8 @@ function ThreadDetailBody(
             if (feedbackTarget?.supportsFeedback) {
               if (hasAttachmentsOrContext) {
                 Dialog.alert(
-                  "Approval feedback",
-                  "Send approval feedback without attachments or added context.",
+                  t("Approval feedback"),
+                  t("Send approval feedback without attachments or added context."),
                 );
                 return false;
               }
@@ -1309,7 +1311,7 @@ function ThreadDetailBody(
     if (AsyncResult.isFailure(edited)) {
       const error = squashAtomCommandFailure(edited);
       Dialog.alert(
-        "Could not edit message",
+        t("Could not edit message"),
         error instanceof Error ? error.message : "Please try again.",
       );
       return;

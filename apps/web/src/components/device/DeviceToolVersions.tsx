@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { DeviceToolVersions as ToolVersions } from "@t3tools/contracts";
 import { InlineButton } from "~/components/ui/button";
 import { Popover, PopoverPopup, PopoverTitle, PopoverTrigger } from "~/components/ui/popover";
-import { T, useMessages, Var } from "gt-react";
+import { T, useMessages, Var, t } from "gt-react";
 
 export function DeviceToolVersions({
   tools,
@@ -65,7 +65,9 @@ export function DeviceToolVersions({
                     <dt className="text-muted-foreground">
                       <T>Running</T>
                     </dt>
-                    <dd className="text-right font-mono">{tool.runningVersion ?? "Not running"}</dd>
+                    <dd className="text-right font-mono">
+                      {tool.runningVersion ?? t("Not running")}
+                    </dd>
                     <dt className="text-muted-foreground">
                       <T>Required</T>
                     </dt>
@@ -74,7 +76,7 @@ export function DeviceToolVersions({
                       <T>Installed</T>
                     </dt>
                     <dd className="text-right font-mono break-words">
-                      {tool.installedVersions.join(", ") || "None"}
+                      {tool.installedVersions.join(", ") || t("None")}
                     </dd>
                   </dl>
                 </div>

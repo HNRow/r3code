@@ -1,6 +1,7 @@
 import type { EnvironmentId, ThreadContextRecord } from "@t3tools/contracts";
 import { collectInlineContextIds } from "../../lib/composerContextReferences";
 import type { ComposerThreadDraftState } from "../../composerDraftStore";
+import { t } from "gt-react";
 
 /** Compare immutable user content without copying image bytes or upload metadata. */
 export function composerDraftContentChanged(
@@ -42,8 +43,10 @@ export function loadBalancingSendWarning(input: {
 }) {
   if (input.pending) {
     return {
-      title: "Checking machine resources",
-      description: "Resource checks are still running. You can choose a machine in the composer.",
+      title: t("Checking machine resources"),
+      description: t(
+        "Resource checks are still running. You can choose a machine in the composer.",
+      ),
     };
   }
   const noMachineReadsEveryThread =
@@ -52,7 +55,7 @@ export function loadBalancingSendWarning(input: {
       input.threadContexts.every((record) => record.environmentId === environmentId),
     );
   return {
-    title: "Choose a machine to continue",
+    title: t("Choose a machine to continue"),
     description: noMachineReadsEveryThread
       ? "No machine can read every attached thread. Choose a machine in the composer or remove the threads."
       : "No eligible machine has available resources. Choose a machine in the composer to override.",

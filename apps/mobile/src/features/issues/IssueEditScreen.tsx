@@ -9,6 +9,7 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { PullRequestSheetContent } from "../pull-requests/PullRequestSheetContent";
 import { issueTarget, type IssueParams } from "./issueParams";
 import { issueCommandError, useIssueAccess } from "./issuePresentation";
+import { t } from "../../i18n/gt";
 
 type IssueEditParams = IssueParams & { readonly field: "title" | "body" };
 
@@ -87,7 +88,7 @@ export function IssueEditScreen({ route }: StaticScreenProps<IssueEditParams>) {
       />
       {detail && !allowed ? (
         <Text className="text-xs text-foreground-muted">
-          {access?.blocked ?? "You can't edit this issue."}
+          {access?.blocked ?? t("You can't edit this issue.")}
         </Text>
       ) : null}
       {error || detailQuery.error ? (

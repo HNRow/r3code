@@ -1,3 +1,4 @@
+import { t } from "../../i18n/gt";
 import { Platform } from "react-native";
 
 import { GLASS_HEADER_OPTIONS, type AppScreenOptions } from "../../native/glass-header-options";
@@ -12,6 +13,42 @@ import { formSheetDetents } from "../../native/sheet-surface";
  */
 
 type HeaderStyle = "glass" | "solid" | "none";
+
+// 别名让 GT 抽取时不去分析这个动态调用：标题原文由调用方用 msg() 标记。
+const translateTitle = t;
+
+/**
+ * 标题按读取时翻译：路由选项在模块加载时构建，此时 GT 还没切到用户语言，
+ * 直接 t() 会永远是英文。用 getter 让导航在渲染时再取值。
+ */
+// 调用方常在模块加载期用 `get title() { return t(...) }`；保留 getter，推迟到渲染时求值。
+function titleGetter(options: { readonly title?: string }): (() => string) | undefined {
+  const getter = Object.getOwnPropertyDescriptor(options, "title")?.get;
+  const plain = getter === undefined ? options.title : undefined;
+  if (getter === undefined && plain === undefined) return undefined;
+  return () =>
+    translateTitle(getter === undefined ? (plain as string) : String(getter.call(options)));
+}
+
+function withTitle<T extends object>(result: T, options: { readonly title?: string }): T {
+  const descriptor = Object.getOwnPropertyDescriptor(options, "title");
+  // 有 getter 时保留惰性；纯字符串直接落值，方便调用方 spread 而不触发 GT。
+  if (descriptor?.get !== undefined) {
+    Object.defineProperty(result, "title", {
+      enumerable: true,
+      configurable: true,
+      get: titleGetter(options),
+    });
+  } else if (options.title !== undefined) {
+    Object.defineProperty(result, "title", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: options.title,
+    });
+  }
+  return result;
+}
 
 const SOLID_HEADER_OPTIONS: AppScreenOptions = {
   headerBackButtonDisplayMode: "minimal",
@@ -55,14 +92,16 @@ export interface PageRouteOptions {
 
 /** A page in the workspace: pushed on compact windows, a column page on wide ones. */
 export function pageRoute(options: PageRouteOptions = {}): AppScreenOptions {
-  return {
-    ...headerOptions(options.header ?? "glass", options.itemStyle ?? "editor"),
-    ...(options.title === undefined ? undefined : { title: options.title }),
-    ...(options.duoMinimize
-      ? { unstable_headerMinimizationBehavior: options.duoMinimize }
-      : undefined),
-    ...(options.root ? { headerBackVisible: false } : undefined),
-  };
+  return withTitle(
+    {
+      ...headerOptions(options.header ?? "glass", options.itemStyle ?? "editor"),
+      ...(options.duoMinimize
+        ? { unstable_headerMinimizationBehavior: options.duoMinimize }
+        : undefined),
+      ...(options.root ? { headerBackVisible: false } : undefined),
+    },
+    options,
+  );
 }
 
 export interface SheetRouteOptions {
@@ -99,21 +138,20 @@ export function sheetRoute(options: SheetRouteOptions): AppScreenOptions {
   const header = headerOptions(options.header ?? "glass", options.itemStyle ?? "standard");
   const shared = {
     ...header,
-    ...(options.title === undefined ? undefined : { title: options.title }),
     ...(options.duoMinimize
       ? { unstable_headerMinimizationBehavior: options.duoMinimize }
       : undefined),
     headerBackVisible: false,
     gestureEnabled: true,
   } satisfies AppScreenOptions;
+  const finish = (extra: AppScreenOptions) => withTitle({ ...shared, ...extra }, options);
   if (Platform.OS === "android" && options.android === "card") {
-    return { ...shared, presentation: "card" };
+    return finish({ presentation: "card" });
   }
   if (Platform.OS === "android" && options.android === "fullScreen") {
-    return { ...shared, presentation: "fullScreenModal" };
+    return finish({ presentation: "fullScreenModal" });
   }
-  return {
-    ...shared,
+  return finish({
     presentation: "formSheet",
     sheetPrefersHorizontalBars: true,
     sheetGrabberVisible: true,
@@ -121,7 +159,7 @@ export function sheetRoute(options: SheetRouteOptions): AppScreenOptions {
       Platform.OS === "android" && options.androidFit ? "fitToContents" : sheetDetents(options),
     ...(Platform.OS === "android" ? { sheetCornerRadius: 28 } : undefined),
     ...(options.spansRail ? { nativeContentInsetHorizontally: false } : undefined),
-  } as AppScreenOptions;
+  } as AppScreenOptions);
 }
 
 export interface ModalRouteOptions {
@@ -134,15 +172,17 @@ export interface ModalRouteOptions {
 
 /** A full-screen modal over the workspace with a close button, not a back button. */
 export function modalRoute(options: ModalRouteOptions = {}): AppScreenOptions {
-  return {
-    ...headerOptions(options.header ?? "none", options.itemStyle ?? "standard"),
-    ...(options.title === undefined ? undefined : { title: options.title }),
-    ...(options.duoMinimize
-      ? { unstable_headerMinimizationBehavior: options.duoMinimize }
-      : undefined),
-    headerBackVisible: false,
-    presentation: "fullScreenModal",
-  };
+  return withTitle(
+    {
+      ...headerOptions(options.header ?? "none", options.itemStyle ?? "standard"),
+      ...(options.duoMinimize
+        ? { unstable_headerMinimizationBehavior: options.duoMinimize }
+        : undefined),
+      headerBackVisible: false,
+      presentation: "fullScreenModal",
+    },
+    options,
+  );
 }
 
 /** Full-screen media (a device stream, a browser, an app) with no bar and no dismiss gesture. */

@@ -53,7 +53,7 @@ import {
   THREAD_DETAILS_PANEL_SPLIT_GROUP_CLASS,
   THREAD_DETAILS_PANEL_SPLIT_SEPARATOR_CLASS,
 } from "./chat/threadDetailsPanelStyles";
-import { T, useGT, Var } from "gt-react";
+import { T, useGT, Var, t } from "gt-react";
 
 export type { NewProjectScriptInput, ProjectScriptActionResult };
 
@@ -234,7 +234,7 @@ export default function ProjectScriptsControl({
       {importMenuItems}
       <MenuItem density={presentation === "menu" ? "touch" : "default"} onClick={openAddDialog}>
         <PlusIcon className="size-4" />
-        <MenuItemLabel>{isPanel ? "Add project script" : "Add action"}</MenuItemLabel>
+        <MenuItemLabel>{isPanel ? t("Add project script") : t("Add action")}</MenuItemLabel>
       </MenuItem>
     </>
   );
@@ -328,7 +328,7 @@ export default function ProjectScriptsControl({
             <TooltipPopup side="top">
               {onRunScript
                 ? `Run ${primaryScript.name}`
-                : "Pair this client again with permission to run terminal commands."}
+                : t("Pair this client again with permission to run terminal commands.")}
             </TooltipPopup>
           </Tooltip>
           {isPanel ? (
@@ -464,10 +464,12 @@ export default function ProjectScriptsControl({
                 isPanel && cn("not-sr-only ml-0.5", THREAD_DETAILS_PANEL_LABEL_CLASS),
               )}
             >
-              {isPanel ? "Add project script" : "Add action"}
+              {isPanel ? t("Add project script") : t("Add action")}
             </span>
           </TooltipTrigger>
-          <TooltipPopup side="top">{isPanel ? "Add project script" : "Add action"}</TooltipPopup>
+          <TooltipPopup side="top">
+            {isPanel ? t("Add project script") : t("Add action")}
+          </TooltipPopup>
         </Tooltip>
       )}
 

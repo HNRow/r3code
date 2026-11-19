@@ -61,7 +61,7 @@ import { WizardFooter, WizardHeader, WizardPanel, WizardPopup, WizardSteps } fro
 import { SecretSourceInput, useSecretSources } from "./SecretSourceInput";
 import { searchableSetting } from "./settingsSearch";
 import { SETTINGS_PICKER_TRIGGER_CLASSNAME, SettingsRow, SettingsSection } from "./settingsLayout";
-import { T, useGT, Var, msg } from "gt-react";
+import { T, useGT, Var, t } from "gt-react";
 
 const decodeTextGenerator = Schema.decodeUnknownOption(TextGeneratorConfig);
 
@@ -132,7 +132,7 @@ export function TextGeneratorsSettings({
               description={
                 // Indented past the icon so it lines up with the name.
                 <span className="block truncate ps-7.5">
-                  {config.enabled ? "" : "Off · "}
+                  {config.enabled ? "" : t("Off · ")}
                   {config.baseUrl.replace(/^https?:\/\//, "")}
                 </span>
               }
@@ -246,12 +246,24 @@ const STEPS = ["Connect", "Use it"] as const;
 
 /** Text tasks a generator can write, in the order the settings pages show them. */
 const TASKS = [
-  { key: "textGenerationModelSelection", label: "Thread titles and other generated text" },
+  {
+    key: "textGenerationModelSelection",
+    get label() {
+      return t("Thread titles and other generated text");
+    },
+  },
   {
     key: "sourceControlWriterModelSelection",
-    label: "Commit messages, pull requests, and branch names",
+    get label() {
+      return t("Commit messages, pull requests, and branch names");
+    },
   },
-  { key: "speechPostProcessingModelSelection", label: "Voice transcript cleanup" },
+  {
+    key: "speechPostProcessingModelSelection",
+    get label() {
+      return t("Voice transcript cleanup");
+    },
+  },
 ] as const;
 
 /**
@@ -341,7 +353,7 @@ function TextGeneratorWizard({
       <WizardPopup>
         <WizardHeader
           title={
-            existing ? `Edit ${textGeneratorDisplayName(existing)}` : msg("Add a text generator")
+            existing ? `Edit ${textGeneratorDisplayName(existing)}` : t("Add a text generator")
           }
           description={gt(
             "Writes thread titles, commit messages, and other short text without starting a coding agent. Your API key is stored on this environment.",
@@ -402,7 +414,7 @@ function TextGeneratorWizard({
                                 badgeContent="none"
                               />
                             )}
-                            {candidate.id === "custom" ? "Custom" : candidate.label}
+                            {candidate.id === "custom" ? t("Custom") : candidate.label}
                           </button>
                         );
                       })}
@@ -429,7 +441,7 @@ function TextGeneratorWizard({
                 ) : null}
                 <div className="grid gap-1.5">
                   <Label htmlFor="text-generator-key">
-                    {keyRequired ? "API key" : "API key (optional)"}
+                    {keyRequired ? t("API key") : t("API key (optional)")}
                   </Label>
                   <SecretSourceInput
                     id="text-generator-key"
@@ -510,7 +522,7 @@ function TextGeneratorWizard({
               </Button>
               <Button onClick={() => void connect()} disabled={!canConnect || checking}>
                 {checking ? <Spinner /> : null}
-                {checking ? "Connecting" : existing ? "Save and continue" : "Connect"}
+                {checking ? t("Connecting") : existing ? t("Save and continue") : t("Connect")}
               </Button>
             </>
           ) : (
@@ -734,7 +746,7 @@ function TextGeneratorModelsDialog({
     if ("error" in outcome) {
       toastManager.add({
         type: "error",
-        title: `Couldn't load ${name} models`,
+        title: t`Couldn't load ${name} models`,
         description: outcome.error,
       });
     }
@@ -758,8 +770,8 @@ function TextGeneratorModelsDialog({
           <DialogDescription>
             {models === null
               ? error
-                ? "The model list couldn't load."
-                : "Loading the model list."
+                ? t("The model list couldn't load.")
+                : t("Loading the model list.")
               : `${models.length} ${models.length === 1 ? "model" : "models"} available. Pick one in a text generation model picker.`}
           </DialogDescription>
         </DialogHeader>

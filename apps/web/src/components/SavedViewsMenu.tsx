@@ -23,7 +23,7 @@ import { Label } from "./ui/label";
 import { Menu, MenuItem, MenuItemLabel, MenuPopup, MenuSeparator, MenuTrigger } from "./ui/menu";
 import { toastManager } from "./ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 export interface SavedView<Preferences> {
   readonly id: string;
@@ -93,9 +93,10 @@ export function SavedViewsMenu<Preferences extends Stored, Stored, Encoded>({
     }
     toastManager.add({
       type: "error",
-      title: `Could not save ${kind.shortNoun} views`,
-      description:
+      title: t`Could not save ${kind.shortNoun} views`,
+      description: t(
         "Local storage is unavailable or full. Try again after freeing space or allowing storage.",
+      ),
     });
     return false;
   }
@@ -119,8 +120,8 @@ export function SavedViewsMenu<Preferences extends Stored, Stored, Encoded>({
       setEditor((current) => (current ? { name: current.name } : null));
       toastManager.add({
         type: "error",
-        title: "This saved view was removed",
-        description: "Your name has been kept. Save it as a new view or cancel.",
+        title: t("This saved view was removed"),
+        description: t("Your name has been kept. Save it as a new view or cancel."),
       });
       return;
     }
@@ -142,7 +143,7 @@ export function SavedViewsMenu<Preferences extends Stored, Stored, Encoded>({
             }
           >
             <BookmarkIcon aria-hidden className="size-4" />
-            <span className="max-w-40 truncate">{selectedView?.name ?? "Views"}</span>
+            <span className="max-w-40 truncate">{selectedView?.name ?? t("Views")}</span>
             {modified ? <span aria-label={gt("Modified view")}>*</span> : null}
             <ChevronDownIcon aria-hidden className="size-3 shrink-0" />
           </TooltipTrigger>

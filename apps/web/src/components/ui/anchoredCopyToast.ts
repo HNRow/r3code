@@ -1,5 +1,6 @@
 import type { RefObject } from "react";
 import { anchoredToastManager } from "./toast";
+import { t } from "gt-react";
 
 export const ANCHORED_COPY_TOAST_TIMEOUT_MS = 1000;
 
@@ -10,7 +11,7 @@ export function showAnchoredCopyErrorToast(ref: RefObject<HTMLButtonElement | nu
     positionerProps: {
       anchor: ref.current,
     },
-    title: "Failed to copy",
+    title: t("Failed to copy"),
     description: error.message,
   });
 }

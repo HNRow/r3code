@@ -37,7 +37,7 @@ import { projectEnvironment } from "~/state/projects";
 import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
 import { useAtomCommand } from "~/state/use-atom-command";
 import { readEnvironmentScope, useEnvironmentScope } from "~/state/session";
-import { T, useGT, Var } from "gt-react";
+import { T, useGT, Var, t } from "gt-react";
 
 export const ProposedPlanCard = memo(function ProposedPlanCard({
   planMarkdown,
@@ -69,7 +69,7 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not copy plan",
+          title: t("Could not copy plan"),
           description: error instanceof Error ? error.message : "An error occurred while copying.",
         }),
       );
@@ -103,8 +103,8 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Workspace path is unavailable",
-          description: "This thread does not have a workspace path to save into.",
+          title: t("Workspace path is unavailable"),
+          description: t("This thread does not have a workspace path to save into."),
         }),
       );
       return;
@@ -120,7 +120,7 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
     if (!relativePath) {
       toastManager.add({
         type: "warning",
-        title: "Enter a workspace path",
+        title: t("Enter a workspace path"),
       });
       return;
     }
@@ -141,7 +141,7 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
         setIsSaveDialogOpen(false);
         toastManager.add({
           type: "success",
-          title: "Plan saved to workspace",
+          title: t("Plan saved to workspace"),
           description: result.value.relativePath,
         });
         return;
@@ -151,7 +151,7 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not save plan",
+            title: t("Could not save plan"),
             description: error instanceof Error ? error.message : "An error occurred while saving.",
           }),
         );
@@ -179,7 +179,7 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
           </MenuTrigger>
           <MenuPopup align="end">
             <MenuItem onClick={handleCopyPlan}>
-              {isCopied ? "Copied!" : "Copy to clipboard"}
+              {isCopied ? t("Copied!") : t("Copy to clipboard")}
             </MenuItem>
             <MenuItem onClick={handleDownload}>
               <T>Download as markdown</T>
@@ -231,7 +231,7 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
               data-scroll-anchor-ignore
               onClick={() => setExpanded((value) => !value)}
             >
-              {expanded ? "Collapse plan" : "Expand plan"}
+              {expanded ? t("Collapse plan") : t("Expand plan")}
             </Button>
           </div>
         ) : null}
@@ -316,7 +316,7 @@ function SavePlanToWorkspaceForm({
           <T>Cancel</T>
         </Button>
         <Button size="sm" onClick={() => onSave(savePath)} disabled={!canWriteFiles || saving}>
-          {saving ? "Saving..." : "Save"}
+          {saving ? t("Saving...") : t("Save")}
         </Button>
       </DialogFooter>
     </>

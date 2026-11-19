@@ -13,6 +13,8 @@ import {
 import type { PullRequestListControls } from "../../persistence/mobile-preferences";
 import { compareTimestamps } from "../../lib/time";
 
+import { t } from "../../i18n/gt";
+
 export const PR_LIST_PAGE_SIZE = 30;
 export type { PullRequestListControls } from "../../persistence/mobile-preferences";
 export const DEFAULT_PR_LIST_CONTROLS: PullRequestListControls = {
@@ -468,28 +470,28 @@ export function pullRequestListReviewStatus(
 ) {
   if (entry.reviewDecision === "changes-requested")
     return {
-      label: "Changes",
+      label: t("Changes"),
       accessibleLabel: "Changes requested",
       icon: "person.fill.xmark",
       tint: "accent-danger-foreground",
     } as const;
   if (entry.reviewDecision === "approved")
     return {
-      label: "Approved",
+      label: t("Approved"),
       accessibleLabel: "Reviews approved",
       icon: "person.fill.checkmark",
       tint: "accent-adaptive-emerald-600-400",
     } as const;
   if (entry.viewerReviewRequested)
     return {
-      label: "Your review",
+      label: t("Your review"),
       accessibleLabel: "Your review requested",
       icon: "person.badge.clock",
       tint: "accent-warning-foreground",
     } as const;
   if (entry.reviewDecision === "review-required")
     return {
-      label: "Review",
+      label: t("Review"),
       accessibleLabel: "Review required",
       icon: "person.badge.clock",
       tint: "accent-icon-muted",

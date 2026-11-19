@@ -11,7 +11,7 @@ import { ComposerSurface } from "../chat/ComposerSurface";
 import { readableFailure } from "../pullRequest/pullRequestDetail.logic";
 import { Spinner } from "../ui/spinner";
 import { toastManager } from "../ui/toast";
-import { useGT } from "gt-react";
+import { useGT, t } from "gt-react";
 
 /** The thread composer's card, floating over the issue's timeline, with a comment as its message. */
 export function IssueCommentComposer({
@@ -48,7 +48,7 @@ export function IssueCommentComposer({
     if (result._tag === "Failure") {
       toastManager.add({
         type: "error",
-        title: "The comment could not be posted",
+        title: t("The comment could not be posted"),
         description: readableFailure(squashAtomCommandFailure(result), "The tracker refused it."),
       });
       return;

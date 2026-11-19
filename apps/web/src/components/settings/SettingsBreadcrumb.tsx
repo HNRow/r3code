@@ -1,4 +1,4 @@
-import { msg, useMessages, useGT } from "gt-react";
+import { msg, useMessages, useGT, t } from "gt-react";
 
 import {
   WorkspaceBreadcrumb,
@@ -11,8 +11,12 @@ const SETTINGS_LABEL = msg("Settings");
 
 const SETTINGS_BREADCRUMB_LABELS: Readonly<Record<string, string>> = {
   ...SETTINGS_SECTION_LABELS,
-  "/settings/diagnostics": msg("Diagnostics"),
-  "/settings/open-source-licenses": msg("Open source licenses"),
+  get "/settings/diagnostics"() {
+    return t("Diagnostics");
+  },
+  get "/settings/open-source-licenses"() {
+    return t("Open source licenses");
+  },
 };
 
 function settingsBreadcrumbLabel(pathname: string): string | null {

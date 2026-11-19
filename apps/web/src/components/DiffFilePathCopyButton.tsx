@@ -5,7 +5,7 @@ import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
 import { ANCHORED_COPY_TOAST_TIMEOUT_MS, showAnchoredCopyErrorToast } from "./ui/anchoredCopyToast";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
-import { useGT } from "gt-react";
+import { useGT, t } from "gt-react";
 
 export function DiffFilePathCopyButton({
   filePath,
@@ -39,7 +39,7 @@ export function DiffFilePathCopyButton({
         {isCopied ? <CheckIcon className="size-3 text-success" /> : <CopyIcon className="size-3" />}
       </TooltipTrigger>
       <TooltipPopup>
-        <p>{isCopied ? "Copied" : "Copy path"}</p>
+        <p>{isCopied ? t("Copied") : t("Copy path")}</p>
       </TooltipPopup>
     </Tooltip>
   );

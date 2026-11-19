@@ -13,6 +13,7 @@ import { Sheet } from "../../components/ui/Sheet";
 import { orchestrationEnvironment } from "../../state/orchestration";
 import { useEnvironmentQuery } from "../../state/query";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const stepLabel = (type: string) => {
   const words = type.toLowerCase().replaceAll("_", " ");
@@ -80,7 +81,7 @@ function NativeChild(props: { readonly child: OrchestrationV2NativeChildWork }) 
   const { child } = props;
   return (
     <View className="gap-2">
-      <Text className="font-t3-bold text-sm text-foreground">{child.role || "Subagent"}</Text>
+      <Text className="font-t3-bold text-sm text-foreground">{child.role || t("Subagent")}</Text>
       <Text selectable className="font-sans text-sm text-foreground-secondary">
         {child.prompt}
       </Text>

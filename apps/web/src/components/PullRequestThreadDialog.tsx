@@ -35,7 +35,7 @@ import {
 import { Input } from "./ui/input";
 import { Spinner } from "./ui/spinner";
 import { toastManager } from "./ui/toast";
-import { Var, T } from "gt-react";
+import { Var, T, t } from "gt-react";
 
 interface PullRequestThreadDialogProps {
   open: boolean;
@@ -230,7 +230,7 @@ export function PullRequestThreadDialog({
             </span>
             <Input
               ref={referenceInputRef}
-              placeholder={`${terminology.shortLabel} URL, checkout command, or #42`}
+              placeholder={t`${terminology.shortLabel} URL, checkout command, or #42`}
               value={reference}
               onChange={(event) => {
                 setReferenceDirty(true);
@@ -305,7 +305,7 @@ export function PullRequestThreadDialog({
               preparePullRequestThreadAction.isPending
             }
           >
-            {preparingMode === "local" ? "Preparing local..." : "Local"}
+            {preparingMode === "local" ? t("Preparing local...") : t("Local")}
           </Button>
           <Button
             type="button"
@@ -320,7 +320,7 @@ export function PullRequestThreadDialog({
               preparePullRequestThreadAction.isPending
             }
           >
-            {preparingMode === "worktree" ? "Preparing worktree..." : "Worktree"}
+            {preparingMode === "worktree" ? t("Preparing worktree...") : t("Worktree")}
           </Button>
         </DialogFooter>
       </DialogPopup>

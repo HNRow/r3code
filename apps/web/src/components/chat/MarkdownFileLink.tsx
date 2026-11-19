@@ -27,6 +27,7 @@ import {
 } from "./MarkdownFileLink.logic";
 import { reportMarkdownActionFailure } from "./markdownActionFailure";
 import { WorkspaceEntryTooltip } from "./WorkspaceEntryIcon";
+import { t } from "gt-react";
 
 interface MarkdownFileLinkProps {
   environmentId: EnvironmentId | null;
@@ -96,7 +97,7 @@ export const MarkdownFileLink = memo(function MarkdownFileLink({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Unable to open file",
+            title: t("Unable to open file"),
             description: error instanceof Error ? error.message : "An error occurred.",
           }),
         );
@@ -108,7 +109,7 @@ export const MarkdownFileLink = memo(function MarkdownFileLink({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Unable to open file",
+            title: t("Unable to open file"),
             description: cause instanceof Error ? cause.message : "An error occurred.",
           }),
         );
@@ -146,7 +147,7 @@ export const MarkdownFileLink = memo(function MarkdownFileLink({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Unable to open file in browser",
+            title: t("Unable to open file in browser"),
             description: error instanceof Error ? error.message : "An error occurred.",
           }),
         );
@@ -158,7 +159,7 @@ export const MarkdownFileLink = memo(function MarkdownFileLink({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Unable to open file in browser",
+            title: t("Unable to open file in browser"),
             description: cause instanceof Error ? cause.message : "An error occurred.",
           }),
         );
@@ -184,7 +185,7 @@ export const MarkdownFileLink = memo(function MarkdownFileLink({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Unable to reveal file",
+            title: t("Unable to reveal file"),
             description: error instanceof Error ? error.message : "An error occurred.",
           }),
         );
@@ -196,7 +197,7 @@ export const MarkdownFileLink = memo(function MarkdownFileLink({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Unable to reveal file",
+            title: t("Unable to reveal file"),
             description: cause instanceof Error ? cause.message : "An error occurred.",
           }),
         );
@@ -209,8 +210,8 @@ export const MarkdownFileLink = memo(function MarkdownFileLink({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: `Failed to copy ${title.toLowerCase()}`,
-          description: "Clipboard API unavailable.",
+          title: t`Failed to copy ${title.toLowerCase()}`,
+          description: t("Clipboard API unavailable."),
         }),
       );
       return;
@@ -234,7 +235,7 @@ export const MarkdownFileLink = memo(function MarkdownFileLink({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: `Failed to copy ${title.toLowerCase()}`,
+          title: t`Failed to copy ${title.toLowerCase()}`,
           description: error instanceof Error ? error.message : "An error occurred.",
         }),
       );
@@ -252,10 +253,10 @@ export const MarkdownFileLink = memo(function MarkdownFileLink({
       const copyItems = markdownFileCopyMenuItems({ targetPath, workspaceRelativePath });
       const clicked = await api.contextMenu.show(
         [
-          ...(onOpenMedia ? ([{ id: "preview-media", label: "Preview media" }] as const) : []),
+          ...(onOpenMedia ? ([{ id: "preview-media", label: t("Preview media") }] as const) : []),
           ...(onOpen ? ([{ id: "open", label: openInEditorMenuLabel }] as const) : []),
           ...(onOpenInBrowser
-            ? ([{ id: "open-in-browser", label: "Open in integrated browser" }] as const)
+            ? ([{ id: "open-in-browser", label: t("Open in integrated browser") }] as const)
             : []),
           ...(onReveal && revealLabel ? ([{ id: "reveal", label: revealLabel }] as const) : []),
           ...copyItems.map(({ id, label }) => ({ id, label })),

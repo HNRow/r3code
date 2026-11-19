@@ -28,7 +28,7 @@ import {
 import { Button } from "../ui/button";
 import { toastManager } from "../ui/toast";
 import { SettingsRow, SettingsSection } from "./settingsLayout";
-import { useGT, T, Var } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 const DismissedEnvironmentIds = Schema.Array(Schema.String);
 const reclaimPermissionsAtom = environmentAtomList(
@@ -73,7 +73,7 @@ export function DatabaseStorageNotice({
     <SettingsSection id="storage-database" title={gt("Database")}>
       <SettingsRow
         title={gt("Reclaim freed database space")}
-        description={`These databases still hold space freed by history cleanup.${
+        description={t`These databases still hold space freed by history cleanup.${
           visible.every((recommendation) => recommendation.reclaimable)
             ? ""
             : " Run the command on each machine to reclaim it. It restarts the background service. Quit the desktop app first if it hosts the environment."
@@ -146,8 +146,8 @@ function ReclaimRow({
     if (result._tag === "Success") {
       toastManager.add({
         type: "success",
-        title: `Reclaiming ${amount} on ${label}`,
-        description: `R3 Code there restarts and is back in about ${minutes} min.`,
+        title: t`Reclaiming ${amount} on ${label}`,
+        description: t`R3 Code there restarts and is back in about ${minutes} min.`,
       });
       return;
     }
@@ -156,7 +156,7 @@ function ReclaimRow({
     const error = squashAtomCommandFailure(result);
     toastManager.add({
       type: "error",
-      title: `Could not reclaim space on ${label}`,
+      title: t`Could not reclaim space on ${label}`,
       description: error instanceof Error ? error.message : "An error occurred.",
     });
   };
@@ -176,7 +176,7 @@ function ReclaimRow({
             disabled={restarting}
             onClick={() => setConfirming(true)}
           >
-            {restarting ? "Restarting…" : "Reclaim"}
+            {restarting ? t("Restarting…") : t("Reclaim")}
           </Button>
           {dismiss}
           <AlertDialog open={confirming} onOpenChange={setConfirming}>

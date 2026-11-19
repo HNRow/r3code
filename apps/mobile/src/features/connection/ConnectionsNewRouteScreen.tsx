@@ -32,6 +32,7 @@ import { splitEnvironmentSections } from "./environmentSections";
 import { leaveSettingsPage } from "../settings/settings-navigation";
 import { workspaceHasColumns } from "../layout/workspace/workspace-selection-store";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 type ConnectionsNewRouteParams = {
   readonly mode?: string;
@@ -121,11 +122,11 @@ function PairingForm({
     }
     if (permission.canAskAgain) return;
     Dialog.alert(
-      "Camera access needed",
-      "Camera access was denied for this app. Open Settings to enable it.",
+      t("Camera access needed"),
+      t("Camera access was denied for this app. Open Settings to enable it."),
       [
-        { text: "Cancel", style: "cancel" },
-        { text: "Open Settings", onPress: () => void Linking.openSettings() },
+        { text: t("Cancel"), style: "cancel" },
+        { text: t("Open Settings"), onPress: () => void Linking.openSettings() },
       ],
     );
   };
@@ -148,7 +149,7 @@ function PairingForm({
     } catch (error) {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Dialog.alert(
-        "Invalid QR code",
+        t("Invalid QR code"),
         error instanceof Error ? error.message : "Scanned QR code was not recognized.",
       );
       setTimeout(() => {
@@ -257,7 +258,9 @@ function PairingForm({
               )}
             >
               {pairingConnectionError ??
-                "For machines on your local network or tailnet. The machine keeps its own provider credentials."}
+                t(
+                  "For machines on your local network or tailnet. The machine keeps its own provider credentials.",
+                )}
             </Text>
           </View>
 

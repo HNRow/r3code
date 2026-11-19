@@ -30,6 +30,7 @@ import {
   resolveSvgImageSize,
 } from "./markdownImageSize";
 import { T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 /** Use known feed width immediately; later image measurement would move already-positioned rows. */
 export const MarkdownImageAvailableWidthContext = createContext(0);
@@ -162,7 +163,7 @@ export function ThreadMarkdownImageView(props: {
               <Text className="px-3 text-center text-xs text-foreground-muted">
                 {props.unavailableDetail
                   ? `Image unavailable. ${props.unavailableDetail}`
-                  : "Image unavailable"}
+                  : t("Image unavailable")}
               </Text>
             ) : (
               <AppActivityIndicator />

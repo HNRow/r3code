@@ -32,6 +32,7 @@ import { describe, expect, it, vi } from "vite-plus/test";
 import type { PendingNewTask } from "../../state/use-pending-new-tasks";
 import { makeRawThreadShell, makeThreadShellFixture } from "../../test-fixtures";
 import { threadJumpTarget } from "../keyboard/threadKeyboardShortcuts";
+import { msg } from "gt-react-native";
 import {
   buildThreadListV2Items,
   buildThreadListV2ListItems,
@@ -505,7 +506,7 @@ describe("buildThreadListV2Items", () => {
       threads: [
         makeThread({
           id: ThreadId.make("open"),
-          title: "Open",
+          title: msg("Open"),
           snoozedUntil: "2026-06-03T09:00:00.000Z",
           snoozedAt: "2026-06-01T12:00:00.000Z",
         }),

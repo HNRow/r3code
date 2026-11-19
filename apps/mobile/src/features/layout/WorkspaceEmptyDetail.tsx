@@ -8,6 +8,7 @@ import { EmptyState } from "../../components/ui/EmptyState";
 import { ScreenContent } from "../../components/ui/ScreenContent";
 import type { WorkspaceTab } from "./workspace/workspace-tabs-state";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function WorkspaceEmptyDetail(props: {
   readonly tab?: WorkspaceTab | "settings";
@@ -55,23 +56,23 @@ export function WorkspaceEmptyDetail(props: {
             />
             <Text className="text-center text-xl font-t3-bold">
               {settings
-                ? "Select a setting"
+                ? t("Select a setting")
                 : pullRequests
-                  ? "Select a pull request"
+                  ? t("Select a pull request")
                   : issues
-                    ? "Select an issue"
-                    : "Select a thread"}
+                    ? t("Select an issue")
+                    : t("Select a thread")}
             </Text>
             <Text className="text-center text-base text-foreground-muted">
               {settings
-                ? "Choose a page from the sidebar."
+                ? t("Choose a page from the sidebar.")
                 : pullRequests
-                  ? "Choose a pull request from the sidebar to review it."
+                  ? t("Choose a pull request from the sidebar to review it.")
                   : issues
-                    ? "Choose an issue from the sidebar to read it."
+                    ? t("Choose an issue from the sidebar to read it.")
                     : Platform.OS === "android"
-                      ? "Choose a thread from the sidebar or start a new thread."
-                      : "Choose a thread from the sidebar or start a new task."}
+                      ? t("Choose a thread from the sidebar or start a new thread.")
+                      : t("Choose a thread from the sidebar or start a new task.")}
             </Text>
             {props.onStartNewTask && !pullRequests && !issues && !settings ? (
               Platform.OS === "android" ? (

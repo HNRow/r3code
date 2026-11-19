@@ -48,6 +48,7 @@ import { useCopyToClipboard } from "./useCopyToClipboard";
 import { useNewThreadHandler } from "./useHandleNewThread";
 import { useClientSettings } from "./useSettings";
 import { canTurnThreadIntoProject, useThreadActions } from "./useThreadActions";
+import { t } from "gt-react";
 
 function failureToast(title: string, error: unknown) {
   toastManager.add(
@@ -264,7 +265,7 @@ export function useThreadActionMenu(input: {
           if (result._tag === "Success") {
             toastManager.add({
               type: "success",
-              title: "Project created",
+              title: t("Project created"),
               description: thread.title,
             });
           } else if (!isAtomCommandInterrupted(result)) {
@@ -278,8 +279,8 @@ export function useThreadActionMenu(input: {
             toastManager.add(
               stackedThreadToast({
                 type: "error",
-                title: "Path unavailable",
-                description: "This thread does not have a workspace path to copy.",
+                title: t("Path unavailable"),
+                description: t("This thread does not have a workspace path to copy."),
               }),
             );
             return;
@@ -303,7 +304,7 @@ export function useThreadActionMenu(input: {
         case "archive": {
           if (confirmThreadArchive) {
             const confirmed = await settlePromise(() =>
-              api.dialogs.confirm(`Archive thread "${thread.title}"?`),
+              api.dialogs.confirm(t`Archive thread "${thread.title}"?`),
             );
             if (confirmed._tag === "Failure" || !confirmed.value) return;
           }

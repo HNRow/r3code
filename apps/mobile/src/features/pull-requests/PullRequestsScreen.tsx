@@ -49,6 +49,7 @@ import { useWorkspaceTabs } from "../layout/workspace/WorkspaceTabsContext";
 import { useSearchScrollRestoration } from "../layout/workspace/useSearchScrollRestoration";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 function PullRequestListError(props: { readonly message: string }) {
   const [expanded, setExpanded] = useState(false);
@@ -413,20 +414,20 @@ export function PullRequestsScreen(
                   result.error
                     ? "Couldn't load pull requests"
                     : targets.length && connectedTargets.length === 0
-                      ? "Environment offline"
+                      ? t("Environment offline")
                       : targets.length
                         ? query
-                          ? "No results"
-                          : "No matching pull requests"
-                        : "Connect an environment"
+                          ? t("No results")
+                          : t("No matching pull requests")
+                        : t("Connect an environment")
                 }
                 detail={
                   result.error ??
                   (targets.length && connectedTargets.length === 0
-                    ? "Reconnect to load pull requests that aren't saved on this device."
+                    ? t("Reconnect to load pull requests that aren't saved on this device.")
                     : targets.length
-                      ? "Pull requests from the selected environments' projects appear here."
-                      : "Add an environment in Settings to browse its pull requests.")
+                      ? t("Pull requests from the selected environments' projects appear here.")
+                      : t("Add an environment in Settings to browse its pull requests."))
                 }
                 variant="plain"
               />

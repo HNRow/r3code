@@ -53,15 +53,45 @@ import { Label } from "./ui/label";
 import { Popover, PopoverPopup, PopoverTrigger } from "./ui/popover";
 import { Switch } from "./ui/switch";
 import { Textarea } from "./ui/textarea";
-import { Var, T, useGT } from "gt-react";
+import { Var, T, useGT, t } from "gt-react";
 
 const SCRIPT_ICONS: Array<{ id: ProjectScriptIcon; label: string }> = [
-  { id: "play", label: "Play" },
-  { id: "test", label: "Test" },
-  { id: "lint", label: "Lint" },
-  { id: "configure", label: "Configure" },
-  { id: "build", label: "Build" },
-  { id: "debug", label: "Debug" },
+  {
+    id: "play",
+    get label() {
+      return t("Play");
+    },
+  },
+  {
+    id: "test",
+    get label() {
+      return t("Test");
+    },
+  },
+  {
+    id: "lint",
+    get label() {
+      return t("Lint");
+    },
+  },
+  {
+    id: "configure",
+    get label() {
+      return t("Configure");
+    },
+  },
+  {
+    id: "build",
+    get label() {
+      return t("Build");
+    },
+  },
+  {
+    id: "debug",
+    get label() {
+      return t("Debug");
+    },
+  },
 ];
 
 export function ScriptIcon({

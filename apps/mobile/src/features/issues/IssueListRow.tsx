@@ -71,6 +71,7 @@ export const IssueListRow = memo(function IssueListRow(props: {
             </Text>
           </View>
           <Text
+            translate={false}
             className={cn("text-base leading-5 font-t3-medium", foreground)}
             numberOfLines={2}
             ellipsizeMode="tail"
@@ -90,7 +91,9 @@ export const IssueListRow = memo(function IssueListRow(props: {
               {item.commentCount > 0 ? (
                 <View className="shrink-0 flex-row items-center gap-1">
                   <SymbolView name="bubble.left" size={12} tintColorClassName="accent-icon-muted" />
-                  <Text className={cn("text-2xs tabular-nums", muted)}>{item.commentCount}</Text>
+                  <Text translate={false} className={cn("text-2xs tabular-nums", muted)}>
+                    {item.commentCount}
+                  </Text>
                 </View>
               ) : null}
             </View>

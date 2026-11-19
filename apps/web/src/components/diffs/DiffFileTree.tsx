@@ -23,7 +23,7 @@ import {
   diffFileTreePositions,
   type DiffFileTreeEntry,
 } from "./diffFileTree.logic";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 export type { DiffFileTreeEntry } from "./diffFileTree.logic";
 
@@ -220,7 +220,7 @@ export function DiffFileTree({
               )}
             </TooltipTrigger>
             <TooltipPopup>
-              {allDirectoriesExpanded ? "Collapse all folders" : "Expand all folders"}
+              {allDirectoriesExpanded ? t("Collapse all folders") : t("Expand all folders")}
             </TooltipPopup>
           </Tooltip>
         ) : null}

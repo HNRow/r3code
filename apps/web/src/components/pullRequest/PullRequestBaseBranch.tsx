@@ -8,7 +8,7 @@ import { MiddleTruncate } from "../ui/middle-truncate";
 import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { PullRequestGlyph } from "./pullRequestIcons";
-import { T, useGT } from "gt-react";
+import { T, useGT, t } from "gt-react";
 
 interface BaseFreshness {
   readonly behindBy: number | null;
@@ -75,7 +75,7 @@ function PullRequestBaseFreshnessWarning({
                 onClick={() => onUpdate(method)}
               >
                 <PullRequestGlyph.merged aria-hidden className="size-3" />
-                {method === "rebase" ? "Update with rebase" : "Update branch"}
+                {method === "rebase" ? t("Update with rebase") : t("Update branch")}
               </Button>
             ))}
           </span>

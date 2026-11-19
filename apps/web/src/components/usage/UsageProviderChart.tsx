@@ -13,7 +13,7 @@ import {
 import { cn } from "~/lib/utils";
 import { PROVIDER_ORDER, PROVIDER_PRESENTATION } from "./usageProviders";
 import { observeResize } from "~/lib/observeResize";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 260;
@@ -532,7 +532,7 @@ export function UsageProviderChart({
         </caption>
         <thead>
           <tr>
-            <th scope="col">{resolution === "hour" ? "Hour" : "Day"}</th>
+            <th scope="col">{resolution === "hour" ? t("Hour") : t("Day")}</th>
             {providers.map((provider) => (
               <th key={provider} scope="col">
                 {PROVIDER_PRESENTATION[provider].label}

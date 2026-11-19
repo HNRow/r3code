@@ -9,6 +9,7 @@ import { assetEnvironment } from "../../state/assets";
 import { usePreparedConnection } from "../../state/session";
 import { useAtomQueryRunner } from "../../state/use-atom-query-runner";
 import { fileChipShareSource, type FileChipTarget } from "./fileChipMenu";
+import { t } from "../../i18n/gt";
 
 export function useFileChipShare(
   environmentId: EnvironmentId,
@@ -47,7 +48,7 @@ export function useFileChipShare(
       .catch((error: unknown) => {
         if (!request.signal.aborted) {
           Dialog.alert(
-            "Could not share file",
+            t("Could not share file"),
             error instanceof Error ? error.message : "Try again.",
           );
         }

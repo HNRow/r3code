@@ -1,4 +1,5 @@
 import type { OrchestrationV2ProviderFailure } from "@t3tools/contracts";
+import type { AcpRegistrySettings } from "../settings.ts";
 import { makeProviderFailure } from "@t3tools/provider-core/server/failure";
 import * as HostProcess from "@t3tools/shared/HostProcess";
 import * as Effect from "effect/Effect";
@@ -50,11 +51,21 @@ function turnFailure(ended: KimiTurnEnded): OrchestrationV2ProviderFailure | und
   });
 }
 
+/** Kimi Code 识别：registry 的 kimi-code，或 local 启动的可执行文件名为 kimi。 */
+export function isKimiAcpSettings(settings: AcpRegistrySettings): boolean {
+  return (
+    (settings.source !== "local" && settings.agentId === "kimi-code") ||
+    (settings.source === "local" &&
+      /^kimi(\.exe|\.cmd)?$/i.test(settings.commandPath.split(/[\\/]/).pop() ?? ""))
+  );
+}
+
 /**
  * Kimi Code (2.5.3, 2.6.1) answers a failed turn with `end_turn` and no error. Its main
  * agent's `wire.jsonl` records the real outcome, so the check reads the `turn.ended`
  * this prompt appended.
  */
+
 export const makeKimiPromptOutcomeWatch = Effect.fn("KimiTurnOutcome.make")(function* (
   configuredHome: string | undefined,
 ) {

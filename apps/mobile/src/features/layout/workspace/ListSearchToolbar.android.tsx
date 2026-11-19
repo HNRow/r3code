@@ -10,6 +10,7 @@ import { useWorkspaceTabs } from "./WorkspaceTabsContext";
 import type { PullRequestFilterMenu } from "../../pull-requests/PullRequestListFilters";
 import { openSettings } from "../../settings/settings-navigation";
 import { useGT } from "gt-react-native";
+import { t } from "../../../i18n/gt";
 
 const NOUNS = { pullRequests: "pull requests", issues: "issues" } as const;
 
@@ -72,7 +73,7 @@ export function ListSearchToolbar(props: {
       search={{
         value: tab.query,
         onChangeText: (query) => dispatch({ type: "query", tab: section, query }),
-        placeholder: `Search ${noun}`,
+        placeholder: t`Search ${noun}`,
         active: searching,
         onOpen: openSearch,
         onClose: closeSearch,
@@ -81,7 +82,7 @@ export function ListSearchToolbar(props: {
         filters
           ? [
               {
-                title: `Filter ${noun}`,
+                title: t`Filter ${noun}`,
                 icon: filters.customized
                   ? "line.3.horizontal.decrease.circle.fill"
                   : "line.3.horizontal.decrease.circle",

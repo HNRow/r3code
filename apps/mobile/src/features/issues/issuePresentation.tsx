@@ -16,6 +16,8 @@ import { pullRequestLabelColor } from "../pull-requests/pullRequestList";
 import { usePullRequestConnected } from "../pull-requests/usePullRequestConnected";
 import { issueTarget, type IssueParams } from "./issueParams";
 
+import { t } from "../../i18n/gt";
+
 // Open and completed wear the pull request colors for open and merged; closed any other way
 // than completed is grey, because work that stopped must not look like work that finished.
 export function issueStatus(state: IssueState): {
@@ -30,20 +32,20 @@ export function issueStatus(state: IssueState): {
       label,
       icon: "git.issue",
       tint: "accent-adaptive-emerald-600-400",
-      text: "text-adaptive-emerald-600-400",
+      text: t("text-adaptive-emerald-600-400"),
     };
   if (state.closeReason !== undefined && state.closeReason !== "completed")
     return {
       label,
       icon: "slash.circle",
       tint: "accent-icon-muted",
-      text: "text-foreground-muted",
+      text: t("text-foreground-muted"),
     };
   return {
     label,
     icon: "checkmark.circle",
     tint: "accent-adaptive-violet-600-400",
-    text: "text-adaptive-violet-600-400",
+    text: t("text-adaptive-violet-600-400"),
   };
 }
 

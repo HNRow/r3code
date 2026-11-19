@@ -1393,6 +1393,38 @@ export function createServerEnvironmentAtoms<R, E>(
     hiddenThreadTagsAtom,
     usageModelFilterAtom,
     providersValueAtom,
+    skillInventory: createEnvironmentRpcCommand(runtime, {
+      label: "environment-data:server:skill-inventory",
+      tag: WS_METHODS.skillsList,
+    }),
+    installSkill: createEnvironmentRpcCommand(runtime, {
+      label: "environment-data:server:skill-install",
+      tag: WS_METHODS.skillsInstall,
+    }),
+    setSkillEnabled: createEnvironmentRpcCommand(runtime, {
+      label: "environment-data:server:skill-set-enabled",
+      tag: WS_METHODS.skillsSetEnabled,
+    }),
+    uninstallSkill: createEnvironmentRpcCommand(runtime, {
+      label: "environment-data:server:skill-uninstall",
+      tag: WS_METHODS.skillsUninstall,
+    }),
+    syncSkills: createEnvironmentRpcCommand(runtime, {
+      label: "environment-data:server:skill-sync",
+      tag: WS_METHODS.skillsSync,
+    }),
+    pluginInventory: createEnvironmentRpcCommand(runtime, {
+      label: "environment-data:server:plugin-inventory",
+      tag: WS_METHODS.pluginsList,
+    }),
+    setPluginEnabled: createEnvironmentRpcCommand(runtime, {
+      label: "environment-data:server:plugin-set-enabled",
+      tag: WS_METHODS.pluginsSetEnabled,
+    }),
+    uninstallPlugin: createEnvironmentRpcCommand(runtime, {
+      label: "environment-data:server:plugin-uninstall",
+      tag: WS_METHODS.pluginsUninstall,
+    }),
     providerAuthState: createEnvironmentRpcSubscriptionAtomFamily(runtime, {
       label: "environment-data:provider:auth-state",
       tag: WS_METHODS.providerAuthSubscribe,

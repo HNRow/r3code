@@ -52,7 +52,7 @@ import { PullRequestGlyph } from "~/components/pullRequest/pullRequestIcons";
 import { isSourceControlProviderOffered } from "@t3tools/client-runtime/operations/projects";
 import { sourceControlClients } from "@t3tools/client-runtime/source-control-clients";
 import { sourceControlIcon } from "~/sourceControlPresentation";
-import { msg, T, useGT, useMessages, Var } from "gt-react";
+import { T, useGT, useMessages, Var, t } from "gt-react";
 
 const EMPTY_DISCOVERY_RESULT: SourceControlDiscoveryResult = {
   versionControlSystems: [],
@@ -84,12 +84,12 @@ function authPresentation(auth: SourceControlProviderAuth): {
   readonly badge: "secondary" | null;
 } {
   if (auth.status === "authenticated") {
-    return { label: msg("Authenticated"), badge: null };
+    return { label: t("Authenticated"), badge: null };
   }
   if (auth.status === "unauthenticated") {
-    return { label: msg("Not authenticated"), badge: "secondary" };
+    return { label: t("Not authenticated"), badge: "secondary" };
   }
-  return { label: msg("Status unknown"), badge: null };
+  return { label: t("Status unknown"), badge: null };
 }
 
 function RedactedAccount(props: { readonly account: string | null }) {
@@ -414,12 +414,14 @@ function EmptySourceControlDiscovery({
         </EmptyMedia>
         <EmptyHeader>
           <EmptyTitle>
-            {hasError ? "Could not scan the server environment" : "Nothing detected yet"}
+            {hasError ? t("Could not scan the server environment") : t("Nothing detected yet")}
           </EmptyTitle>
           <EmptyDescription>
             {hasError
               ? error
-              : "Install Git on the server, add optional hosting integrations or credentials your workspace needs, then rescan."}
+              : t(
+                  "Install Git on the server, add optional hosting integrations or credentials your workspace needs, then rescan.",
+                )}
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
@@ -574,7 +576,7 @@ export function SourceControlSettingsPanel() {
       ) : isInitialScanPending ? (
         <>
           <SourceControlSectionSkeleton
-            title={`Version Control${environmentSuffix}`}
+            title={t`Version Control${environmentSuffix}`}
             headerAction={scanButton}
           />
           <SourceControlSectionSkeleton title={gt("Source control providers")} />
@@ -584,7 +586,7 @@ export function SourceControlSettingsPanel() {
           {hasVersionControlSystems ? (
             <SettingsSection
               id={searchableSetting("source-control").id}
-              title={`Version Control${environmentSuffix}`}
+              title={t`Version Control${environmentSuffix}`}
               headerAction={scanButton}
             >
               {result.versionControlSystems.map((item) => (
@@ -598,7 +600,7 @@ export function SourceControlSettingsPanel() {
               id={hasVersionControlSystems ? undefined : searchableSetting("source-control").id}
               title={
                 hasVersionControlSystems
-                  ? msg("Source control providers")
+                  ? t("Source control providers")
                   : `Source control providers${environmentSuffix}`
               }
               headerAction={hasVersionControlSystems ? null : scanButton}

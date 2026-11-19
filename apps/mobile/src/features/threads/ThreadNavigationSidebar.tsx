@@ -81,6 +81,7 @@ import {
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { NativeScrollView } from "../../native/NativeScrollViewMarker";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 type SidebarListItem =
   | ThreadListV2ListItem
@@ -538,8 +539,8 @@ function ThreadNavigationSidebarPane(props: ThreadNavigationSidebarProps) {
       search={{
         value: props.searchQuery,
         onChangeText: props.onSearchQueryChange,
-        placeholder: "Search",
-        accessibilityLabel: "Search threads",
+        placeholder: t("Search"),
+        accessibilityLabel: t("Search threads"),
       }}
       filter={{
         customized: options.selectedEnvironmentId !== null || selectedProjectKey !== null,
@@ -573,16 +574,16 @@ function ThreadNavigationSidebarPane(props: ThreadNavigationSidebarProps) {
         }
       >
         {catalogState.isLoadingConnections
-          ? "Loading threads…"
+          ? t("Loading threads…")
           : showAddEnvironment
-            ? "No environments connected"
+            ? t("No environments connected")
             : props.searchQuery.trim().length > 0
               ? threadSearch.isPending
-                ? "Searching thread messages…"
-                : "No matching threads"
+                ? t("Searching thread messages…")
+                : t("No matching threads")
               : selectedProjectScope !== null
                 ? `No threads in ${selectedProjectScope.title}`
-                : "No threads yet"}
+                : t("No threads yet")}
       </Text>
       {showAddEnvironment ? (
         <View className={Platform.OS === "android" ? "self-center" : "px-2"}>

@@ -4,6 +4,7 @@ import { ZapIcon } from "lucide-react";
 import { UltrafastIcon } from "../Icons";
 import { cn } from "~/lib/utils";
 import { ComposerControlIcon, type ComposerControlSize } from "./ComposerControl";
+import { t } from "gt-react";
 
 export function getTraitsSpeedDisplay(
   descriptor: ProviderOptionDescriptor,
@@ -62,7 +63,7 @@ export function TraitsSpeedIcon({
         )}
       />
       <span className="sr-only">
-        {speedIcon === "ultrafast" ? "Ultrafast mode on" : "Fast mode on"}
+        {speedIcon === "ultrafast" ? t("Ultrafast mode on") : t("Fast mode on")}
       </span>
     </>
   );

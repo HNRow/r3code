@@ -45,6 +45,7 @@ import {
 } from "./source-file-document";
 import { sourceHighlightAtom } from "./sourceHighlightingState";
 import { T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 interface SourceFileSurfaceProps {
   readonly contents: string;
@@ -140,7 +141,7 @@ const HighlightedSourceLine = function HighlightedSourceLine(props: {
   return onLongPress ? (
     <Pressable
       onLongPress={onLongPress}
-      accessibilityActions={[{ name: "longpress", label: "Select text" }]}
+      accessibilityActions={[{ name: "longpress", label: t("Select text") }]}
       onAccessibilityAction={(event) => {
         if (event.nativeEvent.actionName === "longpress") onLongPress();
       }}

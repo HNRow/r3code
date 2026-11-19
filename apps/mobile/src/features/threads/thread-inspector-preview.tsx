@@ -16,6 +16,7 @@ import {
 } from "./thread-inspector-navigation";
 import { ThreadPreviewRoute } from "./thread-preview-route";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 /** A thread shown outside its route: in the inspector pane, or presented full screen with a close. */
 export type ThreadInspectorPresentation =
@@ -33,7 +34,7 @@ export function ThreadInspectorHeader(
         subtitle={props.subtitle}
         actions={[
           {
-            accessibilityLabel: "Maximize thread",
+            accessibilityLabel: t("Maximize thread"),
             icon: "arrow.up.left.and.arrow.down.right",
             onPress: props.onMaximize,
           },

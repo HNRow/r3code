@@ -18,7 +18,7 @@ import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { StandalonePage, StandalonePageHeader } from "../ui/standalone-page";
-import { useGT, T, Var } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 const OPENER_STORAGE_KEY = "t3code:prompt-link-opener";
 const Opener = Schema.NullOr(Schema.Literals(["app", "browser"]));
@@ -31,8 +31,12 @@ interface LinkSummary {
 }
 
 const PROMPT_HEADER = {
-  title: "Open this prompt",
-  description: "It opens as a draft. Nothing runs until you press Send.",
+  get title() {
+    return t("Open this prompt");
+  },
+  get description() {
+    return t("It opens as a draft. Nothing runs until you press Send.");
+  },
 };
 
 function summarize(
@@ -47,8 +51,8 @@ function summarize(
       value:
         prompt.value === null
           ? {
-              title: "Open this thread",
-              description: "It opens in R3 Code if you're connected to the machine it runs on.",
+              title: t("Open this thread"),
+              description: t("It opens in R3 Code if you're connected to the machine it runs on."),
               prompt: null,
               details: [],
             }
@@ -171,7 +175,7 @@ function HostedPromptLinkLanding({
       ) : null}
       <div className="mt-6 flex flex-wrap gap-2">
         <Button render={<a href={deepLink} />} onClick={() => onChoose("app", remember)}>
-          {onPhone ? "Open in app" : "Open in desktop app"}
+          {onPhone ? t("Open in app") : t("Open in desktop app")}
         </Button>
         {canContinue ? (
           <Button variant="outline" onClick={() => onChoose("browser", remember)}>

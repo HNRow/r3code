@@ -57,6 +57,7 @@ import { buildReviewSectionMenu } from "./review-section-menu";
 import { reportShowcaseSceneRendered } from "../showcase/showcaseRenderSignal";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 function ReviewHeader(
   props: Parameters<typeof useReviewHeaderPresentation>[0] & {
@@ -85,7 +86,7 @@ function ReviewHeader(
       subtitle={presentation.subtitle}
       onBack={props.onReturnToThread}
       hideBottomBorder
-      backInSplitView={{ accessibilityLabel: "Back to chat", icon: "chevron.left" }}
+      backInSplitView={{ accessibilityLabel: t("Back to chat"), icon: "chevron.left" }}
       actions={
         props.showChangedFilesToggle
           ? [
@@ -105,7 +106,7 @@ function ReviewHeader(
         ...(props.showSectionToolbar
           ? [
               {
-                title: "Select diff",
+                title: t("Select diff"),
                 icon: presentation.menuIcon,
                 items: [
                   {
@@ -121,7 +122,7 @@ function ReviewHeader(
                     ? [
                         {
                           id: "turns",
-                          title: "Turn",
+                          title: t("Turn"),
                           items: props.sectionMenu.turns.map((section) => ({
                             id: `section:${section.id}`,
                             title: section.title,
@@ -238,6 +239,7 @@ const ReviewFileNavigatorRow = function ReviewFileNavigatorRow(props: {
   return (
     <PaneListItem selected={selected} onPress={handlePress}>
       <Text
+        translate={false}
         className={
           selected
             ? "text-xs font-t3-bold text-foreground"

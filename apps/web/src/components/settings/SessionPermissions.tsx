@@ -1,4 +1,4 @@
-import { msg, useMessages } from "gt-react";
+import { useMessages, t } from "gt-react";
 import { type EnvironmentId, sessionGrantsScope } from "@t3tools/contracts";
 import {
   AUTH_SCOPE_OPTIONS,
@@ -7,22 +7,54 @@ import {
 import { useEnvironmentSessionState } from "~/state/session";
 
 const SCOPE_TITLES: Readonly<Record<string, string>> = {
-  "View environment": msg("View environment"),
-  "Operate tasks": msg("Operate tasks"),
-  "Change environment settings": msg("Change environment settings"),
-  "Manage providers": msg("Manage providers"),
-  "Maintain environment": msg("Maintain environment"),
-  "Control previews": msg("Control previews"),
-  "View diagnostics and usage": msg("View diagnostics and usage"),
-  "View terminals": msg("View terminals"),
-  "Use terminals": msg("Use terminals"),
-  "Change source control": msg("Change source control"),
-  "Read files": msg("Read files"),
-  "Write files": msg("Write files"),
-  "View access": msg("View access"),
-  "Manage access": msg("Manage access"),
-  "View relay": msg("View relay"),
-  "Manage relay": msg("Manage relay"),
+  get "View environment"() {
+    return t("View environment");
+  },
+  get "Operate tasks"() {
+    return t("Operate tasks");
+  },
+  get "Change environment settings"() {
+    return t("Change environment settings");
+  },
+  get "Manage providers"() {
+    return t("Manage providers");
+  },
+  get "Maintain environment"() {
+    return t("Maintain environment");
+  },
+  get "Control previews"() {
+    return t("Control previews");
+  },
+  get "View diagnostics and usage"() {
+    return t("View diagnostics and usage");
+  },
+  get "View terminals"() {
+    return t("View terminals");
+  },
+  get "Use terminals"() {
+    return t("Use terminals");
+  },
+  get "Change source control"() {
+    return t("Change source control");
+  },
+  get "Read files"() {
+    return t("Read files");
+  },
+  get "Write files"() {
+    return t("Write files");
+  },
+  get "View access"() {
+    return t("View access");
+  },
+  get "Manage access"() {
+    return t("Manage access");
+  },
+  get "View relay"() {
+    return t("View relay");
+  },
+  get "Manage relay"() {
+    return t("Manage relay");
+  },
 };
 
 export function SessionPermissions({

@@ -21,6 +21,7 @@ import {
   releaseCheckValue,
 } from "./environmentUpdateCheck";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function OutdatedServerUpdateSection({
   environmentId,
@@ -55,12 +56,12 @@ export function OutdatedServerUpdateSection({
     const targetVersion = release?.targetVersion;
     if (busy || !release || !targetVersion) return;
     Dialog.alert(
-      `Update ${label}?`,
-      `Install R3 Code ${targetVersion}. R3 Code restarts on that machine and reconnects. Running threads may be interrupted.`,
+      t`Update ${label}?`,
+      t`Install R3 Code ${targetVersion}. R3 Code restarts on that machine and reconnects. Running threads may be interrupted.`,
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("Cancel"), style: "cancel" },
         {
-          text: "Update",
+          text: t("Update"),
           onPress: () => {
             setCheckErrorDismissed(true);
             void update({
@@ -78,20 +79,20 @@ export function OutdatedServerUpdateSection({
     <SettingsSection title={gt("R3 Code")}>
       <View className="gap-1 p-4">
         <Text className="text-base text-foreground">
-          {release ? `Version ${release.fromVersion}` : "Update required"}
+          {release ? `Version ${release.fromVersion}` : t("Update required")}
         </Text>
         <Text className="text-sm text-foreground-muted">
           {state.status === "running"
             ? state.stage === "resuming"
-              ? "Restarting and reconnecting…"
+              ? t("Restarting and reconnecting…")
               : state.stage === "installing"
-                ? "Installing update…"
-                : "Downloading update…"
+                ? t("Installing update…")
+                : t("Downloading update…")
             : release
               ? release.targetVersion
                 ? `Version ${release.targetVersion} is available.`
-                : "No newer version is available yet."
-              : "This app needs a newer version of R3 Code on this machine."}
+                : t("No newer version is available yet.")
+              : t("This app needs a newer version of R3 Code on this machine.")}
         </Text>
         {error || state.status === "failed" ? (
           <Text selectable accessibilityRole="alert" className="text-sm text-danger-foreground">

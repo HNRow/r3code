@@ -16,23 +16,39 @@ import { environmentCatalog } from "../../connection/catalog";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { SettingsSection } from "../settings/components/SettingsSection";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const options: ReadonlyArray<{
   value: PullRequestRoutingPermission;
   label: string;
   description: string;
 }> = [
-  { value: "off", label: "Off", description: "Keep source control requests on this environment." },
+  {
+    value: "off",
+    get label() {
+      return t("Off");
+    },
+    get description() {
+      return t("Keep source control requests on this environment.");
+    },
+  },
   {
     value: "read",
-    label: "Read PRs",
-    description: "Share PR data with other enabled environments.",
+    get label() {
+      return t("Read PRs");
+    },
+    get description() {
+      return t("Share PR data with other enabled environments.");
+    },
   },
   {
     value: "read-write",
-    label: "Read and act",
-    description:
-      "Actions may use broader source control permissions than the original environment.",
+    get label() {
+      return t("Read and act");
+    },
+    get description() {
+      return t("Actions may use broader source control permissions than the original environment.");
+    },
   },
 ];
 
@@ -63,11 +79,11 @@ export function PullRequestRoutingSettings() {
                 onPress={() => setExpanded(expanded === environmentId ? null : environmentId)}
               >
                 <View className="min-w-0 flex-1 gap-0.5">
-                  <Text className="text-base font-t3-bold text-foreground">
+                  <Text translate={false} className="text-base font-t3-bold text-foreground">
                     {entry.target.label}
                   </Text>
                   <Text className="text-xs text-foreground-muted" numberOfLines={1}>
-                    {connectionCatalogDisplayUrl(entry) ?? "R3 Connect"}
+                    {connectionCatalogDisplayUrl(entry) ?? t("R3 Connect")}
                   </Text>
                 </View>
                 <Text className="text-sm text-foreground-muted">
@@ -93,8 +109,8 @@ export function PullRequestRoutingSettings() {
                           setSaving(false);
                           if (result._tag === "Failure")
                             Dialog.alert(
-                              "Could not save pull request routing permission",
-                              "Try again before leaving this screen.",
+                              t("Could not save pull request routing permission"),
+                              t("Try again before leaving this screen."),
                             );
                         });
                       }}

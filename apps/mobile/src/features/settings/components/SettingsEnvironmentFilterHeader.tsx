@@ -4,6 +4,8 @@ import type { AppBarMenu } from "../../../components/ui/AppBar.types";
 import { ENVIRONMENT_MACHINE_SYMBOLS } from "../../../components/EnvironmentMachineSymbol";
 import { useSettingsEnvironmentFilter } from "../settings-environment-filter";
 
+import { t } from "../../../i18n/gt";
+
 /** The settings scope filter, as an `AppBar` menu. */
 export function useSettingsEnvironmentMenu(): AppBarMenu {
   const {
@@ -17,7 +19,7 @@ export function useSettingsEnvironmentMenu(): AppBarMenu {
     selectProject,
   } = useSettingsEnvironmentFilter();
   return {
-    title: "Filter settings environments and projects",
+    title: t("Filter settings environments and projects"),
     icon:
       selectedIds === null && selectedProjectKey === null
         ? "line.3.horizontal.decrease"
@@ -32,7 +34,7 @@ export function useSettingsEnvironmentMenu(): AppBarMenu {
         items: [
           {
             id: "all",
-            title: "All connected environments",
+            title: t("All connected environments"),
             selected: selectedIds === null,
             onPress: selectAll,
           },
@@ -54,7 +56,7 @@ export function useSettingsEnvironmentMenu(): AppBarMenu {
         items: [
           {
             id: "project:all",
-            title: "All projects",
+            title: t("All projects"),
             selected: selectedProjectKey === null,
             onPress: () => selectProject(null),
           },

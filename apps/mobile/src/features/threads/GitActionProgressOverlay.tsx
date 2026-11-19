@@ -5,6 +5,8 @@ import { useBarInset } from "../../components/ui/useBarInset";
 import { MOBILE_MOTION } from "../../lib/designTokens";
 import type { GitActionProgress } from "../../state/use-vcs-action-state";
 
+import { t } from "../../i18n/gt";
+
 export function GitActionProgressOverlay(props: {
   readonly progress: GitActionProgress;
   readonly onDismiss: () => void;
@@ -47,7 +49,7 @@ export function GitActionProgressOverlay(props: {
               : "default"
         }
         busy={progress.phase === "running"}
-        action={progress.prUrl ? { label: "View", onPress: handlePress } : undefined}
+        action={progress.prUrl ? { label: t("View"), onPress: handlePress } : undefined}
       />
     </Animated.View>
   );

@@ -1378,11 +1378,21 @@ export const OrchestrationV2NotificationSource = kindUnionWithFallback(
 );
 export type OrchestrationV2NotificationSource = typeof OrchestrationV2NotificationSource.Type;
 
+export const OrchestrationV2NotificationRestart = Schema.Struct({
+  /** The restarted server's own merged list; its note text is a subset capped for the context budget. */
+  cancelledWork: Schema.Array(OrchestrationV2RestartCancelledBackgroundWork),
+  /** The restart stopped the work instead of resuming it. */
+  settled: Schema.Boolean,
+});
+export type OrchestrationV2NotificationRestart = typeof OrchestrationV2NotificationRestart.Type;
+
 export const OrchestrationV2Notification = Schema.Struct({
   source: OrchestrationV2NotificationSource,
   outcome: OrchestrationV2NotificationOutcome,
   summary: TrimmedNonEmptyString,
   detail: Schema.optional(Schema.String),
+  /** Absent on notifications sent before the server wrote this field. */
+  restart: Schema.optional(OrchestrationV2NotificationRestart),
 });
 export type OrchestrationV2Notification = typeof OrchestrationV2Notification.Type;
 

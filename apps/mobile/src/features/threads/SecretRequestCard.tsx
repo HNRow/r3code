@@ -33,6 +33,7 @@ import { tryOpenExternalUrl } from "../../lib/openExternalUrl";
 import { Button } from "../../components/ui/Button";
 import { Chip } from "../../components/ui/Chip";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const LOCK_SYMBOL: AppSymbolName = { ios: "lock", android: "lock" };
 const PRIVATE_SYMBOL: AppSymbolName = { ios: "checkmark.shield", android: "lock" };
@@ -78,7 +79,7 @@ function PendingSecretRequestForm(props: {
   const gt = useGT();
   const { item } = props;
   const answer = useAtomCommand(serverEnvironment.answerSecretRequest, {
-    label: "answer secret request",
+    label: t("answer secret request"),
     // The failure cause holds the request; keep it out of the console.
     reportFailure: false,
     reportDefect: false,
@@ -128,9 +129,15 @@ function PendingSecretRequestForm(props: {
   return (
     <View className="mb-3 gap-3 rounded-[20px] border border-border bg-card-alt p-4">
       <View className="gap-1">
-        <Text className="font-t3-bold text-base text-foreground">{item.label}</Text>
+        <Text translate={false} className="font-t3-bold text-base text-foreground">
+          {item.label}
+        </Text>
         {item.reason.trim() ? (
-          <Text className="font-sans text-sm leading-5 text-foreground-muted" selectable>
+          <Text
+            translate={false}
+            className="font-sans text-sm leading-5 text-foreground-muted"
+            selectable
+          >
             {item.reason}
           </Text>
         ) : null}
@@ -138,14 +145,14 @@ function PendingSecretRequestForm(props: {
       {link !== null ? (
         <View className="gap-1.5">
           <Button
-            label={`Open ${link.host}`}
+            label={t`Open ${link.host}`}
             tone="secondary"
             fullWidth
             onPress={() => void tryOpenExternalUrl(link.href, "secret-request")}
           />
           {/* A link found in the reason is already shown there. */}
           {item.url !== undefined ? (
-            <Text selectable className="font-mono text-xs text-foreground-muted">
+            <Text translate={false} selectable className="font-mono text-xs text-foreground-muted">
               {item.url}
             </Text>
           ) : null}

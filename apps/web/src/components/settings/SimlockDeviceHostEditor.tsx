@@ -33,7 +33,7 @@ import {
   type SimlockHostEnvironment,
   type SimlockTokenEntry,
 } from "./simlockDeviceHostsSettings.logic";
-import { T, Var, useGT } from "gt-react";
+import { T, Var, useGT, t } from "gt-react";
 
 const failureMessage = (cause: Cause.Cause<unknown>) => {
   const error = Cause.squash(cause);
@@ -140,11 +140,17 @@ export function SimlockDeviceHostEditor(props: {
           }}
         >
           <DialogHeader>
-            <DialogTitle>{props.isNew ? "Add Simlock host" : "Edit Simlock host"}</DialogTitle>
+            <DialogTitle>
+              {props.isNew ? t("Add Simlock host") : t("Edit Simlock host")}
+            </DialogTitle>
             <DialogDescription>
               {several
-                ? "Each selected environment's server leases devices from your Simlock gateway with its own agent token, and releases them when they close."
-                : "The environment's server leases devices from your Simlock gateway and releases them when they close."}
+                ? t(
+                    "Each selected environment's server leases devices from your Simlock gateway with its own agent token, and releases them when they close.",
+                  )
+                : t(
+                    "The environment's server leases devices from your Simlock gateway and releases them when they close.",
+                  )}
             </DialogDescription>
           </DialogHeader>
           <DialogPanel>
@@ -224,7 +230,9 @@ export function SimlockDeviceHostEditor(props: {
               <T>
                 A lease ends after the lease minutes even while in use.
                 <Var>
-                  {props.isNew ? null : " Saving restarts this host, which releases its devices."}
+                  {props.isNew
+                    ? null
+                    : t(" Saving restarts this host, which releases its devices.")}
                 </Var>
               </T>
             </p>

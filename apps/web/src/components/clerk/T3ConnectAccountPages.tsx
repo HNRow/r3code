@@ -6,22 +6,29 @@ import { createPortal } from "react-dom";
 import { MobileClientsUserProfilePage } from "./MobileClientsUserProfilePage";
 import { T3ChatUserProfilePage } from "./T3ChatUserProfilePage";
 import { T3ConnectUserProfilePage } from "./T3ConnectUserProfilePage";
+import { t } from "gt-react";
 
 export const T3_CONNECT_ACCOUNT_PAGES = [
   {
-    label: "Mobile clients",
+    get label() {
+      return t("Mobile clients");
+    },
     url: "mobile-clients",
     icon: <SmartphoneIcon className="size-4" />,
     content: <MobileClientsUserProfilePage />,
   },
   {
-    label: "R3 Connect",
+    get label() {
+      return t("R3 Connect");
+    },
     url: "t3-connect",
     icon: <ServerIcon className="size-4" />,
     content: <T3ConnectUserProfilePage />,
   },
   {
-    label: "T3 Chat",
+    get label() {
+      return t("T3 Chat");
+    },
     url: "t3-chat",
     icon: <MessageSquareIcon className="size-4" />,
     content: <T3ChatUserProfilePage />,

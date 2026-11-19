@@ -45,6 +45,7 @@ import { workspaceHasColumns } from "../layout/workspace/workspace-selection-sto
 import { DEFAULT_SETTINGS_PAGE } from "../layout/workspace/workspace-tab-navigation";
 import { readUnloadedThreadCount } from "../../state/olderSettledShelf";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function SettingsProjectOverviewRouteScreen() {
   const gt = useGT();
@@ -158,11 +159,11 @@ function ProjectOverviewContent(props: {
   );
   const deleteProject = useAtomCommand(projectEnvironment.delete, { reportFailure: false });
   const updateProject = useAtomCommand(projectEnvironment.update, {
-    label: "project name update",
+    label: t("project name update"),
     reportFailure: true,
   });
   const organizeProject = useAtomCommand(projectEnvironment.update, {
-    label: "project update",
+    label: t("project update"),
     reportFailure: true,
   });
   const [isOrganizing, setIsOrganizing] = useState(false);
@@ -187,7 +188,7 @@ function ProjectOverviewContent(props: {
     setIsOrganizing(true);
     for (const member of allMembers) {
       if (!readEnvironmentScope(member.environmentId, AuthOrchestrationOperateScope)) {
-        Dialog.alert("Failed to update project", "This connection can no longer change it.");
+        Dialog.alert(t("Failed to update project"), t("This connection can no longer change it."));
         break;
       }
       const result = await organizeProject({
@@ -198,7 +199,7 @@ function ProjectOverviewContent(props: {
         if (!isAtomCommandInterrupted(result)) {
           const error = squashAtomCommandFailure(result);
           Dialog.alert(
-            `Failed to update "${member.title}"`,
+            t`Failed to update "${member.title}"`,
             error instanceof Error ? error.message : "An error occurred.",
           );
         }
@@ -219,8 +220,8 @@ function ProjectOverviewContent(props: {
       (entry) => entry.environmentId === denied.environmentId,
     );
     Dialog.alert(
-      "Failed to remove project",
-      `This connection cannot change projects in ${environment?.label ?? "this environment"}.`,
+      t("Failed to remove project"),
+      t`This connection cannot change projects in ${environment?.label ?? "this environment"}.`,
     );
     return false;
   };
@@ -261,7 +262,7 @@ function ProjectOverviewContent(props: {
               if (!isAtomCommandInterrupted(result)) {
                 const error = squashAtomCommandFailure(result);
                 Dialog.alert(
-                  `Failed to remove "${member.title}"`,
+                  t`Failed to remove "${member.title}"`,
                   error instanceof Error ? error.message : "An error occurred.",
                 );
               }
@@ -323,7 +324,7 @@ function ProjectOverviewContent(props: {
             {displayName}
           </Text>
           <Text className="text-sm text-foreground-muted">
-            {props.members.length === 1 ? "1 checkout" : `${props.members.length} checkouts`}
+            {props.members.length === 1 ? t("1 checkout") : `${props.members.length} checkouts`}
           </Text>
         </View>
       </View>
@@ -400,10 +401,10 @@ function ProjectOverviewContent(props: {
                     : "text-lg text-foreground"
                 }
               >
-                {environment?.label ?? "Environment"}
+                {environment?.label ?? t("Environment")}
               </Text>
               {environment?.displayUrl ? (
-                <Text className="text-sm leading-normal text-foreground-muted">
+                <Text translate={false} className="text-sm leading-normal text-foreground-muted">
                   {environment.displayUrl}
                 </Text>
               ) : null}

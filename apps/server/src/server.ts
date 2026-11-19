@@ -125,6 +125,9 @@ import * as ProviderInstallationGate from "./provider/ProviderInstallationGate.t
 import * as ProviderInstanceRegistry from "./provider/ProviderInstanceRegistry.ts";
 import * as ProviderAdapterRegistry from "./orchestration-v2/ProviderAdapterRegistry.ts";
 import * as ProviderRegistry from "./provider/ProviderRegistry.ts";
+import * as SkillInventoryService from "./provider/SkillInventoryService.ts";
+import * as PluginManager from "./provider/PluginManager.ts";
+import * as SkillManager from "./provider/SkillManager.ts";
 import * as ProviderUsageLimitsIngestion from "./provider/ProviderUsageLimitsIngestion.ts";
 import * as UsageLimitSources from "./usage/UsageLimitSources.ts";
 import * as ProjectFaviconResolver from "./project/ProjectFaviconResolver.ts";
@@ -744,7 +747,19 @@ const layerRuntimeCoreDependenciesBase = Layer.mergeAll(
   Layer.provideMerge(Layer.mergeAll(layerTerminal, layerPreview, layerDevice)),
   Layer.provideMerge(layerPersistence),
   Layer.provideMerge(Layer.mergeAll(Keybindings.layer, UsageLimitSources.layer)),
-  Layer.provideMerge(ProviderRegistry.layer),
+  Layer.provideMerge(
+    SkillManager.layer.pipe(
+      Layer.provideMerge(SkillInventoryService.layer),
+      Layer.provideMerge(ProviderRegistry.layer),
+      Layer.provideMerge(layerKnownWorkspaces),
+    ),
+  ),
+  Layer.provideMerge(
+    PluginManager.layer.pipe(
+      Layer.provideMerge(ProviderRegistry.layer),
+      Layer.provideMerge(layerKnownWorkspaces),
+    ),
+  ),
   Layer.provideMerge(
     ProviderInstanceRegistryHydration.layer.pipe(Layer.provide(SqlitePersistence.layerConfig)),
   ),

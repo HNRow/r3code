@@ -4,7 +4,7 @@ import {
   settlePromise,
   squashAtomCommandFailure,
 } from "@t3tools/client-runtime/state/runtime";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 import { useRef, useState } from "react";
 
 import { useEnvironmentProviders, useEnvironments } from "~/state/environments";
@@ -51,7 +51,7 @@ export function useCheckProviderUpdates() {
     toastManager.add(
       stackedThreadToast({
         type: "error",
-        title: "Could not check provider updates",
+        title: t("Could not check provider updates"),
         description: <span className="whitespace-pre-line">{lines.join("\n")}</span>,
       }),
     );

@@ -30,6 +30,7 @@ import {
 } from "./ComposerModelEffort";
 import type { useComposerProviderModel } from "./useComposerProviderModel";
 import { resolveComposerControlsOwnership } from "./composerControlsOwnership";
+import { t } from "gt-react";
 
 /**
  * The composer footer controls: the model picker (which also holds effort, speed and
@@ -258,7 +259,7 @@ export function ComposerControlsBar(props: {
       className="shrink-0"
     >
       <CircleAlertIcon className="size-4" />
-      {providerSetupInstanceId ? "Open provider settings" : "No provider available"}
+      {providerSetupInstanceId ? t("Open provider settings") : t("No provider available")}
     </ComposerControl>
   ) : (
     <>

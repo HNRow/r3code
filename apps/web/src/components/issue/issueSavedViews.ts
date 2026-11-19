@@ -7,6 +7,7 @@ import {
   IssueListPreferencesSchema,
   type IssueListPreferences,
 } from "./issueListPreferences";
+import { t } from "gt-react";
 
 export function issueViewMatches(
   view: SavedView<typeof IssueListPreferencesSchema.Type>,
@@ -27,7 +28,9 @@ export const ISSUE_SAVED_VIEWS = {
   empty: [],
   noun: "issue",
   shortNoun: "issue",
-  placeholder: "Issues Assigned to Me",
+  get placeholder() {
+    return t("Issues Assigned to Me");
+  },
   suggestedName: (preferences) => (preferences.who === "assigned" ? "Issues Assigned to Me" : ""),
   normalize: issueListPreferences,
   matches: issueViewMatches,

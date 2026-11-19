@@ -5,10 +5,23 @@ import { useAndroidControlSizing } from "../../components/ui/useAndroidControlSi
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { Menu } from "../../components/ui/Menu";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const ATTACHMENT_MENU_ACTIONS: MenuAction[] = [
-  { id: "photos", title: "Photo Library", image: "photo" },
-  { id: "files", title: "Choose Files", image: "folder" },
+  {
+    id: "photos",
+    get title() {
+      return t("Photo Library");
+    },
+    image: "photo",
+  },
+  {
+    id: "files",
+    get title() {
+      return t("Choose Files");
+    },
+    image: "folder",
+  },
 ];
 
 export function ComposerAttachmentButton(props: {

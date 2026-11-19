@@ -27,7 +27,7 @@ import { Input } from "../ui/input";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
 import { toastManager } from "../ui/toast";
 import { SettingsRow } from "./settingsLayout";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 interface AcpSessionProject {
   readonly id: ProjectId;
@@ -247,7 +247,7 @@ function InstanceSessionManagement(
     if (projectId === null || deletingSessionId !== null || session.importedThreadId !== null)
       return;
     const confirmed = await ensureLocalApi().dialogs.confirm(
-      `Permanently delete native ACP session "${session.title ?? session.sessionId}"?`,
+      t`Permanently delete native ACP session "${session.title ?? session.sessionId}"?`,
       { variant: "destructive" },
     );
     if (
@@ -318,7 +318,7 @@ function InstanceSessionManagement(
     if (!parsedHeaders.ok) {
       toastManager.add({
         type: "error",
-        title: "Invalid provider headers",
+        title: t("Invalid provider headers"),
         description: parsedHeaders.error,
       });
       return;
@@ -350,7 +350,7 @@ function InstanceSessionManagement(
     if (projectId === null || savingProviderId !== null || loadingProviders || provider.required)
       return;
     const confirmed = await ensureLocalApi().dialogs.confirm(
-      `Disable ACP provider "${provider.providerId}"?`,
+      t`Disable ACP provider "${provider.providerId}"?`,
       { variant: "destructive" },
     );
     if (
@@ -409,7 +409,7 @@ function InstanceSessionManagement(
                 disabled={props.readOnly || loggingOut}
                 onClick={() => void logoutProvider()}
               >
-                {loggingOut ? "Logging out" : "Log out"}
+                {loggingOut ? t("Logging out") : t("Log out")}
               </Button>
             ) : null}
             {canList && props.projects.length > 0 ? (
@@ -446,7 +446,11 @@ function InstanceSessionManagement(
                   disabled={!canRead || loading || projectId === null}
                   onClick={() => void loadSessions()}
                 >
-                  {loading ? "Loading" : sessions.length === 0 ? "List sessions" : "Refresh"}
+                  {loading
+                    ? t("Loading")
+                    : sessions.length === 0
+                      ? t("List sessions")
+                      : t("Refresh")}
                 </Button>
               </>
             ) : null}
@@ -484,10 +488,10 @@ function InstanceSessionManagement(
                         onClick={() => void importNativeSession(session)}
                       >
                         {!needsImport(session)
-                          ? "Imported"
+                          ? t("Imported")
                           : importingSessionId === session.sessionId
-                            ? "Importing"
-                            : "Import"}
+                            ? t("Importing")
+                            : t("Import")}
                       </Button>
                       {canDelete ? (
                         <Button
@@ -501,7 +505,7 @@ function InstanceSessionManagement(
                           }
                           onClick={() => void deleteNativeSession(session)}
                         >
-                          {deletingSessionId === session.sessionId ? "Deleting" : "Delete"}
+                          {deletingSessionId === session.sessionId ? t("Deleting") : t("Delete")}
                         </Button>
                       ) : null}
                     </div>
@@ -519,7 +523,7 @@ function InstanceSessionManagement(
                 disabled={!canRead || loading}
                 onClick={() => void loadSessions(nextCursor)}
               >
-                {loading ? "Loading" : "Load more"}
+                {loading ? t("Loading") : t("Load more")}
               </Button>
             ) : null}
           </>
@@ -546,7 +550,11 @@ function InstanceSessionManagement(
               }
               onClick={() => void loadProviders()}
             >
-              {loadingProviders ? "Loading" : providers.length === 0 ? "List providers" : "Refresh"}
+              {loadingProviders
+                ? t("Loading")
+                : providers.length === 0
+                  ? t("List providers")
+                  : t("Refresh")}
             </Button>
           </div>
 
@@ -599,7 +607,7 @@ function InstanceSessionManagement(
                           {provider.providerId}
                         </p>
                         <p className="text-3xs text-muted-foreground">
-                          {provider.current === null ? "Disabled" : "Configured"}
+                          {provider.current === null ? t("Disabled") : t("Configured")}
                           {provider.required ? " · Required" : ""}
                         </p>
                       </div>
@@ -617,7 +625,7 @@ function InstanceSessionManagement(
                           }
                           onClick={() => void saveProvider(provider)}
                         >
-                          {savingProviderId === provider.providerId ? "Saving" : "Save"}
+                          {savingProviderId === provider.providerId ? t("Saving") : t("Save")}
                         </Button>
                         {!provider.required && provider.current !== null ? (
                           <Button

@@ -95,7 +95,7 @@ function QueuedEditAttachmentChip(props: {
           />
         </View>
       )}
-      <Text className="min-w-0 shrink text-xs text-foreground" numberOfLines={1}>
+      <Text translate={false} className="min-w-0 shrink text-xs text-foreground" numberOfLines={1}>
         {attachment.name}
       </Text>
       <Pressable

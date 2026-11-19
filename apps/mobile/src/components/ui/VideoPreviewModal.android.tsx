@@ -21,6 +21,7 @@ import { AppText } from "./AppText";
 import { MediaPreviewHeader } from "../MediaPreviewHeader";
 import { MediaVideoPlayer } from "../MediaVideoPlayer";
 import { T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export type { VideoPreviewSource } from "../../lib/videoPreviewSource";
 
@@ -163,7 +164,7 @@ function OpenVideoPreviewModal(props: {
           className="mx-4 my-3 min-h-12 items-center justify-center rounded-xl bg-white/15 px-4"
         >
           <AppText className="font-t3-medium text-base text-white">
-            {mediaActions.sharing ? "Opening share sheet..." : "Save or share video"}
+            {mediaActions.sharing ? t("Opening share sheet...") : t("Save or share video")}
           </AppText>
         </Pressable>
       </View>

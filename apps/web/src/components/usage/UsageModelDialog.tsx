@@ -23,7 +23,7 @@ import {
   tokenTypeSegments,
 } from "./usageBreakdown";
 import { PROVIDER_PRESENTATION } from "./usageProviders";
-import { useGT, Var, T } from "gt-react";
+import { useGT, Var, T, t } from "gt-react";
 
 export interface UsageChartWindow {
   readonly days: readonly string[];
@@ -60,10 +60,10 @@ export function UsageModelDialog({
   const hitRate = cacheHitRate(model);
   const perMillion = costPerMillionTokens(model);
   const stats = [
-    { label: "Cost", value: costUnknown ? "Unpriced" : formatUsd(model.costUsd) },
-    { label: "Tokens", value: formatTokens(model.totalTokens) },
-    perMillion === null ? null : { label: "Per 1M tokens", value: formatUsd(perMillion) },
-    hitRate === null ? null : { label: "Cache hit", value: formatPercent(hitRate) },
+    { label: t("Cost"), value: costUnknown ? "Unpriced" : formatUsd(model.costUsd) },
+    { label: t("Tokens"), value: formatTokens(model.totalTokens) },
+    perMillion === null ? null : { label: t("Per 1M tokens"), value: formatUsd(perMillion) },
+    hitRate === null ? null : { label: t("Cache hit"), value: formatPercent(hitRate) },
   ].filter((stat) => stat !== null);
 
   return (

@@ -7,6 +7,7 @@ import type { DragEvent } from "react";
 import { hostEnvironmentIdAtom } from "./state/primaryEnvironment";
 import { useEnvironmentScope } from "./state/session";
 import { toastManager } from "./components/ui/toast";
+import { t } from "gt-react";
 
 export function useNativeFileDrag(
   environmentId: EnvironmentId | null | undefined,
@@ -38,7 +39,7 @@ export function useNativeFileDrag(
         if (released) return;
         toastManager.add({
           type: "error",
-          title: "Unable to drag file",
+          title: t("Unable to drag file"),
           description: error instanceof Error ? error.message : "An error occurred.",
         });
       });

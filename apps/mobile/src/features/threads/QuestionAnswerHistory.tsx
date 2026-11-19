@@ -34,7 +34,9 @@ function AnswerFile(props: {
           contentFit="contain"
         />
       ) : null}
-      <Text className="text-sm text-foreground underline">{props.attachment.name}</Text>
+      <Text translate={false} className="text-sm text-foreground underline">
+        {props.attachment.name}
+      </Text>
     </Pressable>
   );
 }

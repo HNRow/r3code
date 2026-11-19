@@ -38,6 +38,7 @@ import { NewTaskDraftScreen } from "./NewTaskDraftScreen";
 
 import type { NewTaskDraftRouteParams } from "./thread-route-state";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 export type { NewTaskDraftRouteParams } from "./thread-route-state";
 
 const branchCheckouts = makeNewTaskBranchCheckouts({
@@ -68,7 +69,7 @@ const branchCheckouts = makeNewTaskBranchCheckouts({
     if (!isAtomCommandInterrupted(result)) {
       const error = squashAtomCommandFailure(result);
       Dialog.alert(
-        "Could not switch branch",
+        t("Could not switch branch"),
         error instanceof Error ? error.message : "The branch could not be checked out.",
       );
     }

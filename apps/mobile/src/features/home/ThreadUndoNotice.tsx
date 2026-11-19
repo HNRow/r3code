@@ -12,11 +12,13 @@ import {
 } from "../../native/native-layout-metrics";
 import { workspaceSearchBottomClearance } from "../layout/workspace/workspace-tabs-state";
 import { useWorkspaceTabs } from "../layout/workspace/WorkspaceTabsContext";
+
 import {
   dismissThreadUndoNotice,
   readThreadUndoNotice,
   useThreadUndoNotice,
 } from "./thread-undo-notice";
+import { t } from "../../i18n/gt";
 
 export function ThreadUndoNotice(props: { readonly visible: boolean }) {
   const floatingTabsEnabled = useAndroidFloatingTabs();
@@ -84,7 +86,7 @@ export function ThreadUndoNotice(props: { readonly visible: boolean }) {
       <Toast
         message={`${notice.action} thread`}
         action={{
-          label: "Undo",
+          label: t("Undo"),
           onPress: () => {
             void notice.undo();
           },

@@ -22,11 +22,23 @@ import { ProjectFavicon } from "../ProjectFavicon";
 
 import { useRef, useState } from "react";
 import { Tooltip, TooltipTrigger, TooltipPopup } from "../ui/tooltip";
-import { Var, T, msg, useMessages } from "gt-react";
+import { Var, T, useMessages, t } from "gt-react";
 
 const ARCHIVE_ACTIONS = [
-  { action: "unarchive", label: "Unarchive", Icon: ArchiveX },
-  { action: "delete", label: "Delete", Icon: Trash2Icon },
+  {
+    action: "unarchive",
+    get label() {
+      return t("Unarchive");
+    },
+    Icon: ArchiveX,
+  },
+  {
+    action: "delete",
+    get label() {
+      return t("Delete");
+    },
+    Icon: Trash2Icon,
+  },
 ] as const;
 type ArchiveAction = (typeof ARCHIVE_ACTIONS)[number]["action"];
 
@@ -204,15 +216,15 @@ export function ArchivedThreadsPanel() {
                   <ArchiveIcon className="size-3.5 text-muted-foreground" />
                 )}
                 {isLoadingArchive
-                  ? "Loading archived threads"
+                  ? t("Loading archived threads")
                   : archiveError
-                    ? "Could not load archived threads"
-                    : "No archived threads"}
+                    ? t("Could not load archived threads")
+                    : t("No archived threads")}
               </span>
             }
             description={
               isLoadingArchive
-                ? msg("Checking connected environments.")
+                ? t("Checking connected environments.")
                 : (archiveError ?? "Archived threads will appear here.")
             }
           />

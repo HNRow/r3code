@@ -15,6 +15,7 @@ import { SettingsSection } from "./components/SettingsSection";
 import { LanguageSettingsSection } from "./SettingsLanguageRouteScreen";
 import { NewThreadSettingsSection, WorkingSectionSettings } from "./ThreadSettingsSections";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const GROUPING_OPTIONS: ReadonlyArray<{
   readonly mode: SidebarProjectGroupingMode;
@@ -23,18 +24,30 @@ const GROUPING_OPTIONS: ReadonlyArray<{
 }> = [
   {
     mode: "repository",
-    label: "Group by repository",
-    description: "Matching repositories appear as one project.",
+    get label() {
+      return t("Group by repository");
+    },
+    get description() {
+      return t("Matching repositories appear as one project.");
+    },
   },
   {
     mode: "repository_path",
-    label: "Group by repository path",
-    description: "Keep monorepo paths separate.",
+    get label() {
+      return t("Group by repository path");
+    },
+    get description() {
+      return t("Keep monorepo paths separate.");
+    },
   },
   {
     mode: "separate",
-    label: "Keep separate",
-    description: "Show every workspace as its own project.",
+    get label() {
+      return t("Keep separate");
+    },
+    get description() {
+      return t("Show every workspace as its own project.");
+    },
   },
 ];
 

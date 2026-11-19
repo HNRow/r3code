@@ -129,7 +129,7 @@ import {
   resolveRemoteOperateAccess,
   resolveSelectedProviderEnvironmentId,
 } from "./ProviderSettingsPanel.logic";
-import { T, Var, useGT, msg, useMessages } from "gt-react";
+import { T, Var, useGT, useMessages, t } from "gt-react";
 
 function providerInstanceName(instance: ProviderInstanceConfig): string {
   return (
@@ -453,11 +453,11 @@ function ProviderSettingsPanelContent(target: ProviderSettingsTarget) {
       {options.length === 0 && !targetEnvironmentMissing ? (
         <ProviderSettingsPlaceholder
           icon={<EnvironmentMachineIcon kind={resolveEnvironmentMachineKind(null)} />}
-          title={isReady ? msg("No connected devices") : msg("Loading devices")}
+          title={isReady ? t("No connected devices") : t("Loading devices")}
           description={
             isReady
-              ? msg("Connect an execution environment before configuring providers.")
-              : msg("Reading connected execution environments.")
+              ? t("Connect an execution environment before configuring providers.")
+              : t("Reading connected execution environments.")
           }
         />
       ) : null}
@@ -617,8 +617,8 @@ export function EnvironmentProviderSettings({
         if (result._tag === "Success" && !result.value.accepted) {
           toastManager.add({
             type: "warning",
-            title: "Authentication request expired",
-            description: "Refresh the provider and start the authentication flow again.",
+            title: t("Authentication request expired"),
+            description: t("Refresh the provider and start the authentication flow again."),
           });
           return;
         }
@@ -626,7 +626,7 @@ export function EnvironmentProviderSettings({
           const error = squashAtomCommandFailure(result);
           toastManager.add({
             type: "error",
-            title: "Could not continue authentication",
+            title: t("Could not continue authentication"),
             description:
               error instanceof Error ? error.message : "The authentication request expired.",
           });
@@ -700,7 +700,7 @@ export function EnvironmentProviderSettings({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: `Could not update ${PROVIDER_DISPLAY_NAMES[candidate.driver] ?? candidate.driver}`,
+            title: t`Could not update ${PROVIDER_DISPLAY_NAMES[candidate.driver] ?? candidate.driver}`,
             description:
               error instanceof Error
                 ? error.message
@@ -824,7 +824,7 @@ export function EnvironmentProviderSettings({
       const error = squashAtomCommandFailure(result);
       toastManager.add({
         type: "error",
-        title: "Could not update provider instance",
+        title: t("Could not update provider instance"),
         description: error instanceof Error ? error.message : "The settings update failed.",
       });
     }
@@ -869,7 +869,7 @@ export function EnvironmentProviderSettings({
         const error = squashAtomCommandFailure(updateResult);
         toastManager.add({
           type: "error",
-          title: "Could not delete provider instance",
+          title: t("Could not delete provider instance"),
           description: error instanceof Error ? error.message : "The settings update failed.",
         });
         return;
@@ -889,7 +889,7 @@ export function EnvironmentProviderSettings({
         const error = squashAtomCommandFailure(uninstallResult);
         toastManager.add({
           type: "warning",
-          title: "Provider deleted, but managed files remain",
+          title: t("Provider deleted, but managed files remain"),
           description: error instanceof Error ? error.message : "Managed binary cleanup failed.",
         });
       }
@@ -912,7 +912,7 @@ export function EnvironmentProviderSettings({
       const error = squashAtomCommandFailure(result);
       toastManager.add({
         type: "error",
-        title: "Could not reset provider instance",
+        title: t("Could not reset provider instance"),
         description: error instanceof Error ? error.message : "The settings update failed.",
       });
     }
@@ -1038,7 +1038,7 @@ export function EnvironmentProviderSettings({
                     </span>
                     <span className="hidden min-w-0 truncate sm:inline">
                       {isRefreshingProviders ? (
-                        "Refreshing providers"
+                        t("Refreshing providers")
                       ) : (
                         <ProviderLastChecked environmentId={environmentId} />
                       )}
@@ -1060,7 +1060,7 @@ export function EnvironmentProviderSettings({
           <SettingsGroup divided={false} className="overflow-hidden">
             <SettingsRow
               title={gt("Limited permissions")}
-              description={`This session can view ${environmentLabel}'s providers but can't change their settings.`}
+              description={t`This session can view ${environmentLabel}'s providers but can't change their settings.`}
             />
           </SettingsGroup>
         ) : null}
@@ -1106,8 +1106,8 @@ export function EnvironmentProviderSettings({
             ) : (
               <div className="p-6 text-sm text-muted-foreground">
                 {targetInstanceMissing
-                  ? "This provider instance is no longer available on this device."
-                  : "No providers configured."}
+                  ? t("This provider instance is no longer available on this device.")
+                  : t("No providers configured.")}
               </div>
             )}
           </div>

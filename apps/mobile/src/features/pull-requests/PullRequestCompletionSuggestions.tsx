@@ -6,22 +6,38 @@ import { PullRequestAvatar } from "./PullRequestPresentation";
 import type { PullRequestCompletion } from "@t3tools/shared/pullRequestComposerTrigger";
 import type { usePullRequestCompletions } from "./usePullRequestCompletions";
 
+import { t } from "../../i18n/gt";
+
 const COPY = {
   mention: {
-    label: "Mention a user",
+    get label() {
+      return t("Mention a user");
+    },
     pending: "Searching users...",
     failed: "Couldn't search users on the host",
     none: "No matching users",
   },
   reference: {
-    label: "Reference an issue or change request",
+    get label() {
+      return t("Reference an issue or change request");
+    },
     pending: "Searching...",
     failed: "Couldn't search the host",
     none: "No matching issues or change requests",
   },
 } as const;
 
-const STATE_LABEL = { open: "Open", closed: "Closed", merged: "Merged" } as const;
+const STATE_LABEL = {
+  get open() {
+    return t("Open");
+  },
+  get closed() {
+    return t("Closed");
+  },
+  get merged() {
+    return t("Merged");
+  },
+} as const;
 
 function CompletionRow({ completion }: { readonly completion: PullRequestCompletion }) {
   if (completion.kind === "mention") {
@@ -29,11 +45,19 @@ function CompletionRow({ completion }: { readonly completion: PullRequestComplet
     return (
       <>
         <PullRequestAvatar actor={actor} size={20} />
-        <Text className="shrink-0 text-base font-t3-medium text-foreground" numberOfLines={1}>
+        <Text
+          translate={false}
+          className="shrink-0 text-base font-t3-medium text-foreground"
+          numberOfLines={1}
+        >
           {actor.login}
         </Text>
         {actor.name && actor.name !== actor.login ? (
-          <Text className="min-w-0 flex-1 text-xs text-foreground-muted" numberOfLines={1}>
+          <Text
+            translate={false}
+            className="min-w-0 flex-1 text-xs text-foreground-muted"
+            numberOfLines={1}
+          >
             {actor.name}
           </Text>
         ) : null}

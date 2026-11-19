@@ -6,16 +6,32 @@ import { AppText as Text, AppTextInput } from "../../../components/ui/AppText";
 import { ListChoiceRow as SettingsChoiceRow } from "../../../components/ui/ListChoiceRow";
 import { SettingsSection } from "./SettingsSection";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../../i18n/gt";
 
 const MODES = {
-  static: { label: "Static prefix", description: "Add your prefix to the generated branch name." },
+  static: {
+    get label() {
+      return t("Static prefix");
+    },
+    get description() {
+      return t("Add your prefix to the generated branch name.");
+    },
+  },
   semantic: {
-    label: "Semantic prefix",
-    description: "Let the model choose feat/, fix/, refactor/, or another prefix.",
+    get label() {
+      return t("Semantic prefix");
+    },
+    get description() {
+      return t("Let the model choose feat/, fix/, refactor/, or another prefix.");
+    },
   },
   custom: {
-    label: "Custom instructions",
-    description: "Generate the complete name with no added prefix or suffix.",
+    get label() {
+      return t("Custom instructions");
+    },
+    get description() {
+      return t("Generate the complete name with no added prefix or suffix.");
+    },
   },
 } satisfies Record<BranchNamingMode, { label: string; description: string }>;
 

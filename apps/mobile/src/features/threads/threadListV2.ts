@@ -47,6 +47,7 @@ import {
   reconcilePendingThreadOrder,
   type PendingThreadOrder,
 } from "./threadOrder";
+import { t } from "../../i18n/gt";
 
 export const threadListInboxReturns = createInboxReturnTracker();
 
@@ -156,14 +157,14 @@ export function layoutThreadListV2RowMenuActions(input: {
     ...input.pin,
     {
       id: "more",
-      title: "More",
+      title: t("More"),
       image: "ellipsis.circle",
       subactions: [
         ...(input.reorder.length > 1
           ? [
               {
                 id: "arrange-menu",
-                title: "Arrange",
+                title: t("Arrange"),
                 image: "arrow.up.arrow.down",
                 subactions: [...input.reorder],
               },

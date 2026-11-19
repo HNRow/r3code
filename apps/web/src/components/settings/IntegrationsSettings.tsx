@@ -118,7 +118,7 @@ import { AdvancedSettings } from "./AdvancedSettings";
 import { useSettingsScope } from "./SettingsScopeContext";
 import { BrowserImportWizard, type WizardTarget } from "./BrowserImportWizard";
 import type { ImportOutcome } from "./browserImportWizard.logic";
-import { msg, T, useGT, useMessages, Var } from "gt-react";
+import { T, useGT, useMessages, Var, t } from "gt-react";
 
 const FILL_VALUE = "fill";
 const RESPONSIVE_VALUE = "responsive";
@@ -681,7 +681,9 @@ function BrowserRecordingFrameRateSetting({ disabled }: { readonly disabled: boo
 }
 
 const LINK_TARGET_LABELS: Readonly<Record<BrowserLinkTarget, string>> = {
-  system: msg("Your default browser"),
+  get system() {
+    return t("Your default browser");
+  },
   app: "R3 Code",
 };
 
@@ -932,8 +934,8 @@ function DeviceIntegrationControls({
     if (failed.length > 0) {
       toastManager.add({
         type: "error",
-        title: "Device settings not saved on all environments",
-        description: `Could not update ${failed.map((environment) => environment.label).join(", ")}.`,
+        title: t("Device settings not saved on all environments"),
+        description: t`Could not update ${failed.map((environment) => environment.label).join(", ")}.`,
       });
     }
   };
@@ -964,7 +966,7 @@ function DeviceIntegrationControls({
                   .finally(() => setPending(null));
               }}
             >
-              {pending === `update-${tool}` ? "Updating…" : "Update"}
+              {pending === `update-${tool}` ? t("Updating…") : t("Update")}
             </Button>
           ) : null}
           {state.supportsToolInspection ? (
@@ -980,7 +982,7 @@ function DeviceIntegrationControls({
                 );
               }}
             >
-              {pending === "check" ? "Checking…" : "Check versions"}
+              {pending === "check" ? t("Checking…") : t("Check versions")}
             </Button>
           ) : null}
         </div>
@@ -1098,10 +1100,10 @@ function AgentBrowserAccessSetting() {
       {...searchableSetting("agent-browser-access")}
       description={
         isProjectScope
-          ? msg(
+          ? t(
               "Allow agents in this project to use the shared browser. Applies when the agent session next starts.",
             )
-          : msg("Allow agents to use the shared browser. Projects can override it.")
+          : t("Allow agents to use the shared browser. Projects can override it.")
       }
       resetAction={
         settings.enableAgentBrowserAccess !== DEFAULT_SERVER_SETTINGS.enableAgentBrowserAccess ? (
@@ -1255,8 +1257,8 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
     if (!removalAvailable) {
       toastManager.add({
         type: "error",
-        title: `Could not clear ${name}'s data`,
-        description: "You're not connected to a server yet.",
+        title: t`Could not clear ${name}'s data`,
+        description: t("You're not connected to a server yet."),
       });
       return;
     }
@@ -1267,10 +1269,10 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
       serverProfileData,
     )
       .then(() => {
-        toastManager.add({ type: "success", title: `Cleared ${name}'s cookies and cache` });
+        toastManager.add({ type: "success", title: t`Cleared ${name}'s cookies and cache` });
       })
       .catch(() => {
-        toastManager.add({ type: "error", title: `Could not clear ${name}'s data` });
+        toastManager.add({ type: "error", title: t`Could not clear ${name}'s data` });
       });
   };
 
@@ -1534,8 +1536,8 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
                       <MenuSeparator />
                       <MenuItem disabled>
                         {environmentsReady
-                          ? "Connect to an environment to clear profile data"
-                          : "Checking environments…"}
+                          ? t("Connect to an environment to clear profile data")
+                          : t("Checking environments…")}
                       </MenuItem>
                     </>
                   ) : null}
@@ -1594,7 +1596,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
                 }
               }}
             >
-              {profileRemovalInFlight ? "Removing…" : "Remove profile"}
+              {profileRemovalInFlight ? t("Removing…") : t("Remove profile")}
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>
@@ -1656,8 +1658,8 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
               .catch(() => {
                 toastManager.add({
                   type: "error",
-                  title: "Could not open System Settings",
-                  description: "Open Privacy & Security → Full Disk Access manually.",
+                  title: t("Could not open System Settings"),
+                  description: t("Open Privacy & Security → Full Disk Access manually."),
                 });
               });
           }}
@@ -1671,7 +1673,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
 export function BrowserSettingsPanel() {
   const gt = useGT();
   const desktopOnly = !isElectron;
-  const desktopOnlyMessage = desktopOnly ? msg("Only available in the desktop app.") : undefined;
+  const desktopOnlyMessage = desktopOnly ? t("Only available in the desktop app.") : undefined;
 
   return (
     <SettingsPageContainer>

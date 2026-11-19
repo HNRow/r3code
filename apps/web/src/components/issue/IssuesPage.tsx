@@ -91,7 +91,7 @@ import { useEnvironments, useIssuesSupported } from "~/state/environments";
 import { issueEnvironment, useIssueList, type IssueListTarget } from "~/state/issues";
 import { useDebouncedValue } from "~/state/queries";
 import { primaryServerKeybindingsAtom } from "~/state/server";
-import { useGT, T, Var } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 export interface IssuesSearch extends IssueListPreferences {
   readonly selectedEnvironmentId?: EnvironmentId;
@@ -104,21 +104,75 @@ export interface IssuesSearch extends IssueListPreferences {
 }
 
 const STATE_TABS = [
-  { value: "open", label: "Open", Icon: IssueGlyph.issue },
-  { value: "closed", label: "Closed", Icon: CircleCheckIcon },
-  { value: "all", label: "All", Icon: LayersIcon },
+  {
+    value: "open",
+    get label() {
+      return t("Open");
+    },
+    Icon: IssueGlyph.issue,
+  },
+  {
+    value: "closed",
+    get label() {
+      return t("Closed");
+    },
+    Icon: CircleCheckIcon,
+  },
+  {
+    value: "all",
+    get label() {
+      return t("All");
+    },
+    Icon: LayersIcon,
+  },
 ] as const satisfies ReadonlyArray<PullRequestFilterOption<IssueListState>>;
 
 const INVOLVEMENT_TABS = [
-  { value: "all", label: "Everyone", Icon: UsersIcon },
-  { value: "assigned", label: "Assigned to me", Icon: UserCheckIcon },
-  { value: "authored", label: "Opened by me", Icon: PenLineIcon },
-  { value: "mentioned", label: "Mentioning me", Icon: AtSignIcon },
+  {
+    value: "all",
+    get label() {
+      return t("Everyone");
+    },
+    Icon: UsersIcon,
+  },
+  {
+    value: "assigned",
+    get label() {
+      return t("Assigned to me");
+    },
+    Icon: UserCheckIcon,
+  },
+  {
+    value: "authored",
+    get label() {
+      return t("Opened by me");
+    },
+    Icon: PenLineIcon,
+  },
+  {
+    value: "mentioned",
+    get label() {
+      return t("Mentioning me");
+    },
+    Icon: AtSignIcon,
+  },
 ] as const satisfies ReadonlyArray<PullRequestFilterOption<IssueInvolvement>>;
 
 const SORT_OPTIONS = [
-  { value: "updated", label: "Recently updated", Icon: ClockIcon },
-  { value: "created", label: "Newest", Icon: CalendarArrowDownIcon },
+  {
+    value: "updated",
+    get label() {
+      return t("Recently updated");
+    },
+    Icon: ClockIcon,
+  },
+  {
+    value: "created",
+    get label() {
+      return t("Newest");
+    },
+    Icon: CalendarArrowDownIcon,
+  },
 ] as const satisfies ReadonlyArray<PullRequestFilterOption<IssueListSort>>;
 
 const PAGE_SIZE = 50;
@@ -142,7 +196,7 @@ function hostOptionsFor(groups: ReturnType<typeof groupIssues>, chosen: string |
   const hosts = new Map<string, IssueTrackerSummary>();
   for (const group of groups) hosts.set(group.tracker.host, group.tracker);
   return [
-    { value: "", label: "All", Icon: Plug2Icon },
+    { value: "", label: t("All"), Icon: Plug2Icon },
     // A remembered host no project is on any more stays listed, so the filter can be taken off.
     ...(chosen !== undefined && !hosts.has(chosen)
       ? [{ value: chosen, label: chosen, Icon: Plug2Icon }]
@@ -442,7 +496,7 @@ export function IssuesPage() {
             </h2>
             {!group.tracker.configured ? (
               <p className="px-3 text-sm text-muted-foreground">
-                {group.tracker.detail ?? "This tracker cannot be read right now."}
+                {group.tracker.detail ?? t("This tracker cannot be read right now.")}
               </p>
             ) : null}
             {group.errors.map((error) => (
@@ -455,7 +509,7 @@ export function IssuesPage() {
             ))}
             {group.tracker.configured && group.rows.length === 0 && group.errors.length === 0 ? (
               <p className="px-3 text-sm text-muted-foreground">
-                {debouncedQuery ? "Nothing matches that." : "No issues under these filters."}
+                {debouncedQuery ? t("Nothing matches that.") : t("No issues under these filters.")}
               </p>
             ) : null}
             {group.rows.map((row) => {
@@ -497,10 +551,10 @@ export function IssuesPage() {
                     onClick={() => void loadMore(environmentId, group.tracker.host)}
                   >
                     {loadingMore === `${environmentId} ${group.tracker.host}`
-                      ? "Loading…"
+                      ? t("Loading…")
                       : moreFailure === null
-                        ? "Load more"
-                        : "Retry"}
+                        ? t("Load more")
+                        : t("Retry")}
                   </Button>
                 </Fragment>
               );

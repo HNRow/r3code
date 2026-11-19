@@ -32,6 +32,7 @@ import { connectionAtomRuntime } from "../../connection/runtime";
 import { uuidv4 } from "../../lib/uuid";
 import { createEnvironmentTranscriber } from "./environmentTranscriber";
 import { readVoiceGrant, writeVoiceGrant, type VoiceGrant } from "./voiceGrantStorage";
+import { t } from "../../i18n/gt";
 
 const storedGrant = Atom.make(Effect.promise(readVoiceGrant)).pipe(Atom.keepAlive);
 const choice = Atom.make<VoiceGrant | null | undefined>(undefined).pipe(Atom.keepAlive);
@@ -124,7 +125,7 @@ export function runSpeech<A, E>(
             if (signal?.aborted || !canSend())
               throw new VoiceTranscriptionError({
                 code: "cancelled",
-                message: "Your transcription choice changed.",
+                message: t("Your transcription choice changed."),
               });
             return expoFetch(url, { ...options, redirect: "error" });
           }),
@@ -155,8 +156,9 @@ function environmentTranscriber(
       if (status.state === "missing-model")
         throw new VoiceTranscriptionError({
           code: "unavailable",
-          message:
+          message: t(
             "Install a transcription model for this environment in Settings → Voice, then try again.",
+          ),
         });
       return status.languages
         ? effectiveSpeechLanguage(
@@ -172,7 +174,7 @@ function environmentTranscriber(
       if (!native?.decodeRecording)
         throw new VoiceTranscriptionError({
           code: "unavailable",
-          message: "Update R3 Code to transcribe on an environment.",
+          message: t("Update R3 Code to transcribe on an environment."),
         });
       return native.decodeRecording(uri);
     },

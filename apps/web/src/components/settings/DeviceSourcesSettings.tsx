@@ -49,7 +49,7 @@ import {
   type SimlockTokenEntry,
 } from "./simlockDeviceHostsSettings.logic";
 import { useHostConnectionChecks } from "./useHostConnectionChecks";
-import { msg, T, useGT, useMessages } from "gt-react";
+import { T, useGT, useMessages, t } from "gt-react";
 
 const deviceHostStatesAtom = environmentAtomList("web-device-host-states", (environmentId) =>
   deviceEnvironment.state({ environmentId, input: {} }),
@@ -114,7 +114,7 @@ function hostStatus(
   state: DeviceServiceState | undefined,
   hostId: string,
 ): SourceStatus | undefined {
-  if (!state) return { tone: "pending", label: "Loading" };
+  if (!state) return { tone: "pending", label: t("Loading") };
   const status = state.hostStatuses[hostId];
   switch (status?.status) {
     case "ready": {
@@ -125,9 +125,9 @@ function hostStatus(
     }
     case "installing":
     case "starting":
-      return { tone: "pending", label: "Starting", detail: status.detail };
+      return { tone: "pending", label: t("Starting"), detail: status.detail };
     case "failed":
-      return { tone: "error", label: "Failed", detail: status.detail };
+      return { tone: "error", label: t("Failed"), detail: status.detail };
     default:
       return undefined;
   }
@@ -191,7 +191,7 @@ export function DeviceSourcesSettings(props: {
       toastManager.add({
         type: "error",
         title: failedTitle,
-        description: `This connection cannot change settings on ${unwritable.map((patch) => name(patch.environmentId)).join(", ")}.`,
+        description: t`This connection cannot change settings on ${unwritable.map((patch) => name(patch.environmentId)).join(", ")}.`,
       });
       return false;
     }
@@ -240,7 +240,7 @@ export function DeviceSourcesSettings(props: {
     } catch (error) {
       toastManager.add({
         type: "error",
-        title: "Device host not saved",
+        title: t("Device host not saved"),
         description: error instanceof Error ? error.message : String(error),
       });
     }
@@ -364,11 +364,11 @@ export function DeviceSourcesSettings(props: {
   rows.push({
     key: "local",
     shared: false,
-    title: msg("Local simulators"),
+    title: t("Local simulators"),
     description:
       members.length > 1
-        ? msg("Simulators and emulators installed on each environment's own machine.")
-        : msg("Simulators and emulators installed on this environment's machine."),
+        ? t("Simulators and emulators installed on each environment's own machine.")
+        : t("Simulators and emulators installed on this environment's machine."),
     environments: active.map((member) => {
       const local = member.state?.hosts.find((host) => host.kind === "local");
       const status = local ? hostStatus(member.state, local.id) : hostStatus(member.state, "");
@@ -382,7 +382,7 @@ export function DeviceSourcesSettings(props: {
             ? {
                 ...status,
                 action: {
-                  label: "Refresh",
+                  label: t("Refresh"),
                   run: () => void list({ environmentId: member.environmentId, input: {} }),
                 },
               }
@@ -423,7 +423,7 @@ export function DeviceSourcesSettings(props: {
         if (!held)
           return { environmentId: member.environmentId, label: member.label, added: false };
         const status = testing.has(host.id)
-          ? ({ tone: "pending", label: "Testing connection" } as const)
+          ? ({ tone: "pending", label: t("Testing connection") } as const)
           : hostStatus(member.state, held.host.id);
         return {
           environmentId: member.environmentId,
@@ -434,8 +434,11 @@ export function DeviceSourcesSettings(props: {
             status?.tone === "error" && member.state?.supportsHostRetry
               ? {
                   ...status,
-                  label: "Can't connect",
-                  action: { label: "Retry", run: () => retry(member.environmentId, held.host.id) },
+                  label: t("Can't connect"),
+                  action: {
+                    label: t("Retry"),
+                    run: () => retry(member.environmentId, held.host.id),
+                  },
                 }
               : status,
         };
@@ -620,7 +623,13 @@ export function DeviceSourcesSettings(props: {
 
 const PLATFORMS = [
   { platform: "ios", label: "iOS", Icon: AppleIcon },
-  { platform: "android", label: "Android", Icon: AndroidIcon },
+  {
+    platform: "android",
+    get label() {
+      return t("Android");
+    },
+    Icon: AndroidIcon,
+  },
 ] as const satisfies ReadonlyArray<{ platform: DevicePlatform; label: string; Icon: unknown }>;
 
 /** The platforms a source offers: one icon each, solid where available, muted where not. */
@@ -737,7 +746,7 @@ function PlatformIcon(props: {
                 <Fragment key={environment.environmentId}>
                   <dt className="text-muted-foreground">{environment.label}</dt>
                   <dd className={entry?.available ? "" : "text-muted-foreground"}>
-                    {entry?.available ? "Available" : (entry?.reason ?? "Not available")}
+                    {entry?.available ? t("Available") : (entry?.reason ?? t("Not available"))}
                   </dd>
                 </Fragment>
               );
@@ -745,7 +754,7 @@ function PlatformIcon(props: {
           </dl>
         ) : !available ? (
           <p className="mt-1 text-xs text-muted-foreground">
-            {availability(props.known[0]!)?.reason ?? "Not set up on this machine."}
+            {availability(props.known[0]!)?.reason ?? t("Not set up on this machine.")}
           </p>
         ) : null}
       </PopoverPopup>

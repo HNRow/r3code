@@ -15,26 +15,111 @@ import {
 import type { PullRequestFilterOption } from "./PullRequestListFilters";
 import type { PullRequestListSort } from "./pullRequestListPreferences";
 import { PullRequestGlyph } from "./pullRequestIcons";
+import { t } from "gt-react";
 
 export const INVOLVEMENT_TABS = [
-  { value: "all", label: "All", Icon: LayersIcon },
-  { value: "reviewing", label: "Reviewing", Icon: EyeIcon },
-  { value: "authored", label: "Authored", Icon: PenLineIcon },
+  {
+    value: "all",
+    get label() {
+      return t("All");
+    },
+    Icon: LayersIcon,
+  },
+  {
+    value: "reviewing",
+    get label() {
+      return t("Reviewing");
+    },
+    Icon: EyeIcon,
+  },
+  {
+    value: "authored",
+    get label() {
+      return t("Authored");
+    },
+    Icon: PenLineIcon,
+  },
 ] as const satisfies ReadonlyArray<PullRequestFilterOption<PullRequestInvolvement>>;
 
 export const STATE_TABS = [
-  { value: "all", label: "All", Icon: LayersIcon },
-  { value: "open", label: "Open", Icon: PullRequestGlyph.pullRequest },
-  { value: "closed", label: "Closed", Icon: PullRequestGlyph.closed },
-  { value: "merged", label: "Merged", Icon: PullRequestGlyph.merged },
+  {
+    value: "all",
+    get label() {
+      return t("All");
+    },
+    Icon: LayersIcon,
+  },
+  {
+    value: "open",
+    get label() {
+      return t("Open");
+    },
+    Icon: PullRequestGlyph.pullRequest,
+  },
+  {
+    value: "closed",
+    get label() {
+      return t("Closed");
+    },
+    Icon: PullRequestGlyph.closed,
+  },
+  {
+    value: "merged",
+    get label() {
+      return t("Merged");
+    },
+    Icon: PullRequestGlyph.merged,
+  },
 ] as const satisfies ReadonlyArray<PullRequestFilterOption<PullRequestListState>>;
 
 export const SORT_OPTIONS = [
-  { value: "ready", label: "Merge readiness", Icon: ListChecksIcon },
-  { value: "blocked", label: "Blocked on me", Icon: UserLockIcon },
-  { value: "updated", label: "Recently updated", Icon: ClockIcon },
-  { value: "newest", label: "Newest shown", Icon: CalendarArrowDownIcon },
-  { value: "oldest", label: "Oldest shown", Icon: CalendarArrowUpIcon },
-  { value: "largest", label: "Largest shown", Icon: Maximize2Icon },
-  { value: "smallest", label: "Smallest shown", Icon: Minimize2Icon },
+  {
+    value: "ready",
+    get label() {
+      return t("Merge readiness");
+    },
+    Icon: ListChecksIcon,
+  },
+  {
+    value: "blocked",
+    get label() {
+      return t("Blocked on me");
+    },
+    Icon: UserLockIcon,
+  },
+  {
+    value: "updated",
+    get label() {
+      return t("Recently updated");
+    },
+    Icon: ClockIcon,
+  },
+  {
+    value: "newest",
+    get label() {
+      return t("Newest shown");
+    },
+    Icon: CalendarArrowDownIcon,
+  },
+  {
+    value: "oldest",
+    get label() {
+      return t("Oldest shown");
+    },
+    Icon: CalendarArrowUpIcon,
+  },
+  {
+    value: "largest",
+    get label() {
+      return t("Largest shown");
+    },
+    Icon: Maximize2Icon,
+  },
+  {
+    value: "smallest",
+    get label() {
+      return t("Smallest shown");
+    },
+    Icon: Minimize2Icon,
+  },
 ] as const satisfies ReadonlyArray<PullRequestFilterOption<PullRequestListSort>>;

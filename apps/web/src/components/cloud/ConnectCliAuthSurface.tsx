@@ -11,13 +11,18 @@ import { StandalonePage, StandalonePageHeader } from "../ui/standalone-page";
 import { resolveClerkSignInProps } from "../clerk/authRedirect";
 import { retryClerkLoad, useClerkLoadFailed } from "../clerk/clerkLoadFailure";
 import { Button } from "../ui/button";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 const invalidLinkMessage = {
   context: "Authorization request",
-  title: "This connect link is incomplete",
-  description:
-    "The link is missing its authorization request. Re-run `t3 connect` in your terminal and open the freshly printed URL.",
+  get title() {
+    return t("This connect link is incomplete");
+  },
+  get description() {
+    return t(
+      "The link is missing its authorization request. Re-run `t3 connect` in your terminal and open the freshly printed URL.",
+    );
+  },
 } as const;
 
 export function ConnectCliAuthorizeSurface() {

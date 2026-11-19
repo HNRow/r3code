@@ -37,7 +37,8 @@ export function SettingsRow(props: {
   const onPress = () => {
     if (props.target) {
       if (inList) openSettings(navigation, props.target);
-      else navigation.navigate(props.target);
+      // 静态导航器的 RootParamList 不会随新增页面自动扩展，这里按名字跳转。
+      else navigation.navigate(props.target as never);
     } else if (props.fullScreenTarget) {
       navigation.navigate(props.fullScreenTarget);
     } else {

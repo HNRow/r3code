@@ -1,4 +1,8 @@
-import type { AssetResource, OrchestrationV2TurnItem } from "@t3tools/contracts";
+import type {
+  AssetResource,
+  OrchestrationV2RestartCancelledBackgroundWork,
+  OrchestrationV2TurnItem,
+} from "@t3tools/contracts";
 import { commandItemOutput } from "@t3tools/shared/commandOutput";
 import { MCP_APP_OUTPUT_KEY } from "@t3tools/shared/mcpApp";
 import {
@@ -295,4 +299,55 @@ export function turnItemHasDetail(item: OrchestrationV2TurnItem): boolean {
     default:
       return false;
   }
+}
+
+type RestartNoticeItem = {
+  readonly type: string;
+  /** Only notification items carry a source kind; the turn-item union types it loosely. */
+  readonly source?: unknown;
+  readonly summary?: string | undefined;
+  readonly restart?:
+    | {
+        readonly cancelledWork: ReadonlyArray<OrchestrationV2RestartCancelledBackgroundWork>;
+        readonly settled: boolean;
+      }
+    | undefined;
+};
+
+export type RestartNotice =
+  | {
+      readonly state: "structured";
+      readonly cancelledWork: ReadonlyArray<OrchestrationV2RestartCancelledBackgroundWork>;
+      readonly settled: boolean;
+    }
+  | { readonly state: "legacy" };
+
+/** Notifications written before the server sent `restart`; matched here because they carry no marker. */
+const LEGACY_RESTART_SUMMARIES: ReadonlySet<string> = new Set([
+  "R3 Code restarted and resumed this turn",
+  "R3 Code restarted and stopped background work",
+  "T3 Code restarted and resumed this turn",
+  "T3 Code restarted and stopped background work",
+]);
+
+/**
+ * The restart note's detail is the prompt sent to the agent, so the work the restart lost comes from
+ * the server's structured field; the client must not re-derive it from runs.
+ */
+export function restartNoticeForItem(item: RestartNoticeItem): RestartNotice | null {
+  if (item.type !== "notification") return null;
+  const source = item.source;
+  const sourceKind =
+    typeof source === "object" && source !== null && "kind" in source ? source.kind : undefined;
+  if (sourceKind !== "system") return null;
+  if (item.restart !== undefined) {
+    return {
+      state: "structured",
+      cancelledWork: item.restart.cancelledWork,
+      settled: item.restart.settled,
+    };
+  }
+  return item.summary !== undefined && LEGACY_RESTART_SUMMARIES.has(item.summary)
+    ? { state: "legacy" }
+    : null;
 }

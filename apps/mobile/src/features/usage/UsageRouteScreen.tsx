@@ -49,19 +49,67 @@ import { UsageLimitsSection } from "./UsageLimitsPooled";
 import type { UsageChartMetric } from "./usageChartData";
 import { PROVIDER_LABEL, useProviderColors, useUsageMixColors } from "./usageProviders";
 import { useGT, Var, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 type UsageView = UsageChartMetric | "limits";
 const VIEW_OPTIONS = [
-  { value: "cost", label: "Cost" },
-  { value: "tokens", label: "Tokens" },
-  { value: "limits", label: "Limits" },
+  {
+    value: "cost",
+    get label() {
+      return t("Cost");
+    },
+  },
+  {
+    value: "tokens",
+    get label() {
+      return t("Tokens");
+    },
+  },
+  {
+    value: "limits",
+    get label() {
+      return t("Limits");
+    },
+  },
 ] as const satisfies readonly { value: UsageView; label: string }[];
 
 const WINDOW_OPTIONS = [
-  { value: 1, label: "24h", accessibilityLabel: "Past 24 hours" },
-  { value: 7, label: "7d", accessibilityLabel: "Past 7 days" },
-  { value: 30, label: "30d", accessibilityLabel: "Past 30 days" },
-  { value: 90, label: "90d", accessibilityLabel: "Past 90 days" },
+  {
+    value: 1,
+    get label() {
+      return t("24h");
+    },
+    get accessibilityLabel() {
+      return t("Past 24 hours");
+    },
+  },
+  {
+    value: 7,
+    get label() {
+      return t("7d");
+    },
+    get accessibilityLabel() {
+      return t("Past 7 days");
+    },
+  },
+  {
+    value: 30,
+    get label() {
+      return t("30d");
+    },
+    get accessibilityLabel() {
+      return t("Past 30 days");
+    },
+  },
+  {
+    value: 90,
+    get label() {
+      return t("90d");
+    },
+    get accessibilityLabel() {
+      return t("Past 90 days");
+    },
+  },
 ] as const;
 
 const CHART_HEIGHT = 180;
@@ -193,7 +241,7 @@ function UsageScreen(props: {
     setSelectedEnvironmentIds((selected) => toggleUsageEnvironment(selected, environments, id));
   };
   const environmentMenu = {
-    title: "Filter usage environments",
+    title: t("Filter usage environments"),
     icon:
       selectedEnvironmentIds === null
         ? ("line.3.horizontal.decrease" as const)
@@ -201,7 +249,7 @@ function UsageScreen(props: {
     items: [
       {
         id: "all",
-        title: "All environments",
+        title: t("All environments"),
         selected: selectedEnvironmentIds === null,
         onPress: () => selectEnvironment("all"),
       },
@@ -308,8 +356,8 @@ function UsageScreen(props: {
                   ) : selectedEnvironments.length === 0 ? (
                     <Text className="py-16 text-center text-base text-foreground-muted">
                       {environments.length === 0
-                        ? "Connect an environment to see usage."
-                        : "Select an environment to see usage."}
+                        ? t("Connect an environment to see usage.")
+                        : t("Select an environment to see usage.")}
                     </Text>
                   ) : !canReadDiagnostics ? (
                     <View className="gap-2 py-16">
@@ -503,7 +551,7 @@ function UsageSummary(props: { readonly merged: MergedUsage; readonly metric: Us
   return (
     <View className="gap-0.5">
       <Text className="text-sm text-foreground-muted">
-        {metric === "cost" ? "Raw token cost" : "Processed tokens"}
+        {metric === "cost" ? t("Raw token cost") : t("Processed tokens")}
       </Text>
       <Text className="text-4xl font-t3-bold tabular-nums text-foreground">
         {metric === "cost" ? `${formatUsd(merged.costUsd)}*` : formatTokens(merged.totalTokens)}
@@ -659,22 +707,22 @@ function CostSection(props: { readonly merged: MergedUsage; readonly wide: boole
   const { categoryCost, speedCost } = props.merged;
   const colors = useUsageMixColors();
   const byType = [
-    { label: "Input", value: categoryCost.input, color: colors.input },
-    { label: "Cache read", value: categoryCost.cacheRead, color: colors.cacheRead },
-    { label: "Cache write", value: categoryCost.cacheWrite, color: colors.cacheWrite },
-    { label: "Output", value: categoryCost.output, color: colors.output },
+    { label: t("Input"), value: categoryCost.input, color: colors.input },
+    { label: t("Cache read"), value: categoryCost.cacheRead, color: colors.cacheRead },
+    { label: t("Cache write"), value: categoryCost.cacheWrite, color: colors.cacheWrite },
+    { label: t("Output"), value: categoryCost.output, color: colors.output },
     // Reported cost with no rates to split it, or from older servers. Below a
     // cent it is rounding, not usage.
     {
-      label: "Other",
+      label: t("Other"),
       value: categoryCost.unsplit >= 0.005 ? categoryCost.unsplit : 0,
       color: colors.other,
     },
   ];
   const bySpeed = [
-    { label: "Standard", value: speedCost.standard, color: colors.standard },
-    { label: "Fast", value: speedCost.fast, color: colors.fast },
-    { label: "Ultrafast", value: speedCost.ultrafast, color: colors.ultrafast },
+    { label: t("Standard"), value: speedCost.standard, color: colors.standard },
+    { label: t("Fast"), value: speedCost.fast, color: colors.fast },
+    { label: t("Ultrafast"), value: speedCost.ultrafast, color: colors.ultrafast },
   ];
   if (props.merged.costUsd <= 0) return null;
 
@@ -733,7 +781,9 @@ function ShareBar(props: {
         {visible.map((segment) => (
           <View key={segment.label} className="flex-row items-center gap-1.5">
             <View className="size-2 rounded-sm" style={{ backgroundColor: segment.color }} />
-            <Text className="text-sm text-foreground-muted">{segment.label}</Text>
+            <Text translate={false} className="text-sm text-foreground-muted">
+              {segment.label}
+            </Text>
             <Text className="text-sm tabular-nums text-foreground">{formatUsd(segment.value)}</Text>
           </View>
         ))}
@@ -792,10 +842,10 @@ function ModelsSection(props: {
               style={{ backgroundColor: colors[model.provider] }}
             />
             <View className="min-w-0 flex-1 gap-0.5">
-              <Text className="text-base text-foreground" numberOfLines={1}>
+              <Text translate={false} className="text-base text-foreground" numberOfLines={1}>
                 {model.model}
               </Text>
-              <Text className="text-sm text-foreground-muted">
+              <Text translate={false} className="text-sm text-foreground-muted">
                 {metric === "tokens"
                   ? `${formatPercent(model.tokenShare)} of tokens · ${
                       isModelCostUnknown(model) ? "no known rates" : formatUsd(model.costUsd)
@@ -809,7 +859,7 @@ function ModelsSection(props: {
               {metric === "tokens"
                 ? formatTokens(model.totalTokens)
                 : isModelCostUnknown(model)
-                  ? "Unpriced"
+                  ? t("Unpriced")
                   : formatUsd(model.costUsd)}
             </Text>
           </View>

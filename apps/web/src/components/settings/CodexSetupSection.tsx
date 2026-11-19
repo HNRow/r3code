@@ -54,7 +54,7 @@ import {
   settleHandoffAuthorizationPage,
   settleProviderInstall,
 } from "./CodexSetupSection.logic";
-import { Var, T, useGT, msg } from "gt-react";
+import { Var, T, useGT, t } from "gt-react";
 
 const noop = () => undefined;
 
@@ -141,14 +141,14 @@ export function CodexSetupSection(props: CodexSetupSectionProps) {
                 </T>
               </>
             ) : (
-              msg("Connected with your Codex CLI.")
+              t("Connected with your Codex CLI.")
             )
           ) : existingChecking ? (
-            msg("Checking your Codex CLI...")
+            t("Checking your Codex CLI...")
           ) : props.provider?.installed ? (
             existingSummary.headline
           ) : (
-            msg("Code with your ChatGPT subscription.")
+            t("Code with your ChatGPT subscription.")
           )
         }
         control={
@@ -689,18 +689,18 @@ function ManagedCodexSetup({
       }}
     >
       {finishingSignIn
-        ? "Finishing sign-in..."
+        ? t("Finishing sign-in...")
         : handoffQuery.data?.phase === "finished"
           ? transferFailed
-            ? "Retry connection"
-            : "Finishing sign-in..."
+            ? t("Retry connection")
+            : t("Finishing sign-in...")
           : auth?.phase === "waiting"
             ? remoteWeb
-              ? "Open ChatGPT sign-in"
-              : "Open sign-in page"
+              ? t("Open ChatGPT sign-in")
+              : t("Open sign-in page")
             : presentation === "onboarding"
-              ? "Open sign-in page"
-              : "Signing in..."}
+              ? t("Open sign-in page")
+              : t("Signing in...")}
     </Button>
   );
   const callbackCompletion =
@@ -852,7 +852,7 @@ function ManagedCodexSetup({
                   </T>
                 </>
               ) : (
-                msg("Connected to ChatGPT.")
+                t("Connected to ChatGPT.")
               )
             ) : callbackCompletion && !needsManualCallback ? (
               <CodexSignInDescription
@@ -869,7 +869,7 @@ function ManagedCodexSetup({
             ) : authActive || auth?.phase === "failed" || auth?.phase === "cancelled" ? (
               accountDescription
             ) : (
-              msg("Code with your ChatGPT subscription.")
+              t("Code with your ChatGPT subscription.")
             )
           }
           control={
@@ -896,10 +896,10 @@ function ManagedCodexSetup({
                 }}
               >
                 {installActive || pending
-                  ? "Setting up..."
+                  ? t("Setting up...")
                   : hasSavedAccount
-                    ? "Reconnect account"
-                    : "Continue with ChatGPT"}
+                    ? t("Reconnect account")
+                    : t("Continue with ChatGPT")}
               </ChatGptConnectionButton>
             )
           }
@@ -1046,10 +1046,10 @@ function ManagedCodexSetup({
                   }}
                 >
                   {pending
-                    ? "Setting up..."
+                    ? t("Setting up...")
                     : hasSavedAccount
-                      ? "Reconnect account"
-                      : "Continue with ChatGPT"}
+                      ? t("Reconnect account")
+                      : t("Continue with ChatGPT")}
                 </ChatGptConnectionButton>
                 {hasSavedAccount ? (
                   <Button
@@ -1092,7 +1092,7 @@ function ManagedCodexSetup({
           {error ??
             (installation?.phase === "failed"
               ? installation.message
-              : "Could not read Codex setup status. Reconnect and try again.")}
+              : t("Could not read Codex setup status. Reconnect and try again."))}
         </p>
       ) : null}
     </section>
@@ -1152,8 +1152,8 @@ export function CodexManagedRuntimeFields({
         title={gt("Shadow home path")}
         description={
           provider?.runtimePaths?.shadowHomePath
-            ? msg("Account-specific home sharing the Codex state above.")
-            : msg("This instance uses the shared Codex home directly.")
+            ? t("Account-specific home sharing the Codex state above.")
+            : t("This instance uses the shared Codex home directly.")
         }
         control={
           <div className="w-full sm:w-80">

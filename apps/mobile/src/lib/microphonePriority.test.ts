@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 
+import { msg } from "gt-react-native";
 import {
   type MicrophoneEntry,
   microphoneEntryKey,
@@ -12,7 +13,7 @@ const iPhone = { uid: "Built-In Microphone", name: "iPhone Microphone", type: "M
 const airPods = { uid: "airpods", name: "Julius’s AirPods Pro", type: "BluetoothHFP" };
 const bose = { uid: "bose", name: "Julius’s Bose QC", type: "BluetoothHFP" };
 const civic = { uid: "civic", name: "Honda Civic", type: "BluetoothHFP" };
-const carPlay = { uid: "carplay", name: "CarPlay", type: "CarAudio" };
+const carPlay = { uid: "carplay", name: msg("CarPlay"), type: "CarAudio" };
 const usb = { uid: "usb", name: "Shure MV7", type: "USBAudio" };
 
 const keys = (order: ReadonlyArray<MicrophoneEntry>) => order.map(microphoneEntryKey);

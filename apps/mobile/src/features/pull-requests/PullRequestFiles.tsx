@@ -31,7 +31,8 @@ import {
 import { usePullRequestFileFilter } from "./usePullRequestFileFilter";
 import { usePullRequestFilesViewed } from "./usePullRequestFilesViewed";
 import { pullRequestFileJumpScope, requestPullRequestFileJump } from "./pullRequestFileJump";
-import { Var, T, useGT, t } from "gt-react-native";
+import { Var, T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const BREAKDOWN_LABELS = {
   code: "Code",
@@ -109,11 +110,16 @@ function FileRow(props: {
     >
       <PierreEntryIcon kind="file" path={file.path} size={20} />
       <View className="min-w-0 flex-1 gap-0.5">
-        <Text textRole="footnote" className="font-t3-medium" numberOfLines={2}>
+        <Text translate={false} textRole="footnote" className="font-t3-medium" numberOfLines={2}>
           {file.path.split("/").at(-1)}
         </Text>
         {props.directory ? (
-          <Text textRole="caption" className="text-foreground-muted" numberOfLines={1}>
+          <Text
+            translate={false}
+            textRole="caption"
+            className="text-foreground-muted"
+            numberOfLines={1}
+          >
             {props.directory}
           </Text>
         ) : null}
@@ -166,7 +172,7 @@ function FileFilterMenu({ filter }: { readonly filter: ChangedFiles["filter"] })
       actions={[
         {
           id: "hide-tests",
-          title: "Hide test files",
+          title: t("Hide test files"),
           image: "line.3.horizontal.decrease",
           state: filter.hideTestFiles ? "on" : "off",
         },
@@ -256,6 +262,7 @@ function ChangeBreakdownLine(props: {
  * so the section supplies its header, rows, and footer instead of rendering a list of its own.
  */
 export function usePullRequestFilesSection(params: PullRequestParams) {
+  const gt = useGT();
   const navigation = useNavigation();
   const files = useChangedFiles(params);
   const { diff, filter, viewed, pr, parsed, loading } = files;
@@ -270,7 +277,7 @@ export function usePullRequestFilesSection(params: PullRequestParams) {
         <PullRequestReadStatus pending={false} error={diff.error} terminology={files.terminology} />
         {loading ? (
           <View
-            accessibilityLabel={t("Loading changed files")}
+            accessibilityLabel={gt("Loading changed files")}
             accessibilityState={{ busy: true }}
             className="min-h-17 flex-row items-center gap-2 py-3"
           >
@@ -427,12 +434,12 @@ export function PullRequestFilesSheet({ route }: StaticScreenProps<PullRequestDi
         onClose={() => navigation.goBack()}
         menus={[
           {
-            title: "Filter review files",
+            title: t("Filter review files"),
             icon: "line.3.horizontal.decrease",
             items: [
               {
                 id: "hide-tests",
-                title: "Hide test files",
+                title: t("Hide test files"),
                 icon: "line.3.horizontal.decrease",
                 selected: filter.hideTestFiles,
                 onPress: filter.toggle,

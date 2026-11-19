@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vite-plus/test";
 import { VoiceInputController } from "@t3tools/client-runtime/voice-input";
 
 import { createLazyVoiceRecorder, type VoiceRecordingInput } from "./lazyVoiceRecorder";
+import { msg } from "gt-react-native";
 
 type Status = { readonly isFinished: boolean };
 type State = { readonly isRecording: boolean };
@@ -29,7 +30,7 @@ function createNativeRecorder(uri: string) {
       return { remove: () => listeners.delete(listener) };
     }),
     getAvailableInputs: vi.fn((): ReadonlyArray<VoiceRecordingInput> => [
-      { uid: "car", name: "CarPlay", type: "CarAudio" },
+      { uid: "car", name: msg("CarPlay"), type: "CarAudio" },
       { uid: "built-in", name: "iPhone Microphone", type: "MicrophoneBuiltIn" },
     ]),
     setInput: vi.fn((_uid: string): void | Promise<void> => undefined),

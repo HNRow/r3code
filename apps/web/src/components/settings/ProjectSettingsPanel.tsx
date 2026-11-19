@@ -61,7 +61,7 @@ import {
 import { useSettingsProjectGroups } from "./useSettingsProjectGroups";
 import { readUnloadedThreadCount } from "../../state/olderSettledShelf";
 import { settingsScopeEnvironmentLabels } from "./settingsScopeAxis";
-import { T, useGT, msg } from "gt-react";
+import { T, useGT, t } from "gt-react";
 
 const ProjectIconPickerDialog = lazy(() =>
   import("./ProjectIconPickerDialog").then((module) => ({
@@ -102,7 +102,7 @@ function CheckoutGroupingSelect({ member }: { member: SidebarProjectGroupMember 
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Could not save grouping rule",
+              title: t("Could not save grouping rule"),
               description: error instanceof Error ? error.message : "An error occurred.",
             }),
           );
@@ -227,8 +227,8 @@ export function ProjectSettingsPanel({
     return (
       <div className="flex flex-1 items-center justify-center p-8 text-sm text-muted-foreground">
         {groups.length === 0
-          ? "Add a project from the sidebar to configure it here."
-          : "This project is no longer available."}
+          ? t("Add a project from the sidebar to configure it here.")
+          : t("This project is no longer available.")}
       </div>
     );
   }
@@ -310,7 +310,7 @@ function ProjectDetail({
   const renameGroup = async (nextTitle: string, wasEdited: boolean) => {
     const title = nextTitle.trim();
     if (!title) {
-      toastManager.add({ type: "warning", title: "Project title cannot be empty" });
+      toastManager.add({ type: "warning", title: t("Project title cannot be empty") });
       return;
     }
     if (!projectGroupTitleNeedsUpdate(group.memberProjects, title, wasEdited)) return;
@@ -534,8 +534,8 @@ function ProjectDetail({
           {!canEditGroup ? (
             <p className="px-3 py-2 text-sm text-muted-foreground sm:px-4">
               {group.memberProjects.length > 1
-                ? "Shared settings require permission to change every checkout in this group."
-                : "This connection cannot change this project."}
+                ? t("Shared settings require permission to change every checkout in this group.")
+                : t("This connection cannot change this project.")}
             </p>
           ) : null}
           <SettingsRow
@@ -649,8 +649,8 @@ function ProjectDetail({
                 title={gt("Archive")}
                 description={
                   group.archived
-                    ? msg("Hidden from project pickers. Threads and files are kept.")
-                    : msg("Hides the project from project pickers. Threads and files are kept.")
+                    ? t("Hidden from project pickers. Threads and files are kept.")
+                    : t("Hides the project from project pickers. Threads and files are kept.")
                 }
                 control={
                   <Button
@@ -666,7 +666,7 @@ function ProjectDetail({
                       )
                     }
                   >
-                    {group.archived ? "Unarchive" : "Archive"}
+                    {group.archived ? t("Unarchive") : t("Archive")}
                   </Button>
                 }
               />
@@ -680,19 +680,19 @@ function ProjectDetail({
           <SettingsRow
             title={
               hasOtherMembers
-                ? msg("Remove checkout")
+                ? t("Remove checkout")
                 : group.memberProjects.length > 1
-                  ? msg("Remove this project everywhere")
-                  : msg("Remove project")
+                  ? t("Remove this project everywhere")
+                  : t("Remove project")
             }
             description={
               hasOtherMembers
-                ? msg(
+                ? t(
                     "Deletes the selected machine's checkout entries and their threads. Other machines and files on disk are not touched.",
                   )
                 : group.memberProjects.length > 1
                   ? `Deletes all ${group.memberProjects.length} checkout entries and their threads on every machine. Files on disk are not touched.`
-                  : msg("Deletes the project entry and its threads. Files on disk are not touched.")
+                  : t("Deletes the project entry and its threads. Files on disk are not touched.")
             }
             control={
               <Button
@@ -703,10 +703,10 @@ function ProjectDetail({
               >
                 <Trash2Icon />
                 {hasOtherMembers
-                  ? "Remove checkout"
+                  ? t("Remove checkout")
                   : group.memberProjects.length > 1
-                    ? "Remove all entries"
-                    : "Remove project"}
+                    ? t("Remove all entries")
+                    : t("Remove project")}
               </Button>
             }
           />

@@ -184,6 +184,31 @@ it("does not repeat the note when a steer restarts the run on a new attempt", ()
   assert.deepEqual(pending([firstAttempt, RunAttemptId.make("attempt:2b")], false), lost);
 });
 
+it("merges the cancelled work of every interrupted run in the chain", () => {
+  const first = run(1, claudeThread, {
+    status: "cancelled",
+    restartCancelledBackgroundWork: [{ kind: "shell", label: "first check", id: "check-1" }],
+  });
+  const second = run(2, claudeThread, {
+    status: "cancelled",
+    restartContinuationOfRunId: first.id,
+    restartCancelledBackgroundWork: [{ kind: "monitor", label: "PR watch", id: "watch-1" }],
+  });
+  const third = run(3, claudeThread, {
+    status: "running",
+    restartContinuationOfRunId: second.id,
+    restartCancelledBackgroundWork: [{ kind: "shell", label: "first check", id: "check-1" }],
+  });
+
+  assert.deepEqual(restartContinuationNote(third, [first, second, third], [], []), {
+    work: [
+      { kind: "shell", label: "first check", id: "check-1" },
+      { kind: "monitor", label: "PR watch", id: "watch-1" },
+    ],
+    settled: true,
+  });
+});
+
 it("counts a prompted mid-turn or chained continuation as delivering the note", () => {
   const cut = run(1, claudeThread, { status: "cancelled", restartCancelledBackgroundWork: lost });
   const cutTurn = { ...turnFor(cut), status: "cancelled" as const };

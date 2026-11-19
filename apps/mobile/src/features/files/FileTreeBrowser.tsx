@@ -19,6 +19,7 @@ import {
   type VisibleFileTreeNode,
 } from "./fileTree";
 import { T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const fileTreeCache = new WeakMap<ReadonlyArray<ProjectEntry>, ReadonlyArray<FileTreeNode>>();
 const OPTIMISTIC_SELECTION_TIMEOUT_MS = 1_000;
@@ -79,6 +80,7 @@ const FileTreeRow = function FileTreeRow(props: {
       )}
       <PierreEntryIcon path={node.path} kind={node.kind} size={17} />
       <Text
+        translate={false}
         className={cn(
           "min-w-0 flex-1 text-sm leading-normal",
           props.selected
@@ -282,8 +284,8 @@ export function FileTreeBrowser(props: {
               </Text>
               <Text className="mt-1 text-xs leading-normal text-foreground-muted">
                 {props.searchQuery.trim().length > 0
-                  ? "Try a different search."
-                  : "The workspace is empty."}
+                  ? t("Try a different search.")
+                  : t("The workspace is empty.")}
               </Text>
             </>
           )}

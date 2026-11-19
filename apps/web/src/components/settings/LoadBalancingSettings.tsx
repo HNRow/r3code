@@ -11,13 +11,33 @@ import { Switch } from "../ui/switch";
 import { EnvironmentRow, EnvironmentTransportLabel } from "./EnvironmentRow";
 import { FoldedSettingsSection } from "./FoldedSettingsSection";
 import { searchableSetting } from "./settingsSearch";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 const preferences = [
-  { value: 100, label: "Prefer" },
-  { value: 50, label: "Normal" },
-  { value: 25, label: "Less often" },
-  { value: 0, label: "Manual only" },
+  {
+    value: 100,
+    get label() {
+      return t("Prefer");
+    },
+  },
+  {
+    value: 50,
+    get label() {
+      return t("Normal");
+    },
+  },
+  {
+    value: 25,
+    get label() {
+      return t("Less often");
+    },
+  },
+  {
+    value: 0,
+    get label() {
+      return t("Manual only");
+    },
+  },
 ] as const;
 
 type LoadPreference = (typeof preferences)[number]["value"];

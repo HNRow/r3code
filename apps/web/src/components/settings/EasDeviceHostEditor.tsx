@@ -28,7 +28,7 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../
 import { Spinner } from "../ui/spinner";
 import { parseEasDeviceHostDraft } from "./easDeviceHostsSettings.logic";
 import { SecretSourceInput, useSecretSources } from "./SecretSourceInput";
-import { T, useGT, Var } from "gt-react";
+import { T, useGT, Var, t } from "gt-react";
 
 const FROM_THREAD_PROJECT = "thread-project";
 
@@ -176,7 +176,7 @@ export function EasDeviceHostEditor(props: {
           }}
         >
           <DialogHeader>
-            <DialogTitle>{props.isNew ? "Add Expo host" : "Edit Expo host"}</DialogTitle>
+            <DialogTitle>{props.isNew ? t("Add Expo host") : t("Edit Expo host")}</DialogTitle>
             <DialogDescription>
               <T>
                 The environment's server signs in to Expo and starts the sessions. Without a token
@@ -269,8 +269,8 @@ export function EasDeviceHostEditor(props: {
                   : account.status === "failed"
                     ? account.error
                     : account.status === "checking"
-                      ? "Checking the Expo account…"
-                      : "Check the Expo account before choosing a project."}
+                      ? t("Checking the Expo account…")
+                      : t("Check the Expo account before choosing a project.")}
               </p>
               <Button
                 type="button"
@@ -343,7 +343,7 @@ export function EasDeviceHostEditor(props: {
                 <Var>
                   {props.isNew
                     ? null
-                    : " Saving restarts this host and stops its running sessions."}
+                    : t(" Saving restarts this host and stops its running sessions.")}
                 </Var>
               </T>
             </p>

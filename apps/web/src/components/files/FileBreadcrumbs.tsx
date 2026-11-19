@@ -29,7 +29,7 @@ import {
   isListableHostFolder,
 } from "./filePath";
 import { useProjectEntriesQuery } from "./projectFilesQueryState";
-import { Var, T, useGT } from "gt-react";
+import { Var, T, useGT, t } from "gt-react";
 
 interface FileBreadcrumbsProps {
   readonly cwd: string;
@@ -150,8 +150,8 @@ function BreadcrumbMenuContent(props: {
         ) : children.length === 0 ? (
           <MenuItem disabled>
             {entriesTruncated
-              ? "No entries from this folder are available in the partial workspace index."
-              : "This folder is empty."}
+              ? t("No entries from this folder are available in the partial workspace index.")
+              : t("This folder is empty.")}
           </MenuItem>
         ) : (
           <MenuRadioGroup

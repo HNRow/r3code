@@ -14,6 +14,7 @@ import { Pressable, View } from "react-native";
 import { AppText as Text } from "../../components/ui/AppText";
 import type { PendingApproval } from "../../lib/threadActivity";
 import { T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export interface PendingApprovalCardProps {
   readonly canOperateThread: boolean;
@@ -26,9 +27,24 @@ export interface PendingApprovalCardProps {
 }
 
 const DEFAULT_APPROVAL_OPTIONS: ReadonlyArray<ProviderApprovalOption> = [
-  { decision: "accept", label: "Allow once" },
-  { decision: "acceptForSession", label: "Allow session" },
-  { decision: "decline", label: "Decline" },
+  {
+    decision: "accept",
+    get label() {
+      return t("Allow once");
+    },
+  },
+  {
+    decision: "acceptForSession",
+    get label() {
+      return t("Allow session");
+    },
+  },
+  {
+    decision: "decline",
+    get label() {
+      return t("Decline");
+    },
+  },
 ];
 
 export function PendingApprovalCard(props: PendingApprovalCardProps) {

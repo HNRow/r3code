@@ -12,10 +12,13 @@ import {
   MessageId,
   ProjectId,
   ProviderDriverKind,
+  ProviderInstanceId,
   ThreadId,
   TurnItemId,
   type AgentSessionImportInput,
   type AgentSessionImportResult,
+  type AgentSessionListInput,
+  type AgentSessionListResult,
   type OrchestrationV2AppThread,
   type OrchestrationV2ConversationMessage,
   type OrchestrationV2DomainEvent,
@@ -46,6 +49,34 @@ import * as ProjectService from "./ProjectService.ts";
 const isProjectionStoreThreadNotFoundError = Schema.is(
   ProjectionStore.ProjectionStoreThreadNotFoundError,
 );
+
+// Best-effort edge: the scanner reads recent transcripts only, so a session outside its
+// window or byte budget never reaches the list even though the transcript exists on disk.
+function sessionSummary(
+  outcome: AgentSessionScanner.AgentSessionRecentThread,
+): Option.Option<AgentSessionListResult["sessions"][number]> {
+  switch (outcome._tag) {
+    case "Skipped":
+      return Option.none();
+    case "Importable":
+      return Option.some({
+        source: outcome.thread.source,
+        providerSessionId: outcome.thread.providerSessionId,
+        title: outcome.thread.title,
+        lastActiveAt: outcome.thread.updatedAt,
+        alreadyImported: false,
+      });
+    case "AlreadyImported":
+    case "Duplicate":
+      return Option.some({
+        source: outcome.source.provider,
+        providerSessionId: outcome.source.providerSessionId,
+        title: null,
+        lastActiveAt: null,
+        alreadyImported: true,
+      });
+  }
+}
 
 const IMPORT_EVENT_PREFIX = "agent-session-import:v2";
 const CLAUDE_SESSION_ID_PATTERN =
@@ -205,9 +236,12 @@ const make = Effect.gen(function* () {
   const threadCommands = yield* ThreadCommandExecutor.ThreadCommandExecutor;
   const settingsService = yield* ServerSettings.ServerSettingsService;
   const ceiling = settingsService.managedPolicy?.limits?.maxRuntimeMode;
-  const importRecentAgentThreads = Effect.fn("importRecentAgentThreadsV2")(function* (
-    input: AgentSessionImportInput,
-  ) {
+  // A project's transcripts, and the imported sources its threads already own, are
+  // what both listing and importing sessions of that project need.
+  const resolveProjectScanScope = Effect.fn("resolveProjectScanScope")(function* (input: {
+    readonly projectId: ProjectId;
+    readonly expectedWorkspaceRoot?: string | undefined;
+  }) {
     const project = yield* projects.getById(input.projectId).pipe(
       Effect.mapError((cause) => new AgentSessionScanError({ operation: "read-projects", cause })),
       Effect.flatMap(
@@ -225,21 +259,6 @@ const make = Effect.gen(function* () {
     ) {
       return yield* new AgentSessionImportProjectChangedError({ projectId: input.projectId });
     }
-    // Imports run in full access, except under a policy ceiling: then in the project's default,
-    // which the policy keeps under it, so imported threads never sit above the ceiling.
-    const runtimeMode =
-      ceiling === undefined
-        ? DEFAULT_RUNTIME_MODE
-        : yield* settingsService.getSettings.pipe(
-            Effect.mapError(
-              (cause) => new AgentSessionScanError({ operation: "read-settings", cause }),
-            ),
-            Effect.map((settings) => {
-              const mode = resolveProjectSettings(settings, input.projectId, project).settings
-                .defaultRuntimeMode;
-              return isRuntimeModeAbove(mode, ceiling) ? ceiling : mode;
-            }),
-          );
     const runtimeRows = yield* runtimes
       .list()
       .pipe(
@@ -262,6 +281,86 @@ const make = Effect.gen(function* () {
         ),
       );
     })).flat();
+    return { project, completedSources };
+  });
+
+  const listRecentAgentThreads = Effect.fn("listRecentAgentThreadsV2")(function* (
+    input: AgentSessionListInput,
+  ) {
+    const { project, completedSources } = yield* resolveProjectScanScope(input);
+    const outcomes = yield* Stream.runCollect(
+      scanner.recentThreads(project.workspaceRoot, completedSources),
+    );
+    // A session a thread already runs belongs to that thread; offering it again would import
+    // nothing, because the import refuses a native thread another thread owns.
+    const owned = new Set<string>();
+    const providers = new Map<
+      string,
+      { readonly driver: ProviderDriverKind; readonly providerInstanceId: ProviderInstanceId }
+    >();
+    for (const outcome of Array.from(outcomes)) {
+      if (outcome._tag === "Skipped") continue;
+      const { provider, providerInstanceId } = outcome.source;
+      providers.set(`${provider}\0${providerInstanceId}`, {
+        driver: ProviderDriverKind.make(provider),
+        providerInstanceId,
+      });
+    }
+    for (const { driver, providerInstanceId } of providers.values()) {
+      const nativeIds = yield* eventSink
+        .listOwnedNativeThreadIds(driver, providerInstanceId)
+        .pipe(
+          Effect.mapError(
+            (cause) => new AgentSessionScanError({ operation: "read-projects", cause }),
+          ),
+        );
+      for (const nativeId of nativeIds) owned.add(`${driver}\0${nativeId}`);
+    }
+    const sessions = Array.from(outcomes).flatMap((outcome) => {
+      if (outcome._tag === "Skipped") return [];
+      const summary = sessionSummary(outcome);
+      if (Option.isNone(summary)) return [];
+      const nativeId =
+        outcome.source.provider === "pi"
+          ? outcome.source.filePath
+          : outcome.source.providerSessionId;
+      return [
+        owned.has(`${outcome.source.provider}\0${nativeId}`)
+          ? { ...summary.value, alreadyImported: true }
+          : summary.value,
+      ];
+    });
+    const seen = new Set<string>();
+    return {
+      sessions: sessions.filter((session) => {
+        const key = `${session.source}\0${session.providerSessionId}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      }),
+      scannedAt: DateTime.formatIso(yield* DateTime.now),
+    } satisfies AgentSessionListResult;
+  });
+
+  const importRecentAgentThreads = Effect.fn("importRecentAgentThreadsV2")(function* (
+    input: AgentSessionImportInput,
+  ) {
+    const { project, completedSources } = yield* resolveProjectScanScope(input);
+    // Imports run in full access, except under a policy ceiling: then in the project's default,
+    // which the policy keeps under it, so imported threads never sit above the ceiling.
+    const runtimeMode =
+      ceiling === undefined
+        ? DEFAULT_RUNTIME_MODE
+        : yield* settingsService.getSettings.pipe(
+            Effect.mapError(
+              (cause) => new AgentSessionScanError({ operation: "read-settings", cause }),
+            ),
+            Effect.map((settings) => {
+              const mode = resolveProjectSettings(settings, input.projectId, project).settings
+                .defaultRuntimeMode;
+              return isRuntimeModeAbove(mode, ceiling) ? ceiling : mode;
+            }),
+          );
     const outcomes = scanner.recentThreads(project.workspaceRoot, completedSources);
     const importedThreadIds = new Set<ThreadId>();
     let importedCount = 0;
@@ -596,7 +695,7 @@ const make = Effect.gen(function* () {
     return yield* commit(messages);
   });
 
-  return { importRecentAgentThreads, importNativeHistory };
+  return { listRecentAgentThreads, importRecentAgentThreads, importNativeHistory };
 });
 
 type AgentSessionImporterShape = Effect.Success<typeof make>;

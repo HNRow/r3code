@@ -9,7 +9,7 @@ import { EnvironmentMachineIcon } from "../EnvironmentMachineIcon";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Badge } from "../ui/badge";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
-import { T, Var } from "gt-react";
+import { T, Var, t } from "gt-react";
 
 /**
  * Shown wherever a link goes to an address this app does not already have for a
@@ -46,7 +46,7 @@ export function LinkMachineBadge({ machine }: { readonly machine: LinkableMachin
   if (machine.connected) return null;
   return (
     <Badge variant="outline" size="sm">
-      {machine.connectOnly ? "R3 Connect" : "Not connected"}
+      {machine.connectOnly ? t("R3 Connect") : t("Not connected")}
     </Badge>
   );
 }

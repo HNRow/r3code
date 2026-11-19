@@ -1,4 +1,5 @@
 import type { OrchestrationV2UserMessageInputIntent } from "@t3tools/contracts";
+import { t } from "../../i18n/gt";
 
 export interface UserMessageIntentBadgePresentation {
   readonly label: string;
@@ -11,7 +12,7 @@ export function resolveUserMessageIntentBadge(
 ): UserMessageIntentBadgePresentation | null {
   if (unread && (intent === "steer" || intent === "promoted_queued_to_steer")) {
     return {
-      label: "Steer · waiting to be read",
+      label: t("Steer · waiting to be read"),
       accessibilityLabel:
         "Steer waiting for the agent to read it after the running command finishes",
     };
@@ -19,12 +20,12 @@ export function resolveUserMessageIntentBadge(
   switch (intent) {
     case "steer":
       return {
-        label: "Steer",
+        label: t("Steer"),
         accessibilityLabel: "Steered the active turn",
       };
     case "promoted_queued_to_steer":
       return {
-        label: "Steer",
+        label: t("Steer"),
         accessibilityLabel: "Originally queued, then promoted to steer the active turn",
       };
     case "queued_turn":

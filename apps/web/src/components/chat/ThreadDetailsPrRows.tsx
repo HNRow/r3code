@@ -35,6 +35,7 @@ import {
 } from "../ThreadStatusIndicators";
 
 import { ThreadDetailsPrRow } from "./ThreadDetailsPrRow";
+import { t } from "gt-react";
 
 function ThreadDetailsPrLinkRow({
   environmentId,
@@ -149,7 +150,7 @@ function ThreadDetailsPrRows({
         ) : (
           <ChevronDownIcon aria-hidden className="size-4 shrink-0" />
         )}
-        {expanded ? "Show less" : `Show ${rest.length} more`}
+        {expanded ? t("Show less") : `Show ${rest.length} more`}
       </ThreadDetailsControl>
     </>
   );

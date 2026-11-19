@@ -9,7 +9,7 @@ import type { DeviceScreenSize } from "@t3tools/client-runtime/device/stream";
 import { DeviceDuoGlyph } from "./DeviceDuoGlyph";
 import { Button } from "~/components/ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "~/components/ui/tooltip";
-import { useGT } from "gt-react";
+import { useGT, t } from "gt-react";
 
 const FOLDS = [
   { id: "closed", angle: 0 },
@@ -17,8 +17,18 @@ const FOLDS = [
   { id: "open", angle: 180 },
 ] as const;
 const STANDS = [
-  { id: "laptop", label: "Laptop stand" },
-  { id: "tent", label: "Tent stand" },
+  {
+    id: "laptop",
+    get label() {
+      return t("Laptop stand");
+    },
+  },
+  {
+    id: "tent",
+    get label() {
+      return t("Tent stand");
+    },
+  },
 ] as const;
 
 export function DeviceDuoControls(props: {

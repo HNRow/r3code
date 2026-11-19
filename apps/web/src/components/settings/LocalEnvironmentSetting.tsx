@@ -15,7 +15,7 @@ import { Spinner } from "../ui/spinner";
 import { Switch } from "../ui/switch";
 import { SettingsRow } from "./settingsLayout";
 import { searchableSetting } from "./settingsSearch";
-import { useGT, T, msg } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 // Toggling relaunches desktop; the switch reflects startup state.
 export function LocalEnvironmentSetting() {
@@ -44,10 +44,10 @@ export function LocalEnvironmentSetting() {
         {...searchableSetting("local-environment")}
         description={
           enabled
-            ? msg(
+            ? t(
                 "Run agents on this computer. Turn off to use R3 Code only with remote environments.",
               )
-            : msg("Turned off. Agents only run in remote environments.")
+            : t("Turned off. Agents only run in remote environments.")
         }
         control={
           <Switch
@@ -69,12 +69,14 @@ export function LocalEnvironmentSetting() {
         <AlertDialogPopup>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {enabled ? "Turn off local environment?" : "Turn on local environment?"}
+              {enabled ? t("Turn off local environment?") : t("Turn on local environment?")}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {enabled
-                ? "R3 Code will restart without running a server on this computer. Any agents and terminals running here will stop, and other devices will no longer be able to connect to this computer. Your projects, history, and remote environments are unaffected."
-                : "R3 Code will restart and start running a server on this computer again."}
+                ? t(
+                    "R3 Code will restart without running a server on this computer. Any agents and terminals running here will stop, and other devices will no longer be able to connect to this computer. Your projects, history, and remote environments are unaffected.",
+                  )
+                : t("R3 Code will restart and start running a server on this computer again.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           {error ? <p className="px-6 pb-4 text-sm text-destructive">{error}</p> : null}
@@ -95,9 +97,9 @@ export function LocalEnvironmentSetting() {
                   </T>
                 </>
               ) : enabled ? (
-                "Restart and turn off"
+                t("Restart and turn off")
               ) : (
-                "Restart and turn on"
+                t("Restart and turn on")
               )}
             </Button>
           </AlertDialogFooter>

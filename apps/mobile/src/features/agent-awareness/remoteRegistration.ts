@@ -37,6 +37,7 @@ import {
   saveAgentAwarenessRegistrationRecord,
 } from "../../persistence/imperative";
 import type { AgentActivityProps } from "../../widgets/AgentActivity";
+import type { AgentActivityLabels } from "../../widgets/agentActivityLabels";
 import type { AgentActivityWidgetSource } from "../../widgets/agentActivityWidgetTimeline";
 import { publishAgentActivityWidget } from "../../widgets/publishAgentActivityWidget";
 import {
@@ -47,6 +48,7 @@ import {
 import { resolveCloudPublicConfig } from "../cloud/publicConfig";
 import { supportsAgentAwarenessPush } from "./capabilities";
 import { makeRelayDeviceRegistrationRequest, resolveApsEnvironment } from "./registrationPayload";
+import { t } from "../../i18n/gt";
 
 const REMOTE_ACTIVITY_REGISTRATION_RETRY_MS = 15_000;
 
@@ -520,7 +522,8 @@ function armAgentAwarenessLiveActivityForLocalWorkNow(input: {
     const activity = startAgentLiveActivity(
       {
         title: "R3 Code",
-        subtitle: "Agent work in progress",
+        subtitle: t("Agent work in progress"),
+        labels: agentActivityLabels(),
         activeCount: 1,
         updatedAt: nowIso,
         activities: [
@@ -796,11 +799,37 @@ function ensureAppStateListener(): void {
   });
 }
 
+// 小组件在独立 runtime 里跑，GT 未初始化：文案在这里翻好，经 props 传进去。
+function agentActivityLabels(): AgentActivityLabels {
+  return {
+    approval: t("Approval"),
+    input: t("Input"),
+    failed: t("Failed"),
+    done: t("Done"),
+    outOfDate: t("Out of date"),
+    agentWorkFailed: t("Agent work failed"),
+    agentWorkCompleted: t("Agent work completed"),
+    agentStatusOutOfDate: t("Agent status out of date"),
+    activeAgentOne: t("%count% active agent"),
+    activeAgentMany: t("%count% active agents"),
+    active: t("%count% active"),
+    needAttentionOne: t("%count% need attention"),
+    needAttentionMany: t("%count% needs attention"),
+    needYouOne: t("%count% need you"),
+    needYouMany: t("%count% needs you"),
+    loadActivity: t("Open R3 Code to load agent activity"),
+    noActiveAgents: t("No active agents"),
+    subtitleSignedOut: t("Sign in to R3 Connect to see agents"),
+    subtitleUnavailable: t("Couldn't reach R3 Connect"),
+    subtitleLoading: t("Loading agents…"),
+  };
+}
+
 function publishWidget(source: AgentActivityWidgetSource): void {
   if (!canRegisterRemoteLiveActivities()) {
     return;
   }
-  publishAgentActivityWidget(source).catch((error: unknown) => {
+  publishAgentActivityWidget(source, agentActivityLabels()).catch((error: unknown) => {
     logRegistrationError("agent activity widget publish failed", error);
   });
 }
@@ -1111,6 +1140,7 @@ export const refreshActiveLiveActivityRemoteRegistration = Effect.fn(
                 activeCount: aggregate.activeCount,
                 updatedAt: aggregate.updatedAt,
                 activities: aggregate.activities,
+                labels: agentActivityLabels(),
               },
               liveActivityStaleDate(),
             ),

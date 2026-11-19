@@ -10,6 +10,7 @@ import * as SecureStore from "expo-secure-store";
 import { DpopProof } from "@t3tools/client-runtime/relay";
 import { DpopPublicJwk } from "@t3tools/shared/dpopCommon";
 import * as Layer from "effect/Layer";
+import { t } from "../../i18n/gt";
 
 export class CloudDpopError extends Schema.TaggedError<CloudDpopError>()("CloudDpopError", {
   message: Schema.String,
@@ -160,7 +161,7 @@ export const loadOrCreateDpopProofKeyPair = Effect.fn("dpop.loadOrCreateDpopProo
         catch: cloudDpopError("Stored DPoP proof key is invalid."),
       });
       if (!matches) {
-        return yield* new CloudDpopError({ message: "Stored DPoP proof key is invalid." });
+        return yield* new CloudDpopError({ message: t("Stored DPoP proof key is invalid.") });
       }
       return { privateJwk: storedPrivateJwk, publicJwk };
     }
@@ -189,7 +190,7 @@ export const loadOrCreateProofKey = Effect.fn("dpop.loadOrCreateProofKey")(funct
       Effect.tryPromise({
         try: async () => (await nativeDpopKeys()).signDpop(privateKey, signingInput),
         catch: (cause) =>
-          new DpopProof.DpopProofError({ message: "Could not sign DPoP proof.", cause }),
+          new DpopProof.DpopProofError({ message: t("Could not sign DPoP proof."), cause }),
       }),
   } satisfies DpopProof.DpopProofKey;
 });

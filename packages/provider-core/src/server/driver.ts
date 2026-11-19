@@ -7,9 +7,12 @@ import type {
   AcpRegistrySetProviderInput,
   ProviderDriverKind,
   ResolvedProviderInstanceEnvironment,
+  PluginInventoryEntry,
+  PluginScope,
   ProviderInstanceId,
   ServerProvider,
   ServerProviderWorkspaceSnapshot,
+  SkillInventory,
 } from "@t3tools/contracts";
 import type * as Effect from "effect/Effect";
 import type * as Schema from "effect/Schema";
@@ -22,6 +25,29 @@ import type { ProviderDriverError } from "./errors.ts";
 import type { ManagedServerProvider } from "./snapshot.ts";
 import type { ProviderTextGeneration } from "./textGeneration.ts";
 import type { ProviderUsageReader } from "./usage.ts";
+
+export interface ProviderPluginManagement {
+  /** Instances sharing a config directory see each other's changes. */
+  readonly configHome: string;
+  readonly list: (cwd: string) => Effect.Effect<
+    {
+      readonly entries: ReadonlyArray<PluginInventoryEntry>;
+      readonly diagnostics: ReadonlyArray<string>;
+    },
+    ProviderDriverError
+  >;
+  readonly setEnabled: (input: {
+    readonly cwd: string;
+    readonly pluginId: string;
+    readonly scope: PluginScope;
+    readonly enabled: boolean;
+  }) => Effect.Effect<void, ProviderDriverError>;
+  readonly uninstall: (input: {
+    readonly cwd: string;
+    readonly pluginId: string;
+    readonly scope: PluginScope;
+  }) => Effect.Effect<void, ProviderDriverError>;
+}
 
 export interface ProviderDriverMetadata {
   readonly displayName: string;
@@ -38,6 +64,20 @@ export type ProviderWorkspaceSnapshot = ServerProvider &
     readonly workspaceModelsPending?: boolean;
   };
 
+export interface ProviderSkillManagementTarget {
+  readonly root: string;
+  readonly directory: string;
+  readonly quarantineRoot: string;
+  readonly name: string;
+}
+
+export interface ProviderSkillSyncRoots {
+  readonly configRoot: string;
+  readonly skillsRoot: string;
+  readonly backupRoot: string;
+  readonly rollbackRoot: string;
+}
+
 export interface ProviderInstance {
   readonly instanceId: ProviderInstanceId;
   readonly driverKind: ProviderDriverKind;
@@ -49,6 +89,33 @@ export interface ProviderInstance {
   readonly snapshotForCwd?: (
     cwd: string,
   ) => Effect.Effect<ProviderWorkspaceSnapshot, ProviderDriverError>;
+  readonly skillInventory?: {
+    readonly list: (
+      cwd: string,
+    ) => Effect.Effect<Pick<SkillInventory, "entries" | "diagnostics">, ProviderDriverError>;
+  };
+  readonly skillManagement?: {
+    readonly listDiscoveryRoots: (
+      cwd: string,
+    ) => Effect.Effect<ReadonlyArray<string>, ProviderDriverError>;
+    readonly resolveTarget: (input: {
+      readonly cwd: string;
+      readonly nativeId: string;
+    }) => Effect.Effect<ProviderSkillManagementTarget, ProviderDriverError>;
+    readonly resolveSyncRoots: (
+      cwd: string,
+    ) => Effect.Effect<ProviderSkillSyncRoots, ProviderDriverError>;
+    readonly validate: (input: {
+      readonly directory: string;
+    }) => Effect.Effect<void, ProviderDriverError>;
+    readonly setEnabled: (input: {
+      readonly cwd: string;
+      readonly nativeId: string;
+      readonly enabled: boolean;
+    }) => Effect.Effect<void, ProviderDriverError>;
+  };
+  /** Absent for providers whose plugins R3 cannot manage. */
+  readonly pluginManagement?: ProviderPluginManagement;
   /**
    * Cwds whose workspace skills may have changed. The registry rescans only cwds already
    * requested. The stream must end when the instance is torn down.

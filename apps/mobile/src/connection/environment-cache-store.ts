@@ -19,6 +19,7 @@ import {
   projectFaviconDatabaseCache,
 } from "../lib/projectFaviconDatabaseCache";
 import { decodeStoredShellSnapshot } from "./shell-cache-decoding";
+import { t } from "../i18n/gt";
 
 const SERVER_CONFIG_CACHE_SCHEMA_VERSION = 1;
 const VCS_REFS_CACHE_SCHEMA_VERSION = 1;
@@ -47,7 +48,7 @@ type CacheOperation = Persistence.ConnectionPersistenceError["operation"];
 function persistenceError(operation: CacheOperation, cause: unknown) {
   return new Persistence.ConnectionPersistenceError({
     operation,
-    message: `Could not ${operation.replaceAll("-", " ")}: ${String(cause)}`,
+    message: t`Could not ${operation.replaceAll("-", " ")}: ${String(cause)}`,
   });
 }
 

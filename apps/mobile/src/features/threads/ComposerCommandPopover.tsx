@@ -210,6 +210,7 @@ const CommandRow = memo(function CommandRow(props: {
         />
       ) : null}
       <Text
+        translate={false}
         className={cn(
           "shrink-0 text-base font-t3-medium text-foreground",
           props.item.type === "thread" && "max-w-[45%]",
@@ -228,7 +229,11 @@ const CommandRow = memo(function CommandRow(props: {
         )}
       </Text>
       {props.item.description ? (
-        <Text className="min-w-0 flex-1 text-xs text-foreground-muted" numberOfLines={1}>
+        <Text
+          translate={false}
+          className="min-w-0 flex-1 text-xs text-foreground-muted"
+          numberOfLines={1}
+        >
           {props.item.description}
         </Text>
       ) : null}

@@ -20,7 +20,7 @@ import { useNowSecond } from "../../hooks/useNowSecond";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
-import { Var, T } from "gt-react";
+import { Var, T, t } from "gt-react";
 
 /**
  * What failed on the way to an environment, or null while it is connected, off,
@@ -142,7 +142,7 @@ export function ConnectionDiagnosisPanel({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not copy diagnostics",
+          title: t("Could not copy diagnostics"),
           description: error.message,
         }),
       ),

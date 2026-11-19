@@ -79,7 +79,7 @@ import { SettingsPageContainer, SettingsRow, SettingsSection } from "./settingsL
 import { keybindingSearchAnchorId, searchableSetting } from "./settingsSearch";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { useAtomCommand } from "../../state/use-atom-command";
-import { useGT, T, Var, msg } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 function KeybindingPill({ value }: { value: string }) {
   // Keys dedupe repeated parts; a literal "+" in a shortcut splits into empty strings.
@@ -96,13 +96,13 @@ function KeybindingPill({ value }: { value: string }) {
           {part === "mod"
             ? navigator.platform.toLowerCase().includes("mac")
               ? "⌘"
-              : "Ctrl"
+              : t("Ctrl")
             : part === "shift"
               ? "⇧"
               : part === "alt"
                 ? navigator.platform.toLowerCase().includes("mac")
                   ? "⌥"
-                  : "Alt"
+                  : t("Alt")
                 : part === "ctrl"
                   ? "⌃"
                   : part.length === 1
@@ -873,7 +873,7 @@ function KeybindingKeyControl({
           disabled={isSaving || keyDraft.trim().length === 0 || !isWhenDraftValid}
           onClick={save}
         >
-          {isSaving ? "Saving" : "Save"}
+          {isSaving ? t("Saving") : t("Save")}
         </Button>
       ) : null}
       {showPill ? (
@@ -947,7 +947,7 @@ function WhenClauseControl({
         }
         aria-label={`Edit when clause for ${label}`}
       >
-        <span className="truncate font-mono">{expression || "Always"}</span>
+        <span className="truncate font-mono">{expression || t("Always")}</span>
         <ChevronDownIcon className="size-3.5 shrink-0 opacity-60" />
       </PopoverTrigger>
       <PopoverContent align="start" sideOffset={6}>
@@ -1089,7 +1089,7 @@ function KeybindingSettingsRow(props: KeybindingRowProps) {
       title={<KeybindingRowTitle row={row} />}
       description={
         row.isUnassigned && !editor.isDirty ? (
-          msg("No keyboard shortcut assigned. Click Unassigned to set one.")
+          t("No keyboard shortcut assigned. Click Unassigned to set one.")
         ) : (
           <KeybindingRowWhen row={row} editor={editor} variables={variables} />
         )
@@ -1326,7 +1326,7 @@ function NewKeybindingSettingsRow(props: NewKeybindingProps) {
           <KeybindingConflictWarning labels={draft.conflictLabels} />
           <NewKeybindingKeyInput draft={draft} className="w-44" />
           <Button size="sm" disabled={isSaving || !draft.canSave} onClick={draft.save}>
-            {isSaving ? "Saving" : "Save"}
+            {isSaving ? t("Saving") : t("Save")}
           </Button>
           <NewKeybindingCancelIcon isSaving={isSaving} onCancel={onCancel} />
         </div>
@@ -1452,7 +1452,7 @@ export function KeybindingsSettingsPanel() {
       }
       const error = squashAtomCommandFailure(result);
       toastManager.add({
-        title: "Unable to open keybindings file",
+        title: t("Unable to open keybindings file"),
         description:
           error instanceof Error ? error.message : "The keybindings file was not opened.",
         type: "error",
@@ -1490,7 +1490,7 @@ export function KeybindingsSettingsPanel() {
       if (!isAtomCommandInterrupted(failed)) {
         const error = squashAtomCommandFailure(failed);
         toastManager.add({
-          title: "Unable to save keybinding",
+          title: t("Unable to save keybinding"),
           description: error instanceof Error ? error.message : "The keybinding was not saved.",
           type: "error",
         });
@@ -1521,7 +1521,7 @@ export function KeybindingsSettingsPanel() {
       if (result?._tag === "Failure" && !isAtomCommandInterrupted(result)) {
         const error = squashAtomCommandFailure(result);
         toastManager.add({
-          title: "Unable to remove keybinding",
+          title: t("Unable to remove keybinding"),
           description: error instanceof Error ? error.message : "The keybinding was not removed.",
           type: "error",
         });
@@ -1608,8 +1608,8 @@ export function KeybindingsSettingsPanel() {
       {!canWriteSettings ? (
         <p className="text-xs text-muted-foreground">
           {connectedEnvironments.length === 0
-            ? "Connect an environment to change keybindings."
-            : "This connection can view keybindings but cannot change them."}
+            ? t("Connect an environment to change keybindings.")
+            : t("This connection can view keybindings but cannot change them.")}
         </p>
       ) : null}
       <div inert={!canWriteSettings} className="flex flex-col gap-8">

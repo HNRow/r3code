@@ -28,7 +28,7 @@ import { PullRequestStackHeader } from "./PullRequestStackHeader";
 import { PullRequestStackLayerContent } from "./PullRequestStackLayerContent";
 import { PullRequestGlyph } from "./pullRequestIcons";
 import { readableFailure } from "./pullRequestDetail.logic";
-import { Var, T } from "gt-react";
+import { Var, T, t } from "gt-react";
 
 export function PullRequestStackMenu({
   hostLabel,
@@ -285,7 +285,7 @@ export function PullRequestStackMenu({
               <T>Cancel</T>
             </Button>
             <Button onClick={() => void run()}>
-              {confirmation === "merge" ? "Merge stack" : "Rebase stack"}
+              {confirmation === "merge" ? t("Merge stack") : t("Rebase stack")}
             </Button>
           </DialogFooter>
         </DialogPopup>

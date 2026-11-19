@@ -16,6 +16,7 @@ import {
 import { shortcutConflictKey, shortcutKeyFromEvent } from "../../keybindings";
 import { isMacPlatform } from "../../lib/utils";
 import { METRIC_OPTIONS, WINDOW_OPTIONS } from "../usage/usageShortcuts";
+import { t } from "gt-react";
 
 // Rank every usage command; mixing rank and alphabetical comparisons makes order input-dependent.
 const usageCommandOrder = new Map<KeybindingCommand, number>(
@@ -127,7 +128,7 @@ export function parseWhenExpressionDraft(
   if (!ast) {
     return {
       ok: false,
-      message: "Use variables with !, &&, ||, and parentheses.",
+      message: t("Use variables with !, &&, ||, and parentheses."),
     };
   }
 
@@ -220,17 +221,60 @@ export interface KeybindingGroup {
 const KEYBINDING_GROUPS = [
   {
     id: "navigation",
-    title: "Navigation",
+    get title() {
+      return t("Navigation");
+    },
     prefixes: ["sidebar", "rightPanel", "commandPalette", "filePicker", "projectSearch", "editor"],
   },
-  { id: "threads", title: "Threads", prefixes: ["thread", "chat", "pullRequest"] },
-  { id: "composer", title: "Composer", prefixes: ["composer", "modelPicker"] },
-  { id: "terminal", title: "Terminal", prefixes: ["terminal"] },
-  { id: "preview", title: "Preview & diff", prefixes: ["preview", "diff"] },
-  { id: "appearance", title: "Appearance", prefixes: ["theme", "appearance", "themeEditor"] },
-  { id: "scripts", title: "Project scripts", prefixes: ["script"] },
+  {
+    id: "threads",
+    get title() {
+      return t("Threads");
+    },
+    prefixes: ["thread", "chat", "pullRequest"],
+  },
+  {
+    id: "composer",
+    get title() {
+      return t("Composer");
+    },
+    prefixes: ["composer", "modelPicker"],
+  },
+  {
+    id: "terminal",
+    get title() {
+      return t("Terminal");
+    },
+    prefixes: ["terminal"],
+  },
+  {
+    id: "preview",
+    get title() {
+      return t("Preview & diff");
+    },
+    prefixes: ["preview", "diff"],
+  },
+  {
+    id: "appearance",
+    get title() {
+      return t("Appearance");
+    },
+    prefixes: ["theme", "appearance", "themeEditor"],
+  },
+  {
+    id: "scripts",
+    get title() {
+      return t("Project scripts");
+    },
+    prefixes: ["script"],
+  },
 ] as const;
-const OTHER_KEYBINDING_GROUP = { id: "other", title: "Other" } as const;
+const OTHER_KEYBINDING_GROUP = {
+  id: "other",
+  get title() {
+    return t("Other");
+  },
+} as const;
 
 function keybindingGroupFor(command: KeybindingCommand): { id: string; title: string } {
   const prefix = String(command).split(".")[0] ?? "";

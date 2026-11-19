@@ -33,7 +33,7 @@ import {
 import { Tooltip, TooltipPopup, TooltipTrigger } from "~/components/ui/tooltip";
 import type { DeviceStreamHandle, DeviceViewControls } from "./DeviceStreamView";
 import type { DeviceControls } from "./useDeviceControls";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 export function DeviceControlsRail(props: {
   platform: DevicePlatform;
@@ -135,7 +135,7 @@ export function DeviceControlsRail(props: {
             <RailDivider />
             <RailButton
               tooltipSide={popupSide}
-              label={`Switch device to ${nextAppearance} mode`}
+              label={t`Switch device to ${nextAppearance} mode`}
               disabled={controls.disabled || !settings?.appearance}
               onClick={() => void controls.act({ type: "setAppearance", value: nextAppearance })}
             >
@@ -235,7 +235,9 @@ export function DeviceControlsRail(props: {
             <MenuSeparator />
             <MenuItem variant="destructive" onClick={props.onPowerOff}>
               <Power />
-              {props.hostKind === "simlock" ? "Return device to the pool" : "Power off device"}
+              {props.hostKind === "simlock"
+                ? t("Return device to the pool")
+                : t("Power off device")}
             </MenuItem>
           </MenuPopup>
         </Menu>

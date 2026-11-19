@@ -30,6 +30,7 @@ import { usePullRequestPermissions } from "../usePullRequestPermissions";
 import { pullRequestTarget } from "../usePullRequestDiff";
 import { useReviewGuide } from "./useReviewGuide";
 import { T } from "gt-react-native";
+import { t } from "../../../i18n/gt";
 
 export type GuideStopParams = PullRequestParams & {
   readonly position: number;
@@ -132,16 +133,16 @@ export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideSto
   return (
     <View className="flex-1 bg-screen">
       <AppBar
-        title={`Stop ${route.params.position + 1} of ${guide?.stops.length ?? "…"}`}
+        title={t`Stop ${route.params.position + 1} of ${guide?.stops.length ?? "…"}`}
         onBack={() => navigation.goBack()}
         menus={[
           {
-            title: "Guide options",
+            title: t("Guide options"),
             icon: "ellipsis",
             items: [
               {
                 id: "word-wrap",
-                title: "Word wrap",
+                title: t("Word wrap"),
                 icon: "text.alignleft",
                 selected: appearance.codeWordBreak,
                 onPress: () => setCodeWordBreak(!appearance.codeWordBreak),
@@ -165,7 +166,7 @@ export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideSto
                 <T>This guide was rewritten. Go back to start the new tour.</T>
               </Text>
             ) : !stop ? (
-              <Text>{state.error ?? "Loading stop…"}</Text>
+              <Text>{state.error ?? t("Loading stop…")}</Text>
             ) : (
               <>
                 <GuideNotice state={state} />
@@ -286,14 +287,14 @@ export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideSto
                     <Text className="text-xs text-foreground-muted">
                       {guide && position < guide.stops.length - 1
                         ? `Next · ${position + 2} of ${guide.stops.length}`
-                        : "End of guide"}
+                        : t("End of guide")}
                     </Text>
                     <Text className="text-base font-t3-semibold">
                       {guide && position < guide.stops.length - 1
                         ? guide.stops[position + 1]?.title
                         : canReview
-                          ? "Finish review"
-                          : "Finish tour"}
+                          ? t("Finish review")
+                          : t("Finish tour")}
                     </Text>
                   </View>
                   <View className="h-11 w-11 items-center justify-center rounded-full bg-foreground">

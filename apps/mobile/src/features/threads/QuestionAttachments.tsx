@@ -30,6 +30,7 @@ import {
   questionAttachmentPreparationAtom,
 } from "../../state/question-attachments";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function QuestionAttachments(props: {
   requestId: string;
@@ -117,12 +118,12 @@ export function QuestionAttachments(props: {
             ...(result.error ? [result.error] : []),
             ...(append(key, result.attachments) > 0 ? ["Too many attachments."] : []),
           ];
-          if (problems.length) Dialog.alert("Could not paste image", problems.join("\n\n"));
+          if (problems.length) Dialog.alert(t("Could not paste image"), problems.join("\n\n"));
         } else await releaseUnusedComposerAttachmentFiles(result.attachments);
       })
       .catch((error) =>
         Dialog.alert(
-          "Could not paste image",
+          t("Could not paste image"),
           error instanceof Error ? error.message : "Try again.",
         ),
       )
@@ -165,12 +166,15 @@ export function QuestionAttachments(props: {
       }
       const rejected = append(key, picked);
       if (result.error || rejected > 0)
-        Dialog.alert("Could not attach file", result.error ?? "Too many attachments.");
+        Dialog.alert(t("Could not attach file"), result.error ?? "Too many attachments.");
     });
     changeQuestionAttachmentPreparation(key, -1);
     if (AsyncResult.isFailure(picked)) {
       const error = squashAtomCommandFailure(picked);
-      Dialog.alert("Could not attach file", error instanceof Error ? error.message : "Try again.");
+      Dialog.alert(
+        t("Could not attach file"),
+        error instanceof Error ? error.message : "Try again.",
+      );
     }
   };
   return (

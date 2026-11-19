@@ -18,6 +18,7 @@ import { useDeadlinePassed } from "../../lib/clock";
 import { threadEnvironment } from "../../state/threads";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function UsageLimitRecoveryCard({
   thread,
@@ -100,7 +101,7 @@ export function UsageLimitRecoveryCard({
   }
   const action = workspaceLimit
     ? {
-        label: "Copy request for admin",
+        label: t("Copy request for admin"),
         role: "button" as const,
         run: () => {
           setError(null);
@@ -115,7 +116,7 @@ export function UsageLimitRecoveryCard({
         },
       }
     : {
-        label: "Manage usage",
+        label: t("Manage usage"),
         role: "link" as const,
         run: () => {
           setError(null);
@@ -148,13 +149,17 @@ export function UsageLimitRecoveryCard({
         >
           {workspaceLimit
             ? copied
-              ? "Request copied. Send it to your workspace admin."
-              : "You've reached your workspace's limit for using your ChatGPT plan in other apps. Copy a request to ask your workspace admin for increased usage limits."
+              ? t("Request copied. Send it to your workspace admin.")
+              : t(
+                  "You've reached your workspace's limit for using your ChatGPT plan in other apps. Copy a request to ask your workspace admin for increased usage limits.",
+                )
             : chatGptLimit
-              ? (resetText ?? "Review your usage settings in ChatGPT.")
+              ? (resetText ?? t("Review your usage settings in ChatGPT."))
               : resetText
                 ? `Usage limit reached. ${resetText}`
-                : "Usage limit reached. The provider did not report a reset time. Retry manually when your limit is available."}
+                : t(
+                    "Usage limit reached. The provider did not report a reset time. Retry manually when your limit is available.",
+                  )}
         </Text>
         {chatGptLimit || canSchedule ? (
           // The margins cancel the 44pt touch height so the links sit 8pt under the text.

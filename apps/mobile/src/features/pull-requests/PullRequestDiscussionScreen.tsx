@@ -34,6 +34,7 @@ import { pullRequestReviewKey } from "./pullRequestReviewDrafts";
 import { PullRequestCompletionSuggestions } from "./PullRequestCompletionSuggestions";
 import { usePullRequestCompletions } from "./usePullRequestCompletions";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function PullRequestDiscussionScreen({
   route,
@@ -214,7 +215,7 @@ function Discussion({ params }: { params: PullRequestParams & { readonly discuss
                   </Text>
                 )}
                 <Text className="text-xs text-foreground-muted">
-                  {thread.isResolved ? "Resolved" : "Unresolved"}
+                  {thread.isResolved ? t("Resolved") : t("Unresolved")}
                   {thread.isOutdated ? " · Outdated" : ""}
                 </Text>
                 {filePath === null ? null : (
@@ -254,7 +255,7 @@ function Discussion({ params }: { params: PullRequestParams & { readonly discuss
                 <View className="flex-row items-center gap-2">
                   <PullRequestAvatar actor={comment.author} size={28} />
                   <Text className="min-w-0 flex-1 text-sm font-t3-medium">
-                    {comment.author?.login ?? "Unknown author"}
+                    {comment.author?.login ?? t("Unknown author")}
                   </Text>
                   <Text className="text-2xs text-foreground-muted">
                     {relativeTime(comment.createdAt)}

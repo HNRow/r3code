@@ -47,7 +47,10 @@ export function ThreadCommandOutput(props: {
           ? null
           : "No output.";
     return message === null ? null : (
-      <Text className="pt-1.5 font-mono text-2xs leading-normal text-foreground-muted">
+      <Text
+        translate={false}
+        className="pt-1.5 font-mono text-2xs leading-normal text-foreground-muted"
+      >
         {message}
       </Text>
     );
@@ -76,14 +79,18 @@ export function ThreadCommandOutput(props: {
             <T>Earlier output not shown</T>
           </Text>
         ) : null}
-        <Text selectable className="font-mono text-2xs leading-normal text-foreground-muted">
+        <Text
+          translate={false}
+          selectable
+          className="font-mono text-2xs leading-normal text-foreground-muted"
+        >
           {spans.map((span, index) =>
             span.style === null ? (
               span.text
             ) : (
               // Spans are rebuilt from scratch on every update and never reorder.
               // oxlint-disable-next-line react/no-array-index-key
-              <Text key={index} style={span.style}>
+              <Text translate={false} key={index} style={span.style}>
                 {span.text}
               </Text>
             ),

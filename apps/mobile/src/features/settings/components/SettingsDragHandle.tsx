@@ -4,6 +4,8 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import { SymbolView } from "../../../components/ui/AppSymbol";
 
+import { t } from "../../../i18n/gt";
+
 export function SettingsDragHandle(props: {
   readonly title: string;
   readonly canMoveUp: boolean;
@@ -37,8 +39,8 @@ export function SettingsDragHandle(props: {
         accessibilityRole="adjustable"
         accessibilityLabel={`Reorder ${props.title}`}
         accessibilityActions={[
-          ...(props.canMoveUp ? [{ name: "decrement", label: "Move up" }] : []),
-          ...(props.canMoveDown ? [{ name: "increment", label: "Move down" }] : []),
+          ...(props.canMoveUp ? [{ name: "decrement", label: t("Move up") }] : []),
+          ...(props.canMoveDown ? [{ name: "increment", label: t("Move down") }] : []),
         ]}
         onAccessibilityAction={({ nativeEvent }) => {
           if (nativeEvent.actionName === "decrement" && props.canMoveUp) props.onStep("up");

@@ -9,7 +9,7 @@ import { useOpenInPreferredEditor } from "../editorPreferences";
 import { useEnvironmentScope } from "../state/session";
 import { Button } from "./ui/button";
 import { stackedThreadToast, toastManager } from "./ui/toast";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 export function KeybindingsConfigWarning({
   message,
@@ -41,7 +41,7 @@ export function KeybindingsConfigWarning({
             toastManager.add(
               stackedThreadToast({
                 type: "error",
-                title: "Unable to open keybindings file",
+                title: t("Unable to open keybindings file"),
                 description: error instanceof Error ? error.message : "Unknown error opening file.",
               }),
             );

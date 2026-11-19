@@ -15,7 +15,7 @@ import {
   PROJECT_FILE_PICKER_RESULT_LIMIT,
 } from "./ProjectFilePicker.logic";
 import { useProjectFilePickerQuery } from "./projectFilesQueryState";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 interface ProjectFilePickerProps {
   readonly setOpen: (open: boolean) => void;
@@ -58,7 +58,7 @@ function EmptyProjectFilePicker() {
       aria-label={gt("File picker")}
       escapeLabel={gt("Back")}
       footerActionLabel={gt("Open file")}
-      inputProps={{ disabled: true, placeholder: "Search files…" }}
+      inputProps={{ disabled: true, placeholder: t("Search files…") }}
       mode="none"
       testId="project-file-picker"
       value=""
@@ -117,7 +117,7 @@ function OpenProjectFilePicker(props: ProjectFilePickerProps & { target: ActiveP
       autoHighlight="always"
       escapeLabel={gt("Back")}
       footerActionLabel={gt("Open file")}
-      inputProps={{ placeholder: "Search files…" }}
+      inputProps={{ placeholder: t("Search files…") }}
       mode="none"
       onItemHighlighted={(value) => {
         setHighlightedItemValue(typeof value === "string" ? value : null);

@@ -28,7 +28,7 @@ import {
   ClerkUserProfileRow,
 } from "./ClerkUserProfilePage";
 import { useT3ChatLink } from "./useT3ChatLink";
-import { T, Var, useGT } from "gt-react";
+import { T, Var, useGT, t } from "gt-react";
 
 const linkedAtFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" });
 
@@ -110,7 +110,7 @@ function T3ConnectEnvironmentRow(props: {
                   disabled={props.mutationPending}
                   onClick={() => props.onDeregister(environment)}
                 >
-                  {props.mutationPending ? "Deregistering…" : "Deregister"}
+                  {props.mutationPending ? t("Deregistering…") : t("Deregister")}
                 </Button>
               </div>
             </div>
@@ -150,7 +150,7 @@ function T3ConnectTunnelUsage() {
               {tunnelUpgradeCopy(usage.upgrade)}{" "}
               {usage.upgrade === "link" ? (
                 <InlineButton disabled={t3Chat.pending !== null} onClick={() => void t3Chat.link()}>
-                  {t3Chat.pending === "link" ? "Opening…" : "Link T3 Chat"}
+                  {t3Chat.pending === "link" ? t("Opening…") : t("Link T3 Chat")}
                 </InlineButton>
               ) : (
                 <a
@@ -214,8 +214,8 @@ export function T3ConnectUserProfilePage() {
       void refreshRelayEnvironments();
       toastManager.add({
         type: "success",
-        title: "Server deregistered",
-        description: "R3 Connect access was revoked and a host space is now available.",
+        title: t("Server deregistered"),
+        description: t("R3 Connect access was revoked and a host space is now available."),
       });
       return;
     }
@@ -235,7 +235,7 @@ export function T3ConnectUserProfilePage() {
     toastManager.add(
       stackedThreadToast({
         type: "error",
-        title: "Could not deregister server",
+        title: t("Could not deregister server"),
         description: relayFailureReason(cause) ?? message,
         ...(traceId
           ? {

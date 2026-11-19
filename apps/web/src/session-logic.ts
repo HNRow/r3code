@@ -54,6 +54,7 @@ import {
 import * as DateTime from "effect/DateTime";
 import * as Equal from "effect/Equal";
 import { shallow } from "zustand/vanilla/shallow";
+import { t } from "gt-react";
 
 export { formatDuration } from "@t3tools/shared/orchestrationTiming";
 export {
@@ -362,7 +363,7 @@ function projectedWorkEntry(row: OrchestrationV2ProjectedTurnItem): WorkLogEntry
     case "thread_created":
       return {
         ...common,
-        label: "Created thread",
+        label: t("Created thread"),
       };
     case "compaction":
       return {
@@ -470,7 +471,7 @@ function projectedWorkEntry(row: OrchestrationV2ProjectedTurnItem): WorkLogEntry
         item.steps.find((step) => step.status === "pending");
       return {
         ...common,
-        label: `Tasks ${done}/${item.steps.length}${current ? ` · ${current.text}` : ""}`,
+        label: t`Tasks ${done}/${item.steps.length}${current ? ` · ${current.text}` : ""}`,
       };
     }
     case "approval_request":

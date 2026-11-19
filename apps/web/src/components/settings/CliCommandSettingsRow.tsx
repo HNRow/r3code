@@ -10,7 +10,7 @@ import { Button } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { SettingsRow } from "./settingsLayout";
 import { searchableSetting } from "./settingsSearch";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 const FAILURE_TITLES = {
   install: "Could not install t3",
@@ -80,7 +80,7 @@ export function CliCommandSettingsRow() {
             disabled={busy || (!installed && Boolean(state.shadowedBy))}
             onClick={() => run(installed ? "uninstall" : "install")}
           >
-            {installed ? "Remove" : "Install"}
+            {installed ? t("Remove") : t("Install")}
           </Button>
         </div>
       }

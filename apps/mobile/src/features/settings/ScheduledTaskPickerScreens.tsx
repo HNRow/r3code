@@ -28,6 +28,7 @@ import {
 } from "./scheduled-task-editor";
 import { moveDraftToThread, unbindDraftFromThread } from "./scheduledTaskDraft";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 function MissingTaskDraft() {
   const gt = useGT();
@@ -204,7 +205,7 @@ export function ScheduledTaskThreadPickerRouteScreen() {
     value: query,
     onChangeText: setQuery,
     placeholder: THREAD_SEARCH_PLACEHOLDER,
-    accessibilityLabel: "Search threads",
+    accessibilityLabel: t("Search threads"),
     clearAccessibilityLabel: "Clear thread search",
     mode: "inline" as const,
     compactToolbar: true,

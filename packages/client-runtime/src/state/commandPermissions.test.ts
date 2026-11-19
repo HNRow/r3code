@@ -10,6 +10,7 @@ import {
   AuthAccessReadScope,
   AuthAccessWriteScope,
   AuthEnvironmentMaintainScope,
+  AuthFilesystemWriteScope,
   AuthOrchestrationOperateScope,
   AuthOrchestrationReadScope,
   AuthPreviewOperateScope,
@@ -304,6 +305,97 @@ describe("command permissions", () => {
     }
   });
 });
+
+it.effect("derives skill mutation grants from the operation and nativeId scope", () =>
+  Effect.gen(function* () {
+    const registry = yield* setup;
+    const install = createCommandPermissions(runtime, WS_METHODS.skillsInstall);
+    const setEnabled = createCommandPermissions(runtime, WS_METHODS.skillsSetEnabled);
+    const sync = createCommandPermissions(runtime, WS_METHODS.skillsSync);
+    const userInstall = {
+      instanceId: "claude",
+      cwd: "/repo",
+      nativeId: "user:review",
+      sourceFolder: "/source/review",
+      expectedRevision: "revision-1",
+    };
+    const projectEnable = {
+      instanceId: "claude",
+      cwd: "/repo",
+      nativeId: "project:review",
+      expectedRevision: "revision-1",
+      enabled: true,
+    };
+    const userSync = {
+      sourceInstanceId: "claude-a",
+      targetInstanceId: "claude-b",
+      cwd: "/repo",
+      mode: "copy",
+      nativeIds: ["review"],
+      expectedRevision: "revision-1",
+      onConflict: "cancel",
+    };
+
+    registry.set(sessions(env), AsyncResult.success(grant(true)));
+    expect(registry.get(install.permissionAtom(env, userInstall))).toBe(false);
+    expect(
+      (yield* install.authorize(registry, env, userInstall).pipe(Effect.flip)).requiredPermission,
+    ).toBe(AuthProvidersManageScope);
+
+    registry.set(
+      sessions(env),
+      AsyncResult.success({
+        ...grant(false),
+        scopes: [AuthProvidersManageScope],
+        permissions: [AuthProvidersManageScope],
+      }),
+    );
+    expect(registry.get(install.permissionAtom(env, userInstall))).toBe(true);
+    expect(registry.get(setEnabled.permissionAtom(env, projectEnable))).toBe(false);
+    expect(registry.get(sync.permissionAtom(env, userSync))).toBe(true);
+    expect(
+      (yield* setEnabled.authorize(registry, env, projectEnable).pipe(Effect.flip))
+        .requiredPermission,
+    ).toBe(AuthFilesystemWriteScope);
+
+    registry.set(
+      sessions(env),
+      AsyncResult.success({
+        ...grant(false),
+        scopes: [AuthProvidersManageScope, AuthFilesystemWriteScope],
+        permissions: [AuthProvidersManageScope, AuthFilesystemWriteScope],
+      }),
+    );
+    expect(registry.get(setEnabled.permissionAtom(env, projectEnable))).toBe(true);
+    yield* setEnabled.authorize(registry, env, projectEnable);
+    yield* sync.authorize(registry, env, userSync);
+
+    const pluginSetEnabled = createCommandPermissions(runtime, WS_METHODS.pluginsSetEnabled);
+    const userPlugin = {
+      instanceId: "claude",
+      cwd: "/repo",
+      pluginId: "superpowers@claude-plugins-official",
+      scope: "user",
+      expectedRevision: "revision-1",
+      enabled: false,
+    };
+    const projectPlugin = { ...userPlugin, scope: "project" };
+    registry.set(
+      sessions(env),
+      AsyncResult.success({
+        ...grant(false),
+        scopes: [AuthProvidersManageScope],
+        permissions: [AuthProvidersManageScope],
+      }),
+    );
+    expect(registry.get(pluginSetEnabled.permissionAtom(env, userPlugin))).toBe(true);
+    expect(registry.get(pluginSetEnabled.permissionAtom(env, projectPlugin))).toBe(false);
+    expect(
+      (yield* pluginSetEnabled.authorize(registry, env, projectPlugin).pipe(Effect.flip))
+        .requiredPermission,
+    ).toBe(AuthFilesystemWriteScope);
+  }),
+);
 
 it.effect(
   "requires source control alone for git, and both grants when attaching a worktree to a thread",

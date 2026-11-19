@@ -65,7 +65,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { SecretInput } from "./SecretInput";
 import { SecretSourceSelect } from "./SecretSourceInput";
-import { useGT, T, Var } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 // Per dialog instance, not an Atom.family: key presence must be read fresh each time it opens.
 function useCloudRead<A, E>(
@@ -259,13 +259,15 @@ export function CloudVoiceConfiguration({
 
   const keyField = (
     <>
-      <Label htmlFor="voice-cloud-key">{routed && saved ? "Replace API key" : "API key"}</Label>
+      <Label htmlFor="voice-cloud-key">
+        {routed && saved ? t("Replace API key") : t("API key")}
+      </Label>
       <div className="flex min-w-0 items-start gap-2">
         {sources.length > 0 && (
           <SecretSourceSelect
             value={sourceId}
             sources={sources}
-            label={`${company} API key`}
+            label={t`${company} API key`}
             disabled={busy}
             onValueChange={(next) => {
               setSourceId(next);
@@ -307,11 +309,12 @@ export function CloudVoiceConfiguration({
       </div>
       <p className="text-sm text-muted-foreground">
         {draft.trim() && !credential
-          ? (source?.invalidReferenceMessage ?? "Enter an API key, not a URL or secret reference.")
+          ? (source?.invalidReferenceMessage ??
+            t("Enter an API key, not a URL or secret reference."))
           : active && !routed
-            ? "Updating the key keeps dictation enabled."
+            ? t("Updating the key keeps dictation enabled.")
             : routed && saved
-              ? "Leave blank to keep the saved key."
+              ? t("Leave blank to keep the saved key.")
               : `Anyone with dictation access to ${environment.label} can bill this key.`}
       </p>
     </>
@@ -331,7 +334,7 @@ export function CloudVoiceConfiguration({
               ? `Remove the ${company} key?`
               : active
                 ? routed
-                  ? "Manage OpenRouter dictation"
+                  ? t("Manage OpenRouter dictation")
                   : `Manage ${company} key`
                 : `Use ${name} for dictation?`}
           </DialogTitle>
@@ -476,12 +479,12 @@ export function CloudVoiceConfiguration({
             ) : routed ? (
               saved !== undefined && (saved || canManage) ? (
                 <Button type="submit" form={formId} size="sm" disabled={busy || !canSubmit}>
-                  {active ? "Save" : "Save and enable"}
+                  {active ? t("Save") : t("Save and enable")}
                 </Button>
               ) : null
             ) : editingKey ? (
               <Button type="submit" form={formId} size="sm" disabled={busy || !credential}>
-                {active ? "Save key" : "Save and enable"}
+                {active ? t("Save key") : t("Save and enable")}
               </Button>
             ) : saved && !active ? (
               <Button

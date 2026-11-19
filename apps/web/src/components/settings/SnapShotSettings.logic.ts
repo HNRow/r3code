@@ -1,4 +1,4 @@
-import { msg } from "gt-react";
+import { t } from "gt-react";
 import type { ClientSettingsPatch, DesktopSnapShotState, SnapShotSound } from "@t3tools/contracts";
 import {
   captureSetupBackend,
@@ -8,54 +8,54 @@ import {
 } from "./SnapShotSetupDialog.logic";
 
 export function snapShotStatus(state: DesktopSnapShotState | null, enabled: boolean): string {
-  if (!state) return msg("Checking snapshots…");
-  if (state.mode === "unavailable") return state.message ?? msg("Not supported on this platform.");
-  if (!enabled) return msg("Turn this on to set up snapshots.");
+  if (!state) return t("Checking snapshots…");
+  if (state.mode === "unavailable") return state.message ?? t("Not supported on this platform.");
+  if (!enabled) return t("Turn this on to set up snapshots.");
   return snapShotSetupSummary(state, enabled);
 }
 
 export function snapShotSetupSummary(state: DesktopSnapShotState, enabled: boolean): string {
-  if (state.message) return msg("Capture needs attention");
+  if (state.message) return t("Capture needs attention");
   if (state.linuxBackend === "hyprland" && state.hyprlandHelper?.status !== "ready")
     return state.hyprlandHelper?.status === "error"
-      ? msg("Check capture access in setup")
-      : msg("Install the capture helper to continue");
+      ? t("Check capture access in setup")
+      : t("Install the capture helper to continue");
   if (captureSetupBackend(state) === "gnome" && state.gnomeExtension?.status !== "enabled")
-    return msg("Set up active-window snapshots");
+    return t("Set up active-window snapshots");
   if (captureSetupBackend(state) === "kde" && state.kdeHelper?.status !== "ready")
     return state.kdeHelper?.status === "error"
-      ? msg("Check capture access in setup")
-      : msg("Install the capture helper to continue");
+      ? t("Check capture access in setup")
+      : t("Install the capture helper to continue");
   if (captureSetupBackend(state) === "picker")
-    return msg("Manual capture only. You'll choose a window each time");
-  if (!enabled) return msg("Enable capture to continue");
+    return t("Manual capture only. You'll choose a window each time");
+  if (!enabled) return t("Enable capture to continue");
   if (state.shortcutPending)
     return state.linuxBackend === "hyprland"
-      ? msg("Connecting your shortcut…")
-      : msg("Waiting for shortcut permission");
-  if (state.shortcutVerified) return msg("Ready to capture");
+      ? t("Connecting your shortcut…")
+      : t("Waiting for shortcut permission");
+  if (state.shortcutVerified) return t("Ready to capture");
   if (state.linuxBackend === "niri" && state.shortcutBinding)
-    return msg("Use your shortcut from another app");
+    return t("Use your shortcut from another app");
   if (state.linuxBackend === "hyprland" && state.shortcutActionRegistered)
-    return msg("Use your shortcut from another app");
+    return t("Use your shortcut from another app");
   if (state.shortcutRegistered)
-    return state.shortcutLabel ? msg("Ready to capture") : msg("Shortcut saved");
-  return msg("Finish shortcut setup");
+    return state.shortcutLabel ? t("Ready to capture") : t("Shortcut saved");
+  return t("Finish shortcut setup");
 }
 
 export function snapShotShortcutStatus(state: DesktopSnapShotState | null): string | null {
   if (!state) return null;
   if (state.linuxBackend === "hyprland") return state.shortcutMessage;
-  if (state.shortcutPending) return msg("Approve the shortcut permission prompt to continue.");
-  if (state.shortcutRegistered) return state.mode === "portal" ? null : msg("Shortcut saved.");
+  if (state.shortcutPending) return t("Approve the shortcut permission prompt to continue.");
+  if (state.shortcutRegistered) return state.mode === "portal" ? null : t("Shortcut saved.");
   return state.shortcutMessage;
 }
 
 export function snapShotSetupButtonLabel(state: DesktopSnapShotState | null): string {
-  if (!state) return msg("Continue setup");
-  if (captureSetupAccessReady(state)) return msg("Manage capture");
+  if (!state) return t("Continue setup");
+  if (captureSetupAccessReady(state)) return t("Manage capture");
   const desktop = captureSetupDesktopName(state);
-  return desktop ? `Set up ${desktop} capture` : msg("Continue setup");
+  return desktop ? `Set up ${desktop} capture` : t("Continue setup");
 }
 
 export function snapShotSetupComplete(
@@ -79,24 +79,24 @@ export function snapShotFeedbackUnavailableMessage(
   if (state?.mode !== "portal" || state.linuxFeedbackAvailable) return undefined;
   if (state.linuxBackend === "hyprland")
     return state.hyprlandHelper?.status === "ready"
-      ? msg("Capture effects aren't available on this desktop.")
-      : msg("Install or update the capture helper to enable effects.");
-  if (state.linuxBackend === "niri") return msg("Capture effects aren't available on Niri.");
+      ? t("Capture effects aren't available on this desktop.")
+      : t("Install or update the capture helper to enable effects.");
+  if (state.linuxBackend === "niri") return t("Capture effects aren't available on Niri.");
   if (state.linuxBackend === "kde")
     return state.kdeHelper?.status === "ready"
-      ? msg("Capture effects aren't available on this desktop.")
-      : msg("Install or update the capture helper to enable effects.");
+      ? t("Capture effects aren't available on this desktop.")
+      : t("Install or update the capture helper to enable effects.");
   return state.linuxBackend === "gnome-extension"
-    ? msg("Update the GNOME extension, then sign out and back in to enable effects.")
+    ? t("Update the GNOME extension, then sign out and back in to enable effects.")
     : captureSetupBackend(state) === "gnome"
-      ? msg("Finish extension setup to enable effects.")
-      : msg("Capture effects aren't available on this desktop.");
+      ? t("Finish extension setup to enable effects.")
+      : t("Capture effects aren't available on this desktop.");
 }
 
 export function snapShotDescription(state: DesktopSnapShotState | null): string {
   return state?.mode === "portal" && captureSetupBackend(state) === "picker"
-    ? msg("Automatic capture isn't available here. Choose a window instead.")
-    : msg("Capture a window and attach it to your current draft.");
+    ? t("Automatic capture isn't available here. Choose a window instead.")
+    : t("Capture a window and attach it to your current draft.");
 }
 
 export function snapShotAccessibilityUnavailableMessage(
@@ -104,15 +104,15 @@ export function snapShotAccessibilityUnavailableMessage(
 ): string | undefined {
   if (state?.mode !== "portal") return undefined;
   if (state.linuxBackend === "picker" || state.linuxBackend === "screenshot-portal")
-    return msg("This desktop only provides a screenshot.");
+    return t("This desktop only provides a screenshot.");
   return undefined;
 }
 
 export function snapShotUnavailableMessage(hasBridge: boolean): string | undefined {
   if (hasBridge) return undefined;
   return typeof window !== "undefined" && window.desktopBridge
-    ? msg("Update the desktop app to use snapshots.")
-    : msg("Only available in the desktop app.");
+    ? t("Update the desktop app to use snapshots.")
+    : t("Only available in the desktop app.");
 }
 
 export function snapShotSoundPatch(sound: SnapShotSoundSelection): ClientSettingsPatch {

@@ -62,13 +62,37 @@ import {
   visibleResourceTelemetryProcesses,
 } from "./ResourceTelemetryDiagnostics.logic";
 import { SettingsSection } from "./settingsLayout";
-import { T, Var, useGT } from "gt-react";
+import { T, Var, useGT, t } from "gt-react";
 
 const HISTORY_WINDOWS = [
-  { label: "5m", windowMs: 5 * 60_000, bucketMs: 15_000 },
-  { label: "15m", windowMs: 15 * 60_000, bucketMs: 30_000 },
-  { label: "30m", windowMs: 30 * 60_000, bucketMs: 60_000 },
-  { label: "1h", windowMs: 60 * 60_000, bucketMs: 2 * 60_000 },
+  {
+    get label() {
+      return t("5m");
+    },
+    windowMs: 5 * 60_000,
+    bucketMs: 15_000,
+  },
+  {
+    get label() {
+      return t("15m");
+    },
+    windowMs: 15 * 60_000,
+    bucketMs: 30_000,
+  },
+  {
+    get label() {
+      return t("30m");
+    },
+    windowMs: 30 * 60_000,
+    bucketMs: 60_000,
+  },
+  {
+    get label() {
+      return t("1h");
+    },
+    windowMs: 60 * 60_000,
+    bucketMs: 2 * 60_000,
+  },
 ] as const;
 
 function formatRate(value: number): string {
@@ -300,7 +324,7 @@ function HealthSource({ label, health }: { label: string; health: ResourceTeleme
         <div className="text-sm font-medium text-foreground">{label}</div>
         <div className="mt-1 text-2xs leading-relaxed text-muted-foreground/65">
           {expectedInBrowser
-            ? "Available when this page runs inside the desktop app."
+            ? t("Available when this page runs inside the desktop app.")
             : Option.match(health.lastError, {
                 onNone: () => "No reported errors",
                 onSome: (error) => error,
@@ -313,7 +337,7 @@ function HealthSource({ label, health }: { label: string; health: ResourceTeleme
         presentation={
           expectedInBrowser
             ? {
-                label: "Desktop only",
+                label: t("Desktop only"),
                 tone: "neutral",
               }
             : undefined
@@ -939,14 +963,14 @@ function ResourceTelemetryDiagnosticsBody({
       let confirmed = false;
       try {
         confirmed = await ensureLocalApi().dialogs.confirm(
-          `Send SIGKILL to process ${process.identity.pid}? This cannot be handled by the process.`,
+          t`Send SIGKILL to process ${process.identity.pid}? This cannot be handled by the process.`,
           { variant: "destructive" },
         );
       } catch (error) {
         clearSignaling();
         toastManager.add({
           type: "error",
-          title: "Could not confirm signal",
+          title: t("Could not confirm signal"),
           description: error instanceof Error ? error.message : `Failed to send ${signal}.`,
         });
         return;
@@ -976,7 +1000,7 @@ function ResourceTelemetryDiagnosticsBody({
         if (result.value.signaled) return;
         toastManager.add({
           type: "error",
-          title: `Could not send ${signal}`,
+          title: t`Could not send ${signal}`,
           description: Option.getOrElse(
             result.value.message,
             () => `Failed to send ${signal} to process ${process.identity.pid}.`,
@@ -986,7 +1010,7 @@ function ResourceTelemetryDiagnosticsBody({
       .catch((error: unknown) => {
         toastManager.add({
           type: "error",
-          title: `Could not send ${signal}`,
+          title: t`Could not send ${signal}`,
           description: error instanceof Error ? error.message : `Failed to send ${signal}.`,
         });
       })
@@ -1018,7 +1042,7 @@ function ResourceTelemetryDiagnosticsBody({
       .catch((error: unknown) => {
         toastManager.add({
           type: "error",
-          title: "Could not restart resource monitor",
+          title: t("Could not restart resource monitor"),
           description:
             error instanceof Error ? error.message : "The resource monitor retry failed.",
         });
@@ -1095,7 +1119,7 @@ function ResourceTelemetryDiagnosticsBody({
                     : "bg-muted-foreground/55",
                 )}
               />
-              {snapshot ? formatSamplingStatus(snapshot.sampleIntervalMs) : "Sampling every ..."}
+              {snapshot ? formatSamplingStatus(snapshot.sampleIntervalMs) : t("Sampling every ...")}
             </div>
           </div>
           <div className="grid grid-cols-2 divide-x divide-y divide-border/55 md:grid-cols-3">

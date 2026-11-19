@@ -5,6 +5,7 @@ import {
   ProviderInstanceId,
   type ProviderInstallState,
   type ProviderSetupInput,
+  type SkillInventory,
   ServerObservability,
   EnvironmentThemeId,
   UsageLimitSourceId,
@@ -73,6 +74,26 @@ import {
   runDesktopCommitWithReconnectObserver,
 } from "./server.ts";
 import { applyServerConfigProjection } from "./serverConfigProjection.ts";
+
+vi.mock(import("./session.ts"), async () => {
+  const { AsyncResult, Atom } = await import("effect/reactivity");
+  const session = {
+    authenticated: true,
+    auth: {
+      policy: "remote-reachable",
+      bootstrapMethods: [],
+      sessionMethods: [],
+      sessionCookieName: "test",
+    },
+    scopes: ["providers:manage", "filesystem:write"],
+    permissions: ["providers:manage", "filesystem:write"],
+  };
+  return {
+    createEnvironmentSessionAtoms: () => ({
+      sessionStateAtom: Atom.family(() => Atom.make(AsyncResult.success(session as never))),
+    }),
+  } as never;
+});
 
 const CONFIG = {
   availableEditors: [],
@@ -1838,6 +1859,140 @@ describe("provider setup commands", () => {
       );
       yield* TestClock.adjust(Duration.seconds(1));
       expect(yield* Fiber.join(saved)).toBe(true);
+    }),
+  );
+
+  it.effect("routes skill queries and mutations through the selected environment", () =>
+    Effect.gen(function* () {
+      const requested = yield* Queue.unbounded<{
+        readonly instanceId?: ProviderInstanceId;
+        readonly cwd: string;
+      }>();
+      const routedEnvironmentIds: EnvironmentId[] = [];
+      const mutations: Array<{ readonly method: string; readonly input: unknown }> = [];
+      const inventory: SkillInventory = {
+        checkedAt: "2026-11-17T00:00:00.000Z",
+        revision: "revision-1",
+        entries: [],
+        diagnostics: ["scan issue"],
+      };
+      const record = (method: string, input: unknown) =>
+        Effect.sync(() => {
+          mutations.push({ method, input });
+          return { requiresSessionRestart: true as const };
+        });
+      const client = {
+        [WS_METHODS.skillsList]: (input: { readonly cwd: string }) =>
+          Queue.offer(requested, input).pipe(Effect.as(inventory)),
+        [WS_METHODS.skillsInstall]: (input: unknown) => record("install", input),
+        [WS_METHODS.skillsSetEnabled]: (input: unknown) => record("setEnabled", input),
+        [WS_METHODS.skillsUninstall]: (input: unknown) => record("uninstall", input),
+        [WS_METHODS.skillsSync]: (input: unknown) =>
+          Effect.as(record("sync", input), {
+            requiresSessionRestart: true as const,
+            backups: [{ nativeId: "review", path: "/backup/review" }],
+          }),
+      } as unknown as WsRpcProtocolClient;
+      const supervisor = EnvironmentSupervisor.EnvironmentSupervisor.of({
+        target: TARGET,
+        state: yield* SubscriptionRef.make(AVAILABLE_CONNECTION_STATE),
+        session: yield* SubscriptionRef.make(Option.some(session(client))),
+        prepared: yield* SubscriptionRef.make(Option.none<PreparedConnection>()),
+        connect: Effect.void,
+        disconnect: Effect.void,
+        retryNow: Effect.void,
+      } satisfies EnvironmentSupervisor.EnvironmentSupervisor["Service"]);
+      const runtime = Atom.runtime(
+        Layer.merge(
+          Layer.succeed(EnvironmentRegistry.EnvironmentRegistry, {
+            run: (environmentId, effect) => {
+              routedEnvironmentIds.push(environmentId);
+              return Effect.provideService(
+                effect,
+                EnvironmentSupervisor.EnvironmentSupervisor,
+                supervisor,
+              );
+            },
+          } as EnvironmentRegistry.EnvironmentRegistry["Service"]),
+          Layer.succeed(
+            Persistence.EnvironmentCacheStore,
+            {} as Persistence.EnvironmentCacheStore["Service"],
+          ),
+        ),
+      );
+      const atoms = createServerEnvironmentAtoms(runtime, {
+        initialConfigValueAtom: () => Atom.make(CONFIG),
+      });
+      const registry = yield* Effect.acquireRelease(Effect.sync(AtomRegistry.make), (registry) =>
+        Effect.sync(() => registry.dispose()),
+      );
+
+      const result = yield* Effect.promise(() =>
+        atoms.skillInventory.run(registry, {
+          environmentId: TARGET.environmentId,
+          input: { instanceId: ProviderInstanceId.make("claude"), cwd: "/repo" },
+        }),
+      );
+      const base = {
+        instanceId: ProviderInstanceId.make("claude"),
+        cwd: "/repo",
+        nativeId: "project:review",
+        expectedRevision: "revision-1",
+      };
+      const target = <T>(input: T) => ({ environmentId: TARGET.environmentId, input });
+      const installed = yield* Effect.promise(() =>
+        atoms.installSkill.run(registry, target({ ...base, sourceFolder: "/source/review" })),
+      );
+      yield* Effect.promise(() =>
+        atoms.setSkillEnabled.run(registry, target({ ...base, enabled: false })),
+      );
+      yield* Effect.promise(() => atoms.uninstallSkill.run(registry, target(base)));
+      const synced = yield* Effect.promise(() =>
+        atoms.syncSkills.run(
+          registry,
+          target({
+            sourceInstanceId: ProviderInstanceId.make("claude-a"),
+            targetInstanceId: ProviderInstanceId.make("claude-b"),
+            cwd: "/repo",
+            mode: "copy",
+            nativeIds: ["review"] as [string],
+            expectedRevision: "revision-1",
+            onConflict: "backup",
+          }),
+        ),
+      );
+
+      expect(result).toMatchObject({ _tag: "Success", value: inventory });
+      expect(installed).toMatchObject({
+        _tag: "Success",
+        value: { requiresSessionRestart: true },
+      });
+      expect(synced).toMatchObject({
+        _tag: "Success",
+        value: {
+          requiresSessionRestart: true,
+          backups: [{ nativeId: "review", path: "/backup/review" }],
+        },
+      });
+      expect(yield* Queue.take(requested)).toEqual({ instanceId: "claude", cwd: "/repo" });
+      expect(mutations).toEqual([
+        { method: "install", input: { ...base, sourceFolder: "/source/review" } },
+        { method: "setEnabled", input: { ...base, enabled: false } },
+        { method: "uninstall", input: base },
+        {
+          method: "sync",
+          input: {
+            sourceInstanceId: "claude-a",
+            targetInstanceId: "claude-b",
+            cwd: "/repo",
+            mode: "copy",
+            nativeIds: ["review"],
+            expectedRevision: "revision-1",
+            onConflict: "backup",
+          },
+        },
+      ]);
+      expect(routedEnvironmentIds).toEqual(Array.from({ length: 5 }, () => TARGET.environmentId));
     }),
   );
 });

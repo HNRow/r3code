@@ -7,6 +7,7 @@ import instinctLogo from "./logos/instinct.png";
 import museLogo from "./logos/muse.png";
 import openClawLogo from "./logos/openclaw.png";
 import pokeLogo from "./logos/poke.png";
+import { t } from "gt-react";
 
 /** How the Connect step hands R3 Code's MCP URL to an app. Every `link` is https. */
 export type McpAppHandoff =
@@ -189,25 +190,25 @@ export function mcpHandoffAction(app: McpApp, mcpUrl: string) {
   switch (handoff.kind) {
     case "open":
       return {
-        label: `Open in ${app.name}`,
+        label: t`Open in ${app.name}`,
         link: handoff.link(mcpUrl),
         appLink: null,
         copy: null,
       };
     case "copy-url":
       return {
-        label: `Copy URL and open ${app.name}`,
+        label: t`Copy URL and open ${app.name}`,
         link: handoff.link,
         appLink: null,
-        copy: { text: mcpUrl, title: "URL copied" },
+        copy: { text: mcpUrl, title: t("URL copied") },
       };
     case "copy-message": {
       const message = handoff.message(mcpUrl);
       return {
-        label: `Copy message and open ${app.name}`,
+        label: t`Copy message and open ${app.name}`,
         link: handoff.link,
         appLink: handoff.appLink?.(message) ?? null,
-        copy: { text: message, title: "Message copied" },
+        copy: { text: message, title: t("Message copied") },
       };
     }
     case "commands":

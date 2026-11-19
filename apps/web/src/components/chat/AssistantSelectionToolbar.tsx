@@ -19,6 +19,7 @@ import {
 } from "~/lib/selectionActions";
 import { Button } from "../ui/button";
 import { BackgroundThreadContext } from "./backgroundThread";
+import { t } from "gt-react";
 
 export function AssistantSelectionToolbar({
   viewport,
@@ -209,7 +210,7 @@ export function AssistantSelectionToolbar({
       }}
     >
       <QuoteIcon aria-hidden="true" className="size-3.5" />
-      {tooLong ? "Shorten selection" : "Cite"}
+      {tooLong ? t("Shorten selection") : t("Cite")}
     </Button>,
     document.body,
   );

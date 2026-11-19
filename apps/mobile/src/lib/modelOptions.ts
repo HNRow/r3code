@@ -23,6 +23,7 @@ import {
 } from "@t3tools/shared/model";
 import { resolveModelShortName } from "@t3tools/client-runtime/provider-clients";
 import { resolveProvidersForCwd } from "@t3tools/client-runtime/providerSkills";
+import { t } from "../i18n/gt";
 
 export type ModelOption = {
   readonly key: string;
@@ -218,17 +219,17 @@ export function describeUnavailableModelSelection(
       instanceId: selection.instanceId,
     });
     return {
-      title: "Provider not allowed",
+      title: t("Provider not allowed"),
       detail: `${disallowedProviderMessage(config?.managedPolicy?.organization, label)} Choose another model.`,
     };
   }
   return isDisabledForProject(config, provider, selection.instanceId, projectId)
     ? {
-        title: "Model turned off for this project",
+        title: t("Model turned off for this project"),
         detail: "Turn it back on from web or desktop, or choose another model.",
       }
     : {
-        title: "Antigravity model unavailable",
+        title: t("Antigravity model unavailable"),
         detail: "Set up Antigravity on web or desktop, or choose another model.",
       };
 }

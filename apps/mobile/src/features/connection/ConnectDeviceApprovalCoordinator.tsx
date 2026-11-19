@@ -7,11 +7,13 @@ import { useEnvironments } from "../../state/environments";
 import { useEnvironmentQuery } from "../../state/query";
 import { useEnvironmentsWithScope } from "../../state/session";
 import { useAtomCommand } from "../../state/use-atom-command";
+
 import {
   type ConnectDeviceApprovalPrompt,
   connectDeviceApprovalPrompts,
   createApprovalPromptQueue,
 } from "./connectDeviceApproval";
+import { t } from "../../i18n/gt";
 
 /** Asks to approve R3 Connect devices waiting on hosts that require it and this phone manages. */
 export function ConnectDeviceApprovalCoordinator() {
@@ -58,9 +60,9 @@ const approvalPrompts = createApprovalPromptQueue<QueuedApprovalPrompt>((prompt,
       }
       if (outcome === "gone") {
         return Dialog.alert(
-          "Request no longer waiting",
-          "It expired or was answered elsewhere.",
-          [{ text: "OK", onPress: () => answer("done") }],
+          t("Request no longer waiting"),
+          t("It expired or was answered elsewhere."),
+          [{ text: t("OK"), onPress: () => answer("done") }],
           { onDismiss: () => answer("done") },
         );
       }
@@ -68,8 +70,8 @@ const approvalPrompts = createApprovalPromptQueue<QueuedApprovalPrompt>((prompt,
         answer(watchedEnvironments.has(prompt.environmentId) ? "retry" : "done");
       Dialog.alert(
         failure,
-        "The request is still waiting. Try again.",
-        [{ text: "OK", onPress: retryIfWatched }],
+        t("The request is still waiting. Try again."),
+        [{ text: t("OK"), onPress: retryIfWatched }],
         // Another dialog took the screen; offer the request again on the next update.
         { onDismiss: () => answer("later") },
       );
@@ -78,8 +80,8 @@ const approvalPrompts = createApprovalPromptQueue<QueuedApprovalPrompt>((prompt,
     prompt.title,
     prompt.message,
     [
-      { text: "Deny", onPress: respond(prompt.deny, "Could not deny the device") },
-      { text: "Approve", onPress: respond(prompt.approve, "Could not approve the device") },
+      { text: t("Deny"), onPress: respond(prompt.deny, "Could not deny the device") },
+      { text: t("Approve"), onPress: respond(prompt.approve, "Could not approve the device") },
     ],
     // Another dialog took the screen; offer the request again on the next update.
     { cancelable: false, onDismiss: () => answer("later") },

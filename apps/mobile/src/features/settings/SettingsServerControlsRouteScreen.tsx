@@ -45,6 +45,7 @@ import { PullRequestGlyph } from "../pull-requests/pullRequestGlyphs";
 import { AutoSettleSettingsRows } from "./ThreadSettingsSections";
 import { supportsSharedSettingsSync } from "@t3tools/client-runtime/state/shared-settings";
 import { useGT, T, Var } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 type SettingsPage = "threads" | "source-control" | "worktrees" | "maintenance";
 
@@ -82,16 +83,40 @@ const SUBMODULE_CHOICES: ReadonlyArray<{
 }> = [
   {
     mode: null,
-    label: "Inherit",
-    description: "Use the repository's t3.json, or initialize recursively.",
+    get label() {
+      return t("Inherit");
+    },
+    get description() {
+      return t("Use the repository's t3.json, or initialize recursively.");
+    },
   },
-  { mode: "recursive", label: "Recursive", description: "Initialize nested submodules too." },
+  {
+    mode: "recursive",
+    get label() {
+      return t("Recursive");
+    },
+    get description() {
+      return t("Initialize nested submodules too.");
+    },
+  },
   {
     mode: "top-level",
-    label: "Top level only",
-    description: "Skip submodules declared inside other submodules.",
+    get label() {
+      return t("Top level only");
+    },
+    get description() {
+      return t("Skip submodules declared inside other submodules.");
+    },
   },
-  { mode: "none", label: "Skip", description: "Leave submodules empty for a setup script." },
+  {
+    mode: "none",
+    get label() {
+      return t("Skip");
+    },
+    get description() {
+      return t("Leave submodules empty for a setup script.");
+    },
+  },
 ];
 
 const WORKSPACE_CHOICES: ReadonlyArray<{
@@ -101,18 +126,30 @@ const WORKSPACE_CHOICES: ReadonlyArray<{
 }> = [
   {
     mode: null,
-    label: "Inherit",
-    description: "Use the repository's t3.json, or the current checkout.",
+    get label() {
+      return t("Inherit");
+    },
+    get description() {
+      return t("Use the repository's t3.json, or the current checkout.");
+    },
   },
   {
     mode: "local",
-    label: "Current checkout",
-    description: "Start new threads in the existing workspace.",
+    get label() {
+      return t("Current checkout");
+    },
+    get description() {
+      return t("Start new threads in the existing workspace.");
+    },
   },
   {
     mode: "worktree",
-    label: "New worktree",
-    description: "Give each new thread a separate checkout.",
+    get label() {
+      return t("New worktree");
+    },
+    get description() {
+      return t("Give each new thread a separate checkout.");
+    },
   },
 ];
 
@@ -123,13 +160,21 @@ const STREAMING_CHOICES: ReadonlyArray<{
 }> = [
   {
     mode: "turn",
-    label: "After the turn",
-    description: "Show the answer when the agent finishes.",
+    get label() {
+      return t("After the turn");
+    },
+    get description() {
+      return t("Show the answer when the agent finishes.");
+    },
   },
   {
     mode: "paragraph",
-    label: "Finished paragraphs",
-    description: "Show each paragraph or code block as it completes.",
+    get label() {
+      return t("Finished paragraphs");
+    },
+    get description() {
+      return t("Show each paragraph or code block as it completes.");
+    },
   },
 ];
 
@@ -295,8 +340,8 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
         {!hasConnectedSelection || reference === null ? (
           <Text className="px-2 text-base text-foreground-muted">
             {projectSelected
-              ? "Select a project with a checkout on a connected environment."
-              : "Use the filter above to select a connected environment."}
+              ? t("Select a project with a checkout on a connected environment.")
+              : t("Use the filter above to select a connected environment.")}
           </Text>
         ) : (
           <>

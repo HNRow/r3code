@@ -13,6 +13,7 @@ import { FileTreeBrowser } from "./FileTreeBrowser";
 import { useFileTreeEntries } from "./useFileTreeEntries";
 import { preloadWorkspaceFileContents } from "./preload-workspace-file";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function ThreadFileNavigatorPane(props: {
   readonly cwd: string;
@@ -91,9 +92,9 @@ export function ThreadFileNavigatorPane(props: {
         search={{
           value: searchQuery,
           onChangeText: setSearchQuery,
-          placeholder: "Search files",
+          placeholder: t("Search files"),
         }}
-        refresh={{ accessibilityLabel: "Refresh files", onPress: entriesQuery.refresh }}
+        refresh={{ accessibilityLabel: t("Refresh files"), onPress: entriesQuery.refresh }}
       />
       <ScreenContent insetHorizontal>{fileTree}</ScreenContent>
     </SheetPane>

@@ -20,6 +20,7 @@ import {
 } from "../../lib/audioSession";
 import { usePlaybackAudioPlayer } from "../voice-input/usePlaybackAudioPlayer";
 import { Var, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 type PreviewProps = {
   readonly source: FilePreviewSource;
@@ -232,9 +233,9 @@ function InlineAudio(
           </View>
           <Text className="text-xs text-foreground-muted" numberOfLines={1}>
             {error || status.error
-              ? "Unavailable · tap play to retry"
+              ? t("Unavailable · tap play to retry")
               : busy
-                ? "Loading…"
+                ? t("Loading…")
                 : `${timestamp(status.currentTime)} / ${status.isLoaded ? timestamp(status.duration) : "--:--"}`}
           </Text>
         </View>

@@ -31,6 +31,7 @@ import type { SettingsTarget } from "../settings-environment-filter";
 import { SettingsProviderRow } from "./SettingsProviderRow";
 import { SettingsSection } from "./SettingsSection";
 import { useGT } from "gt-react-native";
+import { t } from "../../../i18n/gt";
 
 const saveFailure = (result: Parameters<typeof squashAtomCommandFailure>[0]) => {
   const error = squashAtomCommandFailure(result);
@@ -102,7 +103,7 @@ function EnvironmentProviders(props: {
   );
   const canUpdate = useAtomValue(serverEnvironment.updateSettings.permissionAtom(environmentId));
   const updateSettings = useAtomCommand(serverEnvironment.updateSettings, {
-    label: "save source control providers",
+    label: t("save source control providers"),
   });
   const navigation = useNavigation();
   const items = discovery.data?.sourceControlProviders ?? [];
@@ -215,7 +216,7 @@ export function SourceControlTokenForm(props: {
   return (
     <View className="gap-3 p-4">
       <Text className="text-xs leading-relaxed text-foreground-muted">
-        {`A token saved here is used before ${credentials.tokenEnvVar} and the ${credentials.cliName} login, so ${definition.label} works without the ${credentials.cliLabel}. Give it ${credentials.tokenAccess}.`}
+        {t`A token saved here is used before ${credentials.tokenEnvVar} and the ${credentials.cliName} login, so ${definition.label} works without the ${credentials.cliLabel}. Give it ${credentials.tokenAccess}.`}
       </Text>
       <ConnectionFormField
         label={gt("Host")}

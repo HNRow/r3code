@@ -8,7 +8,7 @@ import { writeTextToClipboard } from "../../hooks/useCopyToClipboard";
 import { Button } from "../ui/button";
 import { toastManager } from "../ui/toast";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 export function feedbackBannerItem(
   submission: CodexFeedbackSubmission,
@@ -32,7 +32,7 @@ export function feedbackBannerItem(
               (error: unknown) => {
                 toastManager.add({
                   type: "error",
-                  title: "Could not copy thread ID",
+                  title: t("Could not copy thread ID"),
                   description: error instanceof Error ? error.message : "An error occurred.",
                 });
               },

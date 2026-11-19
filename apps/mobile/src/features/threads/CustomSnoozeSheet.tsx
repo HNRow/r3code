@@ -34,16 +34,42 @@ import { ScrollView, useWindowDimensions, View } from "react-native";
 
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const durationAmounts = Array.from({ length: 99 }, (_, index) => index + 1);
 const modes = [
-  { value: "date", label: "Date and time" },
-  { value: "duration", label: "Duration" },
+  {
+    value: "date",
+    get label() {
+      return t("Date and time");
+    },
+  },
+  {
+    value: "duration",
+    get label() {
+      return t("Duration");
+    },
+  },
 ] as const;
 const units = [
-  { value: "minutes", label: "Minutes" },
-  { value: "hours", label: "Hours" },
-  { value: "days", label: "Days" },
+  {
+    value: "minutes",
+    get label() {
+      return t("Minutes");
+    },
+  },
+  {
+    value: "hours",
+    get label() {
+      return t("Hours");
+    },
+  },
+  {
+    value: "days",
+    get label() {
+      return t("Days");
+    },
+  },
 ] as const;
 
 export function CustomSnoozeSheet(props: {
@@ -230,7 +256,7 @@ function SnoozePopoverNavigation(props: {
               title={gt("Custom snooze")}
               onCancel={props.onClose}
               accessibilityLabel={gt("Cancel custom snooze")}
-              confirm={{ label: "Snooze", onPress: props.onSubmit }}
+              confirm={{ label: t("Snooze"), onPress: props.onSubmit }}
             />
             <ScrollView
               contentInsetAdjustmentBehavior="automatic"

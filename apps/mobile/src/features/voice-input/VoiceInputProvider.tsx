@@ -27,11 +27,13 @@ import { VoiceInputSession } from "./voiceInputSession";
 import { createVoiceRecordingPermission } from "./voiceRecordingPermission";
 import { voiceRouteAtom } from "./voiceDestination";
 import { makePermissionStatusAtom } from "../../lib/permissionStatusAtom";
+
 import {
   acquireAudioSession,
   activateAudioSession,
   releaseAudioSession,
 } from "../../lib/audioSession";
+import { msg } from "../../i18n/gt";
 
 // The native constructor expects platform-flattened options, as built by useAudioRecorder.
 const { ios: IOS_RECORDING_OPTIONS, android: ANDROID_RECORDING_OPTIONS } =
@@ -59,7 +61,7 @@ export const deviceMicrophoneOrder = (saved?: ReadonlyArray<MicrophoneEntry>) =>
 export const localVoiceTranscriberAtom = makePermissionStatusAtom<
   VoiceTranscriber | null | "checking"
 >({
-  label: "mobile:voice-input:transcriber",
+  label: msg("mobile:voice-input:transcriber"),
   initial: "checking",
   read: () => getLocalVoiceTranscriber().catch(() => null),
 }).pipe(Atom.keepAlive);

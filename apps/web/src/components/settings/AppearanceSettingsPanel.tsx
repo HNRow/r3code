@@ -36,7 +36,7 @@ import { AdvancedSettings } from "./AdvancedSettings";
 import { PanelAnimationsPreview } from "./PanelAnimationsPreview";
 import { TypographySection } from "./TypographySettings";
 import { ThreadDetailsItemsRow } from "./ThreadDetailsItemsRow";
-import { msg, T, useGT, useMessages, Var } from "gt-react";
+import { T, useGT, useMessages, Var, t } from "gt-react";
 
 const ENVIRONMENT_IDENTIFICATION_LABELS: Record<EnvironmentIdentificationMode, string> = {
   artwork: "Artwork",
@@ -75,14 +75,24 @@ function environmentIdentificationOptions(
 }
 
 const CHAT_WIDTH_LABELS: Record<ChatWidth, string> = {
-  comfortable: msg("Comfortable"),
-  wide: msg("Wide"),
-  full: msg("Full"),
+  get comfortable() {
+    return t("Comfortable");
+  },
+  get wide() {
+    return t("Wide");
+  },
+  get full() {
+    return t("Full");
+  },
 };
 
 const EFFORT_DISPLAY_LABELS: Record<EffortDisplay, string> = {
-  label: msg("Word"),
-  bars: msg("Bars"),
+  get label() {
+    return t("Word");
+  },
+  get bars() {
+    return t("Bars");
+  },
 };
 
 export function AppearanceSettingsPanel() {

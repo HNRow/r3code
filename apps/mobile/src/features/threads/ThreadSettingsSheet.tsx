@@ -124,6 +124,7 @@ import {
 } from "./thread-settings-sheet-state";
 import { formatProviderUpdateRequiredNotice } from "@t3tools/client-runtime/providerUpdateRequiredModels";
 import { T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const PRIMARY_PROVIDER_DRIVERS: ReadonlySet<string> = new Set([
   "claudeAgent",
@@ -523,8 +524,8 @@ function ThreadSettingsSessionProvider(
     if (pendingModel) {
       if (!canCommitPendingModel(pendingModel, props.providerGroups)) {
         Dialog.alert(
-          "Model unavailable",
-          "Set up this provider on web or desktop, or select another model.",
+          t("Model unavailable"),
+          t("Set up this provider on web or desktop, or select another model."),
         );
         return false;
       }
@@ -988,7 +989,7 @@ function ThreadSettingsMainContent(props: {
       .then((result) => {
         setIsRefreshingProviders(false);
         const error = providerCatalogRefreshError(result);
-        if (error) Dialog.alert("Could not refresh models", error);
+        if (error) Dialog.alert(t("Could not refresh models"), error);
       });
   };
   const [listLoaded, setListLoaded] = useState(false);
@@ -1018,17 +1019,21 @@ function ThreadSettingsMainContent(props: {
         />
       );
     } else if (item.kind === "notice") {
-      content = <Text className="mx-8 mt-2 text-xs text-foreground-muted">{item.text}</Text>;
+      content = (
+        <Text translate={false} className="mx-8 mt-2 text-xs text-foreground-muted">
+          {item.text}
+        </Text>
+      );
     } else if (item.kind === "empty") {
       content = (
         <View className="items-center px-8 py-14">
           <Text className="text-center text-sm text-foreground-muted">
             {session.providerFilter === FAVORITES_PROVIDER_FILTER &&
             session.searchQuery.trim().length === 0
-              ? "No favorite models"
+              ? t("No favorite models")
               : hasActiveCatalogFilter
-                ? "No matching models"
-                : "No available models"}
+                ? t("No matching models")
+                : t("No available models")}
           </Text>
         </View>
       );
@@ -1139,8 +1144,10 @@ function ThreadSettingsChoiceContent(props: {
                   activeDescriptor.id === session.promptTraits.primarySelectDescriptor?.id
                 ) {
                   Dialog.alert(
-                    "Reasoning controlled by prompt",
-                    'Your prompt contains "ultrathink" in the text. Remove it to change this option.',
+                    t("Reasoning controlled by prompt"),
+                    t(
+                      'Your prompt contains "ultrathink" in the text. Remove it to change this option.',
+                    ),
                   );
                   return;
                 }
@@ -1220,15 +1227,15 @@ function ThreadSettingsModelsScreen() {
   const search: AppBarSearch = {
     value: session.searchQuery,
     onChangeText: session.setSearchQuery,
-    placeholder: "Find a model",
+    placeholder: t("Find a model"),
     clearAccessibilityLabel: "Clear model search",
     mode: "inline",
     compactToolbar: true,
   };
   const searchToolbarInset = useSearchToolbarInset(search);
   const providerFilters = [
-    { id: "all-providers", title: "All providers", value: null },
-    { id: "favorites", title: "Favorites", value: FAVORITES_PROVIDER_FILTER },
+    { id: "all-providers", title: t("All providers"), value: null },
+    { id: "favorites", title: t("Favorites"), value: FAVORITES_PROVIDER_FILTER },
     ...session.providerGroups.map((group) => ({
       id: `provider:${group.providerKey}`,
       title: group.providerLabel,
@@ -1245,14 +1252,14 @@ function ThreadSettingsModelsScreen() {
         search={search}
         menus={[
           {
-            title: "Model filters",
+            title: t("Model filters"),
             icon: hasCustomCatalogFilter
               ? "line.3.horizontal.decrease.circle.fill"
               : "line.3.horizontal.decrease",
             items: [
               {
                 id: "provider",
-                title: "Provider",
+                title: t("Provider"),
                 items: providerFilters.map((filter) => ({
                   id: filter.id,
                   title: filter.title,
@@ -1264,7 +1271,7 @@ function ThreadSettingsModelsScreen() {
                 ? [
                     {
                       id: "show-legacy",
-                      title: "Show legacy models",
+                      title: t("Show legacy models"),
                       selected: session.showLegacy,
                       onPress: () => session.setShowLegacy(!session.showLegacy),
                     },
@@ -1335,7 +1342,7 @@ function ThreadSettingsPickerNavigator(props: ThreadSettingsPickerPresentation) 
         <ThreadSettingsPickerStack.Screen
           name="ThreadSettingsModels"
           component={ThreadSettingsModelsScreen}
-          options={{ headerBackVisible: false, title: "Thread settings" }}
+          options={{ headerBackVisible: false, title: t("Thread settings") }}
         />
         <ThreadSettingsPickerStack.Screen
           name="ThreadSettingsChoice"

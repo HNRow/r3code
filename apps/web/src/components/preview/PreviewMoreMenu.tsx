@@ -18,15 +18,30 @@ import {
   MenuTrigger,
 } from "~/components/ui/menu";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "~/components/ui/tooltip";
-import { useGT, T, Var } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 const COLOR_SCHEME_OPTIONS: ReadonlyArray<{
   value: DesktopPreviewColorScheme;
   label: string;
 }> = [
-  { value: "system", label: "System" },
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
+  {
+    value: "system",
+    get label() {
+      return t("System");
+    },
+  },
+  {
+    value: "light",
+    get label() {
+      return t("Light");
+    },
+  },
+  {
+    value: "dark",
+    get label() {
+      return t("Dark");
+    },
+  },
 ];
 
 export interface PreviewMoreMenuActions {
@@ -122,13 +137,13 @@ export function PreviewMoreMenu({
         {actions.toggleNativePictureInPicture ? (
           <MenuItem onClick={actions.toggleNativePictureInPicture} disabled={disabled}>
             {nativePictureInPicture
-              ? "Close separate preview window"
-              : "Open separate preview window"}
+              ? t("Close separate preview window")
+              : t("Open separate preview window")}
           </MenuItem>
         ) : null}
         {move ? <MenuItem onClick={move.onMove}>{move.label}</MenuItem> : null}
         <MenuItem onClick={onToggleDeviceToolbar} disabled={disabled}>
-          {deviceToolbarVisible ? "Hide device toolbar" : "Show device toolbar"}
+          {deviceToolbarVisible ? t("Hide device toolbar") : t("Show device toolbar")}
         </MenuItem>
         <MenuSub>
           <MenuSubTrigger disabled={disabled}>

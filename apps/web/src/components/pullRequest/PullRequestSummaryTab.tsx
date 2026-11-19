@@ -101,7 +101,7 @@ import { canReactPullRequestComment } from "@t3tools/client-runtime/pull-request
 import { PullRequestResolveThreadButton } from "./PullRequestResolveThreadButton";
 import { PullRequestConversationGhost } from "./PullRequestGhosts";
 import { sectionCollapseAnchorScrollTop } from "./pullRequestSummaryScroll.logic";
-import { T, useGT, Var } from "gt-react";
+import { T, useGT, Var, t } from "gt-react";
 
 function reviewerKey(login: string): string {
   return login.toLowerCase();
@@ -570,7 +570,7 @@ export function PullRequestSummaryTab({
   const openCheck = (url: string) => {
     void openLink(url).catch((error: unknown) => {
       console.error(error);
-      toastManager.add({ type: "error", title: "Unable to open check details" });
+      toastManager.add({ type: "error", title: t("Unable to open check details") });
     });
   };
 
@@ -666,7 +666,7 @@ export function PullRequestSummaryTab({
     descriptionSavesRunning.current -= 1;
     const saved = result._tag === "Success";
     setDescriptionDraft((draft) => settleDescriptionSave(draft, key, saved));
-    if (!saved) toastManager.add({ type: "error", title: "Could not save the description" });
+    if (!saved) toastManager.add({ type: "error", title: t("Could not save the description") });
     if (descriptionSavesRunning.current === 0) onRefresh();
     return saved;
   };
@@ -699,7 +699,7 @@ export function PullRequestSummaryTab({
       });
       setCommentSaving(false);
       if (result._tag === "Failure") {
-        toastManager.add({ type: "error", title: "Could not save the comment" });
+        toastManager.add({ type: "error", title: t("Could not save the comment") });
         return;
       }
       setCommentScope(null);
@@ -775,7 +775,7 @@ export function PullRequestSummaryTab({
                 <HammerIcon className="size-3 self-center" />
                 <span>
                   {pendingFinding === pullRequestFindingKey(finding)
-                    ? "Preparing..."
+                    ? t("Preparing...")
                     : fixFindingLabel}
                 </span>
               </span>
@@ -974,7 +974,7 @@ export function PullRequestSummaryTab({
               completionScope={completionScope}
               threadRef={threadRef}
               label={`${capitalizeTerm(terminology.singular)} description`}
-              placeholder={`Describe this ${terminology.singular}`}
+              placeholder={t`Describe this ${terminology.singular}`}
               saving={descriptionSaving}
               onSave={(body) => void saveBody(body)}
               onCancel={() => setBodyScope(null)}
@@ -1057,7 +1057,7 @@ export function PullRequestSummaryTab({
                       >
                         <HammerIcon className="size-3" />
                         {pendingFinding === pullRequestFindingKey(finding)
-                          ? "Preparing..."
+                          ? t("Preparing...")
                           : fixCheckLabel}
                       </Button>
                     ) : null}
@@ -1069,7 +1069,7 @@ export function PullRequestSummaryTab({
       </PullRequestSection>
 
       <PullRequestSection
-        title={`Comments (${detail.commentCount})`}
+        title={t`Comments (${detail.commentCount})`}
         actions={
           <div className="flex shrink-0 items-center gap-1">
             <Menu>
@@ -1078,7 +1078,7 @@ export function PullRequestSummaryTab({
                 aria-label={gt("Filter comments")}
               >
                 <ListFilterIcon aria-hidden className="size-3" />
-                {filteredOutCount > 0 ? `${filteredOutCount} hidden` : "Filter"}
+                {filteredOutCount > 0 ? `${filteredOutCount} hidden` : t("Filter")}
               </MenuTrigger>
               <MenuPopup align="end">
                 <MenuGroup>
@@ -1115,7 +1115,7 @@ export function PullRequestSummaryTab({
               onClick={() => setCommentOrder((value) => (value === "newest" ? "oldest" : "newest"))}
             >
               <ArrowDownUpIcon aria-hidden className="size-3" />
-              {commentOrder === "newest" ? "Newest first" : "Oldest first"}
+              {commentOrder === "newest" ? t("Newest first") : t("Oldest first")}
             </Button>
           </div>
         }
@@ -1147,7 +1147,7 @@ export function PullRequestSummaryTab({
             ) : filteredItems.length === 0 ? (
               <p className="py-2 text-xs text-muted-foreground">
                 {filteredOutCount === 1
-                  ? "The only comment is hidden by the filter."
+                  ? t("The only comment is hidden by the filter.")
                   : `All ${filteredOutCount} comments are hidden by the filter.`}
               </p>
             ) : (

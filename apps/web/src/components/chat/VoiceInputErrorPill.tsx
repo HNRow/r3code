@@ -5,7 +5,7 @@ import { CircleAlertIcon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { VoiceInputPill } from "./VoiceInputPill";
-import { useGT, Var, T } from "gt-react";
+import { useGT, Var, T, t } from "gt-react";
 
 const VOICE_ERROR_LABELS: Record<string, string> = {
   [MICROPHONE_PERMISSION_ERROR]: "Mic blocked",
@@ -47,10 +47,10 @@ export function VoiceInputErrorPill(props: {
   const openSettings = props.errorAction === "settings";
   const compact = props.size === "compact";
   const action = openSettings
-    ? { label: "Open voice settings", text: "Settings" }
+    ? { label: t("Open voice settings"), text: t("Settings") }
     : props.error && RETRYABLE_TRANSCRIPTIONS.has(props.error)
-      ? { label: "Retry transcription", text: "Retry" }
-      : { label: "Record again", text: "Record again" };
+      ? { label: t("Retry transcription"), text: t("Retry") }
+      : { label: t("Record again"), text: t("Record again") };
   return (
     <VoiceInputPill tone="error" size={props.size}>
       <Tooltip>
@@ -89,7 +89,7 @@ export function VoiceInputErrorPill(props: {
         >
           <CircleAlertIcon aria-hidden className="size-3.5 shrink-0" />
           <span className="truncate">
-            {(props.error && VOICE_ERROR_LABELS[props.error]) || "Voice input failed"}
+            {(props.error && VOICE_ERROR_LABELS[props.error]) || t("Voice input failed")}
           </span>
         </TooltipTrigger>
         <TooltipPopup side="top">{message}</TooltipPopup>

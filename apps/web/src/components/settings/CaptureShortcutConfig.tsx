@@ -19,7 +19,7 @@ import { Button } from "../ui/button";
 import { toastManager } from "../ui/toast";
 import { shortcutToKeybindingInput } from "./KeybindingsSettings.logic";
 import { useSnapShotShortcutRecorder } from "./useSnapShotShortcutRecorder";
-import { T, useGT, Var } from "gt-react";
+import { T, useGT, Var, t } from "gt-react";
 
 const DEFAULT_SHORTCUT = parseKeybindingShortcut("Ctrl+Shift+2")!;
 
@@ -107,7 +107,7 @@ export function CaptureShortcutConfig({
     } else {
       const cause = Cause.squash(previewed.cause);
       setError({
-        message: "Couldn't prepare the changes. Check Advanced for help.",
+        message: t("Couldn't prepare the changes. Check Advanced for help."),
         ...(cause instanceof Error ? { detail: cause.message } : {}),
       });
     }
@@ -123,8 +123,8 @@ export function CaptureShortcutConfig({
       if (!applied.warning && preview.operation === "install" && onComplete) {
         toastManager.add({
           type: "success",
-          title: "Shortcut saved",
-          description: `Use ${preview.shortcut} from another app.`,
+          title: t("Shortcut saved"),
+          description: t`Use ${preview.shortcut} from another app.`,
         });
         await onComplete();
       }
@@ -132,7 +132,7 @@ export function CaptureShortcutConfig({
     if (saved._tag === "Failure") {
       const cause = Cause.squash(saved.cause);
       setError({
-        message: "Couldn't save your shortcut. Review the changes and try again.",
+        message: t("Couldn't save your shortcut. Review the changes and try again."),
         ...(cause instanceof Error ? { detail: cause.message } : {}),
       });
       setPreview(null);
@@ -158,9 +158,9 @@ export function CaptureShortcutConfig({
       {result ? (
         <p role="status">
           {result.warning
-            ? "Saved, but the shortcut needs attention. Check Advanced for help."
+            ? t("Saved, but the shortcut needs attention. Check Advanced for help.")
             : preview?.operation === "remove"
-              ? "Shortcut removed."
+              ? t("Shortcut removed.")
               : `Use ${preview?.shortcut} from another app to capture a window.`}
         </p>
       ) : preview ? (
@@ -168,11 +168,11 @@ export function CaptureShortcutConfig({
           <p className="text-muted-foreground">
             {changed
               ? preview.operation === "remove"
-                ? "Review the change below to remove your shortcut."
-                : "Review the change below, then save your shortcut."
+                ? t("Review the change below to remove your shortcut.")
+                : t("Review the change below, then save your shortcut.")
               : preview.operation === "remove"
-                ? "There's no capture shortcut to remove."
-                : "This shortcut is already set up."}
+                ? t("There's no capture shortcut to remove.")
+                : t("This shortcut is already set up.")}
           </p>
           {diff ? (
             <div
@@ -206,12 +206,12 @@ export function CaptureShortcutConfig({
                 onClick={() => void apply()}
               >
                 {working === "writing"
-                  ? "Saving…"
+                  ? t("Saving…")
                   : changed
                     ? preview.operation === "install"
-                      ? "Save shortcut"
-                      : "Remove shortcut"
-                    : "Done"}
+                      ? t("Save shortcut")
+                      : t("Remove shortcut")
+                    : t("Done")}
               </Button>
             ) : null}
             <Button variant="ghost" disabled={actionBusy} onClick={() => setPreview(null)}>
@@ -232,7 +232,7 @@ export function CaptureShortcutConfig({
             aria-busy={working === "reading"}
             onClick={() => void read()}
           >
-            {working === "reading" ? "Preparing changes…" : "Review changes"}
+            {working === "reading" ? t("Preparing changes…") : t("Review changes")}
           </Button>
         </>
       )}
@@ -244,8 +244,8 @@ export function CaptureShortcutConfig({
       {state.shortcutActionRegistered === false && state.shortcutMessage ? (
         <p role="status" className="text-muted-foreground">
           {state.shortcutPending
-            ? "Connecting to your desktop…"
-            : "Restart R3 Code to finish connecting your shortcut."}
+            ? t("Connecting to your desktop…")
+            : t("Restart R3 Code to finish connecting your shortcut.")}
         </p>
       ) : null}
       <details className="text-xs text-muted-foreground">
@@ -316,8 +316,8 @@ export function CaptureShortcutConfig({
               Use your desktop's shortcut settings file.<Var> </Var>
               <Var>
                 {niri
-                  ? "A custom --config or NIRI_CONFIG can change its location."
-                  : "On Omarchy, use your own bindings file, not its defaults."}
+                  ? t("A custom --config or NIRI_CONFIG can change its location.")
+                  : t("On Omarchy, use your own bindings file, not its defaults.")}
               </Var>
             </T>
           </p>
@@ -336,7 +336,7 @@ export function CaptureShortcutConfig({
               <Var>
                 {niri
                   ? "Paste this inside binds { … } in your Niri config, then save."
-                  : "Add this binding to your Hyprland config, then save."}
+                  : t("Add this binding to your Hyprland config, then save.")}
               </Var>
               <Var> </Var>
               Change the keys if needed.
@@ -353,7 +353,7 @@ export function CaptureShortcutConfig({
               if (state.shortcutBinding) copyToClipboard(state.shortcutBinding);
             }}
           >
-            {isCopied ? "Copied" : "Copy shortcut"}
+            {isCopied ? t("Copied") : t("Copy shortcut")}
           </Button>
           <p>
             <T>

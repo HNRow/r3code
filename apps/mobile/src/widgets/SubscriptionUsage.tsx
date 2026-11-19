@@ -16,8 +16,10 @@ import {
 } from "@expo/ui/swift-ui/modifiers";
 import { createWidget, type WidgetEnvironment } from "expo-widgets";
 
-import type { SubscriptionUsageSnapshot as SubscriptionUsageProps } from "./subscriptionUsageSnapshot";
-import { Var, T } from "gt-react-native";
+import {
+  DEFAULT_SUBSCRIPTION_USAGE_LABELS,
+  type SubscriptionUsageSnapshot as SubscriptionUsageProps,
+} from "./subscriptionUsageSnapshot";
 
 type UsageConfiguration = {
   codexPeriod?: "auto" | "session" | "weekly";
@@ -32,6 +34,7 @@ function SubscriptionUsage(
 ) {
   "widget";
   // The extension evaluates this function without the app's module scope.
+  const labels = props.labels ?? DEFAULT_SUBSCRIPTION_USAGE_LABELS;
   const family = widgetEnvironment.widgetFamily;
   // Gallery snapshots can render an old timeline entry after it has expired.
   const now = Math.max(widgetEnvironment.date?.getTime() ?? 0, Date.now());
@@ -57,8 +60,8 @@ function SubscriptionUsage(
   const primary = palette?.foreground ?? "primary";
   const secondary = palette?.secondary ?? "secondary";
   const providers = props.providers ?? [
-    { name: "Codex", detail: "Open T3 to connect", windows: [], expiresAt: 0 },
-    { name: "Claude", detail: "Open T3 to connect", windows: [], expiresAt: 0 },
+    { name: "Codex", detail: labels.openToConnect, windows: [], expiresAt: 0 },
+    { name: "Claude", detail: labels.openToConnect, windows: [], expiresAt: 0 },
   ];
   const columns = providers.map((provider) => {
     const stale = provider.windows.length > 0 && now >= provider.expiresAt;
@@ -136,10 +139,10 @@ function SubscriptionUsage(
               ]}
             >
               {tightest
-                ? `${tightest.remaining}% left`
+                ? labels.percentLeft.replace("%percent%", String(tightest.remaining))
                 : period !== "auto" && !stale && provider.windows.length > 0
-                  ? "N/A"
-                  : "Open T3"}
+                  ? labels.notAvailable
+                  : labels.openT3}
             </Text>
           </HStack>
           {tightest ? (
@@ -213,9 +216,7 @@ function SubscriptionUsage(
                   ),
                 ]}
               >
-                <T>
-                  <Var>{window.remaining}</Var>% left
-                </T>
+                {labels.percentLeft.replace("%percent%", String(window.remaining))}
               </Text>
             </HStack>
             <ProgressView value={window.remaining / 100} modifiers={barModifiers} />
@@ -232,14 +233,13 @@ function SubscriptionUsage(
           <Text
             modifiers={[font({ textStyle: "caption2" }), foregroundStyle(secondary), lineLimit(1)]}
           >
-            <T>
-              <Var>
-                {(period === "auto" ? (provider.totalWindows ?? windows.length) : windows.length) -
-                  limit}
-              </Var>
-              <Var> </Var>
-              more in T3
-            </T>
+            {labels.moreInT3.replace(
+              "%count%",
+              String(
+                (period === "auto" ? (provider.totalWindows ?? windows.length) : windows.length) -
+                  limit,
+              ),
+            )}
           </Text>
         ) : null}
       </VStack>
@@ -261,7 +261,7 @@ function SubscriptionUsage(
     >
       {providers.length === 0 ? (
         <Text modifiers={[font({ textStyle: "caption" }), foregroundStyle(secondary)]}>
-          <T>No subscription limits available.</T>
+          {labels.noLimits}
         </Text>
       ) : compact ? (
         <VStack alignment="leading" spacing={accessory || dense ? 4 : 8}>
@@ -278,8 +278,16 @@ function SubscriptionUsage(
           modifiers={[font({ textStyle: "caption2" }), foregroundStyle(secondary), lineLimit(1)]}
         >
           {props.checkedAt
-            ? `As of ${new Date(props.checkedAt).toLocaleString(undefined, { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })}`
-            : "Tap to connect in T3"}
+            ? labels.asOf.replace(
+                "%time%",
+                new Date(props.checkedAt).toLocaleString(undefined, {
+                  hour: "numeric",
+                  minute: "2-digit",
+                  month: "short",
+                  day: "numeric",
+                }),
+              )
+            : labels.tapToConnect}
         </Text>
       ) : null}
     </VStack>

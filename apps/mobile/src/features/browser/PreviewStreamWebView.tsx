@@ -36,6 +36,7 @@ import {
   type PreviewStreamConfiguration,
 } from "./preview-stream-document";
 import { useGT, Var, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export interface PreviewStreamRef {
   readonly command: (input: PreviewStreamInput) => void;
@@ -91,10 +92,10 @@ async function sendFilesToPage(chooser: PreviewStreamFileChooser, pick: boolean)
 }
 
 function offerDownload(download: PreviewStreamDownload) {
-  Dialog.alert(`Downloaded ${download.fileName}`, undefined, [
-    { text: "Not now", style: "cancel" },
+  Dialog.alert(t`Downloaded ${download.fileName}`, undefined, [
+    { text: t("Not now"), style: "cancel" },
     {
-      text: "Save or share",
+      text: t("Save or share"),
       onPress: () =>
         void downloadAndShareAttachment({
           url: download.url,
@@ -102,7 +103,7 @@ function offerDownload(download: PreviewStreamDownload) {
           signal: new AbortController().signal,
         }).catch((cause: unknown) =>
           Dialog.alert(
-            "Could not save the download",
+            t("Could not save the download"),
             cause instanceof Error ? cause.message : undefined,
           ),
         ),
@@ -148,7 +149,7 @@ export function PreviewStreamWebView(
               error ? "text-center text-sm text-foreground-muted" : "text-sm text-foreground-muted"
             }
           >
-            {error || "Connecting to browser..."}
+            {error || t("Connecting to browser...")}
           </AppText>
           {error && (
             <View className="items-center">
@@ -254,7 +255,7 @@ function PreviewStreamDocumentView({
     setFileChooser(null);
     void sendFilesToPage(chooser, pick).catch((cause: unknown) =>
       Dialog.alert(
-        "Could not send the files to the page",
+        t("Could not send the files to the page"),
         cause instanceof Error ? cause.message : undefined,
       ),
     );
@@ -270,7 +271,7 @@ function PreviewStreamDocumentView({
       (text) => {
         if (text) command({ type: "text", text });
       },
-      () => Dialog.alert("Could not read the clipboard"),
+      () => Dialog.alert(t("Could not read the clipboard")),
     );
   const clearBootstrapTimer = () => {
     if (bootstrapTimer.current === null) return;
@@ -441,7 +442,7 @@ function PreviewStreamDocumentView({
           <View className="flex-row justify-end gap-3">
             <Button label={gt("Cancel")} tone="text" onPress={() => answerFileChooser(false)} />
             <Button
-              label={`Choose ${fileChooser.multiple ? "files" : "file"}`}
+              label={t`Choose ${fileChooser.multiple ? "files" : "file"}`}
               tone="secondary"
               onPress={() => answerFileChooser(true)}
             />
@@ -500,7 +501,7 @@ function PreviewStreamDocumentView({
               accessibilityLiveRegion="polite"
               className="text-center text-sm text-foreground-muted"
             >
-              {status === "error" ? error : "Connecting to browser..."}
+              {status === "error" ? error : t("Connecting to browser...")}
             </AppText>
           )}
           {status === "error" && hostSetup && !compact ? (

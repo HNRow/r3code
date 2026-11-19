@@ -48,7 +48,7 @@ import {
   useUpdateScopedSettings,
 } from "./useScopedSettings";
 import { settingsScopeEnvironmentLabel } from "./settingsScopeAxis";
-import { useGT, T, Var, msg } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 export function WorktreesDirectoryRow() {
   const gt = useGT();
@@ -464,13 +464,13 @@ function CleanupSection() {
             if (failures.length > 0)
               toastManager.add({
                 type: "error",
-                title: `Cleanup failed on ${environment.label}`,
+                title: t`Cleanup failed on ${environment.label}`,
                 description: failures[0]!.reason,
               });
           } else if (!isAtomCommandInterrupted(result)) {
             toastManager.add({
               type: "error",
-              title: `Could not run cleanup on ${environment.label}`,
+              title: t`Could not run cleanup on ${environment.label}`,
               description: String(squashAtomCommandFailure(result)),
             });
           }
@@ -635,10 +635,10 @@ export function WorktreeCleanupSection() {
             title={gt("Automatic worktree cleanup")}
             description={
               mode === "off"
-                ? msg("Keep this project's worktrees until you delete them manually.")
+                ? t("Keep this project's worktrees until you delete them manually.")
                 : mode === "custom"
-                  ? msg("Use these rules for this project.")
-                  : msg("Use each machine's worktree cleanup settings.")
+                  ? t("Use these rules for this project.")
+                  : t("Use each machine's worktree cleanup settings.")
             }
             serverScoped
             settingKeys={["worktreeCleanup"]}
@@ -656,12 +656,12 @@ export function WorktreeCleanupSection() {
                 <SelectTrigger size="sm" aria-label={gt("Automatic worktree cleanup")}>
                   <SelectValue>
                     {mixedModes
-                      ? "Mixed"
+                      ? t("Mixed")
                       : mode === "inherit"
-                        ? "Inherit"
+                        ? t("Inherit")
                         : mode === "off"
-                          ? "Off"
-                          : "Custom"}
+                          ? t("Off")
+                          : t("Custom")}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -792,10 +792,10 @@ export function WorktreeCleanupSection() {
                   managedPaths={lockablePath("worktreeKeepWhen")}
                   description={
                     settings.worktreeKeepWhen === "any-local-files"
-                      ? msg("Includes ignored files, except node_modules.")
+                      ? t("Includes ignored files, except node_modules.")
                       : settings.worktreeKeepWhen === "tracked-changes"
-                        ? msg("Deletes untracked and ignored files, including .env.")
-                        : msg(
+                        ? t("Deletes untracked and ignored files, including .env.")
+                        : t(
                             "Keeps edits and untracked files. Deletes ignored files, including .env.",
                           )
                   }
@@ -815,7 +815,7 @@ export function WorktreeCleanupSection() {
                       <SelectTrigger size="sm" aria-label={gt("Keep worktrees with local changes")}>
                         <SelectValue>
                           {ruleStatus("worktreeKeepWhen")
-                            ? "Mixed"
+                            ? t("Mixed")
                             : KEEP_WHEN_LABELS[settings.worktreeKeepWhen]}
                         </SelectValue>
                       </SelectTrigger>

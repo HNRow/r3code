@@ -19,12 +19,14 @@ import {
 } from "../../lib/filePreviewGallery";
 import { FilePreviewGallery } from "./FilePreviewGallery";
 import type { MediaActionsSource } from "../../lib/mediaActionsSource";
+
 import type {
   FilePreviewItem,
   FilePreviewModalProps,
   FilePreviewSource,
   FilePreviewViewerProps,
 } from "./FilePreviewModal.types";
+import { t } from "../../i18n/gt";
 
 interface FilePreviewSessionOptions {
   /** Opens before every image resolves; the viewer takes later URLs as they arrive. */
@@ -116,7 +118,7 @@ function ResolvedFilePreview(
   );
   const onResolutionError = useEffectEvent((error: PreviewResolutionError) => {
     if (props.onOpenError) props.onOpenError(error.cause);
-    else Dialog.alert("Could not open preview", error.fallbackMessage);
+    else Dialog.alert(t("Could not open preview"), error.fallbackMessage);
     props.onRequestClose();
   });
   // Resolves once per presentation and holds local file leases until it closes.
@@ -177,12 +179,12 @@ function ResolvedFilePreview(
   if (!uri) return null;
   const onOpenError = (error: unknown) => {
     if (props.onOpenError) return props.onOpenError(error);
-    Dialog.alert("Could not open preview", nativeViewerErrorMessage(error), [
-      { text: "Cancel", style: "cancel" },
+    Dialog.alert(t("Could not open preview"), nativeViewerErrorMessage(error), [
+      { text: t("Cancel"), style: "cancel" },
       ...(selected.kind === "document"
         ? [
             {
-              text: "Save or share",
+              text: t("Save or share"),
               onPress: () => {
                 const input = {
                   attachment: {
@@ -194,7 +196,9 @@ function ResolvedFilePreview(
                 const sharing = /^(file|content):/.test(uri)
                   ? shareLocalAttachment({ ...input, uri })
                   : downloadAndShareAttachment({ ...input, url: uri });
-                void sharing.catch(() => Dialog.alert("Could not share file", "Please try again."));
+                void sharing.catch(() =>
+                  Dialog.alert(t("Could not share file"), t("Please try again.")),
+                );
               },
             },
           ]

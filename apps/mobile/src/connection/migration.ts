@@ -14,6 +14,7 @@ import {
 import { EnvironmentId } from "@t3tools/contracts";
 import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
+import { t } from "../i18n/gt";
 
 const LegacySavedRemoteConnection = Schema.Struct({
   environmentId: EnvironmentId,
@@ -96,7 +97,7 @@ export const migrateLegacyConnectionCatalog = Effect.fn(
     Effect.mapError(
       (cause) =>
         new LegacyConnectionMigrationError({
-          message: `Could not parse the legacy mobile connection catalog: ${String(cause)}`,
+          message: t`Could not parse the legacy mobile connection catalog: ${String(cause)}`,
         }),
     ),
   );
@@ -104,7 +105,7 @@ export const migrateLegacyConnectionCatalog = Effect.fn(
     Effect.mapError(
       (cause) =>
         new LegacyConnectionMigrationError({
-          message: `Could not decode the legacy mobile connection catalog: ${String(cause)}`,
+          message: t`Could not decode the legacy mobile connection catalog: ${String(cause)}`,
         }),
     ),
   );

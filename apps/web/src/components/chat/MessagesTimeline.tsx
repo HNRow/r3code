@@ -141,7 +141,8 @@ import { useThreadFindPositionReader } from "./useThreadFindPositionReader";
 import { ThreadActivityAnnouncer } from "./ThreadActivityAnnouncer";
 import { useStableHandoffRuns, useIncrementalTimelineRows, useStableRows } from "./useTimelineRows";
 import { useClientSettings } from "../../hooks/useSettings";
-import { T, useGT, Var } from "gt-react";
+import { T, useGT, useMessages, Var, t } from "gt-react";
+import { translateTurnFoldLabel } from "../../lib/timelineText";
 
 function timelineListStateFor(identity: string): {
   readonly identity: string;
@@ -1526,7 +1527,7 @@ function TimelineHistoryControl(props: MessagesTimelineHistoryControls) {
           >
             <span aria-hidden="true" className="h-px flex-1 bg-border/70" />
             <span className="shrink-0">
-              {props.loading ? "Loading earlier turns…" : "Load earlier turns"}
+              {props.loading ? t("Loading earlier turns…") : t("Load earlier turns")}
             </span>
             <span aria-hidden="true" className="h-px flex-1 bg-border/70" />
           </button>
@@ -1735,7 +1736,7 @@ function ContextCompactionTimelineRow({
       {row.tokenCounts ? (
         <>
           <T>
-            <Var>{row.title ?? "Context compacted"}</Var> <Var>{row.tokenCounts.before}</Var>
+            <Var>{row.title ?? t("Context compacted")}</Var> <Var>{row.tokenCounts.before}</Var>
             <ArrowRightIcon aria-hidden="true" className="size-3" />
             <Var>{row.tokenCounts.after}</Var> tokens
           </T>
@@ -1828,6 +1829,7 @@ function WorkHistorySkeleton() {
 
 function TurnFoldTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "turn-fold" }> }) {
   const ctx = use(TimelineRowCtx);
+  const m = useMessages();
   const { loading, error, toggle } = useDeferredWorkLoading(row, () =>
     ctx.onToggleTurnFold(row.runId),
   );
@@ -1844,7 +1846,7 @@ function TurnFoldTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "turn-
           className="flex cursor-pointer select-none items-center gap-1 rounded-md px-1 text-sm leading-relaxed text-muted-foreground tabular-nums transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/70"
         >
           <span>
-            {row.label}
+            {translateTurnFoldLabel(row.label, m)}
             {error ? ` · ${error}` : ""}
           </span>
           {row.expanded ? (

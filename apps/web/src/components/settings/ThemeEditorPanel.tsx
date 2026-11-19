@@ -48,7 +48,7 @@ import {
   showThemeInspectorHover,
   type ThemeElementInspection,
 } from "./themeInspector";
-import { T, useGT, Var } from "gt-react";
+import { T, useGT, Var, t } from "gt-react";
 
 const THEME_EDITOR_SIMPLE_ROLES: ReadonlyArray<ThemeColorRole> = ["canvas", "accent"];
 
@@ -66,36 +66,55 @@ const THEME_EDITOR_ROLE_GROUPS: ReadonlyArray<{
 }> = [
   {
     id: "foundation",
-    title: "Foundation",
+    get title() {
+      return t("Foundation");
+    },
     families: [
       {
         id: "background",
-        label: "Background",
+        get label() {
+          return t("Background");
+        },
         role: "canvas",
         roles: ["canvas", "chrome", "toolbar"],
       },
-      { id: "surface", label: "Surface", role: "surface", roles: ["surface"] },
+      {
+        id: "surface",
+        get label() {
+          return t("Surface");
+        },
+        role: "surface",
+        roles: ["surface"],
+      },
       {
         id: "raised-surface",
-        label: "Raised surface",
+        get label() {
+          return t("Raised surface");
+        },
         role: "surfaceRaised",
         roles: ["surfaceRaised"],
       },
       {
         id: "overlay",
-        label: "Overlay",
+        get label() {
+          return t("Overlay");
+        },
         role: "surfaceOverlay",
         roles: ["surfaceOverlay"],
       },
       {
         id: "text",
-        label: "Text",
+        get label() {
+          return t("Text");
+        },
         role: "text",
         roles: ["text", "toolbarForeground", "toolbarControlForeground"],
       },
       {
         id: "muted-text",
-        label: "Muted text",
+        get label() {
+          return t("Muted text");
+        },
         role: "mutedForeground",
         roles: [
           "textMuted",
@@ -108,32 +127,49 @@ const THEME_EDITOR_ROLE_GROUPS: ReadonlyArray<{
       },
       {
         id: "border",
-        label: "Border",
+        get label() {
+          return t("Border");
+        },
         role: "border",
         roles: ["border", "toolbarBorder", "sidebarBorder"],
       },
-      { id: "input", label: "Input", role: "input", roles: ["input"] },
+      {
+        id: "input",
+        get label() {
+          return t("Input");
+        },
+        role: "input",
+        roles: ["input"],
+      },
     ],
   },
   {
     id: "brand-content",
-    title: "Brand & content",
+    get title() {
+      return t("Brand & content");
+    },
     families: [
       {
         id: "subtle-surface",
-        label: "Subtle surface",
+        get label() {
+          return t("Subtle surface");
+        },
         role: "secondary",
         roles: ["secondary", "secondaryForeground", "muted", "toolbarControl"],
       },
       {
         id: "highlight-surface",
-        label: "Highlight surface",
+        get label() {
+          return t("Highlight surface");
+        },
         role: "accentSurface",
         roles: ["accentSurface", "accentSurfaceForeground", "toolbarControlHover"],
       },
       {
         id: "accent",
-        label: "Accent",
+        get label() {
+          return t("Accent");
+        },
         role: "accent",
         roles: [
           "accent",
@@ -147,19 +183,25 @@ const THEME_EDITOR_ROLE_GROUPS: ReadonlyArray<{
       },
       {
         id: "action",
-        label: "Action",
+        get label() {
+          return t("Action");
+        },
         role: "messageAction",
         roles: ["messageAction", "messageActionForeground", "messageActionHover"],
       },
       {
         id: "message-surface",
-        label: "Message surface",
+        get label() {
+          return t("Message surface");
+        },
         role: "messageSurface",
         roles: ["messageSurface", "messageForeground"],
       },
       {
         id: "code-surface",
-        label: "Code surface",
+        get label() {
+          return t("Code surface");
+        },
         role: "codeBackground",
         roles: ["codeBackground", "codeForeground"],
       },
@@ -167,17 +209,23 @@ const THEME_EDITOR_ROLE_GROUPS: ReadonlyArray<{
   },
   {
     id: "search",
-    title: "Search",
+    get title() {
+      return t("Search");
+    },
     families: [
       {
         id: "search-matches",
-        label: "Search matches",
+        get label() {
+          return t("Search matches");
+        },
         role: "searchMatchBackground",
         roles: ["searchMatchBackground", "searchMatchForeground"],
       },
       {
         id: "current-match",
-        label: "Current match",
+        get label() {
+          return t("Current match");
+        },
         role: "searchMatchActiveBackground",
         roles: ["searchMatchActiveBackground", "searchMatchActiveForeground"],
       },
@@ -185,29 +233,39 @@ const THEME_EDITOR_ROLE_GROUPS: ReadonlyArray<{
   },
   {
     id: "context",
-    title: "Context",
+    get title() {
+      return t("Context");
+    },
     families: [
       {
         id: "sidebar-background",
-        label: "Sidebar background",
+        get label() {
+          return t("Sidebar background");
+        },
         role: "sidebar",
         roles: ["sidebar", "sidebarForeground"],
       },
       {
         id: "sidebar-controls",
-        label: "Sidebar controls",
+        get label() {
+          return t("Sidebar controls");
+        },
         role: "sidebarControlSurface",
         roles: ["sidebarControlSurface"],
       },
       {
         id: "sidebar-selection",
-        label: "Sidebar selection",
+        get label() {
+          return t("Sidebar selection");
+        },
         role: "sidebarRowSelected",
         roles: ["sidebarRowHover", "sidebarRowActive", "sidebarRowSelected"],
       },
       {
         id: "terminal-background",
-        label: "Terminal background",
+        get label() {
+          return t("Terminal background");
+        },
         role: "terminalBackground",
         roles: [
           "terminalBackground",
@@ -221,17 +279,23 @@ const THEME_EDITOR_ROLE_GROUPS: ReadonlyArray<{
   },
   {
     id: "status",
-    title: "Status",
+    get title() {
+      return t("Status");
+    },
     families: [
       {
         id: "error",
-        label: "Error",
+        get label() {
+          return t("Error");
+        },
         role: "error",
         roles: ["error", "errorForeground", "errorSurface"],
       },
       {
         id: "warning",
-        label: "Warning",
+        get label() {
+          return t("Warning");
+        },
         role: "warning",
         roles: ["warning", "warningForeground", "warningSurface"],
       },
@@ -925,7 +989,7 @@ export function ThemeEditorPanel({
     // Use aria-disabled so locked modes remain hoverable for explanatory tooltips.
     const button = (
       <Toggle aria-disabled={lockReason !== null} value={appearance}>
-        {appearance === "light" ? "Light" : "Dark"}
+        {appearance === "light" ? t("Light") : t("Dark")}
       </Toggle>
     );
     if (lockReason === null) return button;
@@ -1182,15 +1246,15 @@ export function ThemeEditorPanel({
       >
         <div className="flex min-w-0 flex-1 items-baseline gap-2">
           <h2 className="shrink-0 truncate text-sm font-medium">
-            {isEditing ? "Edit theme" : "Create theme"}
+            {isEditing ? t("Edit theme") : t("Create theme")}
           </h2>
           {isMinimized ? null : (
             <p className="truncate text-xs text-muted-foreground">
               {isInspecting
-                ? "Select an element · Esc to cancel"
+                ? t("Select an element · Esc to cancel")
                 : selectedRole
                   ? `${isAdvanced ? (getThemeEditorColorFamily(selectedRole)?.label ?? getThemeRoleLabel(selectedRole)) : getThemeRoleLabel(selectedRole)} · ${usageCount ?? 0} ${usageCount === 1 ? "use" : "uses"}`
-                  : "Select a color below"}
+                  : t("Select a color below")}
             </p>
           )}
         </div>
@@ -1211,12 +1275,12 @@ export function ThemeEditorPanel({
                 }}
               >
                 <MousePointer2Icon />
-                {isInspecting ? "Cancel" : "Inspect"}
+                {isInspecting ? t("Cancel") : t("Inspect")}
               </Button>
             }
           />
           <TooltipPopup data-theme-editor-panel="">
-            {isInspecting ? "Cancel and clear the selection" : "Pick a color from the app"}
+            {isInspecting ? t("Cancel and clear the selection") : t("Pick a color from the app")}
           </TooltipPopup>
         </Tooltip>
         <Button
@@ -1285,12 +1349,12 @@ export function ThemeEditorPanel({
                 mergeTarget ? (
                   `Merge into “${mergeTarget.label}”`
                 ) : (
-                  "Save changes"
+                  t("Save changes")
                 )
               ) : mergeTarget ? (
                 <>
                   <PlusIcon />
-                  {`Add ${activeAppearance} palette`}
+                  {t`Add ${activeAppearance} palette`}
                 </>
               ) : (
                 <>

@@ -1,6 +1,7 @@
 import type { RelayAgentActivityAggregateState } from "@t3tools/contracts/relay";
 
 import type { AgentActivityProps } from "./AgentActivity";
+import { DEFAULT_AGENT_ACTIVITY_LABELS, type AgentActivityLabels } from "./agentActivityLabels";
 
 // The widget only refreshes while the app is open, so after this long it stops
 // claiming an agent is still working. Matches the Live Activity's stale date.
@@ -12,22 +13,27 @@ export type AgentActivityWidgetSource =
   | { readonly kind: "loading" }
   | { readonly kind: "snapshot"; readonly aggregate: RelayAgentActivityAggregateState | null };
 
-export function agentActivityWidgetTimeline(source: AgentActivityWidgetSource, now: number) {
+export function agentActivityWidgetTimeline(
+  source: AgentActivityWidgetSource,
+  now: number,
+  labels: AgentActivityLabels = DEFAULT_AGENT_ACTIVITY_LABELS,
+) {
   const updatedAt = new Date(now).toISOString();
   if (source.kind !== "snapshot" || !source.aggregate) {
     const props: AgentActivityProps = {
       title: "R3 Code",
       subtitle:
         source.kind === "signed-out"
-          ? "Sign in to R3 Connect to see agents"
+          ? labels.subtitleSignedOut
           : source.kind === "unavailable"
-            ? "Couldn't reach R3 Connect"
+            ? labels.subtitleUnavailable
             : source.kind === "loading"
-              ? "Loading agents…"
-              : "No active agents",
+              ? labels.subtitleLoading
+              : labels.noActiveAgents,
       activeCount: 0,
       updatedAt,
       activities: [],
+      labels,
     };
     return [{ date: new Date(now), props }];
   }
@@ -39,6 +45,7 @@ export function agentActivityWidgetTimeline(source: AgentActivityWidgetSource, n
     activeCount: aggregate.activeCount,
     updatedAt: aggregate.updatedAt,
     activities: aggregate.activities,
+    labels,
   };
   const hasInFlightRows = props.activities.some(
     (row) => row.phase !== "completed" && row.phase !== "failed",
@@ -51,7 +58,7 @@ export function agentActivityWidgetTimeline(source: AgentActivityWidgetSource, n
     activities: props.activities.map((row) =>
       row.phase === "completed" || row.phase === "failed"
         ? row
-        : { ...row, phase: "stale", status: "Out of date" },
+        : { ...row, phase: "stale", status: labels.outOfDate },
     ),
   };
   return [

@@ -30,6 +30,7 @@ import {
   voiceSpeechStatusAtom,
 } from "../voice-input/voiceDestination";
 import { Var, T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const isDownloading = (model: EnvironmentSpeechModel) =>
   model.state === "downloading" || model.state === "verifying";
@@ -83,7 +84,7 @@ export function useVoiceModels(environmentId: EnvironmentId, label: string) {
     download: (model: EnvironmentSpeechModel) => {
       if (!ready) return;
       Dialog.confirm({
-        title: `Download ${model.name}?`,
+        title: t`Download ${model.name}?`,
         message: `${label} will download ${formatBytes(model.size)} and use it as its transcription model.`,
         confirmText: "Download",
         onConfirm: () =>

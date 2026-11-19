@@ -19,18 +19,53 @@ import {
   DialogPopup,
   DialogTitle,
 } from "../ui/dialog";
-import { Var, T, useGT } from "gt-react";
+import { Var, T, useGT, t } from "gt-react";
 const installSteps: ReadonlyArray<{
   readonly stage: RelayClientInstallProgressStage;
   readonly label: string;
 }> = [
-  { stage: "checking", label: "Checking current installation" },
-  { stage: "waiting_for_lock", label: "Waiting for installer" },
-  { stage: "downloading", label: "Downloading relay client" },
-  { stage: "verifying", label: "Verifying download" },
-  { stage: "installing", label: "Installing relay client" },
-  { stage: "validating", label: "Validating executable" },
-  { stage: "activating", label: "Activating installation" },
+  {
+    stage: "checking",
+    get label() {
+      return t("Checking current installation");
+    },
+  },
+  {
+    stage: "waiting_for_lock",
+    get label() {
+      return t("Waiting for installer");
+    },
+  },
+  {
+    stage: "downloading",
+    get label() {
+      return t("Downloading relay client");
+    },
+  },
+  {
+    stage: "verifying",
+    get label() {
+      return t("Verifying download");
+    },
+  },
+  {
+    stage: "installing",
+    get label() {
+      return t("Installing relay client");
+    },
+  },
+  {
+    stage: "validating",
+    get label() {
+      return t("Validating executable");
+    },
+  },
+  {
+    stage: "activating",
+    get label() {
+      return t("Activating installation");
+    },
+  },
 ];
 
 export function RelayClientInstallDialog() {
@@ -68,12 +103,14 @@ export function RelayClientInstallDialog() {
             <DownloadIcon aria-hidden className="size-4.5 text-muted-foreground" />
           </div>
           <DialogTitle>
-            {isInstalling ? "Installing relay client" : "Install relay client?"}
+            {isInstalling ? t("Installing relay client") : t("Install relay client?")}
           </DialogTitle>
           <DialogDescription>
             {isInstalling
-              ? "R3 Code is preparing this environment for secure access through R3 Connect."
-              : "R3 Code needs the relay client to make this environment available through R3 Connect."}
+              ? t("R3 Code is preparing this environment for secure access through R3 Connect.")
+              : t(
+                  "R3 Code needs the relay client to make this environment available through R3 Connect.",
+                )}
           </DialogDescription>
         </DialogHeader>
         <DialogPanel scrollFade={false}>

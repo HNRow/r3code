@@ -22,6 +22,7 @@ import {
   type DeviceStreamConfiguration,
 } from "./device-stream-document";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export interface DeviceStreamRef {
   home: () => void;
@@ -201,7 +202,7 @@ function DeviceStreamDocumentView({
             accessibilityLiveRegion="polite"
             className="text-center text-sm text-foreground-muted"
           >
-            {status === "error" ? error : "Connecting to device..."}
+            {status === "error" ? error : t("Connecting to device...")}
           </AppText>
           {status === "error" ? (
             <View className="items-center">

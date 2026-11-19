@@ -10,6 +10,7 @@ import { SelectionRow } from "../../components/ui/SelectionRow";
 import { NativeScrollView } from "../../native/NativeScrollViewMarker";
 import { PullRequestSearchSheet } from "../pull-requests/PullRequestSearchSheet";
 import { useGT, Var, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 interface Candidate {
   readonly key: string;
@@ -39,7 +40,7 @@ export function IssueCandidatesSheet(props: {
   return (
     <PullRequestSearchSheet
       title={props.title}
-      placeholder={`Search ${props.noun}`}
+      placeholder={t`Search ${props.noun}`}
       closeAccessibilityLabel={`Close ${props.title.toLowerCase()}`}
       clearAccessibilityLabel={gt("Clear search")}
       query={props.query}

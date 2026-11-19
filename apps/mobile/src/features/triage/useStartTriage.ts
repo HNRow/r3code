@@ -17,6 +17,7 @@ import {
 } from "../../state/use-composer-drafts";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { usePrepareTriage } from "./usePrepareTriage";
+import { t } from "../../i18n/gt";
 
 const CLI_COMMAND = "npx t3 triage";
 
@@ -32,17 +33,17 @@ export function useStartTriage() {
 
   const fail = (message: string) =>
     Dialog.alert(
-      "Could not start triage",
-      `${message} Run ${CLI_COMMAND} in a terminal on that machine instead.`,
+      t("Could not start triage"),
+      t`${message} Run ${CLI_COMMAND} in a terminal on that machine instead.`,
       [
         {
-          text: "Copy command",
+          text: t("Copy command"),
           onPress: () =>
             void Clipboard.setStringAsync(CLI_COMMAND).catch(() =>
-              Dialog.alert("Could not copy", `Type ${CLI_COMMAND} instead.`),
+              Dialog.alert(t("Could not copy"), t`Type ${CLI_COMMAND} instead.`),
             ),
         },
-        { text: "OK", style: "cancel" },
+        { text: t("OK"), style: "cancel" },
       ],
     );
   const errorMessage = (error: unknown, fallback: string) =>
@@ -100,7 +101,9 @@ export function useStartTriage() {
     setComposerDraftText(draftId, prepared.value.prompt);
     selectDetail({
       name: "Thread",
-      params: { draft: { environmentId, projectId: scratch.value.id, title: "Triage", draftId } },
+      params: {
+        draft: { environmentId, projectId: scratch.value.id, title: t("Triage"), draftId },
+      },
     });
   };
 }

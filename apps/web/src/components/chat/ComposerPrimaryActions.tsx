@@ -26,7 +26,7 @@ import {
   alternateComposerDispatchAction,
   resolveComposerDispatchMode,
 } from "@t3tools/client-runtime/state/composer-dispatch";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 interface PendingActionState {
   questionIndex: number;
@@ -171,7 +171,7 @@ function StopGenerationButton({
           <rect x="2" y="2" width="8" height="8" rx="1.5" />
         </svg>
       </TooltipTrigger>
-      <TooltipPopup>{stopPhase === "pending" ? "Stopping…" : "Interrupt"}</TooltipPopup>
+      <TooltipPopup>{stopPhase === "pending" ? t("Stopping…") : t("Interrupt")}</TooltipPopup>
     </Tooltip>
   );
 }
@@ -488,7 +488,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
         >
           <Minimize2Icon aria-hidden="true" />
           <span className="@max-[480px]/composer-surface:hidden">
-            {keepFullHistory ? "Keep" : "Compact"}
+            {keepFullHistory ? t("Keep") : t("Compact")}
           </span>
           <span className="text-muted-foreground">{compactTokens}</span>
         </TooltipTrigger>
@@ -498,7 +498,9 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
               ? `Next send keeps all ${compactTokens} tokens.`
               : `Next send compacts ${compactTokens} tokens first.`}
           </div>
-          <div>{keepFullHistory ? "Click to compact first" : "Click to keep full history"}</div>
+          <div>
+            {keepFullHistory ? t("Click to compact first") : t("Click to keep full history")}
+          </div>
         </TooltipPopup>
       </Tooltip>
       {children}

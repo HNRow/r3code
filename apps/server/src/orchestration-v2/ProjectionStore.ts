@@ -44,6 +44,7 @@ import type {
   OrchestrationV2ThreadProjection,
   OrchestrationV2TurnItem,
   GuestShareId,
+  ProviderDriverKind,
   ProviderThreadId,
   ProviderTurnId,
   RunAttemptId,
@@ -594,6 +595,11 @@ export interface ProjectionStoreV2Shape {
   >;
   /** Threads that are not deleted, archived ones included. */
   readonly countThreads: () => Effect.Effect<number, ProjectionStoreV2Error>;
+  /** Native ids some thread already owns for this provider, so an import does not offer it twice. */
+  readonly listOwnedNativeThreadIds: (
+    driver: ProviderDriverKind,
+    providerInstanceId: ProviderInstanceId,
+  ) => Effect.Effect<ReadonlyArray<string>, ProjectionStoreV2Error>;
   /** Every active thread, in shell order. */
   readonly listActiveShellIndex: () => Effect.Effect<
     ReadonlyArray<ActiveShellIndexEntry>,
@@ -9038,6 +9044,20 @@ export const layer: Layer.Layer<ProjectionStoreV2, never, SqlClient.SqlClient> =
       return rows[0]?.count ?? 0;
     }, Effect.mapError(shellSnapshotReadError));
 
+    const listOwnedNativeThreadIds = Effect.fn("ProjectionStore.listOwnedNativeThreadIds")(
+      function* (driver: ProviderDriverKind, providerInstanceId: ProviderInstanceId) {
+        const rows = yield* sql<{ readonly nativeId: string }>`
+          SELECT json_extract(payload_json, '$.nativeThreadRef.nativeId') AS "nativeId"
+          FROM orchestration_v2_projection_provider_threads
+          WHERE driver = ${driver}
+            AND provider_instance_id = ${providerInstanceId}
+            AND json_extract(payload_json, '$.nativeThreadRef.nativeId') IS NOT NULL
+        `;
+        return rows.map((row) => row.nativeId);
+      },
+      Effect.mapError(shellSnapshotReadError),
+    );
+
     // Migration 98 indexes these exact expressions, so the read takes them from the index instead
     // of parsing every active thread's payload. Changing one here needs a matching index change.
     const indexedField = (path: string, read: "json_extract" | "json_type" = "json_extract") =>
@@ -9397,6 +9417,7 @@ export const layer: Layer.Layer<ProjectionStoreV2, never, SqlClient.SqlClient> =
       getPullRequestSnapshot: readOnReader(getPullRequestSnapshot),
       listActiveSubagentThreadIds: readOnReader(listActiveSubagentThreadIds),
       countThreads: readOnReader(countThreads),
+      listOwnedNativeThreadIds: readOnReader(listOwnedNativeThreadIds),
       listActiveShellIndex: readOnReader(listActiveShellIndex),
       listActiveThreads: readOnReader(listActiveThreads),
       readShellSnapshot: readOnReader(readShellSnapshot),

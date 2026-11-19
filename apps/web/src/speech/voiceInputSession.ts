@@ -26,6 +26,7 @@ import { chooseRecordingMicrophone } from "./browserMicrophones";
 import { createBrowserVoiceInputPlatform } from "./browserVoiceInput";
 import { runEnvironmentSpeech } from "./runEnvironmentSpeech";
 import { bindAudioGrant, readCleanupGrant } from "./voiceConsent";
+import { t } from "gt-react";
 
 export const IDLE_VOICE_STATE: VoiceInputState = { phase: "idle", error: null, errorAction: null };
 
@@ -206,8 +207,8 @@ export class VoiceInputSession {
       onPostProcessingError: () =>
         toastManager.add({
           type: "warning",
-          title: "Transcript cleanup failed",
-          description: "The original transcript was added.",
+          title: t("Transcript cleanup failed"),
+          description: t("The original transcript was added."),
         }),
       readDraft: (): VoiceDraftSnapshot | null => {
         const target = this.target;

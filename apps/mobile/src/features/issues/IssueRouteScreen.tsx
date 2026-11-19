@@ -59,6 +59,7 @@ import {
   useIssueAccess,
 } from "./issuePresentation";
 import { useGT, T, Var } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 type IssueAccess = NonNullable<ReturnType<typeof useIssueAccess>>;
 
@@ -157,15 +158,19 @@ function IssueIdentity(props: {
         busy={props.busy}
         onMove={props.onMove}
       />
-      <Text selectable className="text-xl font-t3-bold leading-7">
+      <Text translate={false} selectable className="text-xl font-t3-bold leading-7">
         {issue.title}
       </Text>
       <View className="flex-row items-center gap-2">
         <PullRequestAvatar actor={issue.author} size={20} />
         <Text className="min-w-0 flex-1 text-xs font-t3-medium" numberOfLines={1}>
-          {issue.author?.login ?? "Unknown author"}
+          {issue.author?.login ?? t("Unknown author")}
         </Text>
-        <Text className="shrink text-right text-2xs text-foreground-muted" numberOfLines={1}>
+        <Text
+          translate={false}
+          className="shrink text-right text-2xs text-foreground-muted"
+          numberOfLines={1}
+        >
           {issue.closedAt ? (
             <>
               <T>
@@ -209,7 +214,9 @@ function IssueIdentity(props: {
         {issue.assignees.map((actor) => (
           <View key={actor.login} className="flex-row items-center gap-1.5">
             <PullRequestAvatar actor={actor} size={18} />
-            <Text className="text-xs font-t3-medium">{actor.login}</Text>
+            <Text translate={false} className="text-xs font-t3-medium">
+              {actor.login}
+            </Text>
           </View>
         ))}
         {canAssign ? (
@@ -289,7 +296,7 @@ function IssueCommentCard(props: {
       <View className="flex-row items-center gap-2">
         <PullRequestAvatar actor={comment.author} size={22} />
         <Text className="min-w-0 flex-1 text-sm font-t3-medium" numberOfLines={1}>
-          {comment.author?.login ?? "Unknown author"}
+          {comment.author?.login ?? t("Unknown author")}
         </Text>
         <Text className="text-2xs text-foreground-tertiary">{relativeTime(comment.createdAt)}</Text>
       </View>
@@ -311,7 +318,7 @@ function IssueEventRow({ event }: { readonly event: IssueEvent }) {
     <View className="flex-row items-center gap-2 px-1">
       <PullRequestAvatar actor={event.actor} size={18} />
       <Text className="min-w-0 flex-1 text-xs text-foreground-muted">
-        <Text className="text-xs font-t3-medium">{event.actor?.login ?? "Someone"}</Text>{" "}
+        <Text className="text-xs font-t3-medium">{event.actor?.login ?? t("Someone")}</Text>{" "}
         {issueEventSentence(event)}
       </Text>
       <Text className="text-2xs text-foreground-tertiary">{relativeTime(event.createdAt)}</Text>
@@ -485,21 +492,21 @@ function IssueRoute({ params }: { readonly params: IssueParams }) {
           onBack={layout.usesSplitView ? undefined : returnToList}
           menus={[
             {
-              title: "Issue actions",
+              title: t("Issue actions"),
               icon: "ellipsis",
               items: [
                 ...(access?.edit
                   ? [
                       {
                         id: "edit-title",
-                        title: "Edit title",
+                        title: t("Edit title"),
                         icon: "pencil",
                         onPress: () =>
                           navigation.navigate("IssueEdit", { ...identity, field: "title" }),
                       },
                       {
                         id: "edit-description",
-                        title: "Edit description",
+                        title: t("Edit description"),
                         icon: "doc.text",
                         onPress: () =>
                           navigation.navigate("IssueEdit", { ...identity, field: "body" }),
@@ -510,19 +517,19 @@ function IssueRoute({ params }: { readonly params: IssueParams }) {
                   ? [
                       {
                         id: "open-on-host",
-                        title: "Open on the tracker",
+                        title: t("Open on the tracker"),
                         icon: "arrow.up.right",
                         onPress: () => void Linking.openURL(url),
                       },
                       {
                         id: "copy-link",
-                        title: "Copy link",
+                        title: t("Copy link"),
                         icon: "link",
                         onPress: () => copyTextWithHaptic(url, { target: "issue link" }),
                       },
                       {
                         id: "share",
-                        title: "Share…",
+                        title: t("Share…"),
                         icon: "square.and.arrow.up",
                         onPress: () =>
                           // Android ignores `url`; iOS shows a `message` URL as plain text.

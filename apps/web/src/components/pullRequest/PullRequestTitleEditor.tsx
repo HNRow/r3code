@@ -16,7 +16,7 @@ import { PullRequestDetailTitleRow } from "./PullRequestDetailLayout";
 import { PullRequestEditButton } from "./PullRequestEditButton";
 import { readableFailure } from "./pullRequestDetail.logic";
 import { canEditPullRequestChangeRequest } from "@t3tools/client-runtime/pull-request-editing";
-import { useGT, T } from "gt-react";
+import { useGT, T, t } from "gt-react";
 
 /** The pull request title, which the reader can rename in place when the host allows it. */
 export function PullRequestTitleEditor({
@@ -57,7 +57,7 @@ export function PullRequestTitleEditor({
       setTitleScope({ pullRequestKey, text: title });
       toastManager.add({
         type: "error",
-        title: "The title could not be saved",
+        title: t("The title could not be saved"),
         description: readableFailure(
           squashAtomCommandFailure(result),
           "The host refused the new title.",
@@ -123,7 +123,7 @@ export function PullRequestTitleEditor({
           disabled={!canWriteSourceControl || titleSaving || titleDraft.trim().length === 0}
           onClick={() => void saveTitle(titleDraft)}
         >
-          {titleSaving ? "Saving..." : "Save"}
+          {titleSaving ? t("Saving...") : t("Save")}
         </Button>
       </div>
     </div>

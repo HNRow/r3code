@@ -90,6 +90,23 @@ is running update the picker without waiting for another provider probe.
 Slash commands the agent provides appear under **Provider** in the `/` menu while a session is
 running. Commands the agent names with a `$` prefix appear in R3 Code's `$` skill menu instead.
 
+## Manage Kimi Code plugins
+
+For Kimi Code, **Settings → Plugins** lists the plugins Kimi has installed and
+lets you enable, disable, or uninstall them. R3 Code talks to Kimi's local
+server for this and starts one briefly when none is running, so a change can
+take a few seconds. Install new plugins with `/plugins` inside Kimi. Changes
+reach the next agent session, so use **Restart agent session** in the command
+palette afterwards.
+
+## Manage Grok plugins
+
+**Settings → Plugins** lists the plugins Grok loads and lets you enable,
+disable, or uninstall the ones `grok plugin` installed. Plugins Grok picks up
+from Claude Code are shown read-only; manage them under Claude Code. Install
+new plugins with `grok plugin install`. Changes reach the next agent session,
+so use **Restart agent session** in the command palette afterwards.
+
 ## Native sessions
 
 When an agent advertises ACP session listing and import support, expand its provider card,

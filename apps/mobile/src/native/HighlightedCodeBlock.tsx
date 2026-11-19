@@ -10,6 +10,7 @@ import { CodeBlockFrame, CodeBlockHeaderButton } from "./CodeBlockFrame";
 import { fencedCodeMarkdown } from "./codeBlockMarkdown";
 import type { NativeMarkdownTextStyle } from "./SelectableMarkdownText.types";
 import { useGT } from "gt-react-native";
+import { t } from "../i18n/gt";
 
 // Header names from enriched-markdown's CodeBlockLanguages.cpp that are not the fence capitalized.
 const FENCE_DISPLAY_NAMES: Readonly<Record<string, string>> = {
@@ -31,8 +32,20 @@ const FENCE_DISPLAY_NAMES: Readonly<Record<string, string>> = {
 
 // The native block's long-press menu, with its labels and iOS symbols.
 const CODE_MENU_ACTIONS = [
-  { id: "copy-code", title: "Copy", image: "doc.on.doc" },
-  { id: "copy-markdown", title: "Copy as Markdown", image: "doc.text" },
+  {
+    id: "copy-code",
+    get title() {
+      return t("Copy");
+    },
+    image: "doc.on.doc",
+  },
+  {
+    id: "copy-markdown",
+    get title() {
+      return t("Copy as Markdown");
+    },
+    image: "doc.text",
+  },
 ];
 
 /** A fence in a language enriched-markdown cannot colour, drawn like its native block. */

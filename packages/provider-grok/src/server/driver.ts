@@ -30,6 +30,12 @@ import {
 import { withInstanceIdentity } from "@t3tools/provider-core/server/instanceIdentity";
 import { mergeProviderInstanceEnvironment } from "@t3tools/provider-core/server/instanceEnvironment";
 import { discoverGrokSkills } from "./skills.ts";
+import { grokProbeEnvironment } from "./probeEnvironment.ts";
+import { makeGrokPluginManagement } from "./plugins.ts";
+import { resolveSpawnCommand } from "@t3tools/shared/shell";
+import { spawnAndCollect } from "@t3tools/provider-core/server/snapshotProbe";
+import * as HostProcess from "@t3tools/shared/HostProcess";
+import * as ChildProcess from "effect/process/ChildProcess";
 import {
   homebrewOwnershipFromCommandPath,
   isNixStoreCommandPath,
@@ -165,6 +171,12 @@ export const GrokDriver: ProviderDriver<GrokSettings, GrokDriverEnv, Path.Path> 
     const host = yield* ProviderHost.ProviderHost;
     const { cwd } = host.paths;
     const processEnv = yield* mergeProviderInstanceEnvironment(environment);
+    const grokPath = yield* Path.Path;
+    const configuredGrokHome = processEnv.GROK_HOME?.trim() ?? "";
+    const configHome =
+      configuredGrokHome.length > 0
+        ? grokPath.resolve(configuredGrokHome)
+        : grokPath.join(yield* HostProcess.HomeDirectory, ".grok");
     const continuationIdentity = defaultProviderContinuationIdentity({
       driverKind: DRIVER_KIND,
       instanceId,
@@ -284,6 +296,26 @@ export const GrokDriver: ProviderDriver<GrokSettings, GrokDriverEnv, Path.Path> 
             ),
           ]).pipe(Effect.map(([machineSnapshot, skills]) => ({ ...machineSnapshot, skills })));
 
+    const runGrokPlugin = Effect.fn("GrokPluginManagement.run")(function* (
+      args: ReadonlyArray<string>,
+      cwd: string,
+    ) {
+      const probeEnvironment = grokProbeEnvironment(processEnv);
+      const spawnCommand = yield* resolveSpawnCommand(
+        effectiveConfig.binaryPath || "grok",
+        [...args],
+        { env: probeEnvironment },
+      );
+      return yield* spawnAndCollect(
+        effectiveConfig.binaryPath || "grok",
+        ChildProcess.make(spawnCommand.command, spawnCommand.args, {
+          cwd,
+          env: probeEnvironment,
+          shell: spawnCommand.shell,
+        }),
+      );
+    });
+
     return {
       instanceId,
       driverKind: DRIVER_KIND,
@@ -293,6 +325,28 @@ export const GrokDriver: ProviderDriver<GrokSettings, GrokDriverEnv, Path.Path> 
       enabled,
       snapshot,
       snapshotForCwd,
+      pluginManagement: makeGrokPluginManagement({
+        configHome,
+        instanceId,
+        run: (args, cwd) =>
+          runGrokPlugin(args, cwd).pipe(
+            Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner),
+            Effect.map((result) => ({
+              stdout: result.stdout,
+              stderr: result.stderr,
+              exitCode: result.code,
+            })),
+            Effect.mapError(
+              (cause) =>
+                new ProviderDriverError({
+                  driver: DRIVER_KIND,
+                  instanceId,
+                  detail: `grok ${args.join(" ")} failed.`,
+                  cause,
+                }),
+            ),
+          ),
+      }),
       orchestrationAdapter,
       textGeneration,
     } satisfies ProviderInstance;

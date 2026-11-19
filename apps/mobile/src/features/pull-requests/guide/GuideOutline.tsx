@@ -9,6 +9,7 @@ import { Menu } from "../../../components/ui/Menu";
 
 import { useAppearancePreferences } from "../../settings/appearance/AppearancePreferencesProvider";
 import { Var, T, useGT } from "gt-react-native";
+import { t } from "../../../i18n/gt";
 
 export function GuideOutline({
   guide,
@@ -42,12 +43,12 @@ export function GuideOutline({
           actions={[
             {
               id: "word-wrap",
-              title: "Word wrap",
+              title: t("Word wrap"),
               image: "text.alignleft",
               state: appearance.codeWordBreak ? "on" : "off",
             },
             ...(onRewrite
-              ? [{ id: "rewrite", title: "Rewrite guide", image: "arrow.clockwise" }]
+              ? [{ id: "rewrite", title: t("Rewrite guide"), image: "arrow.clockwise" }]
               : []),
           ]}
           onPressAction={({ nativeEvent }) =>
@@ -97,7 +98,7 @@ export function GuideOutline({
                   <SymbolView name="eye" size={14} tintColorClassName="accent-warning-foreground" />
                 ) : null}
                 <Text className="shrink text-xs text-foreground-muted" numberOfLines={1}>
-                  {filename ?? "Context"}
+                  {filename ?? t("Context")}
                   {paths.length > 1 ? ` +${paths.length - 1}` : ""}
                 </Text>
               </View>

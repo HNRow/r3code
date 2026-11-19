@@ -25,6 +25,7 @@ import { PdfPreview } from "../PdfPreview";
 import { SheetHeader } from "./SheetHeader";
 import { AppText as Text } from "./AppText";
 import { T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 function PdfDocumentPreview(props: {
   readonly source: ResolvedFilePreviewDocument;
@@ -52,7 +53,7 @@ function PdfDocumentPreview(props: {
             save
               ? [
                   {
-                    accessibilityLabel: "Save or share",
+                    accessibilityLabel: t("Save or share"),
                     icon: "square.and.arrow.up",
                     disabled: save.disabled,
                     loading: media.sharing,
@@ -80,8 +81,8 @@ function DocumentPreview(props: {
     if (props.onOpenError) props.onOpenError(error);
     else
       Dialog.alert(
-        "Could not open document",
-        "A compatible viewer must be installed. Check your connection and try again.",
+        t("Could not open document"),
+        t("A compatible viewer must be installed. Check your connection and try again."),
       );
   });
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- opens the attachment in an external viewer and aborts the open on cleanup
@@ -115,7 +116,7 @@ function DocumentPreview(props: {
             <T>Opening document…</T>
           </Text>
           <Text className="text-foreground-muted" numberOfLines={2}>
-            {name ?? "Document"}
+            {name ?? t("Document")}
           </Text>
           <View className="items-end">
             <Button label={gt("Cancel")} tone="text" onPress={props.onRequestClose} />

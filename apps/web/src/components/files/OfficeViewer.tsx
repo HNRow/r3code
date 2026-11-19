@@ -16,7 +16,7 @@ import {
 
 import { FileSurfaceAction, FileSurfaceLoading, FileSurfaceNotice } from "./fileSurfaceChrome";
 import { OFFICE_PREVIEW_MAX_BYTES, type OfficeWorkerResult } from "./officePreviewProtocol";
-import { T, Var, useGT } from "gt-react";
+import { T, Var, useGT, t } from "gt-react";
 
 const DocumentPages = lazy(() => import("./DocumentPages"));
 const NotebookPreview = lazy(() => import("./NotebookPreview"));
@@ -46,6 +46,12 @@ async function readOfficeFile(src: string, signal: AbortSignal) {
     await reader.cancel();
   }
   return new Blob(chunks).arrayBuffer();
+}
+
+// 文档分页标题由 worker 生成（"Page 3"），在渲染时按当前语言重排。
+function pageTitle(title: string | undefined): string | undefined {
+  const match = title === undefined ? null : /^Page (\d+)$/.exec(title);
+  return match ? t`Page ${match[1]}` : title;
 }
 
 export default function OfficeViewer(props: {
@@ -191,7 +197,7 @@ function ExtendedOfficeViewer(props: {
       {count > 0 ? (
         <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border/60 px-3 text-xs">
           <FileSurfaceAction
-            label={`Previous ${navigation}`}
+            label={t`Previous ${navigation}`}
             disabled={page === 0}
             onPress={() => selectPage(page - 1)}
           >
@@ -226,12 +232,12 @@ function ExtendedOfficeViewer(props: {
                 }}
               >
                 <SelectTrigger aria-label={gt("Chapter")} size="xs">
-                  <SelectValue>{documentPage?.title}</SelectValue>
+                  <SelectValue>{pageTitle(documentPage?.title)}</SelectValue>
                 </SelectTrigger>
                 <SelectPopup>
                   {previewDocument.pages.map((item, index) => (
                     <SelectItem key={index} value={index}>
-                      {item.title}
+                      {pageTitle(item.title)}
                     </SelectItem>
                   ))}
                 </SelectPopup>
@@ -240,13 +246,13 @@ function ExtendedOfficeViewer(props: {
           ) : (
             <span className="flex-1 text-center tabular-nums" aria-live="polite">
               <T>
-                <Var>{navigation === "slide" ? "Slide" : "Page"}</Var> <Var>{page + 1}</Var> of{" "}
-                <Var>{count}</Var>
+                <Var>{navigation === "slide" ? t("Slide") : t("Page")}</Var> <Var>{page + 1}</Var>{" "}
+                of <Var>{count}</Var>
               </T>
             </span>
           )}
           <FileSurfaceAction
-            label={`Next ${navigation}`}
+            label={t`Next ${navigation}`}
             disabled={page + 1 === count}
             onPress={() => selectPage(page + 1)}
           >
@@ -296,8 +302,8 @@ function ExtendedOfficeViewer(props: {
               <Var>
                 {sheet.truncated
                   ? props.kind === "ods"
-                    ? " Limited to 500 rows and 50 columns."
-                    : " Preview limited to 250,000 rows, 1,024 columns, and bounded cell text."
+                    ? t(" Limited to 500 rows and 50 columns.")
+                    : t(" Preview limited to 250,000 rows, 1,024 columns, and bounded cell text.")
                   : ""}
               </Var>
             </T>

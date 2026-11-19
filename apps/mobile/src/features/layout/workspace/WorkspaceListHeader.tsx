@@ -5,10 +5,12 @@ import { NativeStackScreenOptions } from "../../../native/StackHeader";
 import { useHardwareKeyboardCommand } from "../../keyboard/hardwareKeyboardCommands";
 import { getConnectionAwareBrandHeaderOptions } from "./brand-header-options";
 import { createWorkspaceListHeaderItems } from "./workspace-list-header-items";
+
 import {
   workspaceListFilterIcon,
   type WorkspaceListHeaderProps,
 } from "./WorkspaceListHeader.types";
+import { t } from "../../../i18n/gt";
 
 export function WorkspaceListHeader(props: WorkspaceListHeaderProps) {
   return props.sidebar ? <SidebarColumnHeader {...props} sidebar={props.sidebar} /> : null;
@@ -34,9 +36,9 @@ function SidebarColumnHeader(
   });
   const items = createWorkspaceListHeaderItems({
     filter: {
-      accessibilityLabel: "Filter threads",
+      accessibilityLabel: t("Filter threads"),
       icon: workspaceListFilterIcon(props.filter.customized),
-      title: "Thread list options",
+      title: t("Thread list options"),
       items: props.filter.items,
     },
     onOpenSettings: props.onOpenSettings,

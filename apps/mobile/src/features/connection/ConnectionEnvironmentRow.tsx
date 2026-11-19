@@ -25,6 +25,7 @@ import { ConnectionFormField } from "./ConnectionFormField";
 import { ConnectionStatusDot } from "./ConnectionStatusDot";
 import { environmentStatusText } from "./environmentStatusText";
 import { T, useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 function connectionStatusLabel(environment: ConnectedEnvironmentSummary): string | null {
   if (!environment.isEnabled && environment.connectionState !== "unsupported") {
@@ -87,7 +88,7 @@ export function ConnectionEnvironmentRow(props: {
     }
     const error = Cause.squash(result.cause);
     Dialog.alert(
-      "Could not update environment",
+      t("Could not update environment"),
       error instanceof Error ? error.message : "The environment could not be updated.",
     );
   };
@@ -117,6 +118,7 @@ export function ConnectionEnvironmentRow(props: {
               tintColorClassName="accent-foreground-muted"
             />
             <Text
+              translate={false}
               className="min-w-0 flex-shrink text-base font-t3-bold leading-snug text-foreground"
               numberOfLines={1}
             >
@@ -124,7 +126,7 @@ export function ConnectionEnvironmentRow(props: {
             </Text>
           </View>
           {!props.environment.isRelayManaged && props.environment.displayUrl.trim() ? (
-            <Text className="text-xs text-foreground-muted" numberOfLines={1}>
+            <Text translate={false} className="text-xs text-foreground-muted" numberOfLines={1}>
               {props.environment.displayUrl}
             </Text>
           ) : null}
@@ -133,7 +135,7 @@ export function ConnectionEnvironmentRow(props: {
               <Text className="text-xs text-danger-foreground">{diagnosis.headline}</Text>
               {connectionState.attempt > 0 ? (
                 <Text className="text-xs text-foreground-muted">
-                  {`Retrying · attempt ${connectionState.attempt}`}
+                  {t`Retrying · attempt ${connectionState.attempt}`}
                 </Text>
               ) : null}
             </>

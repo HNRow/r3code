@@ -20,7 +20,7 @@ import {
   secretProviderFromDraft,
   type SecretProviderDraft,
 } from "./SecretProviderDialog.logic";
-import { Var, T, useGT } from "gt-react";
+import { Var, T, useGT, t } from "gt-react";
 
 /** Mounted per open, so each open starts from a fresh draft. */
 export function SecretProviderDialog({
@@ -69,7 +69,7 @@ export function SecretProviderDialog({
       <DialogPopup className="max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {existing ? `Edit ${existing.config.label}` : "Add a 1Password provider"}
+            {existing ? `Edit ${existing.config.label}` : t("Add a 1Password provider")}
           </DialogTitle>
           <DialogDescription>
             <T>
@@ -156,7 +156,7 @@ export function SecretProviderDialog({
             form="secret-provider-form"
             disabled={submitted && Result.isFailure(result)}
           >
-            {existing ? "Save changes" : "Add provider"}
+            {existing ? t("Save changes") : t("Add provider")}
           </Button>
         </DialogFooter>
       </DialogPopup>

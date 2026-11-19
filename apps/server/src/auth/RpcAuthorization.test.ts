@@ -2,6 +2,7 @@ import {
   AuthEnvironmentMaintainScope,
   AuthDiagnosticsReadScope,
   AuthFilesystemReadScope,
+  AuthFilesystemWriteScope,
   AuthProvidersManageScope,
   AuthSettingsWriteScope,
   AuthAccessWriteScope,
@@ -77,6 +78,28 @@ describe("RPC authorization scopes", () => {
     }
   });
 
+  it("lets orchestration readers list skill inventories", () => {
+    expect(requiredScopeForRpcMethod(WS_METHODS.skillsList)).toBe(AuthOrchestrationReadScope);
+  });
+
+  it("puts every skill mutation behind provider management", () => {
+    for (const method of [
+      WS_METHODS.skillsInstall,
+      WS_METHODS.skillsSetEnabled,
+      WS_METHODS.skillsUninstall,
+      WS_METHODS.skillsSync,
+    ]) {
+      expect(requiredScopeForRpcMethod(method)).toBe(AuthProvidersManageScope);
+    }
+  });
+
+  it("lets orchestration readers list plugins, and provider managers change them", () => {
+    expect(requiredScopeForRpcMethod(WS_METHODS.pluginsList)).toBe(AuthOrchestrationReadScope);
+    for (const method of [WS_METHODS.pluginsSetEnabled, WS_METHODS.pluginsUninstall]) {
+      expect(requiredScopeForRpcMethod(method)).toBe(AuthProvidersManageScope);
+    }
+  });
+
   it("still lets readers load settings the way installed Swift clients ask", () => {
     expect(requiredScopeForRpcMethod("server.getSettings")).toBe(AuthOrchestrationReadScope);
   });
@@ -145,6 +168,96 @@ describe("RPC scope middleware", () => {
     }),
   );
 });
+
+it.effect("enforces provider and project-file grants before skill mutation handlers", () =>
+  Effect.gen(function* () {
+    const tested = [
+      WS_METHODS.skillsInstall,
+      WS_METHODS.skillsSetEnabled,
+      WS_METHODS.skillsUninstall,
+      WS_METHODS.skillsSync,
+    ] as const;
+    const group = WsRpcGroup.omit(
+      ...[...WsRpcGroup.requests.keys()].filter(
+        (tag): tag is Exclude<keyof typeof RPC_REQUIRED_SCOPES, (typeof tested)[number]> =>
+          !(tested as ReadonlyArray<string>).includes(tag),
+      ),
+    );
+    let handled = 0;
+    const mutationResult = Effect.sync(() => {
+      handled++;
+      return { requiresSessionRestart: true as const };
+    });
+    const handlers = Layer.mergeAll(
+      group.toLayerHandler(WS_METHODS.skillsInstall, () => mutationResult),
+      group.toLayerHandler(WS_METHODS.skillsSetEnabled, () => mutationResult),
+      group.toLayerHandler(WS_METHODS.skillsUninstall, () => mutationResult),
+      group.toLayerHandler(WS_METHODS.skillsSync, () =>
+        Effect.as(mutationResult, { requiresSessionRestart: true as const, backups: [] }),
+      ),
+    );
+    const install = {
+      instanceId: ProviderInstanceId.make("claude"),
+      cwd: "/repo",
+      nativeId: "user:review",
+      sourceFolder: "/source/review",
+      expectedRevision: "revision-1",
+    };
+    const projectEnable = {
+      instanceId: ProviderInstanceId.make("claude"),
+      cwd: "/repo",
+      nativeId: "project:review",
+      enabled: true,
+      expectedRevision: "revision-1",
+    };
+    const sync = {
+      sourceInstanceId: ProviderInstanceId.make("claude-a"),
+      targetInstanceId: ProviderInstanceId.make("claude-b"),
+      cwd: "/repo",
+      mode: "copy" as const,
+      nativeIds: ["review"] as [string],
+      expectedRevision: "revision-1",
+      onConflict: "cancel" as const,
+    };
+    const reader = yield* RpcTest.makeClient(group).pipe(
+      Effect.provide(Layer.merge(handlers, RpcAuthorization.layer([AuthOrchestrationReadScope]))),
+    );
+    expect(yield* reader[WS_METHODS.skillsInstall](install).pipe(Effect.flip)).toMatchObject({
+      requiredPermission: AuthProvidersManageScope,
+    });
+    expect(yield* reader[WS_METHODS.skillsSync](sync).pipe(Effect.flip)).toMatchObject({
+      requiredPermission: AuthProvidersManageScope,
+    });
+    expect(handled).toBe(0);
+
+    const providerManager = yield* RpcTest.makeClient(group).pipe(
+      Effect.provide(Layer.merge(handlers, RpcAuthorization.layer([AuthProvidersManageScope]))),
+    );
+    yield* providerManager[WS_METHODS.skillsInstall](install);
+    yield* providerManager[WS_METHODS.skillsSync](sync);
+    expect(
+      yield* providerManager[WS_METHODS.skillsSetEnabled](projectEnable).pipe(Effect.flip),
+    ).toMatchObject({ requiredPermission: AuthFilesystemWriteScope });
+    expect(handled).toBe(2);
+
+    const projectWriter = yield* RpcTest.makeClient(group).pipe(
+      Effect.provide(
+        Layer.merge(
+          handlers,
+          RpcAuthorization.layer([AuthProvidersManageScope, AuthFilesystemWriteScope]),
+        ),
+      ),
+    );
+    yield* projectWriter[WS_METHODS.skillsSetEnabled](projectEnable);
+    yield* projectWriter[WS_METHODS.skillsUninstall]({
+      instanceId: projectEnable.instanceId,
+      cwd: projectEnable.cwd,
+      nativeId: projectEnable.nativeId,
+      expectedRevision: projectEnable.expectedRevision,
+    });
+    expect(handled).toBe(4);
+  }),
+);
 
 it.effect("allows issue reads but requires a source-control grant before commenting", () =>
   Effect.gen(function* () {

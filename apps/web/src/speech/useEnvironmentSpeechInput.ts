@@ -41,6 +41,7 @@ import {
   useVoiceInputSessionSnapshot,
   type VoiceInputTarget,
 } from "./voiceInputSession";
+import { t } from "gt-react";
 
 const WAITING_STATE: VoiceInputState = { phase: "preparing", error: null, errorAction: null };
 const INITIAL_SETUP = {
@@ -401,7 +402,7 @@ export function useEnvironmentSpeechInput(input: HookInput) {
       setQueuedStart(null);
       toastManager.add({
         type: "error",
-        title: "Could not start voice input",
+        title: t("Could not start voice input"),
         description: error instanceof Error ? error.message : String(error),
       });
       return;
@@ -415,7 +416,7 @@ export function useEnvironmentSpeechInput(input: HookInput) {
     if (!latestStatus.supported) {
       toastManager.add({
         type: "error",
-        title: "Voice input is not available",
+        title: t("Voice input is not available"),
         description: latestStatus.reason,
       });
       return;

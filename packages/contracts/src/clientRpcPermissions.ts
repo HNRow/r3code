@@ -3,6 +3,7 @@ import { GitPreparePullRequestThreadInput, GitRunStackedActionInput } from "./gi
 import {
   AuthAccessWriteScope,
   AuthEnvironmentMaintainScope,
+  AuthFilesystemWriteScope,
   AuthOrchestrationOperateScope,
   AuthOrchestrationReadScope,
   AuthPreviewOperateScope,
@@ -14,10 +15,18 @@ import {
 } from "./auth.ts";
 import { ORCHESTRATION_V2_WS_METHODS } from "./orchestrationV2.ts";
 import { WS_METHODS } from "./rpc.ts";
+import { PluginSetEnabledInput, PluginUninstallInput } from "./plugins.ts";
+import { SkillInstallInput, SkillSetEnabledInput, SkillUninstallInput } from "./skills.ts";
 
 /** Incremental client enforcement; the server still authorizes every request. */
 export const CLIENT_GUARDED_RPC_SCOPES = {
   [WS_METHODS.providerAuthRemoveMethod]: AuthProvidersManageScope,
+  [WS_METHODS.skillsInstall]: AuthProvidersManageScope,
+  [WS_METHODS.skillsSetEnabled]: AuthProvidersManageScope,
+  [WS_METHODS.skillsUninstall]: AuthProvidersManageScope,
+  [WS_METHODS.skillsSync]: AuthProvidersManageScope,
+  [WS_METHODS.pluginsSetEnabled]: AuthProvidersManageScope,
+  [WS_METHODS.pluginsUninstall]: AuthProvidersManageScope,
   [WS_METHODS.previewClose]: AuthPreviewOperateScope,
   // Stopping a server signals its processes, as closing a terminal does.
   [WS_METHODS.previewStopLocalServer]: AuthTerminalOperateScope,
@@ -91,11 +100,45 @@ export type ClientGuardedRpcTag = keyof typeof CLIENT_GUARDED_RPC_SCOPES;
 
 const decodePrepareThread = Schema.decodeUnknownSync(GitPreparePullRequestThreadInput);
 const decodeStackedAction = Schema.decodeUnknownSync(GitRunStackedActionInput);
+const decodeSkillInstall = Schema.decodeUnknownSync(SkillInstallInput);
+const decodeSkillSetEnabled = Schema.decodeUnknownSync(SkillSetEnabledInput);
+const decodeSkillUninstall = Schema.decodeUnknownSync(SkillUninstallInput);
+const decodePluginSetEnabled = Schema.decodeUnknownSync(PluginSetEnabledInput);
+const decodePluginUninstall = Schema.decodeUnknownSync(PluginUninstallInput);
 
 export function clientRpcRequiredScopes(
   method: string,
   input: unknown,
 ): readonly AuthEnvironmentScope[] {
+  if (
+    input !== undefined &&
+    (method === WS_METHODS.skillsInstall ||
+      method === WS_METHODS.skillsSetEnabled ||
+      method === WS_METHODS.skillsUninstall)
+  ) {
+    const payload =
+      method === WS_METHODS.skillsInstall
+        ? decodeSkillInstall(input)
+        : method === WS_METHODS.skillsSetEnabled
+          ? decodeSkillSetEnabled(input)
+          : decodeSkillUninstall(input);
+    if (payload.nativeId.startsWith("project:")) {
+      return [AuthProvidersManageScope, AuthFilesystemWriteScope];
+    }
+  }
+  if (
+    input !== undefined &&
+    (method === WS_METHODS.pluginsSetEnabled || method === WS_METHODS.pluginsUninstall)
+  ) {
+    const payload =
+      method === WS_METHODS.pluginsSetEnabled
+        ? decodePluginSetEnabled(input)
+        : decodePluginUninstall(input);
+    // 项目级安装记录写在项目的设置里，和 project 技能一样需要可写文件系统。
+    if (payload.scope === "project" || payload.scope === "local") {
+      return [AuthProvidersManageScope, AuthFilesystemWriteScope];
+    }
+  }
   if (method === WS_METHODS.gitPreparePullRequestThread && input !== undefined) {
     const payload = decodePrepareThread(input);
     if (payload.mode === "worktree" && payload.threadId !== undefined)

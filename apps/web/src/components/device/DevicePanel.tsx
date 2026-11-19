@@ -40,7 +40,7 @@ import {
 } from "./DeviceSetup";
 import { DeviceWorkspace } from "./DeviceWorkspace";
 import { PreviewPanelShell, type PreviewPanelMode } from "../preview/PreviewPanelShell";
-import { Var, T, useGT } from "gt-react";
+import { Var, T, useGT, t } from "gt-react";
 
 const platformLabel = (platform: DevicePlatform) =>
   platform === "ios" ? "iOS Simulators" : "Android Emulators";
@@ -308,8 +308,8 @@ export function DevicePanel(props: {
                       tabIndex={state.hostStatus === "failed" ? 0 : undefined}
                     >
                       {state.hostStatus === "failed"
-                        ? (state.hostStatusDetail ?? "The device hub failed to start.")
-                        : "No simulators or emulators were found on this environment."}
+                        ? (state.hostStatusDetail ?? t("The device hub failed to start."))
+                        : t("No simulators or emulators were found on this environment.")}
                     </p>
                   </>
                 ) : null}
@@ -352,7 +352,7 @@ export function DevicePanel(props: {
                                 ) : (
                                   <Play />
                                 )}
-                                {device.booted ? "Open" : "Start"}
+                                {device.booted ? t("Open") : t("Start")}
                               </Button>
                             </div>
                           ))}
@@ -458,7 +458,7 @@ function DeviceDiscoveryWarning(props: {
               void props.onRetry().finally(() => setRetrying(false));
             }}
           >
-            {retrying ? "Retrying…" : "Retry"}
+            {retrying ? t("Retrying…") : t("Retry")}
           </Button>
         ) : null}
         <Popover open={open} onOpenChange={setOpen}>

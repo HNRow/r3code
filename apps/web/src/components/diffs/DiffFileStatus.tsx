@@ -1,6 +1,7 @@
 import { InfoIcon, RotateCwIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import { t } from "gt-react";
 
 export function DiffFileStatus({
   error,
@@ -31,8 +32,8 @@ export function DiffFileStatus({
       </TooltipTrigger>
       <TooltipPopup>
         {error
-          ? "Retry loading diff"
-          : "This file is too large to show in full. Counts include all changes."}
+          ? t("Retry loading diff")
+          : t("This file is too large to show in full. Counts include all changes.")}
       </TooltipPopup>
     </Tooltip>
   );

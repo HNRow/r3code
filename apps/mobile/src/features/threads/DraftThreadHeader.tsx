@@ -15,6 +15,7 @@ import { vcsActionManager, vcsEnvironment } from "../../state/vcs";
 import { useVcsActionState } from "../../state/use-vcs-action-state";
 import { ThreadHeader } from "./ThreadHeader";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 export function DraftThreadHeader(props: {
   readonly thread: EnvironmentThreadShell;
@@ -44,7 +45,7 @@ export function DraftThreadHeader(props: {
     });
   };
   const requiresThread = () =>
-    Dialog.alert("Available after the first message", "This action needs a saved thread.");
+    Dialog.alert(t("Available after the first message"), t("This action needs a saved thread."));
   return (
     <ThreadHeader
       draft
@@ -76,7 +77,7 @@ export function DraftThreadHeader(props: {
           if (!canWriteGit || !props.cwd) return;
           const result = await pull({ environmentId, input: { cwd: props.cwd } });
           if (AsyncResult.isFailure(result))
-            Dialog.alert("Could not pull", String(Cause.squash(result.cause)));
+            Dialog.alert(t("Could not pull"), String(Cause.squash(result.cause)));
         },
         onRunAction: async (input) => {
           if (!canWriteGit || !props.cwd) return null;
@@ -86,7 +87,7 @@ export function DraftThreadHeader(props: {
             actionId: uuidv4(),
           });
           if (AsyncResult.isFailure(result)) {
-            Dialog.alert("Git action failed", String(Cause.squash(result.cause)));
+            Dialog.alert(t("Git action failed"), String(Cause.squash(result.cause)));
             return null;
           }
           return result.value;

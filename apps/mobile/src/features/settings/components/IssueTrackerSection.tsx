@@ -27,6 +27,7 @@ import { SettingsProviderRow } from "./SettingsProviderRow";
 import { SettingsRow } from "./SettingsRow";
 import { SettingsSection } from "./SettingsSection";
 import { useGT } from "gt-react-native";
+import { t } from "../../../i18n/gt";
 
 const UNBOUND = "";
 const ThemedSvg = withUniwind(Svg);
@@ -233,7 +234,7 @@ export function IssueTrackerProjectRows(props: {
         actions={[
           {
             id: UNBOUND,
-            title: "Not bound",
+            title: t("Not bound"),
             state: value === UNBOUND ? "on" : "off",
             attributes: { disabled: locked },
           },

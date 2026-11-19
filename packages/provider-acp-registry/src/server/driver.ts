@@ -11,6 +11,12 @@ import {
 } from "@t3tools/contracts";
 import { AcpRegistrySettings } from "../settings.ts";
 import * as HostProcess from "@t3tools/shared/HostProcess";
+import * as FileSystem from "effect/FileSystem";
+import * as Path from "effect/Path";
+import { isKimiAcpSettings } from "./kimiAcp.ts";
+import { makeKimiPluginManagement, makeKimiServerRequest } from "./kimiPlugins.ts";
+
+const isProviderDriverError = Schema.is(ProviderDriverError);
 import { createModelCapabilities } from "@t3tools/shared/model";
 import * as Clock from "effect/Clock";
 import * as Digest from "effect/crypto/Digest";
@@ -652,6 +658,13 @@ export const AcpRegistryDriver: ProviderDriver<AcpRegistrySettings, AcpRegistryD
       environment,
       hostEnvironment,
     );
+    const configuredKimiHome = processEnvironment.KIMI_CODE_HOME?.trim() ?? "";
+    const pathService = yield* Path.Path;
+    const kimiFileSystem = yield* FileSystem.FileSystem;
+    const configHome =
+      configuredKimiHome.length > 0
+        ? pathService.resolve(configuredKimiHome)
+        : pathService.join(yield* HostProcess.HomeDirectory, ".kimi-code");
     const orchestrationAdapter = yield* AcpRegistryAdapterV2Driver.create({
       instanceId,
       displayName,
@@ -1004,6 +1017,38 @@ export const AcpRegistryDriver: ProviderDriver<AcpRegistrySettings, AcpRegistryD
         Effect.andThen(clearLearnedModels),
         Effect.andThen(liveSnapshotSemaphore.withPermit(invalidateEnrichmentCache)),
       ),
+      ...(isKimiAcpSettings(effectiveConfig)
+        ? {
+            pluginManagement: makeKimiPluginManagement({
+              configHome,
+              instanceId,
+              request: (request) =>
+                provideAcpManagementServices(
+                  catalog.resolve(effectiveConfig, host.paths.cwd, processEnvironment).pipe(
+                    Effect.flatMap((resolved) =>
+                      makeKimiServerRequest({
+                        configHome,
+                        spawn: resolved.spawn,
+                        instanceId,
+                      })(request),
+                    ),
+                    Effect.provideService(FileSystem.FileSystem, kimiFileSystem),
+                    Effect.provideService(Path.Path, pathService),
+                    Effect.mapError((cause) =>
+                      isProviderDriverError(cause)
+                        ? cause
+                        : new ProviderDriverError({
+                            driver: DRIVER_KIND,
+                            instanceId,
+                            detail: "Could not resolve the Kimi runtime.",
+                            cause,
+                          }),
+                    ),
+                  ),
+                ),
+            }),
+          }
+        : {}),
       orchestrationAdapter,
       textGeneration: makeUnsupportedTextGeneration(),
       acpSessionManagement: {

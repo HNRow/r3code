@@ -95,9 +95,32 @@ Claude skills come from the config directory's `skills` folder and the project's
 `.claude/skills` folder. If both define the same name, the config-directory copy
 wins. Skills disabled in Claude's settings do not appear in the composer.
 
-Use `$` in the composer to select a skill. Enabled installed Claude plugins,
-and plugins synced from your claude.ai account, also contribute skills under
-names such as `plugin:review`. Skills marked `disable-model-invocation` can
+Open **Settings → Skills** on web or desktop to browse the selected environment's
+full skill inventory, filter it, and inspect discovery or sync problems. You can
+install a skill from a folder on that environment, enable or disable skills, and
+copy a skill to another Claude configuration. Linking makes a skill available to
+another configuration without duplicating its files. Mobile shows the inventory
+but does not change it.
+
+Uninstall is available only for skills installed or copied by R3 Code. It moves
+the skill to permanent quarantine inside the provider's configuration area,
+outside the folders scanned for skills, rather than deleting its files. Linked
+skills and skills from ACP providers, plugins, packages, or shadowed sources are
+read-only here; manage plugins in **Settings → Plugins**. After changing skills, use **Restart
+agent session** in the command palette so the next message uses the new setup.
+
+**Settings → Plugins** lists what each Claude configuration has installed, with
+its marketplace, version, install scope, and enabled state. You can enable,
+disable, or uninstall a plugin. Uninstall keeps the plugin's data directory and
+does not remove dependencies, and R3 Code cannot reinstall a plugin: use
+`claude plugin install <id>` for that. Organization-managed plugins, plugins
+synced from claude.ai, and inline or `@skills-dir` plugins are read-only there.
+Changes reach the next agent session, so use **Restart agent session** in the
+command palette afterwards.
+
+Use `$` in the composer to select an enabled skill. Enabled installed Claude
+plugins, and plugins synced from your claude.ai account, also contribute skills
+under names such as `plugin:review`. Skills marked `disable-model-invocation` can
 still be started by you. Invoke those one per message: Claude directly runs only
 the last named skill and may try to start earlier ones through its Skill tool,
 which refuses skills reserved for manual invocation.

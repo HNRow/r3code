@@ -11,6 +11,7 @@ import { ListChoiceRow as SettingsChoiceRow } from "../../components/ui/ListChoi
 import { SettingsSection } from "./components/SettingsSection";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { useGT, Var, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const FOLLOW_UP_OPTIONS: ReadonlyArray<{
   readonly behavior: FollowUpBehavior;
@@ -19,13 +20,21 @@ const FOLLOW_UP_OPTIONS: ReadonlyArray<{
 }> = [
   {
     behavior: "queue",
-    label: "Queue",
-    description: "Your message waits and runs after the current turn finishes.",
+    get label() {
+      return t("Queue");
+    },
+    get description() {
+      return t("Your message waits and runs after the current turn finishes.");
+    },
   },
   {
     behavior: "steer",
-    label: "Steer",
-    description: "Your message reaches the agent right away, changing what it is working on.",
+    get label() {
+      return t("Steer");
+    },
+    get description() {
+      return t("Your message reaches the agent right away, changing what it is working on.");
+    },
   },
 ];
 
@@ -63,7 +72,8 @@ export function SettingsFollowUpRouteScreen() {
       <Text className="px-2 text-sm text-foreground-muted">
         <T>
           Long-press the send button to use the other option for a single message. With a hardware
-          keyboard, hold <Var>{Platform.OS === "android" ? "Ctrl" : "Command"}</Var> while sending.
+          keyboard, hold <Var>{Platform.OS === "android" ? t("Ctrl") : t("Command")}</Var> while
+          sending.
         </T>
       </Text>
     </ScrollView>

@@ -60,7 +60,7 @@ import {
   captureSetupShouldDisableOnClose,
   type CaptureSetupStep,
 } from "./SnapShotSetupDialog.logic";
-import { msg, T, useGT, useMessages } from "gt-react";
+import { T, useGT, useMessages, t } from "gt-react";
 
 const soundOptionRowClassName = "grid grid-cols-[1fr_auto]";
 
@@ -417,8 +417,8 @@ export function SnapShotSettings() {
                 {...searchableSetting("snap-shot-shortcut")}
                 description={
                   state?.linuxBackend === "picker"
-                    ? msg("Choose a window to capture from any app.")
-                    : msg("Capture the window you're using without switching apps.")
+                    ? t("Choose a window to capture from any app.")
+                    : t("Capture the window you're using without switching apps.")
                 }
                 status={managedShortcut ? undefined : shortcutStatus}
                 control={
@@ -441,7 +441,7 @@ export function SnapShotSettings() {
                             disabled={!canSaveShortcut || setupBusy}
                             onClick={() => void saveShortcut()}
                           >
-                            {setupBusy ? "Saving…" : "Save"}
+                            {setupBusy ? t("Saving…") : t("Save")}
                           </Button>
                           <Button
                             size="xs"
@@ -485,7 +485,7 @@ export function SnapShotSettings() {
                       disabled={!captureAvailable}
                     >
                       {soundSelection === "off" ? (
-                        "Off"
+                        t("Off")
                       ) : soundSelection === "soft-pop" ? (
                         <>
                           <T>
@@ -493,7 +493,7 @@ export function SnapShotSettings() {
                           </T>
                         </>
                       ) : (
-                        "Click"
+                        t("Click")
                       )}
                     </MenuTrigger>
                     <MenuPopup align="end">

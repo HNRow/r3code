@@ -55,7 +55,7 @@ import { toastManager } from "../ui/toast";
 import { WizardFooter, WizardHeader, WizardPanel, WizardPopup, WizardSteps } from "../ui/wizard";
 import { afterFailedCheck, resolveMcpGate } from "./mcpGate";
 import { MCP_APPS, type McpApp, mcpHandoffAction, OTHER_MCP_APP_STEPS } from "./mcpApps";
-import { Var, T, useGT } from "gt-react";
+import { Var, T, useGT, t } from "gt-react";
 
 const requestAtom = Atom.make<{ readonly environmentId: EnvironmentId | null } | null>(null).pipe(
   Atom.keepAlive,
@@ -408,7 +408,7 @@ function GateScreen({
       );
     case "disconnected":
       return gate.relay === null ? (
-        <GateMessage title={`Connect to ${name} first.`} />
+        <GateMessage title={t`Connect to ${name} first.`} />
       ) : (
         <GateMessage
           title={
@@ -421,17 +421,17 @@ function GateScreen({
         </GateMessage>
       );
     case "update":
-      return <GateMessage title={`Update R3 Code on ${name}`} />;
+      return <GateMessage title={t`Update R3 Code on ${name}`} />;
     case "no-relay-read":
       return (
         <GateMessage
-          title={`Can't check R3 Connect on ${name}`}
+          title={t`Can't check R3 Connect on ${name}`}
           lines={[`This device needs the View relay permission on ${name}.`]}
         />
       );
     case "error":
       return (
-        <GateMessage title={`Can't check R3 Connect on ${name}`} lines={[gate.message]}>
+        <GateMessage title={t`Can't check R3 Connect on ${name}`} lines={[gate.message]}>
           {checkAgain}
         </GateMessage>
       );
@@ -452,7 +452,7 @@ function GateScreen({
       }
       return (
         <GateMessage
-          title={`Turn on R3 Connect for ${name}`}
+          title={t`Turn on R3 Connect for ${name}`}
           lines={[
             `${name} gets a public https address, with no router setup.`,
             "Only apps you approve can use it. You can turn it off in Settings.",
@@ -461,7 +461,7 @@ function GateScreen({
           {turnOnHere.kind === "here" ? (
             <div className="space-y-2">
               <Button disabled={connecting} onClick={() => void turnOn()}>
-                {connecting ? "Connecting…" : "Turn on"}
+                {connecting ? t("Connecting…") : t("Turn on")}
               </Button>
               {operationError ? (
                 <p className="text-xs text-destructive-foreground">{operationError}</p>
@@ -620,7 +620,7 @@ function ConnectStep({
         {code}
         {app === null ? null : (
           <TextButton onClick={() => setAnotherWay(false)}>
-            {app.handoff.kind === "commands" ? "Back to commands" : "Back to one click"}
+            {app.handoff.kind === "commands" ? t("Back to commands") : t("Back to one click")}
           </TextButton>
         )}
         <LinkedLine environment={environment} access={access} />
@@ -664,7 +664,7 @@ function openLink(url: string) {
     .catch((error: unknown) =>
       toastManager.add({
         type: "error",
-        title: "Could not open the link",
+        title: t("Could not open the link"),
         description: error instanceof Error ? error.message : url,
       }),
     );
@@ -707,8 +707,8 @@ function PrimaryAction({ app, mcpUrl }: { readonly app: McpApp; readonly mcpUrl:
       if (!copied) {
         toastManager.add({
           type: "error",
-          title: "Could not copy",
-          description: "Use Set up another way.",
+          title: t("Could not copy"),
+          description: t("Use Set up another way."),
         });
         return;
       }
@@ -786,7 +786,7 @@ function ApprovalCode({
         </span>
         {live ? null : (
           <Button size="sm" variant="outline" disabled={pending} onClick={() => void mint()}>
-            {pending ? "Getting code…" : code === null ? "Get code" : "New code"}
+            {pending ? t("Getting code…") : code === null ? t("Get code") : t("New code")}
           </Button>
         )}
       </div>

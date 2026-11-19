@@ -32,6 +32,8 @@ export function ComposerInlineControl(props: {
   readonly icon?: ComponentProps<typeof SymbolView>["name"];
   readonly renderIcon?: (size: number) => ReactNode;
   readonly label: string;
+  /** 模型名等用户数据设 false：它们不是源码文案。 */
+  readonly labelTranslate?: boolean;
   readonly labelEllipsizeMode?: ComponentProps<typeof Text>["ellipsizeMode"];
   readonly suffix?: ReactNode;
   readonly suffixWidth?: number;
@@ -91,6 +93,7 @@ export function ComposerInlineControl(props: {
             entering={animatesLabel && !reducedMotion ? INLINE_CONTROL_LABEL_ENTERING : undefined}
           >
             <Text
+              translate={props.labelTranslate}
               className={cn(
                 props.size === "large" ? "text-base font-t3-medium" : "text-sm font-t3-medium",
                 props.emphasized || props.selected ? "text-foreground" : "text-foreground-muted",

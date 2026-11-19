@@ -279,10 +279,55 @@ const makeImporter = Effect.fn(function* (
   const importer = Context.get(context, AgentSessionImporter.AgentSessionImporter);
   return {
     run: importer.importRecentAgentThreads({ projectId }),
+    list: importer.listRecentAgentThreads({ projectId }),
     importNativeHistory: importer.importNativeHistory,
     published,
   };
 });
+
+it.effect("lists recent sessions, dropping skipped outcomes and repeated transcripts", () =>
+  Effect.gen(function* () {
+    const importable = candidate(CODEX_MODEL_SELECTION, "importable");
+    const imported = candidate(
+      CLAUDE_MODEL_SELECTION,
+      "020e7f00-dce6-406b-8ec6-ed90498945d6",
+      "claudeAgent",
+    );
+    const owned = candidate(CODEX_MODEL_SELECTION, "owned");
+    yield* seedOwner(owned);
+    const importer = yield* makeImporter([
+      { _tag: "Skipped" },
+      importable,
+      { _tag: "Duplicate", source: importable.source },
+      owned,
+      { _tag: "AlreadyImported", source: imported.source },
+    ]);
+    const listed = yield* importer.list;
+    expect(listed.sessions).toEqual([
+      {
+        source: "codex",
+        providerSessionId: importable.source.providerSessionId,
+        title: "Imported thread",
+        lastActiveAt: timestamp,
+        alreadyImported: false,
+      },
+      {
+        source: "codex",
+        providerSessionId: owned.source.providerSessionId,
+        title: "Imported thread",
+        lastActiveAt: timestamp,
+        alreadyImported: true,
+      },
+      {
+        source: "claudeAgent",
+        providerSessionId: imported.source.providerSessionId,
+        title: null,
+        lastActiveAt: null,
+        alreadyImported: true,
+      },
+    ]);
+  }).pipe(Effect.scoped, Effect.provide(persistence)),
+);
 
 it.effect(
   "ignores owned sessions, including archived and deleted threads, but imports other instances and unowned sessions",

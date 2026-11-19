@@ -137,7 +137,7 @@ import { searchableSetting } from "./settingsSearch";
 import { useOptionalSettingsScope, useSettingsScope } from "./SettingsScopeContext";
 import { useScopedModelDisabledReason } from "./useScopedModelAvailability";
 import { useScopedSettings, useUpdateScopedSettings } from "./useScopedSettings";
-import { msg, T, useGT, useMessages, Var } from "gt-react";
+import { T, useGT, useMessages, Var, t } from "gt-react";
 
 const OFF = "off";
 function CloudSpeechLogo({ provider }: { provider: CloudSpeechProvider }) {
@@ -153,18 +153,53 @@ function CloudSpeechLogo({ provider }: { provider: CloudSpeechProvider }) {
 }
 const formatSize = (bytes: number) => `${Math.round(bytes / 1024 / 1024)} MB`;
 const SHORTCUT_MODES: Record<VoiceShortcutMode, { label: string; hint: string }> = {
-  auto: { label: msg("Auto"), hint: msg("Tap to toggle, hold to talk") },
-  hold: { label: msg("Hold"), hint: msg("Record while held") },
-  toggle: { label: msg("Toggle"), hint: msg("Tap to start, tap to stop") },
+  auto: {
+    get label() {
+      return t("Auto");
+    },
+    get hint() {
+      return t("Tap to toggle, hold to talk");
+    },
+  },
+  hold: {
+    get label() {
+      return t("Hold");
+    },
+    get hint() {
+      return t("Record while held");
+    },
+  },
+  toggle: {
+    get label() {
+      return t("Toggle");
+    },
+    get hint() {
+      return t("Tap to start, tap to stop");
+    },
+  },
 };
 const UNLOAD_LABELS: Record<SpeechModelUnloadTimeout, string> = {
-  never: msg("Never"),
-  immediately: msg("Immediately"),
-  min_2: msg("After 2 minutes"),
-  min_5: msg("After 5 minutes"),
-  min_10: msg("After 10 minutes"),
-  min_15: msg("After 15 minutes"),
-  hour_1: msg("After 1 hour"),
+  get never() {
+    return t("Never");
+  },
+  get immediately() {
+    return t("Immediately");
+  },
+  get min_2() {
+    return t("After 2 minutes");
+  },
+  get min_5() {
+    return t("After 5 minutes");
+  },
+  get min_10() {
+    return t("After 10 minutes");
+  },
+  get min_15() {
+    return t("After 15 minutes");
+  },
+  get hour_1() {
+    return t("After 1 hour");
+  },
 };
 const normalizeTerm = (value: string) => value.replace(/\s+/g, " ").trim().normalize("NFC");
 const spellingsOf = (words: SpeechCustomWords) =>
@@ -287,7 +322,7 @@ function ModelCard(props: ModelCardProps) {
               </div>
               <p className="mt-1 text-2xs text-muted-foreground">
                 {model.state === "verifying"
-                  ? "Verifying download…"
+                  ? t("Verifying download…")
                   : `${Math.round(progress)}% downloaded`}
               </p>
             </div>
@@ -494,7 +529,7 @@ function ProjectDictionaryRow() {
       serverScoped
       settingKeys={["speechProjectCustomWords"]}
       {...searchableSetting("speech-project-dictionary")}
-      title={isProjectScope ? msg("Project dictionary") : msg("Shared dictionary")}
+      title={isProjectScope ? t("Project dictionary") : t("Shared dictionary")}
       description={
         isProjectScope
           ? gt("Used by everyone who dictates in {1}.", { 1: scope.scope.label })
@@ -559,7 +594,7 @@ function CleanupModelRow() {
   const setModel = (next: ReturnType<typeof createModelSelection>) => {
     const reason = modelDisabledReason(next.instanceId, next.model);
     if (reason) {
-      toastManager.add({ type: "error", title: "Cleanup model not saved", description: reason });
+      toastManager.add({ type: "error", title: t("Cleanup model not saved"), description: reason });
       return;
     }
     updateSettings({ speechPostProcessingModelSelection: next });
@@ -676,7 +711,7 @@ function useVoiceModels(prepared: PreparedConnection | null) {
         if (current !== epoch.current || revision !== refreshRevision.current) return;
         toastManager.add({
           type: "error",
-          title: "Could not load transcription models",
+          title: t("Could not load transcription models"),
           description: error instanceof Error ? error.message : String(error),
         });
       }
@@ -767,10 +802,10 @@ function AdvancedSpeechSettings({
         title={gt("Streaming transcription")}
         description={
           supported.supportsStreaming
-            ? msg(
+            ? t(
                 "Transcribe while recording. Turn off to transcribe after stopping, which may help when live transcription falls behind.",
               )
-            : msg("This model doesn’t support native streaming.")
+            : t("This model doesn’t support native streaming.")
         }
         control={
           <Switch
@@ -801,12 +836,12 @@ function AdvancedSpeechSettings({
             <SelectTrigger size="sm" aria-label={gt("Transcription hardware")} className="max-w-72">
               <SelectValue>
                 {supported.acceleration === "auto"
-                  ? "Auto"
+                  ? t("Auto")
                   : supported.acceleration === "cpu"
-                    ? "CPU"
+                    ? t("CPU")
                     : (supported.gpuDevices.find(
                         (device) => `gpu:${device.id}` === supported.acceleration,
-                      )?.name ?? "Selected GPU")}
+                      )?.name ?? t("Selected GPU"))}
               </SelectValue>
             </SelectTrigger>
             <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -921,14 +956,14 @@ function SpeechModelBrowser(props: {
       <SettingsRow
         {...searchableSetting("speech-models")}
         title={gt("Models")}
-        description={`This environment can’t transcribe audio: ${status.reason}.`}
+        description={t`This environment can’t transcribe audio: ${status.reason}.`}
       />
     );
   return (
     <SettingsRow
       {...searchableSetting("speech-models")}
       title={gt("Models")}
-      description={`Grades are error rates and speed is seconds per 30 s of audio, from Handy’s benchmark ${status.benchmarkTier === "cpu" ? "CPU" : "GPU"}.`}
+      description={t`Grades are error rates and speed is seconds per 30 s of audio, from Handy’s benchmark ${status.benchmarkTier === "cpu" ? "CPU" : "GPU"}.`}
       className="@container/voice-models"
     >
       <div className="mt-3 flex min-w-0 gap-2">
@@ -1186,7 +1221,7 @@ function TranscriptionTest(props: {
               <span className="text-xs text-muted-foreground">
                 {speech.status?.supported === false
                   ? speech.status.reason
-                  : "Waiting for the environment to connect"}
+                  : t("Waiting for the environment to connect")}
               </span>
             )}
           </div>
@@ -1214,7 +1249,7 @@ function TranscriptionTest(props: {
                       <span className="text-muted-foreground">{speech.preview.tentative}</span>
                     </>
                   ) : (
-                    transcript || "No speech recognized. Try again."
+                    transcript || t("No speech recognized. Try again.")
                   )}
                 </p>
               ) : null}
@@ -1585,7 +1620,7 @@ export function VoiceSettingsPanel() {
             title={gt("Language")}
             description={
               destination.cloudProvider
-                ? msg("The provider detects your language automatically.")
+                ? t("The provider detects your language automatically.")
                 : model?.supportsLanguageDetection
                   ? `${model.model} detects the language automatically.`
                   : `${model?.model ?? "This model"} uses one fixed language.`
@@ -1617,7 +1652,7 @@ export function VoiceSettingsPanel() {
           title={gt("Silence filtering")}
           description={
             destination.cloudProvider === "openai"
-              ? msg("OpenAI handles silence itself.")
+              ? t("OpenAI handles silence itself.")
               : gt("Skip silence and background noise before transcribing.")
           }
           control={
@@ -1696,8 +1731,8 @@ export function VoiceSettingsPanel() {
             title={gt("Instructions")}
             description={
               settings.speechPostProcessingPrompt.mode === "custom"
-                ? msg("Your own instructions for cleanup.")
-                : msg("Fix punctuation, numbers, lists, and spoken corrections.")
+                ? t("Your own instructions for cleanup.")
+                : t("Fix punctuation, numbers, lists, and spoken corrections.")
             }
             control={
               <Select
@@ -1718,7 +1753,9 @@ export function VoiceSettingsPanel() {
               >
                 <SelectTrigger size="sm" aria-label={gt("Cleanup instructions")}>
                   <SelectValue>
-                    {settings.speechPostProcessingPrompt.mode === "custom" ? "Custom" : "Built-in"}
+                    {settings.speechPostProcessingPrompt.mode === "custom"
+                      ? t("Custom")
+                      : t("Built-in")}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectPopup align="end" alignItemWithTrigger={false}>

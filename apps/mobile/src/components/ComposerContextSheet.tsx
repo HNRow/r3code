@@ -31,6 +31,7 @@ import { Sheet } from "./ui/Sheet";
 import { useAppearancePreferences } from "../features/settings/appearance/AppearancePreferencesProvider";
 import { getMobileTerminalTheme } from "../features/terminal/terminalTheme";
 import { useGT, Var, T } from "gt-react-native";
+import { t } from "../i18n/gt";
 
 function ContextField(props: { label: string; value: string | null | undefined; code?: boolean }) {
   if (!props.value) return null;
@@ -238,6 +239,7 @@ export function ComposerContextSheet(props: {
                   contentContainerStyle={{ padding: 12 }}
                 >
                   <Text
+                    translate={false}
                     selectable
                     className="text-sm text-foreground"
                     style={{
@@ -382,7 +384,10 @@ export function ComposerContextSheet(props: {
             onPress={() => {
               props.onClose();
               void openPullRequest(pullRequestUrl).catch(() =>
-                Dialog.alert(`Could not open ${changeRequestTerm}`, "Try again when connected."),
+                Dialog.alert(
+                  t`Could not open ${changeRequestTerm}`,
+                  t("Try again when connected."),
+                ),
               );
             }}
             className="rounded-xl bg-subtle p-4"
@@ -404,7 +409,7 @@ export function ComposerContextSheet(props: {
         ) : null}
         {props.onOpenPullRequest && !pullRequestUrl ? (
           <Button
-            label={`Open ${changeRequestTerm}`}
+            label={t`Open ${changeRequestTerm}`}
             tone="secondary"
             onPress={props.onOpenPullRequest}
             fullWidth

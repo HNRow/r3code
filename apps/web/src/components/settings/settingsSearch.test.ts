@@ -87,6 +87,14 @@ describe("searchSettings", () => {
     });
   });
 
+  it("finds the Skills page", () => {
+    expect(searchSettings("skills")[0]).toMatchObject({
+      id: "skills",
+      to: "/settings/skills",
+    });
+    expect(SETTINGS_NAV_GROUPS.flatMap((group) => group.paths)).toContain("/settings/skills");
+  });
+
   it("matches normalized title substrings", () => {
     expect(searchSettings("  WORD   WRAP  ", ITEMS).map((item) => item.id)).toEqual(["word-wrap"]);
     expect(searchSettings("glass").map((item) => item.id)).toEqual(["setting-glass-opacity"]);

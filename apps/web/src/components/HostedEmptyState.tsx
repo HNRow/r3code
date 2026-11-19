@@ -17,7 +17,7 @@ import { Button } from "./ui/button";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "./ui/empty";
 import { SidebarInset } from "./ui/sidebar";
 import { WorkspacePageHeader } from "./WorkspacePageHeader";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 /** Home screen for the hosted app before any computer is added. */
 export function HostedEmptyState() {
@@ -38,14 +38,14 @@ export function HostedEmptyState() {
         <Empty className="flex-1">
           <EmptyHeader>
             <EmptyTitle>
-              {localEnvironmentOff ? "This computer is off" : "No computer connected"}
+              {localEnvironmentOff ? t("This computer is off") : t("No computer connected")}
             </EmptyTitle>
             <EmptyDescription>
               {localEnvironmentOff
-                ? "Turn it back on, or connect a different computer."
+                ? t("Turn it back on, or connect a different computer.")
                 : cloudEnabled
-                  ? "Your agents run on your computer."
-                  : "Your agents run on your computer. Start R3 Code there first."}
+                  ? t("Your agents run on your computer.")
+                  : t("Your agents run on your computer. Start R3 Code there first.")}
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>

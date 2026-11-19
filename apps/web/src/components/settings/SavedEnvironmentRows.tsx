@@ -69,7 +69,7 @@ import {
 } from "../ServerUpdateAction";
 import { CloudEnvironmentConnectRows } from "../cloud/CloudEnvironmentConnectList";
 import { useT3ConnectAuthPrompt } from "../clerk/useT3ConnectAuthPrompt";
-import { T, useGT, msg, useMessages } from "gt-react";
+import { T, useGT, useMessages, t } from "gt-react";
 
 type SavedBackendListRowProps = {
   environment: EnvironmentPresentation;
@@ -84,13 +84,13 @@ function savedBackendStatus(environment: EnvironmentPresentation): {
   readonly tone: "muted" | "error";
 } {
   if (!environment.entry.enabled && environment.connection.phase !== "unsupported")
-    return { text: "Off", tone: "muted" };
+    return { text: t("Off"), tone: "muted" };
   const { connection } = environment;
   switch (connection.phase) {
     case "connected":
-      return { text: "Connected", tone: "muted" };
+      return { text: t("Connected"), tone: "muted" };
     case "connecting":
-      return { text: "Connecting", tone: "muted" };
+      return { text: t("Connecting"), tone: "muted" };
     case "reconnecting":
       if (connection.awaitingApproval) {
         return { text: connection.error ?? "Waiting for approval", tone: "muted" };
@@ -100,16 +100,16 @@ function savedBackendStatus(environment: EnvironmentPresentation): {
         tone: "error",
       };
     case "unsupported":
-      return { text: "Client not supported", tone: "muted" };
+      return { text: t("Client not supported"), tone: "muted" };
     case "error":
       return {
         text: connection.error ? `Connection failed: ${connection.error}` : "Connection failed",
         tone: "error",
       };
     case "offline":
-      return { text: "Offline", tone: "muted" };
+      return { text: t("Offline"), tone: "muted" };
     case "available":
-      return { text: "Not connected", tone: "muted" };
+      return { text: t("Not connected"), tone: "muted" };
   }
 }
 
@@ -136,7 +136,7 @@ export function SavedBackendListRow({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not copy trace ID",
+          title: t("Could not copy trace ID"),
           description: error.message,
         }),
       );
@@ -150,15 +150,15 @@ export function SavedBackendListRow({
     onCopy: ({ url }) => {
       toastManager.add({
         type: "success",
-        title: "MCP URL copied",
-        description: `Add it to an agent, e.g. claude mcp add --transport http t3 ${url}`,
+        title: t("MCP URL copied"),
+        description: t`Add it to an agent, e.g. claude mcp add --transport http t3 ${url}`,
       });
     },
     onError: (error) => {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not copy MCP URL",
+          title: t("Could not copy MCP URL"),
           description: error.message,
         }),
       );
@@ -275,7 +275,7 @@ export function SavedBackendListRow({
             onClick={() => setRoutesOpen((open) => !open)}
             className="inline-flex shrink-0 items-center gap-0.5 rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
           >
-            {routeCount === 1 ? "Routes" : `${routeCount} routes`}
+            {routeCount === 1 ? t("Routes") : `${routeCount} routes`}
             <ChevronRightIcon
               aria-hidden
               className={cn(
@@ -392,7 +392,7 @@ export function SavedBackendListRow({
           }
         />
         <TooltipPopup side="top">
-          {blocked ? "Client not supported" : enabled ? "Switch off" : "Switch on"}
+          {blocked ? t("Client not supported") : enabled ? t("Switch off") : t("Switch on")}
         </TooltipPopup>
       </Tooltip>
       <Menu>
@@ -416,7 +416,7 @@ export function SavedBackendListRow({
           />
           <MenuItem onClick={() => setRoutesOpen((open) => !open)}>
             <RouteIcon />
-            {routesOpen ? "Hide routes" : "Routes"}
+            {routesOpen ? t("Hide routes") : t("Routes")}
           </MenuItem>
           {mcpUrl ? (
             <MenuItem onClick={() => copyMcpUrl(mcpUrl, { url: mcpUrl })}>
@@ -430,7 +430,7 @@ export function SavedBackendListRow({
           ) : null}
           <MenuSeparator />
           <MenuItem variant="destructive" onClick={() => onRemove(environment)}>
-            {isRemoving ? "Removing…" : "Remove from this device…"}
+            {isRemoving ? t("Removing…") : t("Remove from this device…")}
           </MenuItem>
         </MenuPopup>
       </Menu>
@@ -671,26 +671,24 @@ function ConfiguredCloudLinkRow({
             connectDenial !== undefined && !managedTunnelActive
               ? connectDenial
               : signedOut
-                ? msg(
+                ? t(
                     "Sign in to make this environment available to your other devices through R3 Connect.",
                   )
                 : linkRevoked
-                  ? msg(
-                      "This environment was removed from R3 Connect. Turn it on to link it again.",
-                    )
+                  ? t("This environment was removed from R3 Connect. Turn it on to link it again.")
                   : managedTunnelActive
                     ? reachability?.status === "unreachable"
-                      ? msg("R3 Connect is on, but other devices cannot reach this environment.")
+                      ? t("R3 Connect is on, but other devices cannot reach this environment.")
                       : reachability?.status === "reachable"
-                        ? msg(
+                        ? t(
                             "This environment is available to your other devices through R3 Connect.",
                           )
-                        : msg("R3 Connect is on. Reachability has not been checked yet.")
+                        : t("R3 Connect is on. Reachability has not been checked yet.")
                     : managedTunnelOutOfSync
-                      ? msg(
+                      ? t(
                           "R3 Connect is out of sync. This environment is linked only to publish agent activity, so other devices cannot connect. Turn R3 Connect on to repair it.",
                         )
-                      : msg(
+                      : t(
                           "Make this environment available to your other devices through R3 Connect.",
                         )
           }
@@ -731,8 +729,8 @@ function ConfiguredCloudLinkRow({
           title={m(searchableSetting("publish-agent-activity").title)}
           description={
             signedOut
-              ? msg("Sign in to send activity to mobile notifications and Live Activities.")
-              : msg("Send activity to mobile notifications and Live Activities without R3 Connect.")
+              ? t("Sign in to send activity to mobile notifications and Live Activities.")
+              : t("Send activity to mobile notifications and Live Activities without R3 Connect.")
           }
           managed={connectDenial}
           control={

@@ -15,7 +15,7 @@ import {
   type SourceControlHostCredentials,
 } from "@t3tools/client-runtime/source-control-clients";
 import { redactedPlaceholder } from "./RedactedSensitiveText";
-import { Var, T } from "gt-react";
+import { Var, T, t } from "gt-react";
 
 /** Sentinel select value for "follow the CLI's active login"; logins never contain spaces. */
 const ACTIVE_ACCOUNT = "active cli account";
@@ -32,7 +32,7 @@ function RedactedLogin(props: {
       <span className="select-none blur-xs" aria-hidden>
         {redactedPlaceholder(props.account)}
       </span>
-      <span className="sr-only">{props.label ?? "Hidden account"}</span>
+      <span className="sr-only">{props.label ?? t("Hidden account")}</span>
     </span>
   );
 }
@@ -212,7 +212,7 @@ export function SourceControlAccountSettings({
                           <RedactedLogin
                             revealed={revealed}
                             account={account}
-                            label={`Account ${index + 1}`}
+                            label={t`Account ${index + 1}`}
                           />
                         </SelectItem>
                       ))}

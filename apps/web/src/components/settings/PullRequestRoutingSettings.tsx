@@ -15,12 +15,27 @@ import { toastManager } from "../ui/toast";
 import { EnvironmentRow, EnvironmentTransportLabel } from "./EnvironmentRow";
 import { FoldedSettingsSection } from "./FoldedSettingsSection";
 import { searchableSetting } from "./settingsSearch";
-import { T } from "gt-react";
+import { T, t } from "gt-react";
 
 const options: ReadonlyArray<{ value: PullRequestRoutingPermission; label: string }> = [
-  { value: "off", label: "Off" },
-  { value: "read", label: "Read PRs" },
-  { value: "read-write", label: "Read and act" },
+  {
+    value: "off",
+    get label() {
+      return t("Off");
+    },
+  },
+  {
+    value: "read",
+    get label() {
+      return t("Read PRs");
+    },
+  },
+  {
+    value: "read-write",
+    get label() {
+      return t("Read and act");
+    },
+  },
 ];
 
 const summaryLabels = { "read-write": "read and act", read: "read PRs" } as const;
@@ -97,7 +112,7 @@ export function PullRequestRoutingSettings({
                   if (result._tag === "Failure")
                     toastManager.add({
                       type: "error",
-                      title: "Could not save pull request routing permission",
+                      title: t("Could not save pull request routing permission"),
                     });
                 },
               );

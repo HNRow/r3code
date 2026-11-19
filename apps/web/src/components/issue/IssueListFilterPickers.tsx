@@ -25,7 +25,7 @@ import {
   type PullRequestFilterOption,
 } from "../pullRequest/PullRequestListFilters";
 import { pullRequestLabelColor } from "../pullRequest/pullRequestList.logic";
-import { T, useGT } from "gt-react";
+import { T, useGT, t } from "gt-react";
 
 const VISIBLE_CHOICES = 30;
 const matches = (needle: string, ...fields: ReadonlyArray<string | null | undefined>) =>
@@ -90,7 +90,7 @@ export function IssueFiltersMenu(props: {
             </span>
             <span className="min-w-0 max-w-32 truncate text-xs text-muted-foreground">
               {props.labels.length === 0
-                ? "Any"
+                ? t("Any")
                 : props.labels.length === 1
                   ? props.labels[0]
                   : `${props.labels.length} labels`}
@@ -107,7 +107,7 @@ export function IssueFiltersMenu(props: {
               <T>Assignee</T>
             </span>
             <span className="min-w-0 max-w-32 truncate text-xs text-muted-foreground">
-              {props.assignee ?? "Anyone"}
+              {props.assignee ?? t("Anyone")}
             </span>
           </MenuSubTrigger>
           <MenuSubPopup>
@@ -148,7 +148,7 @@ function LabelChoices(props: {
       />
       {visible.length === 0 && !known.isPending ? (
         <MenuItem disabled>
-          {known.error === null ? "No labels found" : "The labels could not be read"}
+          {known.error === null ? t("No labels found") : t("The labels could not be read")}
         </MenuItem>
       ) : null}
       {visible.map((label) => {

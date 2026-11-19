@@ -18,6 +18,7 @@ import { useConnectionController } from "../connection/useConnectionController";
 import { optOutOfConnectOnboarding } from "./connectOnboardingOptOut";
 import { hasCloudPublicConfig } from "./publicConfig";
 import { useGT, T } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 // Only reachable with cloud config: onboarding is requested after a R3 Connect
 // sign-in, and appLinking drops the deep link otherwise.
@@ -53,7 +54,7 @@ function ConfiguredConnectOnboardingRouteScreen() {
     void (async () => {
       if (userId) {
         const result = await settlePromise(() => optOutOfConnectOnboarding(userId));
-        reportAtomCommandResult(result, { label: "connect onboarding opt-out" });
+        reportAtomCommandResult(result, { label: t("connect onboarding opt-out") });
       }
       navigation.goBack();
     })();
@@ -65,7 +66,7 @@ function ConfiguredConnectOnboardingRouteScreen() {
         title={gt("Set up R3 Connect")}
         onClose={handleClose}
         refresh={{
-          accessibilityLabel: "Refresh environments",
+          accessibilityLabel: t("Refresh environments"),
           disabled: isRefreshing,
           onPress: handleRefresh,
         }}

@@ -9,6 +9,7 @@ import { KeyboardController, useKeyboardState } from "react-native-keyboard-cont
 import { isDuoDevice } from "../lib/device-type";
 import { useMobileNavigationTheme } from "../lib/useMobileNavigationTheme";
 import { useDeviceType, useNativeLayoutMetrics } from "./native-layout-metrics";
+import { useMessages } from "gt-react-native";
 import { HeaderItemsWidthContext } from "./header-items-width";
 import {
   SearchBar,
@@ -22,6 +23,7 @@ import {
   type HeaderBarButtonItemWithMenu,
   type HeaderBarButtonSearchBarPlacementItem,
 } from "react-native-screens";
+import { t } from "../i18n/gt";
 
 // UIKit's bar margins, and the width of a glass bar button.
 const BAR_MARGINS = 32;
@@ -160,6 +162,7 @@ export function V5StackHeader(props: {
   readonly searchIdentifier?: string;
 }) {
   const { options } = props;
+  const m = useMessages();
   const theme = useMobileNavigationTheme();
   const nativeMetrics = useNativeLayoutMetrics();
   const deviceType = useDeviceType();
@@ -246,7 +249,7 @@ export function V5StackHeader(props: {
     const compose: HeaderItem = {
       type: "item",
       id: "workspace-compose",
-      title: "New task",
+      title: t("New task"),
       icon: { type: "sfSymbol", name: "square.and.pencil" },
       onPress: props.onCompose,
     };
@@ -267,7 +270,7 @@ export function V5StackHeader(props: {
       {
         type: "item",
         id: "dismiss-keyboard",
-        title: "Dismiss keyboard",
+        title: t("Dismiss keyboard"),
         icon: { type: "sfSymbol", name: "keyboard.chevron.compact.down" },
         onPress: () => void KeyboardController.dismiss(),
         // The folded bar is short; keep this out of the overflow menu.
@@ -335,8 +338,8 @@ export function V5StackHeader(props: {
       <Stack.HeaderConfig
         hidden={options.headerShown === false}
         transparent={options.headerTransparent}
-        title={title}
-        subtitle={options.unstable_headerSubtitle ?? options.headerSubtitle}
+        title={m(title)}
+        subtitle={m(options.unstable_headerSubtitle ?? options.headerSubtitle ?? "")}
         backButtonHidden={options.headerBackVisible === false}
         ios={{
           navigationItemStyle: options.unstable_navigationItemStyle,

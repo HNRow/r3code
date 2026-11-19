@@ -18,7 +18,7 @@ import {
 } from "./ConnectionsSettings.logic";
 import { ITEM_ROW_CLASSNAME, ITEM_ROW_INNER_CLASSNAME } from "./itemRows";
 import { SettingsSection } from "./settingsLayout";
-import { useGT, Var, T } from "gt-react";
+import { useGT, Var, T, t } from "gt-react";
 
 function reportFailure(title: string, result: Parameters<typeof isAtomCommandInterrupted>[0]) {
   if (result._tag !== "Failure" || isAtomCommandInterrupted(result)) return;
@@ -111,7 +111,7 @@ export function ConnectDeviceApprovalSettings({
                     )
                   }
                 >
-                  {busy ? "Saving…" : "Approve"}
+                  {busy ? t("Saving…") : t("Approve")}
                 </Button>
               </div>
             </div>
@@ -157,7 +157,7 @@ export function ConnectDeviceApprovalSettings({
                     )
                   }
                 >
-                  {busy ? "Revoking…" : "Revoke"}
+                  {busy ? t("Revoking…") : t("Revoke")}
                 </Button>
               </div>
             </div>

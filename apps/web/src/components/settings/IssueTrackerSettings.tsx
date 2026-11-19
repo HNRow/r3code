@@ -25,7 +25,7 @@ import { Skeleton } from "../ui/skeleton";
 import { SecretInput } from "./SecretInput";
 import { SettingsRow, SettingsSection } from "./settingsLayout";
 import { searchableSetting } from "./settingsSearch";
-import { useGT, T, Var } from "gt-react";
+import { useGT, T, Var, t } from "gt-react";
 
 type TrackerIcon = ElementType<{ className?: string }>;
 
@@ -272,7 +272,7 @@ function ProjectBindings({
     <>
       <SettingsRow
         title={gt("Projects")}
-        description={`Pick the ${tracker.displayName} ${tracker.scopeNoun} whose issues each project lists beside its repository's own.`}
+        description={t`Pick the ${tracker.displayName} ${tracker.scopeNoun} whose issues each project lists beside its repository's own.`}
       />
       {projects.map((project) => {
         const bound = bindings[project.id];
@@ -297,7 +297,7 @@ function ProjectBindings({
                 >
                   <SelectValue>
                     {value === UNBOUND
-                      ? "Not bound"
+                      ? t("Not bound")
                       : (tracker.scopes.find((scope) => scope.key === value)?.name ?? value)}
                   </SelectValue>
                 </SelectTrigger>

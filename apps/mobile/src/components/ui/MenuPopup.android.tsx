@@ -14,6 +14,8 @@ import { resolveScaledTextRole } from "../../lib/appearancePreferences";
 
 import { useAndroidControlSizing } from "./useAndroidControlSizing";
 import { useAppearancePreferences } from "../../features/settings/appearance/AppearancePreferencesProvider";
+import { translateMenuActions } from "../../lib/menu-action-translation";
+import { useMessages } from "gt-react-native";
 import type { MenuPopupProps } from "./MenuPopup";
 import { isAppSymbolName, SymbolView, type AppSymbolName } from "./AppSymbol.android";
 
@@ -58,6 +60,7 @@ function MenuIcon(props: {
 export function MenuPopupItems(
   props: Pick<MenuPopupProps, "menuWidth" | "actions" | "title" | "parent" | "onPress" | "onBack">,
 ) {
+  const m = useMessages();
   const { appearance, themeVariables: colors } = useAppearancePreferences();
   const { scale, menuItemHeight } = useAndroidControlSizing();
   const body = resolveScaledTextRole("body", appearance.baseFontSize);
@@ -75,7 +78,7 @@ export function MenuPopupItems(
           </DropdownMenuItem.LeadingIcon>
           <DropdownMenuItem.Text>
             <Text color={foreground} style={{ typography: "bodyLarge", ...body }}>
-              {props.parent.title}
+              {m(props.parent.title)}
             </Text>
           </DropdownMenuItem.Text>
         </DropdownMenuItem>
@@ -85,10 +88,10 @@ export function MenuPopupItems(
           style={{ typography: "bodySmall", ...caption }}
           modifiers={[padding(16 * scale, 8 * scale, 16 * scale, 8 * scale)]}
         >
-          {props.title}
+          {m(props.title)}
         </Text>
       ) : null}
-      {props.actions.map((action, index) => (
+      {translateMenuActions(props.actions, m).map((action, index) => (
         <DropdownMenuItem
           key={action.id ?? `${index}-${action.title}`}
           enabled={!action.attributes?.disabled}

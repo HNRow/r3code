@@ -52,12 +52,19 @@ import { issueViewMatches } from "./issueSavedViews";
 import { SavedViewsMenu } from "../layout/workspace/SavedViewsMenu";
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
 import { useGT } from "gt-react-native";
+import { t } from "../../i18n/gt";
 
 const DEFAULT_ISSUE_LIST_INPUT = { state: "open", involvement: "all", limit: 50 } as const;
 const STATES = {
-  open: "Open",
-  closed: "Closed",
-  all: "All states",
+  get open() {
+    return t("Open");
+  },
+  get closed() {
+    return t("Closed");
+  },
+  get all() {
+    return t("All states");
+  },
 } as const satisfies Record<IssueListState, string>;
 const INVOLVEMENT = {
   all: "Everyone",
@@ -234,10 +241,10 @@ export function IssuesScreen(
     Platform.OS === "android"
       ? {
           actions: [
-            { id: "state", title: "State", subactions: choices(STATES, state, "state") },
+            { id: "state", title: t("State"), subactions: choices(STATES, state, "state") },
             {
               id: "involvement",
-              title: "Involvement",
+              title: t("Involvement"),
               subactions: choices(INVOLVEMENT, involvement, "involvement"),
             },
             {
@@ -249,8 +256,8 @@ export function IssuesScreen(
               title:
                 assignee === null ? "Assignee…" : `Assignee: ${assignee.name ?? assignee.login}…`,
             },
-            { id: "sort", title: "Sort", subactions: choices(SORTS, sort, "sort") },
-            { id: "reset", title: "Reset filters", attributes: { disabled: !customized } },
+            { id: "sort", title: t("Sort"), subactions: choices(SORTS, sort, "sort") },
+            { id: "reset", title: t("Reset filters"), attributes: { disabled: !customized } },
           ],
           onSelect: (id) => {
             const [field, value] = id.split(":");
@@ -471,13 +478,13 @@ export function IssuesScreen(
                     ? "Couldn't load issues"
                     : connected.length > 0
                       ? query
-                        ? "No results"
+                        ? t("No results")
                         : "No matching issues"
                       : capable.length > 0
-                        ? "Environment offline"
+                        ? t("Environment offline")
                         : environments.length > 0
                           ? "Issues unavailable"
-                          : "Connect an environment"
+                          : t("Connect an environment")
                 }
                 detail={
                   list.error ??

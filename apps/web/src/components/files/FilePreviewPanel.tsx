@@ -137,7 +137,7 @@ import {
   setProjectFileQueryData,
   useProjectFileQuery,
 } from "./projectFilesQueryState";
-import { T, useGT, Var } from "gt-react";
+import { T, useGT, Var, t } from "gt-react";
 
 const NO_FILE_REVISION_ATOM = Atom.make(null);
 
@@ -1444,7 +1444,7 @@ export default function FilePreviewPanel({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Unable to open file in browser",
+          title: t("Unable to open file in browser"),
           description: error instanceof Error ? error.message : "An error occurred.",
         }),
       );
@@ -1464,7 +1464,7 @@ export default function FilePreviewPanel({
     }
     return (
       <div className="p-4 text-sm text-muted-foreground">
-        {fileAccess.error ?? "This connection cannot read host files."}
+        {fileAccess.error ?? t("This connection cannot read host files.")}
       </div>
     );
   }
@@ -1841,7 +1841,7 @@ export function WorkspaceLargeTextPreview(props: {
   const showError = (cause: unknown) => {
     toastManager.add({
       type: "error",
-      title: "Could not read file",
+      title: t("Could not read file"),
       description: cause instanceof Error ? cause.message : "Try again.",
     });
   };

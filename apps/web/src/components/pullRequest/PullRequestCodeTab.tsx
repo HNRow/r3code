@@ -152,7 +152,7 @@ import {
   usePullRequestReviewStore,
   type PendingReviewComment,
 } from "./pullRequestReviewStore";
-import { T, Var, useGT } from "gt-react";
+import { T, Var, useGT, t } from "gt-react";
 
 interface ReviewAnnotationGroup {
   readonly threads: ReadonlyArray<PullRequestReviewThread>;
@@ -1107,7 +1107,7 @@ function PullRequestCodeTab({
             </Button>
           </>
         ) : diffQuery.isPending ? (
-          "Loading more files..."
+          t("Loading more files...")
         ) : null}
       </div>
     );
@@ -1236,7 +1236,7 @@ function PullRequestCodeTab({
         if (result._tag === "Failure") {
           toastManager.add({
             type: "error",
-            title: "More comments could not be loaded",
+            title: t("More comments could not be loaded"),
           });
           return null;
         }
@@ -1322,7 +1322,7 @@ function PullRequestCodeTab({
           {...(canCommentOnLines && onAddToAgentSelection
             ? {
                 secondaryAction: {
-                  label: "Add to agent",
+                  label: t("Add to agent"),
                   onAction: (text: string) =>
                     finishSelection(draft, text, (comment) =>
                       onAddToAgentSelection({ comment, request: text }),
@@ -1592,7 +1592,7 @@ function PullRequestCodeTab({
               <PilcrowIcon className="size-3.5" />
             </TooltipTrigger>
             <TooltipPopup side="top">
-              {ignoreWhitespace ? "Show whitespace changes" : "Hide whitespace changes"}
+              {ignoreWhitespace ? t("Show whitespace changes") : t("Hide whitespace changes")}
             </TooltipPopup>
           </Tooltip>
           <ToggleGroup
@@ -1631,7 +1631,7 @@ function PullRequestCodeTab({
               <TextWrapIcon className="size-3.5" />
             </TooltipTrigger>
             <TooltipPopup side="top">
-              {wordWrap ? "Disable line wrapping" : "Enable line wrapping"}
+              {wordWrap ? t("Disable line wrapping") : t("Enable line wrapping")}
             </TooltipPopup>
           </Tooltip>
         </div>
@@ -1655,7 +1655,7 @@ function PullRequestCodeTab({
               )}
             </TooltipTrigger>
             <TooltipPopup side="top">
-              {allFilesCollapsed ? "Expand all files" : "Collapse all files"}
+              {allFilesCollapsed ? t("Expand all files") : t("Collapse all files")}
             </TooltipPopup>
           </Tooltip>
         ) : null}
@@ -1675,7 +1675,7 @@ function PullRequestCodeTab({
               <FlaskConicalOffIcon className="size-3.5" />
             </TooltipTrigger>
             <TooltipPopup side="top">
-              {hideTestFiles ? "Show test files" : "Hide test files"}
+              {hideTestFiles ? t("Show test files") : t("Hide test files")}
             </TooltipPopup>
           </Tooltip>
         ) : null}
@@ -1695,7 +1695,7 @@ function PullRequestCodeTab({
               <FolderTreeIcon className="size-3.5" />
             </TooltipTrigger>
             <TooltipPopup side="top">
-              {fileTreeOpen ? "Hide file tree" : "Show file tree"}
+              {fileTreeOpen ? t("Hide file tree") : t("Show file tree")}
             </TooltipPopup>
           </Tooltip>
         ) : null}
@@ -1782,7 +1782,7 @@ function PullRequestCodeTab({
 
   const term = sourceControlClients.get(detail.provider).changeRequest.singular;
   if (diffQuery.isPending && loadedSlices.length === 0) {
-    return withToolbar(<DiffPanelLoadingState label={`Loading ${term} diff...`} />);
+    return withToolbar(<DiffPanelLoadingState label={t`Loading ${term} diff...`} />);
   }
 
   if (diffQuery.error && loadedSlices.length === 0) {
@@ -1803,7 +1803,9 @@ function PullRequestCodeTab({
   if (items.length === 0 && nextCursor === null) {
     return withToolbar(
       <p className="px-4 py-5 text-sm text-muted-foreground">
-        {commit === null ? `This ${term} has no file changes.` : "This commit has no file changes."}
+        {commit === null
+          ? `This ${term} has no file changes.`
+          : t("This commit has no file changes.")}
       </p>,
     );
   }
@@ -1826,8 +1828,8 @@ function PullRequestCodeTab({
               <CollapsibleTrigger className="flex w-full items-center gap-1.5 px-4 py-2 text-left text-xs text-muted-foreground">
                 <span>
                   {nextCursor === null
-                    ? "Conversations not on the current diff"
-                    : "Conversations not on the diff loaded so far"}
+                    ? t("Conversations not on the current diff")
+                    : t("Conversations not on the diff loaded so far")}
                 </span>
                 <ChevronRightIcon
                   aria-hidden
@@ -1838,7 +1840,7 @@ function PullRequestCodeTab({
                 </span>
                 <span className="sr-only">
                   {orphanThreads.length === 1
-                    ? "1 conversation"
+                    ? t("1 conversation")
                     : `${orphanThreads.length} conversations`}
                 </span>
               </CollapsibleTrigger>
@@ -1947,10 +1949,10 @@ function PullRequestCodeTab({
                       onClick={diffQuery.error !== null ? () => diffQuery.refresh() : loadNextSlice}
                     >
                       {diffQuery.error !== null
-                        ? "Retry"
+                        ? t("Retry")
                         : diffQuery.isPending
-                          ? "Loading more files..."
-                          : "Load more files"}
+                          ? t("Loading more files...")
+                          : t("Load more files")}
                     </Button>
                   </div>
                 )
@@ -1978,10 +1980,10 @@ function WithheldFileNotice({
       <TriangleAlertIcon aria-hidden className="size-3.5 shrink-0 text-warning" />
       <span>
         {status === "error"
-          ? "Couldn't load this diff."
+          ? t("Couldn't load this diff.")
           : status === "empty"
-            ? "No text diff for this file."
-            : "Diff too large to display."}
+            ? t("No text diff for this file.")
+            : t("Diff too large to display.")}
       </span>
       {onLoad === undefined || status === "empty" ? null : (
         <Button
@@ -1990,7 +1992,11 @@ function WithheldFileNotice({
           disabled={status === "loading"}
           onClick={() => onLoad(path)}
         >
-          {status === "loading" ? "Loading..." : status === "error" ? "Retry" : "Load diff"}
+          {status === "loading"
+            ? t("Loading...")
+            : status === "error"
+              ? t("Retry")
+              : t("Load diff")}
         </Button>
       )}
     </div>

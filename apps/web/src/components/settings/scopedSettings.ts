@@ -27,6 +27,7 @@ import * as Cause from "effect/Cause";
 import { Atom } from "effect/reactivity";
 
 import type { ResolvedSettingsScope } from "./settingsScope";
+import { t } from "gt-react";
 
 export type ScopedSettingsPatch = ServerSettingsPatch & ClientSettingsPatch;
 
@@ -660,7 +661,7 @@ async function persistScopedSettingsPlan(
       return [
         {
           ...environment,
-          message: "This environment does not support this setting. Update R3 Code on it.",
+          message: t("This environment does not support this setting. Update R3 Code on it."),
         },
       ];
     }
