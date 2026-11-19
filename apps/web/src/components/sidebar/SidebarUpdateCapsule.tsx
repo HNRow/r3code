@@ -1,6 +1,8 @@
 import { useAtomValue } from "@effect/atom-react";
+import { msg, T, useGT, useMessages } from "gt-react";
 import { type ReactNode, useSyncExternalStore } from "react";
 
+import type { MessageResolver } from "~/i18n/messages";
 import { cn } from "~/lib/utils";
 import { environmentIdsKey } from "~/state/environmentAtomList";
 import { environmentUpdateStatesAtom } from "~/state/server";
@@ -21,7 +23,6 @@ import {
   postponeUpdateRestart,
   retryFailedUpdateRunServers,
 } from "./updateEverythingRun";
-import { T, useMessages } from "gt-react";
 
 function useNow(intervalMs: number | null): number {
   const step = intervalMs ?? 60_000;
@@ -45,29 +46,26 @@ function useUpdateRunMachineViews(run: UpdateEverythingRun): ReadonlyArray<Updat
   }));
 }
 
-function restartSecondsLeft(run: UpdateEverythingRun, now: number): number | null {
-  return run.phase === "countdown" && run.restartAt !== null
-    ? Math.max(0, Math.ceil((run.restartAt - now) / 1000))
-    : null;
-}
-
-type MessageResolver = ReturnType<typeof useMessages>;
-
 function localStatusLabel(
   run: UpdateEverythingRun,
   local: UpdateRunLocalState,
   now: number,
   resolve: MessageResolver,
 ) {
-  const seconds = restartSecondsLeft(run, now);
-  if (seconds !== null) return resolve("restarts in {seconds}s", { seconds });
-  if (run.phase === "installing") return resolve("restarting");
+  if (run.phase === "countdown" && run.restartAt !== null) {
+    return resolve(
+      msg("restarts in {seconds}s", {
+        seconds: Math.max(0, Math.ceil((run.restartAt - now) / 1000)),
+      }),
+    );
+  }
+  if (run.phase === "installing") return resolve(msg("restarting"));
   if (local?.status === "downloading") {
     return local.percent === null
-      ? resolve("downloading")
-      : resolve("downloading {percent}%", { percent: Math.floor(local.percent) });
+      ? resolve(msg("downloading"))
+      : resolve(msg("downloading {percent}%", { percent: Math.floor(local.percent) }));
   }
-  return resolve("restarts after the servers");
+  return resolve(msg("restarts after the servers"));
 }
 
 export function SidebarUpdateCapsule({
@@ -81,20 +79,24 @@ export function SidebarUpdateCapsule({
   readonly icon: ReactNode;
   readonly onRestart?: () => Promise<void>;
 }) {
-  const m = useMessages();
   const machines = useUpdateRunMachineViews(run);
   const hasActiveMachine = machines.some(
     ({ status }) => status !== "done" && status !== "failed" && status !== "waiting",
   );
   const now = useNow(run.phase === "countdown" ? 1_000 : hasActiveMachine ? 30_000 : null);
-  const view = describeUpdateCapsule(run, machines, local, now);
+  const gt = useGT();
+  const m = useMessages();
+  const view = describeUpdateCapsule(run, machines, local, now, m);
   const updateServer = useServerUpdate();
   const failed = machines.some(({ status }) => status === "failed");
   const settled = !hasActiveMachine && run.localVersion === null;
-  const restartSeconds = restartSecondsLeft(run, now);
+  const restartSeconds =
+    run.phase === "countdown" && run.restartAt !== null
+      ? Math.max(0, Math.ceil((run.restartAt - now) / 1000))
+      : null;
 
   const actionLabel =
-    view.action === "later" ? m("Later") : view.action === "retry" ? m("Retry") : m("Dismiss");
+    view.action === "later" ? gt("Later") : view.action === "retry" ? gt("Retry") : gt("Dismiss");
   const runAction = () => {
     if (view.action === "later") postponeUpdateRestart();
     else if (view.action === "retry") retryFailedUpdateRunServers(updateServer);
@@ -144,7 +146,7 @@ export function SidebarUpdateCapsule({
               "rounded-full text-xs font-medium tabular-nums ring-1 ring-current/22 ring-inset",
           )}
         >
-          {restartSeconds !== null ? m("{seconds}s", { seconds: restartSeconds }) : icon}
+          {restartSeconds !== null ? `${restartSeconds}s` : icon}
         </span>
       </div>
       <PopoverPopup side="top" align="end" padding="compact" width="sm">
@@ -178,9 +180,9 @@ export function SidebarUpdateCapsule({
                     status === "failed" ? "text-destructive" : "text-muted-foreground",
                   )}
                 >
-                  {RUN_STATUS_LABELS[status]}
+                  {m(RUN_STATUS_LABELS[status])}
                   {status !== "done" && status !== "failed" && status !== "waiting"
-                    ? ` ${formatUpdateElapsed(now - machine.startedAt)}`
+                    ? ` ${formatUpdateElapsed(now - machine.startedAt, m)}`
                     : ""}
                 </span>
               </div>
