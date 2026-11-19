@@ -26,3 +26,13 @@ export function errorDisplayMessage(
     ? error.message
     : null;
 }
+
+/** A thrown `Error`'s text in the active language, its `message`, and null otherwise. */
+export function thrownErrorMessage(
+  error: unknown,
+  resolve: MFunctionType = mFallback,
+): string | null {
+  if (!(error instanceof Error)) return null;
+  const text = errorI18nMessage(error);
+  return text === undefined ? error.message : resolveMarkedText(text, resolve);
+}
