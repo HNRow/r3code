@@ -1,4 +1,4 @@
-import { useAtomSet, useAtomValue } from "@effect/atom-react";
+import { useAtomValue } from "@effect/atom-react";
 import {
   type SavedViewIdentity as SavedViewIdentitySchema,
   savedViewNameError,
@@ -11,7 +11,8 @@ import { prompt as showTextInputDialog } from "../../../components/ui/Dialog";
 import type { MenuProps } from "../../../components/ui/Menu.types";
 import { uuidv4 } from "../../../lib/uuid";
 import type { Preferences } from "../../../persistence/mobile-preferences";
-import { mobilePreferencesAtom, updateMobilePreferencesAtom } from "../../../state/preferences";
+import { mobilePreferencesAtom, saveMobilePreferences } from "../../../state/preferences";
+import { useAtomCommand } from "../../../state/use-atom-command";
 import { ListFilterMenu } from "./ListFilterMenu";
 
 import { t } from "../../../i18n/gt";
@@ -41,7 +42,7 @@ export function SavedViewsMenu<Scope extends object>({
 }) {
   type View = Scope & SavedViewIdentity;
   const preferences = useAtomValue(mobilePreferencesAtom);
-  const savePreferences = useAtomSet(updateMobilePreferencesAtom, { mode: "promise" });
+  const savePreferences = useAtomCommand(saveMobilePreferences, { reportFailure: false });
   const ready = AsyncResult.isSuccess(preferences) && !preferences.waiting;
   const views: ReadonlyArray<View> = AsyncResult.isSuccess(preferences)
     ? (read(preferences.value) ?? EMPTY_SAVED_VIEWS)
@@ -70,17 +71,17 @@ export function SavedViewsMenu<Scope extends object>({
 
   async function persist(transform: (current: ReadonlyArray<View>) => ReadonlyArray<View>) {
     setBusy(true);
-    let saved = true;
-    try {
-      await savePreferences({
-        transform: (current) => write(transform(read(current) ?? EMPTY_SAVED_VIEWS)),
-      });
-    } catch {
+    const saved =
+      (
+        await savePreferences({
+          transform: (current) => write(transform(read(current) ?? EMPTY_SAVED_VIEWS)),
+        })
+      )._tag === "Success";
+    if (!saved) {
       Alert.alert(
         t`Could not save ${shortNoun} views`,
         t("The device could not save your views. Try again."),
       );
-      saved = false;
     }
     setBusy(false);
     return saved;

@@ -1,48 +1,29 @@
-import { useAtomSet, useAtomValue } from "@effect/atom-react";
+import { msg, T, useGT, useMessages } from "gt-react-native";
+import { useAtomValue } from "@effect/atom-react";
 import type { ToolCallVisibility } from "@t3tools/contracts/settings";
 import { AsyncResult } from "effect/reactivity";
 import { View } from "react-native";
 
 import { AppText as Text } from "../../../../components/ui/AppText";
 import { ListChoiceRow } from "../../../../components/ui/ListChoiceRow";
-import { mobilePreferencesAtom, updateMobilePreferencesAtom } from "../../../../state/preferences";
+import { mobilePreferencesAtom, saveMobilePreferences } from "../../../../state/preferences";
+import { useAtomCommand } from "../../../../state/use-atom-command";
 import { SettingsSection } from "../../components/SettingsSection";
-import { useGT, T } from "gt-react-native";
-import { t } from "../../../../i18n/gt";
 
 const TOOL_CALL_VISIBILITY_OPTIONS: ReadonlyArray<{
   readonly value: ToolCallVisibility;
   readonly label: string;
 }> = [
-  {
-    value: "showAll",
-    get label() {
-      return t("Show all");
-    },
-  },
-  {
-    value: "hideSuccessful",
-    get label() {
-      return t("Hide successful");
-    },
-  },
-  {
-    value: "hideAll",
-    get label() {
-      return t("Hide all");
-    },
-  },
-  {
-    value: "zen",
-    get label() {
-      return t("Zen");
-    },
-  },
+  { value: "showAll", label: msg("Show all") },
+  { value: "hideSuccessful", label: msg("Hide successful") },
+  { value: "hideAll", label: msg("Hide all") },
+  { value: "zen", label: msg("Zen", { $context: "tool call visibility: only final answers" }) },
 ];
 
 export function ToolCallsAppearanceSection() {
   const gt = useGT();
-  const savePreferences = useAtomSet(updateMobilePreferencesAtom);
+  const m = useMessages();
+  const savePreferences = useAtomCommand(saveMobilePreferences);
   const preferences = useAtomValue(mobilePreferencesAtom);
   const selected = AsyncResult.isSuccess(preferences)
     ? (preferences.value.toolCallVisibility ?? "showAll")
@@ -54,11 +35,13 @@ export function ToolCallsAppearanceSection() {
         {TOOL_CALL_VISIBILITY_OPTIONS.map((option, index) => (
           <ListChoiceRow
             key={option.value}
-            label={option.label}
+            label={m(option.label)}
             selected={selected === option.value}
             separated={index > 0}
             disabled={selected === null}
-            onPress={() => savePreferences({ toolCallVisibility: option.value })}
+            onPress={() => {
+              void savePreferences({ toolCallVisibility: option.value });
+            }}
           />
         ))}
       </SettingsSection>
