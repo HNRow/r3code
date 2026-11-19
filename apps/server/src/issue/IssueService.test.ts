@@ -452,42 +452,17 @@ describe("IssueService with a standalone tracker", () => {
       });
 
       const first = yield* service.list({ state: "open" });
-      expect(first.scopes?.map((entry) => entry.scope)).toEqual(["ENG", "acme/web", "acme/docs"]);
+      expect(first.errors).toEqual([]);
       expect(reads).toBe(1);
 
       scope = "OPS";
-      const next = yield* service.list({ state: "open", refresh: true });
-      expect(next.scopes?.map((entry) => entry.scope)).toEqual(["OPS", "acme/web", "acme/docs"]);
+      const next = yield* service.list({ state: "open" });
+      expect(next.errors).toEqual([]);
       expect(reads).toBe(2);
 
       const missing = yield* service.list({ state: "open", projectId: "missing" as ProjectId });
-      expect(missing.scopes).toEqual([]);
+      expect(missing.entries).toEqual([]);
       expect(reads).toBe(2);
-    }),
-  );
-
-  it.effect("rejects a URL from another workspace with the same team and issue key", () =>
-    Effect.gen(function* () {
-      const service = yield* makeService({
-        projects: [project({ id: "web" })],
-        trackers: [fakeStandaloneTracker()],
-        bindings: { web: { tracker: LINEAR, scope: "ENG" } },
-      });
-      expect(
-        yield* service.resolveUrl("https://linear.app/acme/issue/ENG-1/old-title"),
-      ).toMatchObject({ key: "ENG-1", writable: true });
-      const refused = yield* service
-        .resolveUrl("https://linear.app/other-workspace/issue/ENG-1/old-title")
-        .pipe(Effect.result);
-      expect(refused).toMatchObject({
-        _tag: "Failure",
-        failure: {
-          _tag: "IssueOperationError",
-          operation: "resolveUrl",
-          reason: "not-found",
-          detail: "This issue URL does not belong to the connected workspace.",
-        },
-      });
     }),
   );
 

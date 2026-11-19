@@ -7138,9 +7138,11 @@ it.layer(layerTest)("GitVcsDriver core integration", (it) => {
           const folder = pathService.basename(created.worktree.path);
           assert.isAtMost(Buffer.byteLength(folder), 40);
           assert.equal(yield* git(created.worktree.path, ["branch", "--show-current"]), branch);
+          // git prints the canonical worktree path; macOS temp dirs come back as /private/var.
+          const listedPath = yield* (yield* FileSystem.FileSystem).realPath(created.worktree.path);
           assert.include(
             yield* git(cwd, ["-c", "core.quotePath=false", "worktree", "list", "--porcelain"]),
-            `worktree ${created.worktree.path}`,
+            `worktree ${listedPath}`,
           );
           folders.add(folder);
         }
