@@ -10,7 +10,7 @@ import {
   devinAnswerablePermissionOptions,
 } from "./devinAcp.ts";
 import { extractDroidElicitationForm } from "./droidAcp.ts";
-import { isKimiAcpSettings, makeKimiPromptOutcomeWatch } from "./kimiAcp.ts";
+import { makeKimiPromptOutcomeWatch } from "./kimiAcp.ts";
 import { extractOmpElicitationForm } from "./ompAcp.ts";
 import { extractOpenCodeElicitationForm } from "./opencodeAcp.ts";
 import {
@@ -182,6 +182,10 @@ function makeAcpRegistryRuntime(
     });
 }
 
+const isHermes = (
+  initializeResult: AcpSessionRuntime.AcpSessionRuntimeStartResult["initializeResult"],
+) => initializeResult.agentInfo?.name === "hermes-agent";
+
 export const makeAcpRegistryAdapterV2 = Effect.fn("makeAcpRegistryAdapterV2")(function* (
   options: AcpRegistryAdapterV2Options,
 ) {
@@ -208,11 +212,10 @@ export const makeAcpRegistryAdapterV2 = Effect.fn("makeAcpRegistryAdapterV2")(fu
     registryAgentId === "github-copilot-cli" ||
     (options.settings.source === "local" &&
       /^copilot(\.exe|\.cmd)?$/i.test(options.settings.commandPath.split(/[\\/]/).pop() ?? ""));
-  const isKimi = isKimiAcpSettings(options.settings);
-  // Hermes Agent is not in the public registry; local installs run `hermes acp`.
-  const isHermes =
-    options.settings.source === "local" &&
-    /^hermes(\.exe|\.cmd)?$/i.test(options.settings.commandPath.split(/[\/]/).pop() ?? "");
+  const isKimi =
+    registryAgentId === "kimi-code" ||
+    (options.settings.source === "local" &&
+      /^kimi(\.exe|\.cmd)?$/i.test(options.settings.commandPath.split(/[\\/]/).pop() ?? ""));
   const isClaude =
     registryAgentId === "claude-acp" ||
     (options.settings.source === "local" &&
@@ -235,7 +238,7 @@ export const makeAcpRegistryAdapterV2 = Effect.fn("makeAcpRegistryAdapterV2")(fu
   const copilotRouting = isCopilot ? makeCopilotSubagentRouting() : undefined;
   // Copilot CLI 1.0.105 rejects stdio MCP servers from the client, and Command Code cannot
   // start the stdio bridge on Windows (it spawns MCP commands through cmd.exe, which splits
-  // the unquoted "R3 Code (Beta).exe" path). Both take T3's MCP endpoint over ACP HTTP.
+  // the unquoted "T3 Code (Beta).exe" path). Both take T3's MCP endpoint over ACP HTTP.
   const useHttpMcpServers =
     copilotRouting !== undefined || prefersHttpMcpTransport(options.settings);
   const flavor: AcpAdapterV2Flavor = {
@@ -286,9 +289,10 @@ export const makeAcpRegistryAdapterV2 = Effect.fn("makeAcpRegistryAdapterV2")(fu
       : {}),
     // Hermes replies on the root session when a background process it started exits; no
     // prompt response follows, so the continuation ends on the deferred-finalize debounce.
-    ...(isHermes
-      ? { enablePostSettleContinuation: true, deferFinalizeForBackgroundWork: true }
-      : {}),
+    // Hermes is not in the public registry and may run through a wrapper, so only its
+    // initialize reply identifies it.
+    enablePostSettleContinuation: isHermes,
+    deferFinalizeForBackgroundWork: isHermes,
     ...(isDevin
       ? {
           clientCapabilitiesMeta: {
