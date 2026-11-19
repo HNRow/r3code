@@ -4,8 +4,8 @@ import {
   guessThreadLinkRef,
   threadLinkCandidates,
   type ThreadLink,
-  unknownThreadLinkLabel,
 } from "@t3tools/shared/threadLinks";
+import { unknownThreadLinkLabel } from "@t3tools/shared/threadLinksCopy";
 
 import { configuredHostedAppUrl } from "../../hostedPairing";
 import { useThreadRefs, useThreadShell } from "../../state/entities";
