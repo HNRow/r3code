@@ -240,6 +240,7 @@ it.effect(
           hasRunInterruptRequest: () => Effect.die("unused stop read"),
           getRunProviderRecords: () => Effect.die("unused run provider read"),
           getRunCardRecords: () => Effect.die("unused run card read"),
+          getDelegatedChildControls: () => Effect.die("not used"),
           getThreadAttachmentIds: () => Effect.die("Unused attachment lookup"),
           searchThread: () => Effect.die("unused"),
           searchThreadStream: () => Stream.empty,
