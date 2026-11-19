@@ -2,14 +2,14 @@ import type { Messages } from "./en";
 
 export const ja: Messages = {
   layout: {
-    defaultTitle: "R3 Code",
+    defaultTitle: "T3 Code",
     defaultDescription:
-      "R3 Code。コーディングエージェントのためのオープンソースのコントロールプレーン。",
+      "T3 Code。コーディングエージェントのためのオープンソースのコントロールプレーン。",
     socialImageAlt:
-      "R3 Code：コーディングエージェントのためのオープンソースのコントロールプレーン。Claude Code、Codex、Cursor、OpenCode、Grok、Antigravity に対応。",
-    homeLabel: "R3 Code ホーム",
+      "T3 Code：コーディングエージェントのためのオープンソースのコントロールプレーン。Claude Code、Codex、Cursor、OpenCode、Grok、Antigravity に対応。",
+    homeLabel: "T3 Code ホーム",
     download: "ダウンロード",
-    starsLabel: "GitHub で R3 Code にスターを付ける（{stars} スター）",
+    starsLabel: "GitHub で T3 Code にスターを付ける（{stars} スター）",
     githubStars: "GitHub スター {stars}",
     language: "言語",
     mitLicensed: "MIT ライセンス",
@@ -20,8 +20,8 @@ export const ja: Messages = {
     security: "セキュリティ",
   },
   home: {
-    title: "R3 Code | コーディングエージェントのためのオープンソースのコントロールプレーン",
-    description: "R3 Code。コーディングエージェントのためのオープンソースのコントロールプレーン。",
+    title: "T3 Code | コーディングエージェントのためのオープンソースのコントロールプレーン",
+    description: "T3 Code。コーディングエージェントのためのオープンソースのコントロールプレーン。",
     heroTitle: ["コーディングエージェントの", "オープンソース", "コントロールプレーン。"],
     heroSub:
       "Claude Code、Codex、Antigravity、OpenCode、Cursor、Grok をひとつの画面からオーケストレーション。サブスクリプションは手持ちのものをそのまま。まるごとフォークも自由です。",
@@ -33,14 +33,14 @@ export const ja: Messages = {
     sourceLink: "コードを盗もう（合法的に）",
     alsoOnPhone: "スマホでも使えます：",
     screenshotAlt:
-      "ひとつのスレッドで Claude、Codex、Muse、Gemini のサブエージェントを動かす R3 Code",
-    endorsementsTitle: "{users} 人以上の開発者が我慢して使っています",
+      "ひとつのスレッドで Claude、Codex、Muse、Gemini のサブエージェントを動かす T3 Code",
+    endorsementsTitle: "{users}人以上の開発者たちが「悪くない」と言っています",
     endorsementsSub: "ツイートまでしてくれた人もいます。",
     endorsementsLabel: "開発者の声",
     readPost: "X で {handle} の投稿を読む",
     harnessTitle: "サブスクは持ち込みで",
     harnessBody:
-      "R3 Code はトークンを転売しません。Claude Code、Codex、Antigravity、OpenCode、Cursor、Grok を、すでに持っている認証情報でつなぐだけ。オーケストレーションは私たちに任せて、プランは今のままで。",
+      "T3 Code はトークンを転売しません。Claude Code、Codex、Antigravity、OpenCode、Cursor、Grok を、すでに持っている認証情報でつなぐだけ。オーケストレーションは私たちに任せて、プランは今のままで。",
     googleSignIn: "Google でサインイン",
     harnessPoints: [
       "キーの転売なし。使用量の上限なし。",
@@ -48,7 +48,7 @@ export const ja: Messages = {
       "対応エージェントは毎週追加。",
     ],
     gitVisualLabel:
-      "R3 Code の Git ワークフローの図：diff を確認し、変更をコミットしてプッシュし、プルリクエストを作成する。",
+      "T3 Code の Git ワークフローの図：diff を確認し、変更をコミットしてプッシュし、プルリクエストを作成する。",
     prReady: "準備完了",
     prCommits: "3 コミット",
     viewDiff: "diff を表示",
@@ -77,15 +77,15 @@ export const ja: Messages = {
     browseSource: "ソースを見る",
     ctaTitle: "あなたのエージェントに、ターミナルだけではもったいない。",
     ctaSub:
-      "R3 Code は無料、オープンソース、そして高速。インストールして、契約中のツールをつなぐだけ。あとはエージェントにおまかせ。",
+      "T3 Code は無料、オープンソース、そして高速。インストールして、契約中のツールをつなぐだけ。あとはエージェントにおまかせ。",
     otherPlatforms: "ほかのプラットフォーム",
   },
   download: {
-    title: "R3 Code をダウンロード（macOS、Windows、Linux）| R3 Code",
+    title: "T3 Code をダウンロード（macOS、Windows、Linux）| T3 Code",
     description:
-      "公式の R3 Code デスクトップアプリ（macOS、Windows、Linux）や、iOS・Android アプリをダウンロードできます。公式のダウンロードサイトは t3.codes だけです。",
+      "公式の T3 Code デスクトップアプリ（macOS、Windows、Linux）や、iOS・Android アプリをダウンロードできます。公式のダウンロードサイトは t3.codes だけです。",
     breadcrumb: "ダウンロード",
-    heading: "R3 Code をダウンロード",
+    heading: "T3 Code をダウンロード",
     channelLabel: "リリースチャンネル",
     stable: "安定版",
     nightly: "Nightly",
@@ -96,7 +96,7 @@ export const ja: Messages = {
     iphoneIpad: "iPhone と iPad",
     terminal: "ターミナル",
     tryOnce: "インストールせずに試すなら：",
-    allBuilds: "すべてのビルドは {link} にあります",
+    allBuilds: "すべてのビルド：{link}",
     releasesPage: "GitHub のリリースページ",
     builtAgo: "{age}にビルド",
     releasesFallback: "リリース",
