@@ -544,7 +544,7 @@ export const make = Effect.gen(function* () {
   });
 
   const proofError = (detail: string) => () =>
-    new ConnectionBlockedError({ reason: "configuration", ...translatableDetail(detail) });
+    new ConnectionBlockedError({ reason: "configuration", detail });
 
   // Requests for the same credential share a renewal without waiting on other hosts.
   const directDpopToken = Effect.fn("clientRuntime.connection.remote.directDpopToken")(function* (
@@ -572,9 +572,7 @@ export const make = Effect.gen(function* () {
             url: environmentEndpointUrl(connection.httpBaseUrl, "/oauth/token"),
           })
           .pipe(
-            Effect.mapError(
-              proofError(msg("Could not create the environment authorization proof.")),
-            ),
+            Effect.mapError(proofError("Could not create the environment authorization proof.")),
           );
         const access = yield* exchangeRemoteDpopAccessToken({
           httpBaseUrl: connection.httpBaseUrl,
@@ -626,9 +624,7 @@ export const make = Effect.gen(function* () {
             signer
               .createProof(proof)
               .pipe(
-                Effect.mapError(
-                  proofError(msg("Could not create the websocket authorization proof.")),
-                ),
+                Effect.mapError(proofError("Could not create the websocket authorization proof.")),
               ),
           clientMetadata: presentation.metadata,
           connectionMethod: "direct",
