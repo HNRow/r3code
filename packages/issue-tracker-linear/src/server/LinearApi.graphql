@@ -95,6 +95,9 @@ query T3Viewer {
   viewer {
     ...LinearUser
   }
+  organization {
+    urlKey
+  }
   teams(first: 250) {
     nodes {
       id
