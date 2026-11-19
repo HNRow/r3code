@@ -512,6 +512,57 @@ export function summarizeT3ToolCalls(
     case "capabilities":
       label = phrase("Checked", "check", `orchestration capabilities ${times}`);
       break;
+    case "read-pr":
+      label = phrase("Read", "read", quantity(selected.length, "pull request"));
+      break;
+    case "list-repo-prs":
+      label = phrase("Listed", "list", `pull requests ${quantity(selected.length, "time")}`);
+      break;
+    case "create-pr": {
+      // An open PR for the branch is returned rather than duplicated.
+      const existing = selected.filter((call) => call.output?.created === false).length;
+      const opened = selected.length - existing;
+      label =
+        completed.length === 0
+          ? phrase("Opened", "open", quantity(selected.length, "pull request"))
+          : opened === 0
+            ? `Found ${quantity(existing, "open pull request", "open pull requests")}`
+            : existing === 0
+              ? phrase("Opened", "open", quantity(opened, "pull request"))
+              : `Opened ${quantity(opened, "pull request")}, found ${existing} open`;
+      break;
+    }
+    case "update-pr":
+      label = phrase("Updated", "update", quantity(selected.length, "pull request"));
+      break;
+    case "respond-pr":
+      label = phrase(
+        "Responded",
+        "respond",
+        `on pull requests ${quantity(selected.length, "time")}`,
+      );
+      break;
+    case "merge-pr": {
+      // Auto-merge and merge queues leave the PR open until it lands.
+      const queued = selected.filter((call) =>
+        call.output?.state === undefined
+          ? call.input?.auto === true
+          : call.output.state !== "merged",
+      ).length;
+      const merged = selected.length - queued;
+      label =
+        completed.length === 0
+          ? phrase("Merged", "merge", quantity(selected.length, "pull request"))
+          : merged === 0
+            ? `Queued ${quantity(queued, "pull request")} to merge`
+            : queued === 0
+              ? phrase("Merged", "merge", quantity(merged, "pull request"))
+              : `Merged ${quantity(merged, "pull request")}, queued ${queued}`;
+      break;
+    }
+    case "review-pr":
+      label = phrase("Reviewed", "review", quantity(selected.length, "pull request"));
+      break;
   }
   return { label, failedCount };
 }
