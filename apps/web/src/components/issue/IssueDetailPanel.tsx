@@ -37,11 +37,10 @@ import {
   UserPlusIcon,
   UsersIcon,
 } from "lucide-react";
-import { msg, T, useGT, useMessages, Var } from "gt-react";
+import { T, t, useGT, Var } from "gt-react";
 import { useContext, useState, type ReactNode } from "react";
 
 import { RefreshIcon } from "~/components/ui/refresh-icon";
-import { m } from "~/i18n/messages";
 import { issueEnvironment, refreshIssueLists } from "~/state/issues";
 import { useProjects, useThreadShell } from "~/state/entities";
 import { useEnvironmentQuery } from "~/state/query";
@@ -121,11 +120,8 @@ function IssueThreadLinkButton({
     if (result._tag === "Failure") {
       toastManager.add({
         type: "error",
-        title: linked ? m(msg("Could not unlink the issue")) : m(msg("Could not link the issue")),
-        description: readableFailure(
-          squashAtomCommandFailure(result),
-          m(msg("The server refused it.")),
-        ),
+        title: linked ? t("Could not unlink the issue") : t("Could not link the issue"),
+        description: readableFailure(squashAtomCommandFailure(result), t("The server refused it.")),
       });
     }
   };
@@ -244,10 +240,10 @@ function IssueLabelPicker({
       setPicks((latest) => issuePicksAfterFailedWrite(latest, sent));
       toastManager.add({
         type: "error",
-        title: m(msg("Could not change labels")),
+        title: t("Could not change labels"),
         description: readableFailure(
           squashAtomCommandFailure(result),
-          m(msg("The tracker refused it.")),
+          t("The tracker refused it."),
         ),
       });
     });
@@ -360,10 +356,10 @@ function IssueAssigneePicker({
       setPicks((latest) => issuePicksAfterFailedWrite(latest, sent));
       toastManager.add({
         type: "error",
-        title: m(msg("Could not change assignees")),
+        title: t("Could not change assignees"),
         description: readableFailure(
           squashAtomCommandFailure(result),
-          m(msg("The tracker refused it.")),
+          t("The tracker refused it."),
         ),
       });
     });
@@ -475,7 +471,6 @@ export function IssueDetailPanel({
   onSelectPullRequest?: ((reference: PullRequestRef) => void) | undefined;
 }) {
   const gt = useGT();
-  const messages = useMessages();
   const detailAtom = issueEnvironment.detail({ environmentId, input: reference });
   const detailQuery = useEnvironmentQuery(detailAtom);
   const registry = useContext(RegistryContext);
@@ -514,7 +509,7 @@ export function IssueDetailPanel({
     ...detail.events.map((e): TimelineItem => ({ kind: "event", at: e.createdAt, event: e })),
   ].sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
 
-  const access = issueWriteAccess(detail, canWrite, messages);
+  const access = issueWriteAccess(detail, canWrite);
   const { blocked } = access;
   const canComment = access.comment;
   const canEdit = access.edit;
@@ -530,7 +525,7 @@ export function IssueDetailPanel({
       loadComments({ environmentId, input: { ...reference, cursor } }),
     );
     if (failure) {
-      toastManager.add({ type: "error", title: m(msg("Older comments could not be read")) });
+      toastManager.add({ type: "error", title: t("Older comments could not be read") });
     }
   };
 
@@ -541,10 +536,10 @@ export function IssueDetailPanel({
     if (result._tag === "Failure") {
       toastManager.add({
         type: "error",
-        title: m(msg("The issue could not be updated")),
+        title: t("The issue could not be updated"),
         description: readableFailure(
           squashAtomCommandFailure(result),
-          m(msg("The tracker refused it.")),
+          t("The tracker refused it."),
         ),
       });
       return;
@@ -564,10 +559,10 @@ export function IssueDetailPanel({
     if (result._tag === "Failure") {
       toastManager.add({
         type: "error",
-        title: m(msg("The state could not be changed")),
+        title: t("The state could not be changed"),
         description: readableFailure(
           squashAtomCommandFailure(result),
-          m(msg("The tracker refused it.")),
+          t("The tracker refused it."),
         ),
       });
       return;
@@ -721,13 +716,13 @@ export function IssueDetailPanel({
             <PullRequestActorLabel actor={detail.author} />
             <span>
               <T>
-                opened <Var>{formatRelativeTimeLabel(detail.createdAt, undefined, messages)}</Var>
+                opened <Var>{formatRelativeTimeLabel(detail.createdAt)}</Var>
               </T>
             </span>
             {detail.closedAt ? (
               <span>
                 <T>
-                  closed <Var>{formatRelativeTimeLabel(detail.closedAt, undefined, messages)}</Var>
+                  closed <Var>{formatRelativeTimeLabel(detail.closedAt)}</Var>
                 </T>
               </span>
             ) : null}
@@ -908,12 +903,10 @@ export function IssueDetailPanel({
                           <a href={item.comment.url} target="_blank" rel="noopener noreferrer" />
                         }
                       >
-                        {formatRelativeTimeLabel(item.comment.createdAt, undefined, messages)}
+                        {formatRelativeTimeLabel(item.comment.createdAt)}
                       </InlineButton>
                     ) : (
-                      <span>
-                        {formatRelativeTimeLabel(item.comment.createdAt, undefined, messages)}
-                      </span>
+                      <span>{formatRelativeTimeLabel(item.comment.createdAt)}</span>
                     )}
                   </PullRequestMetaLine>
                   <PullRequestCommentBody
@@ -938,8 +931,8 @@ export function IssueDetailPanel({
                   className="px-1 text-xs text-muted-foreground"
                 >
                   <PullRequestActorLabel actor={item.event.actor} />
-                  <span>{issueEventSentence(item.event, messages)}</span>
-                  <span>{formatRelativeTimeLabel(item.event.createdAt, undefined, messages)}</span>
+                  <span>{issueEventSentence(item.event)}</span>
+                  <span>{formatRelativeTimeLabel(item.event.createdAt)}</span>
                 </PullRequestMetaLine>
               ),
             )}

@@ -12,7 +12,7 @@ import type {
   IssueSummary,
 } from "@t3tools/contracts";
 import { AsyncResult } from "effect/reactivity";
-import { T, useGT, useMessages, Var } from "gt-react-native";
+import { T, useGT, Var } from "gt-react-native";
 import { useContext, useState } from "react";
 import { Linking, Platform, Pressable, Share, View } from "react-native";
 import { KeyboardStickyView } from "react-native-keyboard-controller";
@@ -305,7 +305,6 @@ function IssueCommentCard(props: {
   readonly canReact: boolean;
 }) {
   const gt = useGT();
-  const messages = useMessages();
   const { comment } = props;
   return (
     <View className="gap-3 rounded-2xl bg-grouped-card p-3">
@@ -314,9 +313,7 @@ function IssueCommentCard(props: {
         <Text className="min-w-0 flex-1 text-sm font-t3-medium" numberOfLines={1}>
           {comment.author?.login ?? gt("Unknown author")}
         </Text>
-        <Text className="text-2xs text-foreground-tertiary">
-          {relativeTime(comment.createdAt, undefined, messages)}
-        </Text>
+        <Text className="text-2xs text-foreground-tertiary">{relativeTime(comment.createdAt)}</Text>
       </View>
       <PullRequestMarkdown markdown={comment.body} />
       {comment.reactions !== undefined ? (
@@ -333,7 +330,6 @@ function IssueCommentCard(props: {
 
 function IssueEventRow({ event }: { readonly event: IssueEvent }) {
   const gt = useGT();
-  const messages = useMessages();
   return (
     <View className="flex-row items-center gap-2 px-1">
       <PullRequestAvatar actor={event.actor} size={18} />
@@ -341,11 +337,9 @@ function IssueEventRow({ event }: { readonly event: IssueEvent }) {
         <Text className="text-xs font-t3-medium">
           {event.actor?.login ?? gt("Someone", { $context: "an unknown person" })}
         </Text>{" "}
-        {issueEventSentence(event, messages)}
+        {issueEventSentence(event)}
       </Text>
-      <Text className="text-2xs text-foreground-tertiary">
-        {relativeTime(event.createdAt, undefined, messages)}
-      </Text>
+      <Text className="text-2xs text-foreground-tertiary">{relativeTime(event.createdAt)}</Text>
     </View>
   );
 }
