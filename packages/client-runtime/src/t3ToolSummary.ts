@@ -563,6 +563,35 @@ export function summarizeT3ToolCalls(
     case "review-pr":
       label = phrase("Reviewed", "review", quantity(selected.length, "pull request"));
       break;
+    case "ci-logs":
+      label = phrase("Read", "read", `CI logs ${quantity(selected.length, "time")}`);
+      break;
+    case "ci-rerun": {
+      // A host can refuse a check it cannot re-run, such as one outside its CI.
+      const outcomes = selected.flatMap((call) =>
+        Array.isArray(call.output?.checks)
+          ? call.output.checks.map((check) => asRecord(check)?.rerun === true)
+          : [],
+      );
+      const rerun = outcomes.filter(Boolean).length;
+      const refused = outcomes.length - rerun;
+      failedCount += refused;
+      const ciTimes = `CI ${quantity(selected.length, "time")}`;
+      label =
+        completed.length === 0
+          ? phrase("Re-ran", "re-run", ciTimes)
+          : outcomes.length === 0
+            ? // An empty list means no check had failed, so nothing was asked of the host.
+              selected.some((call) => Array.isArray(call.output?.checks))
+              ? "Found no failed checks to re-run"
+              : phrase("Re-ran", "re-run", ciTimes)
+            : rerun === 0
+              ? `Could not re-run ${quantity(refused, "check")}`
+              : refused === 0
+                ? phrase("Re-ran", "re-run", quantity(rerun, "check"))
+                : `Re-ran ${quantity(rerun, "check")}, ${refused} refused`;
+      break;
+    }
   }
   return { label, failedCount };
 }
