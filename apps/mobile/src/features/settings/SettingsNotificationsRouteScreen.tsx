@@ -51,8 +51,10 @@ import {
 import { connectionAtomRuntime } from "../../connection/runtime";
 import {
   CloudEnvironmentLinkError,
+  linkEnvironmentToCloudWithPreference,
   updateLinkedEnvironmentLiveActivityPreference,
 } from "../cloud/linkEnvironment";
+import type { SavedRemoteConnection } from "../../lib/connection";
 import { refreshManagedRelayEnvironments } from "../cloud/managedRelayState";
 import { hasCloudPublicConfig, resolveRelayClerkTokenOptions } from "../cloud/publicConfig";
 import { makePermissionStatusAtom } from "../../lib/permissionStatusAtom";
@@ -72,6 +74,22 @@ const updateLiveActivityPreference = createEnvironmentCommand(connectionAtomRunt
 
 const isLiveActivityEnvironmentUpdateError = Schema.is(LiveActivityEnvironmentUpdateError);
 const isCloudEnvironmentLinkError = Schema.is(CloudEnvironmentLinkError);
+
+const saveLocalPreference = (liveActivitiesEnabled: boolean) =>
+  Effect.sync(() => {
+    appAtomRegistry.set(updateMobilePreferencesAtom, { liveActivitiesEnabled });
+  });
+
+const linkEnvironmentWithPreference = Effect.fn("linkEnvironmentWithPreference")(function* (
+  connection: SavedRemoteConnection,
+  input: { readonly clerkToken: string; readonly liveActivitiesEnabled: boolean },
+) {
+  return yield* linkEnvironmentToCloudWithPreference({
+    connection,
+    clerkToken: input.clerkToken,
+    liveActivitiesEnabled: input.liveActivitiesEnabled,
+  });
+});
 
 const updateEnvironmentPreference = Effect.fn("updateEnvironmentPreference")(function* (
   environmentId: EnvironmentId,
@@ -184,7 +202,6 @@ export function SettingsNotificationsRouteScreen() {
 function ConfiguredSettingsNotificationsRouteScreen() {
   const gt = useGT();
   const preferencesResult = useAtomValue(mobilePreferencesAtom);
-  const savePreferences = useAtomSet(updateMobilePreferencesAtom);
   const agentAwarenessPushAvailable = supportsAgentAwarenessPush();
   const agentAwarenessPlatform = resolveAgentAwarenessPlatformPresentation(Platform.OS);
   const agentAwarenessSubtitle =
@@ -362,6 +379,8 @@ function ConfiguredSettingsNotificationsRouteScreen() {
           updateEnvironment: updateEnvironmentPreference,
           canConfigureEnvironment: (id) => canManageConnect(id, AuthRelayConfigureScope),
           canUpdateEnvironment: (id) => canManageConnect(id, AuthRelayWriteScope),
+          linkEnvironment: linkEnvironmentWithPreference,
+          saveLocalPreference,
           enabled: true,
           previousEnabled: liveActivitiesPreferenceEnabled,
           clerkToken: tokenResult.value,
@@ -386,7 +405,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       return;
     }
 
-    savePreferences({ liveActivitiesEnabled: true });
+    void saveLocalPreference(true);
     refreshManagedRelayEnvironments();
     setLiveActivityStatus("enabled");
     // Environment linking can precede device registration; only registered devices can receive Live Activities.
@@ -457,6 +476,8 @@ function ConfiguredSettingsNotificationsRouteScreen() {
           updateEnvironment: updateEnvironmentPreference,
           canConfigureEnvironment: (id) => canManageConnect(id, AuthRelayConfigureScope),
           canUpdateEnvironment: (id) => canManageConnect(id, AuthRelayWriteScope),
+          linkEnvironment: linkEnvironmentWithPreference,
+          saveLocalPreference,
           enabled: false,
           previousEnabled: liveActivitiesPreferenceEnabled,
           clerkToken: token,
@@ -473,7 +494,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       }
       return;
     }
-    savePreferences({ liveActivitiesEnabled: false });
+    void saveLocalPreference(false);
     refreshManagedRelayEnvironments();
     setLiveActivityStatus("disabled");
     if (updateResult.value) {

@@ -16,7 +16,6 @@ import type {
   AgentActivityProps,
   AgentActivityRowProps,
 } from "./AgentActivity";
-import { DEFAULT_AGENT_ACTIVITY_LABELS, formatLabelCount } from "./agentActivityLabels";
 
 // Home-screen and Lock Screen counterpart of the AgentActivity Live Activity.
 // It shares the Live Activity's name, but expo-widgets stores widget and Live
@@ -29,7 +28,7 @@ export function AgentActivityWidget(
   // The extension evaluates this function without the app's module scope.
   // Before the app's first publish, the embedded layout renders with no props.
   const props = publishedProps ?? {};
-  const labels = props.labels ?? DEFAULT_AGENT_ACTIVITY_LABELS;
+  const text = props.text;
   const family = environment.widgetFamily;
   const accessory = family === "accessoryRectangular";
   const small = family === "systemSmall";
@@ -79,29 +78,24 @@ export function AgentActivityWidget(
   const workingCount = rows.filter(
     (row) => row.phase === "running" || row.phase === "starting",
   ).length;
+  const activeCount = props.activeCount ?? workingCount;
   const summary =
     attentionCount > 0
-      ? formatLabelCount(
-          small
-            ? attentionCount === 1
-              ? labels.needYouOne
-              : labels.needYouMany
-            : attentionCount === 1
-              ? labels.needAttentionOne
-              : labels.needAttentionMany,
-          attentionCount,
-        )
+      ? ((small ? text?.needYou : text?.needAttention)?.[String(attentionCount)] ??
+        `${attentionCount} need${attentionCount === 1 ? "s" : ""} ${small ? "you" : "attention"}`)
       : workingCount > 0
-        ? formatLabelCount(labels.active, props.activeCount ?? workingCount)
+        ? (text?.active[String(activeCount)] ?? `${activeCount} active`)
         : rows.some((row) => row.phase === "stale")
-          ? labels.outOfDate
+          ? (text?.outOfDate ?? "Out of date")
           : rows.some((row) => row.phase === "failed")
-            ? labels.failed
+            ? (text?.failed ?? "Failed")
             : rows.length > 0
-              ? labels.done
+              ? (text?.done ?? "Done")
               : "";
   const summaryTint = rows[0] ? phaseTint(rows[0].phase) : secondaryForeground;
-  const emptyMessage = loaded ? (props.subtitle ?? labels.noActiveAgents) : labels.loadActivity;
+  const emptyMessage = loaded
+    ? (props.subtitle ?? text?.noActiveAgents ?? "No active agents")
+    : "Open T3 Code to load agent activity";
 
   // Widget taps open the containing app, and every build accepts the prod
   // scheme as a link prefix, so dev and preview builds route this too.
@@ -187,7 +181,7 @@ export function AgentActivityWidget(
             lineLimit(1),
           ]}
         >
-          {summary || (accessory ? "R3 Code" : "")}
+          {summary || (accessory ? "T3 Code" : "")}
         </Text>
         <Spacer minLength={0} />
       </HStack>

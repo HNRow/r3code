@@ -21,12 +21,19 @@ import * as Dpop from "../cloud/dpop";
 import * as ManagedRelayLayer from "../cloud/managedRelayLayer";
 import {
   clearAgentAwarenessRegistrationRecord,
+  loadAgentAwarenessDeviceId,
   loadAgentAwarenessRegistrationRecord,
   loadOrCreateAgentAwarenessDeviceId,
   loadPreferences,
   saveAgentAwarenessRegistrationRecord,
 } from "../../persistence/imperative";
-import type { Preferences } from "../../persistence/mobile-preferences";
+import {
+  MobilePreferencesLoadError,
+  MobilePreferencesStore,
+  type Preferences,
+} from "../../persistence/mobile-preferences";
+import { MobileSecureStorageError } from "../../persistence/mobile-secure-storage";
+import * as MobileStorage from "../../persistence/mobile-storage";
 import { makeRelayDeviceRegistrationRequest } from "./registrationPayload";
 import {
   __resetAgentAwarenessRemoteRegistrationForTest,
@@ -40,6 +47,7 @@ import {
   subscribeAgentAwarenessRegistrationStatus,
   updateAgentAwarenessRegistrationPreferences,
   type AgentAwarenessRegistrationError,
+  type AgentAwarenessRegistrationServices,
 } from "./remoteRegistration";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
@@ -218,8 +226,53 @@ function proofIat(proof: string): number {
   return decoded.iat;
 }
 
+const storageFailure = (cause: unknown) =>
+  new MobileSecureStorageError({ operation: "read", key: "test", cause });
+const unexpectedStorage = () => Effect.die("Unexpected storage request");
+
+// Delegates to the persistence/imperative mocks so each test steers both paths the same way.
+const layerPersistenceTest = Layer.merge(
+  Layer.succeed(
+    MobileStorage.MobileStorage,
+    MobileStorage.MobileStorage.of({
+      loadOrCreateAgentAwarenessDeviceId: Effect.tryPromise({
+        try: () => loadOrCreateAgentAwarenessDeviceId(),
+        catch: storageFailure,
+      }),
+      loadAgentAwarenessDeviceId: Effect.tryPromise({
+        try: () => loadAgentAwarenessDeviceId(),
+        catch: storageFailure,
+      }),
+      loadAgentAwarenessRegistrationRecord: Effect.tryPromise({
+        try: () => loadAgentAwarenessRegistrationRecord(),
+        catch: storageFailure,
+      }),
+      saveAgentAwarenessRegistrationRecord: (record) =>
+        Effect.tryPromise({
+          try: () => saveAgentAwarenessRegistrationRecord(record),
+          catch: storageFailure,
+        }),
+      clearAgentAwarenessRegistrationRecord: unexpectedStorage(),
+      loadRecentThreadShortcuts: unexpectedStorage(),
+      saveRecentThreadShortcuts: unexpectedStorage,
+    }),
+  ),
+  Layer.succeed(
+    MobilePreferencesStore,
+    MobilePreferencesStore.of({
+      load: Effect.tryPromise({
+        try: () => loadPreferences(),
+        catch: (cause) => new MobilePreferencesLoadError({ cause }),
+      }),
+      savePatch: unexpectedStorage,
+      update: unexpectedStorage,
+    }),
+  ),
+);
+
 const layerRelayTest = ManagedRelayLayer.layer("https://relay.example.test").pipe(
   Layer.provide(Layer.mergeAll(FetchHttpClient.layer, Dpop.layer)),
+  Layer.merge(layerPersistenceTest),
 );
 
 const runBackgroundOperations = Effect.fn("TestRemoteRegistration.runBackgroundOperations")(
@@ -241,7 +294,7 @@ const runBackgroundOperations = Effect.fn("TestRemoteRegistration.runBackgroundO
         pending.operation as Effect.Effect<
           unknown,
           AgentAwarenessRegistrationError,
-          ManagedRelay.ManagedRelayClient
+          AgentAwarenessRegistrationServices
         >,
       );
       yield* Effect.sync(() => {
@@ -706,6 +759,7 @@ describe("makeRelayDeviceRegistrationRequest", () => {
         Effect.provide(
           ManagedRelayLayer.layer("https://permission-relay.example.test").pipe(
             Layer.provide(Layer.mergeAll(FetchHttpClient.layer, Dpop.layer)),
+            Layer.merge(layerPersistenceTest),
           ),
         ),
       );
@@ -1005,7 +1059,7 @@ describe("makeRelayDeviceRegistrationRequest", () => {
           getAgentActivitySnapshot,
           resetTokenCache: Effect.void,
         }),
-      );
+      ).pipe(Layer.merge(layerPersistenceTest));
     }
 
     it.effect("registers an existing Live Activity before waiting on the widget read", () => {
@@ -1031,13 +1085,10 @@ describe("makeRelayDeviceRegistrationRequest", () => {
         yield* refreshActiveLiveActivityRemoteRegistration();
 
         expect(order).toEqual(["push-token", "widget-snapshot"]);
-        expect(publishWidgetMock).toHaveBeenLastCalledWith(
-          {
-            kind: "snapshot",
-            aggregate,
-          },
-          expect.any(Object),
-        );
+        expect(publishWidgetMock).toHaveBeenLastCalledWith({
+          kind: "snapshot",
+          aggregate,
+        });
       }).pipe(Effect.provide(relay));
     });
 
@@ -1065,13 +1116,10 @@ describe("makeRelayDeviceRegistrationRequest", () => {
         yield* Deferred.succeed(olderResponse, { aggregate });
         yield* Fiber.join(older);
 
-        expect(publishWidgetMock).toHaveBeenLastCalledWith(
-          {
-            kind: "snapshot",
-            aggregate: newer,
-          },
-          expect.any(Object),
-        );
+        expect(publishWidgetMock).toHaveBeenLastCalledWith({
+          kind: "snapshot",
+          aggregate: newer,
+        });
       }),
     );
 
@@ -1115,13 +1163,10 @@ describe("makeRelayDeviceRegistrationRequest", () => {
         yield* Deferred.succeed(response, { aggregate });
         yield* Fiber.join(refreshB);
 
-        expect(publishWidgetMock).toHaveBeenLastCalledWith(
-          {
-            kind: "snapshot",
-            aggregate,
-          },
-          expect.any(Object),
-        );
+        expect(publishWidgetMock).toHaveBeenLastCalledWith({
+          kind: "snapshot",
+          aggregate,
+        });
       }),
     );
 

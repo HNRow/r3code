@@ -168,7 +168,7 @@ interface LinkEnvironmentToCloudInput {
   readonly clerkToken: string;
 }
 
-type LinkEnvironmentToCloudRequirements =
+export type LinkEnvironmentToCloudRequirements =
   | HttpClient.HttpClient
   | ManagedRelay.ManagedRelayClient
   | MobileStorage.MobileStorage;

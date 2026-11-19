@@ -19,11 +19,6 @@ import {
   type LiveActivityComponent,
   type LiveActivityLayout,
 } from "expo-widgets";
-import {
-  DEFAULT_AGENT_ACTIVITY_LABELS,
-  formatLabelCount,
-  type AgentActivityLabels,
-} from "./agentActivityLabels";
 
 type LiveActivityEnvironment = Parameters<LiveActivityComponent<AgentActivityProps>>[1];
 
@@ -48,13 +43,33 @@ export interface AgentActivityRowProps {
   readonly deepLink: string;
 }
 
+/**
+ * Copy for the widget extension, which runs without the app's catalogs. Count-keyed tables hold
+ * one string per count. Live Activities updated by push have none and fall back to English.
+ */
+export interface AgentActivityText {
+  readonly outOfDate: string;
+  readonly failed: string;
+  readonly done: string;
+  readonly workFailed: string;
+  readonly workCompleted: string;
+  readonly statusOutOfDate: string;
+  readonly approval: string;
+  readonly input: string;
+  readonly noActiveAgents: string;
+  readonly activeAgents: Readonly<Record<string, string>>;
+  readonly active: Readonly<Record<string, string>>;
+  readonly needAttention: Readonly<Record<string, string>>;
+  readonly needYou: Readonly<Record<string, string>>;
+}
+
 export interface AgentActivityProps {
+  readonly text?: AgentActivityText;
   readonly title: string;
   readonly subtitle: string;
   readonly activeCount: number;
   readonly updatedAt: string;
   readonly activities: ReadonlyArray<AgentActivityRowProps>;
-  readonly labels?: AgentActivityLabels;
 }
 
 // Widget serialization excludes module helpers; use only imported view/modifier factories.
@@ -63,8 +78,8 @@ function AgentActivity(
   environment: LiveActivityEnvironment,
 ): LiveActivityLayout {
   "widget";
-  const labels = props.labels ?? DEFAULT_AGENT_ACTIVITY_LABELS;
 
+  const text = props.text;
   // Hierarchical foregrounds inherit system tint and vibrancy.
   type Foreground = Parameters<typeof foregroundStyle>[0];
   const primaryForeground = { type: "hierarchical", style: "primary" } as const;
@@ -110,7 +125,7 @@ function AgentActivity(
     ? props.activities.map((row) =>
         row.phase === "completed" || row.phase === "failed"
           ? row
-          : { ...row, phase: "stale", status: labels.outOfDate },
+          : { ...row, phase: "stale", status: text?.outOfDate ?? "Out of date" },
       )
     : props.activities;
   const ordered = [...activities].sort((a, b) => phasePriority(a.phase) - phasePriority(b.phase));
@@ -134,29 +149,28 @@ function AgentActivity(
       : tint;
 
   const allDone = props.activeCount === 0;
-  const doneLabel = failedRow ? labels.failed : labels.done;
-  const outcomeLabel = failedRow ? labels.agentWorkFailed : labels.agentWorkCompleted;
+  const doneLabel = failedRow ? (text?.failed ?? "Failed") : (text?.done ?? "Done");
+  const outcomeLabel = failedRow
+    ? (text?.workFailed ?? "Agent work failed")
+    : (text?.workCompleted ?? "Agent work completed");
 
+  const agentWord = props.activeCount === 1 ? "agent" : "agents";
   const agentsLabel = allDone
     ? outcomeLabel
     : environment.isStale
-      ? labels.agentStatusOutOfDate
-      : formatLabelCount(
-          props.activeCount === 1 ? labels.activeAgentOne : labels.activeAgentMany,
-          props.activeCount,
-        );
+      ? (text?.statusOutOfDate ?? "Agent status out of date")
+      : (text?.activeAgents[String(props.activeCount)] ??
+        `${props.activeCount} active ${agentWord}`);
   const attentionSuffix =
     attentionRows.length > 0
-      ? formatLabelCount(
-          attentionRows.length === 1 ? labels.needAttentionOne : labels.needAttentionMany,
-          attentionRows.length,
-        )
+      ? (text?.needAttention[String(attentionRows.length)] ??
+        `${attentionRows.length} need${attentionRows.length === 1 ? "s" : ""} attention`)
       : "";
   const activeLabel = allDone
     ? doneLabel
     : environment.isStale
-      ? labels.outOfDate
-      : formatLabelCount(labels.active, props.activeCount);
+      ? (text?.outOfDate ?? "Out of date")
+      : (text?.active[String(props.activeCount)] ?? `${props.activeCount} active`);
   const showCompactGlyph = !attentionRow && !failedRow && !allDone && !environment.isStale;
   const summary = attentionSuffix || activeLabel;
 
@@ -358,10 +372,10 @@ function AgentActivity(
       >
         {attentionRow
           ? attentionRow.phase === "waiting_for_approval"
-            ? labels.approval
-            : labels.input
+            ? (text?.approval ?? "Approval")
+            : (text?.input ?? "Input")
           : failedRow
-            ? labels.failed
+            ? (text?.failed ?? "Failed")
             : activeLabel}
       </Text>
     ),
