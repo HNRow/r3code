@@ -1,7 +1,7 @@
 import { resolveLocale } from "@t3tools/client-runtime/locales";
 import { useAtomValue } from "@effect/atom-react";
 import { AsyncResult } from "effect/reactivity";
-import { GTProvider } from "gt-react-native";
+import { GTProvider, useLocale } from "gt-react-native";
 import { useDeferredValue, type ReactNode } from "react";
 import { Platform, TurboModuleRegistry, View, type TurboModule } from "react-native";
 
@@ -46,4 +46,9 @@ export function I18nProvider(props: { readonly children: ReactNode }) {
       {props.children}
     </GTProvider>
   );
+}
+
+/** 与 GTProvider 同源的当前 locale，供日期/数字格式化使用。 */
+export function useFormattingLocale(): string {
+  return useLocale();
 }
