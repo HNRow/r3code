@@ -1,6 +1,7 @@
 import { useAtomValue } from "@effect/atom-react";
-import { type AtomCommandSuccess, runAtomCommand } from "@t3tools/client-runtime/state/runtime";
+import { runAtomCommand } from "@t3tools/client-runtime/state/runtime";
 import { sentMessageFromToolItem } from "@t3tools/shared/toolOutput";
+import type * as Effect from "effect/Effect";
 import { Atom, type AtomRegistry } from "effect/reactivity";
 import type { TimelineEntry } from "../../session-logic";
 import { environmentThreadDetails, threadEnvironment } from "../../state/threads";
@@ -32,8 +33,8 @@ export type CitedHistoryOutcome =
   | { readonly _tag: "failed"; readonly title: string; readonly description: string }
   | { readonly _tag: "aborted" };
 
-type HistoryPageResult = AtomCommandSuccess<
-  Awaited<ReturnType<typeof threadEnvironment.loadEarlierHistory.run>>
+type HistoryPageResult = Effect.Success<
+  ReturnType<typeof threadEnvironment.loadEarlierHistory.run>
 >;
 
 const MAX_CITATION_PAGES = 20;
