@@ -582,6 +582,10 @@
     "./pinOrderKey": {
       "types": "./src/pinOrderKey.ts",
       "import": "./src/pinOrderKey.ts"
+    },
+    "./threadLinksCopy": {
+      "types": "./src/threadLinksCopy.ts",
+      "import": "./src/threadLinksCopy.ts"
     }
   },
   "scripts": {
@@ -595,6 +599,7 @@
     "effect": "catalog:",
     "ffi-rs": "1.3.2",
     "get-east-asian-width": "^1.6.0",
+    "gt-i18n": "1.0.40",
     "mdast-util-directive": "catalog:",
     "mdast-util-to-hast": "^13.2.1",
     "micromark-extension-directive": "catalog:",
