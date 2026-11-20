@@ -35,7 +35,7 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { tryOpenExternalUrl } from "../../lib/openExternalUrl";
 import { Button } from "../../components/ui/Button";
 import { Chip } from "../../components/ui/Chip";
-import { useGT } from "gt-react-native";
+import { useGT, useMessages } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 const LOCK_SYMBOL: AppSymbolName = { ios: "lock", android: "lock" };
@@ -88,13 +88,14 @@ function PendingSecretRequestForm(props: {
     reportFailure: false,
     reportDefect: false,
   });
-  const inputs = secretRequestInputs(item, m);
+  const messages = useMessages();
+  const inputs = secretRequestInputs(item, messages);
   const multiple = item.fields !== undefined;
   const config = useAtomValue(serverEnvironment.configValueAtom(props.environmentId));
   // A reference answers one value, so a card with fields is always typed.
   const sources = multiple
     ? NO_SOURCES
-    : secretRequestSources(config, config?.settings.secretProviders ?? {}, m);
+    : secretRequestSources(config, config?.settings.secretProviders ?? {});
   const [sourceId, setSourceId] = useState<SecretProviderId | null>(null);
   const source = sources.find((candidate) => candidate.id === sourceId) ?? null;
   const [values, setValues] = useState<Readonly<Record<string, string>>>({});

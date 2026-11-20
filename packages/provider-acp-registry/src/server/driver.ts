@@ -11,8 +11,6 @@ import {
 } from "@t3tools/contracts";
 import { AcpRegistrySettings } from "../settings.ts";
 import * as HostProcess from "@t3tools/shared/HostProcess";
-import * as FileSystem from "effect/FileSystem";
-import * as Path from "effect/Path";
 import { isKimiAcpSettings } from "./kimiAcp.ts";
 import { makeKimiPluginManagement, makeKimiServerRequest } from "./kimiPlugins.ts";
 

@@ -80,6 +80,7 @@ function fakeLinear(
   const requests: Array<{
     readonly authorization: string | undefined;
     readonly operation: string;
+    readonly query: string;
   }> = [];
   const http = Layer.succeed(
     HttpClient.HttpClient,

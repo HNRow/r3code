@@ -126,7 +126,7 @@ export function AttachmentFilePreview(props: {
   const attachmentId =
     props.asset && "attachmentId" in props.asset ? props.asset.attachmentId : undefined;
   const { copyToClipboard, isCopied } = useCopyToClipboard({
-    target: namedClipboardTarget(props.name),
+    target: props.name,
   });
   // useAssetUrlRefresh keys its callback on these objects, so they must stay cached. Parents
   // rebuild `asset` on every render, so the attachment resource derives only from its fields.
