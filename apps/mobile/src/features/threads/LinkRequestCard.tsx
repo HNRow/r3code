@@ -1,4 +1,3 @@
-import { pipe } from "effect/Function";
 import { useAtomValue } from "@effect/atom-react";
 import {
   ANOTHER_ADDRESS,
@@ -11,7 +10,6 @@ import {
   linkRequestInitialMachine,
   type LinkRequestItem,
   linkRequestTarget,
-  linkRequestTargetName,
   rankMachinesByHint,
 } from "@t3tools/client-runtime/link-request";
 import {
@@ -26,6 +24,7 @@ import {
 } from "@t3tools/contracts";
 import * as Option from "effect/Option";
 import * as Result from "effect/Result";
+import { msg, T, useGT, useMessages, Var } from "gt-react-native";
 import { useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, View, type ColorValue } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -33,6 +32,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SymbolView, type AppSymbolName } from "../../components/ui/AppSymbol";
 import { AppText as Text, AppTextInput as TextInput } from "../../components/ui/AppText";
 import { EnvironmentMachineSymbol } from "../../components/EnvironmentMachineSymbol";
+import type { MessageResolver } from "../../i18n/messages";
 import { peerLinkEnvironment, useLinkableMachines } from "../../state/peerLinks";
 import { mintPairingCodeOn } from "../../state/peerPairingCode";
 import { useEnvironmentScope, usePreparedConnection } from "../../state/session";
@@ -42,28 +42,24 @@ import { SettingsSection } from "../settings/components/SettingsSection";
 import { Button } from "../../components/ui/Button";
 import { Sheet } from "../../components/ui/Sheet";
 import { RUNTIME_MODE_CHOICES } from "./thread-settings-options";
-import { T, useGT, Var } from "gt-react-native";
-import { t } from "../../i18n/gt";
 
 /** The same five levels as web's access picker: read-only, then the runtime modes. */
-const ACCESS_CHOICES: ReadonlyArray<{
+export const LINK_ACCESS_CHOICES: ReadonlyArray<{
   readonly access: AuthMcpClientAccess;
   readonly label: string;
   readonly description: string;
 }> = [
   {
     access: "read-only",
-    get label() {
-      return t("Read only");
-    },
-    get description() {
-      return t("Read projects and threads. Cannot start, message or change anything.");
-    },
+    label: msg("Read only"),
+    description: msg("Read projects and threads. Cannot start, message or change anything."),
   },
   ...RUNTIME_MODE_CHOICES.map((choice) => ({ ...choice, access: choice.mode })),
 ];
-const accessLabel = (access: AuthMcpClientAccess) =>
-  ACCESS_CHOICES.find((choice) => choice.access === access)?.label ?? access;
+const accessLabel = (access: AuthMcpClientAccess, resolve: MessageResolver) => {
+  const label = LINK_ACCESS_CHOICES.find((choice) => choice.access === access)?.label;
+  return label === undefined ? access : resolve(label);
+};
 
 const LINK_SYMBOL: AppSymbolName = { ios: "link", android: "desktop_windows" };
 
@@ -81,9 +77,10 @@ export function LinkRequestCard(props: {
   readonly projectedItem: OrchestrationV2ProjectedTurnItem;
   readonly iconColor: ColorValue;
 }) {
+  const m = useMessages();
   const { item, visibility } = props.projectedItem;
   if (item.type !== "link_request") return null;
-  const display = linkRequestDisplay(item, visibility, accessLabel);
+  const display = linkRequestDisplay(item, visibility, (access) => accessLabel(access, m), m);
   if (display.kind === "pending") {
     return <PendingLinkRequest environmentId={props.environmentId} item={item} />;
   }
@@ -109,20 +106,20 @@ function PendingLinkRequest(props: {
   readonly environmentId: EnvironmentId;
   readonly item: LinkRequestItem;
 }) {
+  const gt = useGT();
+  const m = useMessages();
   const { item } = props;
   const [open, setOpen] = useState(false);
   const [declining, setDeclining] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const answer = useAtomCommand(peerLinkEnvironment.answerRequest, {
-    label: t("decline link request"),
+    label: "decline link request",
     reportFailure: false,
     reportDefect: false,
   });
   const canAnswer = useAtomValue(
     peerLinkEnvironment.answerRequest.permissionAtom(props.environmentId),
   );
-  const target = linkRequestTargetName(item);
-
   const decline = async () => {
     const input = linkRequestAnswerInput(item, { type: "decline" });
     if (input === null) return;
@@ -132,7 +129,7 @@ function PendingLinkRequest(props: {
       setDeclining(false),
     );
     if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
-      pipe(squashAtomCommandFailure(result), linkRequestFailureMessage, setError);
+      setError(linkRequestFailureMessage(squashAtomCommandFailure(result), m));
     }
   };
 
@@ -140,14 +137,12 @@ function PendingLinkRequest(props: {
     <View className="mb-3 gap-3 rounded-[20px] border border-border bg-card-alt p-4">
       <View className="gap-1">
         <Text className="font-t3-bold text-base text-foreground">
-          {picksMachine(item)
-            ? t("Link a machine to this environment")
-            : `Link ${target} to this environment`}
+          {item.url === undefined
+            ? gt("Link a machine to this environment")
+            : gt("Link {target} to this environment", { target: linkDestination(item.url) })}
         </Text>
         {item.reason.trim() ? (
-          <Text translate={false} className="font-sans text-sm leading-5 text-foreground-muted">
-            {item.reason}
-          </Text>
+          <Text className="font-sans text-sm leading-5 text-foreground-muted">{item.reason}</Text>
         ) : null}
       </View>
       {error !== null ? (
@@ -162,7 +157,7 @@ function PendingLinkRequest(props: {
       {canAnswer ? (
         <>
           <Button
-            label={picksMachine(item) ? "Choose machine…" : "Review link…"}
+            label={picksMachine(item) ? gt("Choose machine…") : gt("Review link…")}
             disabled={declining}
             onPress={() => setOpen(true)}
             tone="primary"
@@ -178,7 +173,7 @@ function PendingLinkRequest(props: {
               onPress={() => void decline()}
             >
               <Text className="font-sans text-xs text-foreground-muted">
-                <T>Decline</T>
+                {gt("Decline", { $context: "verb, refuses the link request" })}
               </Text>
             </Pressable>
           </View>
@@ -205,6 +200,7 @@ function LinkRequestSheet(props: {
   readonly onClose: () => void;
 }) {
   const gt = useGT();
+  const m = useMessages();
   const { item } = props;
   const insets = useSafeAreaInsets();
   const pickMachine = picksMachine(item);
@@ -220,14 +216,19 @@ function LinkRequestSheet(props: {
   // Submit then a tap can both run before a re-render; this guard is synchronous.
   const inFlight = useRef(false);
   const answer = useAtomCommand(peerLinkEnvironment.answerRequest, {
-    label: t("answer link request"),
+    label: "answer link request",
     // The failure cause holds the request, and with it the code; keep it out of the console.
     reportFailure: false,
     reportDefect: false,
   });
   const selected = choice ?? linkRequestInitialMachine(item, machines);
-  const target = linkRequestTarget(item, machines, selected);
-  const targetName = target.kind === "machine" ? target.label : linkRequestTargetName(item);
+  const target = linkRequestTarget(item, machines, selected, m);
+  const targetName =
+    target.kind === "machine"
+      ? target.label
+      : item.url === undefined
+        ? null
+        : linkDestination(item.url);
   const targetId = target.kind === "machine" ? target.environmentId : null;
   const connected = usePreparedConnection(targetId);
   const mayMint = useEnvironmentScope(targetId, AuthAccessWriteScope);
@@ -261,7 +262,7 @@ function LinkRequestSheet(props: {
       const minted = await mintPairingCodeOn(targetId, access);
       if (Result.isFailure(minted)) {
         setMintFailed((failed) => new Set(failed).add(targetId));
-        setError(linkRequestFailureMessage(minted.failure));
+        setError(linkRequestFailureMessage(minted.failure, m));
         return null;
       }
       code = minted.success;
@@ -289,13 +290,17 @@ function LinkRequestSheet(props: {
       setPairingCode("");
       props.onClose();
     } else if (!isAtomCommandInterrupted(result)) {
-      pipe(squashAtomCommandFailure(result), linkRequestFailureMessage, setError);
+      setError(linkRequestFailureMessage(squashAtomCommandFailure(result), m));
     }
   };
 
   return (
     <Sheet
-      title={pickMachine ? "Link a machine" : `Link ${targetName}`}
+      title={
+        pickMachine || targetName === null
+          ? gt("Link a machine")
+          : gt("Link {targetName}", { targetName })
+      }
       onClose={props.onClose}
       // An answer that lands after a close would still link, and would close a reopened sheet.
       dismissDisabled={busy}
@@ -316,11 +321,7 @@ function LinkRequestSheet(props: {
             </T>
           </Text>
           {item.url !== undefined && target.kind === "machine" ? (
-            <Text
-              translate={false}
-              className="font-sans text-xs text-foreground-muted"
-              numberOfLines={1}
-            >
+            <Text className="font-sans text-xs text-foreground-muted" numberOfLines={1}>
               {item.url}
             </Text>
           ) : null}
@@ -378,7 +379,7 @@ function LinkRequestSheet(props: {
           <View className="gap-2">
             <TextInput
               accessibilityLabel={gt("Address")}
-              placeholder={t("https://machine.tailnet.ts.net")}
+              placeholder="https://machine.tailnet.ts.net"
               value={address}
               onChangeText={setAddress}
               editable={!busy}
@@ -421,19 +422,26 @@ function LinkRequestSheet(props: {
                   spellCheck={false}
                 />
                 <Text className="font-sans text-xs text-foreground-muted">
-                  <T>
-                    Create a link on <Var>{targetName}</Var>: Settings → Sharing & access →
-                    Authorized clients → Create link, then paste its code here.
-                  </T>
+                  {targetName === null ? (
+                    <T>
+                      Create a link on a machine: Settings → Sharing & access → Authorized clients →
+                      Create link, then paste its code here.
+                    </T>
+                  ) : (
+                    <T>
+                      Create a link on <Var>{targetName}</Var>: Settings → Sharing & access →
+                      Authorized clients → Create link, then paste its code here.
+                    </T>
+                  )}
                 </Text>
               </View>
             )}
             <SettingsSection title={gt("What agents here may do there")}>
-              {ACCESS_CHOICES.map((choice, index) => (
+              {LINK_ACCESS_CHOICES.map((choice, index) => (
                 <SettingsChoiceRow
                   key={choice.access}
-                  label={choice.label}
-                  description={choice.description}
+                  label={m(choice.label)}
+                  description={m(choice.description)}
                   selected={choice.access === access}
                   separated={index > 0}
                   disabled={busy}
@@ -459,7 +467,13 @@ function LinkRequestSheet(props: {
           </Text>
         ) : null}
         <Button
-          label={busy ? "Linking…" : useExisting ? "Use this link" : "Link"}
+          label={
+            busy
+              ? gt("Linking…")
+              : useExisting
+                ? gt("Use this link")
+                : gt("Link", { $context: "verb, confirms linking the machine" })
+          }
           disabled={busy || !ready}
           onPress={() => void submit()}
           tone="primary"
@@ -485,14 +499,15 @@ function MachineRow(props: {
   readonly disabled: boolean;
   readonly onPress: () => void;
 }) {
+  const gt = useGT();
   const { machine } = props;
   const status = machine.linked
-    ? "Linked"
+    ? gt("Linked")
     : machine.connected
       ? null
       : machine.connectOnly
-        ? "R3 Connect"
-        : "Not connected";
+        ? "T3 Connect"
+        : gt("Not connected");
   return (
     <Pressable
       accessibilityRole="radio"
