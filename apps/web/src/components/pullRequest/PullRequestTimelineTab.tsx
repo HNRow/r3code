@@ -286,11 +286,29 @@ function ConversationCard({
       <div className="px-2">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <div className="min-w-0 flex-1">
-            <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-xs">
-              <ActorName actor={event.actor} />
-              <span className="text-muted-foreground">{event.title}</span>
+            <h2 className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-xs">
+              {event.kind === "review" ? (
+                <T>
+                  <Var>
+                    <ActorName actor={event.actor} />
+                  </Var>{" "}
+                  <span className="text-muted-foreground">reviewed</span>
+                </T>
+              ) : event.kind === "comment" ? (
+                <T>
+                  <Var>
+                    <ActorName actor={event.actor} />
+                  </Var>{" "}
+                  <span className="text-muted-foreground">commented</span>
+                </T>
+              ) : (
+                <>
+                  <ActorName actor={event.actor} />
+                  <span className="text-muted-foreground">{event.title}</span>
+                </>
+              )}
               {event.reviewState ? <ReviewStateBadge state={event.reviewState} /> : null}
-            </div>
+            </h2>
             <PullRequestMetaLine className="mt-1 flex-wrap text-2xs text-muted-foreground">
               <span>
                 <RelativeTime timestamp={event.at} />
@@ -667,7 +685,7 @@ function ReviewVerdictEvent({
       />
       <div className="flex min-w-0 flex-wrap items-center gap-2 py-1.5">
         <div className="min-w-0 flex-1">
-          <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-xs">
+          <h2 className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-xs">
             <ActorName actor={event.actor} />
             <Tooltip disabled={!stale}>
               <TooltipTrigger
@@ -687,7 +705,7 @@ function ReviewVerdictEvent({
               </TooltipTrigger>
               <TooltipPopup>{pullRequestReviewOutcomeStaleLabel(outcome)}</TooltipPopup>
             </Tooltip>
-          </div>
+          </h2>
           <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
             <PullRequestMetaLine className="flex-wrap text-2xs text-muted-foreground">
               <span>
