@@ -1,5 +1,5 @@
 import { initializeGT } from "gt-react-native";
-import { createConditionStoreSingleton, ReadonlyConditionStore } from "gt-i18n/internal";
+import { createConditionStoreSingleton, WritableConditionStore } from "gt-i18n/internal";
 
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "./locales";
 import de from "./translations/de.json";
@@ -37,14 +37,14 @@ initializeGT({
 // React Native 的 GTProvider 只把 locale 存进 React context，不注册全局 ConditionStore；
 // 而 t() 在 provider 外（原生 header/footer、模块作用域）也要读 locale。这里补一个全局 store，
 // 由 I18nProvider 在切换语言时调用 setGlobalLocale 同步。
-const globalConditionStore = createConditionStoreSingleton<ReadonlyConditionStore>(
+const globalConditionStore = createConditionStoreSingleton<WritableConditionStore>(
   "GT condition store not initialized.",
 );
-let activeConditionStore = new ReadonlyConditionStore({ locale: DEFAULT_LOCALE });
+// 单例 set 只在首次生效，之后再 set 会被静默忽略，所以之后只能原地 setLocale。
+const activeConditionStore = new WritableConditionStore({ locale: DEFAULT_LOCALE });
 globalConditionStore.setConditionStore(activeConditionStore);
 
 export function setGlobalLocale(locale: string): void {
   if (activeConditionStore.getLocale() === locale) return;
-  activeConditionStore = new ReadonlyConditionStore({ locale });
-  globalConditionStore.setConditionStore(activeConditionStore);
+  activeConditionStore.setLocale(locale);
 }

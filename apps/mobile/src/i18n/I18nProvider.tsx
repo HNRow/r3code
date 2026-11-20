@@ -2,7 +2,7 @@ import { resolveLocale } from "@t3tools/client-runtime/locales";
 import { useAtomValue } from "@effect/atom-react";
 import { AsyncResult } from "effect/reactivity";
 import { GTProvider, useLocale } from "gt-react-native";
-import { useDeferredValue, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Platform, TurboModuleRegistry, View, type TurboModule } from "react-native";
 
 import { mobilePreferencesAtom } from "../state/preferences";
@@ -35,10 +35,19 @@ export function useLanguagePreference(): string {
 
 /** Translates the screens inside it into the saved language; "system" follows the device. */
 export function I18nProvider(props: { readonly children: ReactNode }) {
-  // GT suspends while a locale's catalog loads. Deferring the switch keeps the current language
-  // on screen until then, instead of GT's full-screen spinner.
-  const locale = useDeferredValue(
-    resolveLocale(useLanguagePreference(), readSystemLocales(), SUPPORTED_LOCALES, DEFAULT_LOCALE),
+  const preferences = useAtomValue(mobilePreferencesAtom);
+  // 偏好是异步读的：先用最终语言挂载 GTProvider，否则会先以英文挂载、再切换，
+  // 而 useGT() 子树在冷启动那次切换里会停在英文。
+  if (!AsyncResult.isSuccess(preferences)) {
+    return <View className="flex-1 bg-screen" />;
+  }
+  // 不能包 useDeferredValue：GTProvider 为加载 catalog 挂起后，延迟值会停在上一个语言，
+  // 选完语言界面要等下一次选择才更新。catalog 是本地 JSON，直接切换即可。
+  const locale = resolveLocale(
+    preferences.value.language ?? DEFAULT_LOCALE,
+    readSystemLocales(),
+    SUPPORTED_LOCALES,
+    DEFAULT_LOCALE,
   );
   // 渲染期同步全局 store：provider 之外（原生 header/footer）的 t() 读的就是它。
   setGlobalLocale(locale);
