@@ -2,11 +2,9 @@ import {
   CHATGPT_USAGE_URL,
   collectLimitAccounts,
   collectExternalUsageLinks,
-  collectLimitNotices,
   collectLimitPools,
   cursorUsageWindowDetails,
   displayLimitWindows,
-  formatResetsIn,
   type LimitAccount,
   type LimitPool,
   type LimitPoolMember,
@@ -14,8 +12,12 @@ import {
   paceRemainingPercent,
   remainingPercent,
   type ResetCreditChoice,
-  resetCreditChoices,
 } from "@t3tools/shared/usageLimits";
+import {
+  collectLimitNotices,
+  formatResetsIn,
+  resetCreditChoices,
+} from "@t3tools/shared/usageLimitsCopy";
 import type { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 import { normalizeProviderAccentColor } from "@t3tools/client-runtime/state/provider-instance-display";
 import { AlertTriangleIcon, ExternalLinkIcon, TicketIcon } from "lucide-react";

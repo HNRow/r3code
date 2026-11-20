@@ -88,7 +88,8 @@ function resolveStandaloneIssueLink<Project extends LinkProject>(
   const { bindings } = trackers;
   const onTracker = projects.flatMap((project) => {
     const binding = bindings[project.id];
-    return binding?.tracker === tracker ? [{ project, binding }] : [];
+    if (binding === undefined || binding.tracker !== tracker) return [];
+    return [{ project, binding }];
   });
   const preferFirst = (candidates: typeof onTracker) =>
     candidates.find((candidate) => candidate.project.id === preferredProjectId) ?? candidates[0];

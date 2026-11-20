@@ -40,7 +40,7 @@ export function threadTitleTextFromPrompt(value: string): string {
   );
 }
 
-export function deriveThreadTitleSeed(input: ThreadTitleSeedInput): string {
+export function deriveThreadTitleSeed(input: ThreadTitleSeedInput, _resolve?: unknown): string {
   const text = threadTitleTextFromPrompt(input.text);
   if (text.length > 0) {
     return truncate(text);

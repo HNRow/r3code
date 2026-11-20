@@ -1024,25 +1024,27 @@ export const AcpRegistryDriver: ProviderDriver<AcpRegistrySettings, AcpRegistryD
               instanceId,
               request: (request) =>
                 provideAcpManagementServices(
-                  catalog.resolve(effectiveConfig, host.paths.cwd, processEnvironment).pipe(
-                    Effect.flatMap((resolved) =>
-                      makeKimiServerRequest({
-                        configHome,
-                        spawn: resolved.spawn,
-                        instanceId,
-                      })(request),
-                    ),
-                    Effect.provideService(FileSystem.FileSystem, kimiFileSystem),
-                    Effect.provideService(Path.Path, pathService),
-                    Effect.mapError((cause) =>
-                      isProviderDriverError(cause)
-                        ? cause
-                        : new ProviderDriverError({
-                            driver: DRIVER_KIND,
-                            instanceId,
-                            detail: "Could not resolve the Kimi runtime.",
-                            cause,
-                          }),
+                  Effect.scoped(
+                    catalog.resolve(effectiveConfig, host.paths.cwd, processEnvironment).pipe(
+                      Effect.flatMap((resolved) =>
+                        makeKimiServerRequest({
+                          configHome,
+                          spawn: resolved.spawn,
+                          instanceId,
+                        })(request),
+                      ),
+                      Effect.provideService(FileSystem.FileSystem, kimiFileSystem),
+                      Effect.provideService(Path.Path, pathService),
+                      Effect.mapError((cause) =>
+                        isProviderDriverError(cause)
+                          ? cause
+                          : new ProviderDriverError({
+                              driver: DRIVER_KIND,
+                              instanceId,
+                              detail: "Could not resolve the Kimi runtime.",
+                              cause,
+                            }),
+                      ),
                     ),
                   ),
                 ),

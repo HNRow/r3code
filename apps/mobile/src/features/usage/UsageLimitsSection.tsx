@@ -12,13 +12,11 @@ import {
 } from "@t3tools/contracts";
 import {
   type ResetCreditChoice,
-  resetCreditChoices,
-  formatResetsIn,
-  limitsNotice,
   paceOf,
   paceRemainingPercent,
   remainingPercent,
 } from "@t3tools/shared/usageLimits";
+import { formatResetsIn, limitsNotice, resetCreditChoices } from "@t3tools/shared/usageLimitsCopy";
 import { type ReactNode, useContext, useRef, useState } from "react";
 import { Atom } from "effect/reactivity";
 import { Pressable, View } from "react-native";

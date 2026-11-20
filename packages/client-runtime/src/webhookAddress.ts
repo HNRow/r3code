@@ -10,6 +10,7 @@ export interface WebhookAddress {
 export function webhookAddress(
   endpoint: ScheduledTaskWebhookEndpoint,
   httpBaseUrl: string | null,
+  _resolve?: unknown,
 ): WebhookAddress {
   if (endpoint.url !== null) {
     return { address: endpoint.url, copyable: true, note: null };

@@ -598,6 +598,26 @@
     "./terminalLabelsCopy": {
       "types": "./src/terminalLabelsCopy.ts",
       "import": "./src/terminalLabelsCopy.ts"
+    },
+    "./codexArtifactTemplatesCopy": {
+      "types": "./src/codexArtifactTemplatesCopy.ts",
+      "import": "./src/codexArtifactTemplatesCopy.ts"
+    },
+    "./projectScriptsCopy": {
+      "types": "./src/projectScriptsCopy.ts",
+      "import": "./src/projectScriptsCopy.ts"
+    },
+    "./orchestrationTimingCopy": {
+      "types": "./src/orchestrationTimingCopy.ts",
+      "import": "./src/orchestrationTimingCopy.ts"
+    },
+    "./toolActivityCopy": {
+      "types": "./src/toolActivityCopy.ts",
+      "import": "./src/toolActivityCopy.ts"
+    },
+    "./usageLimitsCopy": {
+      "types": "./src/usageLimitsCopy.ts",
+      "import": "./src/usageLimitsCopy.ts"
     }
   },
   "scripts": {

@@ -36,7 +36,7 @@ export function updateEasDeviceHosts(
     : [...hosts, next];
 }
 
-export function easSessionLimits(host: EasDeviceHostConfigType) {
+export function easSessionLimits(host: EasDeviceHostConfigType, _resolve?: unknown) {
   const sessions =
     host.maxConcurrentSessions === 1 ? "1 session" : `${host.maxConcurrentSessions} sessions`;
   return `Up to ${sessions} at once, each stopped after ${host.maxSessionMinutes} min or ${host.idleMinutes} idle min`;

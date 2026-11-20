@@ -4,6 +4,11 @@ import { defineConfig, normalizePath } from "vite-plus";
 import "vite-plus/test/config";
 
 const reactTests = [
+  "src/features/sharing/incoming-share-model.test.ts",
+  "src/features/threads/NewTaskRouteScreen.test.tsx",
+  "src/features/threads/ThreadGuestShareSheet.test.tsx",
+  "src/features/settings/SkillsSettingsScreen.test.tsx",
+  "src/components/ui/AppText.test.tsx",
   "src/features/threads/useSubmitAfterNativeImages.test.tsx",
   "src/features/threads/git/GitBranchesSheet.test.tsx",
   "src/features/threads/new-task-flow-provider.test.tsx",
@@ -116,6 +121,7 @@ export default defineConfig({
             "../../packages/shared/src/testing/longTempDir.ts",
             "../../packages/shared/src/testing/providerEnv.ts",
             "../../packages/shared/src/testing/gitEnv.ts",
+            "./src/testing/mockGt.ts",
           ],
         },
       },
@@ -167,6 +173,7 @@ export default defineConfig({
           setupFiles: [
             "../../packages/shared/src/testing/providerEnv.ts",
             "../../packages/shared/src/testing/gitEnv.ts",
+            "./src/testing/mockGt.ts",
           ],
         },
       },

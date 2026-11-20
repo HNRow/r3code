@@ -30,6 +30,8 @@ import { runtime } from "../../lib/runtime";
 import { appAtomRegistry } from "../../state/atom-registry";
 import { environmentServerConfigsAtom } from "../../state/server";
 import type { Preferences } from "../../persistence/mobile-preferences";
+import { MobilePreferencesStore } from "../../persistence/mobile-preferences";
+import * as MobileStorage from "../../persistence/mobile-storage";
 import {
   clearAgentAwarenessRegistrationRecord,
   loadAgentAwarenessDeviceId,
@@ -83,6 +85,11 @@ export class AgentAwarenessOperationError extends Schema.TaggedError<AgentAwaren
     return `Agent awareness operation ${this.operation} failed.`;
   }
 }
+
+export type AgentAwarenessRegistrationServices =
+  | ManagedRelay.ManagedRelayClient
+  | MobileStorage.MobileStorage
+  | MobilePreferencesStore;
 
 export type AgentAwarenessRegistrationError =
   | AgentAwarenessOperationError
@@ -738,7 +745,6 @@ const registerDevice = Effect.fn("remoteRegistration.registerDevice")(function* 
       deviceId,
       label:
         Constants.deviceName?.trim() ||
-        // oxlint-disable-next-line t3code/no-untranslated-copy -- device label stored on the relay and shown to every client
         (Platform.OS === "android" ? "Android device" : "iOS device"),
       ...(Platform.OS === "android"
         ? {

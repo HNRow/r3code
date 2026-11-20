@@ -1,6 +1,6 @@
 import type { EnvironmentId, UsageLimitsReport } from "@t3tools/contracts";
 import type { TimestampFormat } from "@t3tools/contracts/settings";
-import { limitsNotice } from "@t3tools/shared/usageLimits";
+import { limitsNotice } from "@t3tools/shared/usageLimitsCopy";
 import { GaugeIcon } from "lucide-react";
 
 import { ensureLocalApi } from "../../localApi";
@@ -72,23 +72,26 @@ export function usageLimitsBannerItem(
   };
 }
 
-export function modelFallbackBannerItem({
-  fallbackModelName,
-  defaultProviderName,
-  defaultModelName,
-  resetsAt,
-  timestampFormat,
-  onUseDefault,
-  onDismiss,
-}: {
-  readonly fallbackModelName: string;
-  readonly defaultProviderName: string;
-  readonly defaultModelName: string;
-  readonly resetsAt: string | null;
-  readonly timestampFormat: TimestampFormat;
-  readonly onUseDefault: () => void;
-  readonly onDismiss: () => void;
-}): ComposerBannerStackItem {
+export function modelFallbackBannerItem(
+  {
+    fallbackModelName,
+    defaultProviderName,
+    defaultModelName,
+    resetsAt,
+    timestampFormat,
+    onUseDefault,
+    onDismiss,
+  }: {
+    readonly fallbackModelName: string;
+    readonly defaultProviderName: string;
+    readonly defaultModelName: string;
+    readonly resetsAt: string | null;
+    readonly timestampFormat: TimestampFormat;
+    readonly onUseDefault: () => void;
+    readonly onDismiss: () => void;
+  },
+  _resolve?: unknown,
+): ComposerBannerStackItem {
   return {
     id: "fallback-model",
     variant: "info",
@@ -107,13 +110,16 @@ export function modelFallbackBannerItem({
   };
 }
 
-function UsageLimitsBannerBody({
-  report,
-  environmentId,
-}: {
-  readonly report: UsageLimitsReport;
-  readonly environmentId: EnvironmentId;
-}) {
+function UsageLimitsBannerBody(
+  {
+    report,
+    environmentId,
+  }: {
+    readonly report: UsageLimitsReport;
+    readonly environmentId: EnvironmentId;
+  },
+  _resolve?: unknown,
+) {
   const m = useMessages();
   const now = Date.parse(report.createdAt);
   return (

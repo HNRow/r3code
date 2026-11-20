@@ -11,14 +11,13 @@ import {
 import { useAtomValue } from "@effect/atom-react";
 import { normalizeProviderAccentColor } from "@t3tools/client-runtime/state/provider-instance-display";
 import {
-  formatResetsIn,
   type LimitPace,
   paceOf,
   paceRemainingPercent,
   remainingPercent,
   type ResetCreditChoice,
-  resetCreditChoices,
 } from "@t3tools/shared/usageLimits";
+import { formatResetsIn, resetCreditChoices } from "@t3tools/shared/usageLimitsCopy";
 import { GaugeIcon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { Fragment, useLayoutEffect, useState } from "react";
 

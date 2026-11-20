@@ -273,14 +273,17 @@ export function backgroundWorkNowItem(input: {
 }
 
 /** The local checkout moved off the branch this thread last ran on. */
-export function branchMismatchBannerItem(input: {
-  readonly mismatchKey: string;
-  readonly mismatch: { readonly threadBranch: string; readonly currentBranch: string };
-  readonly restoreDisabled: boolean;
-  readonly restoring: boolean;
-  readonly onRestore: () => void;
-  readonly onDismiss: () => void;
-}): ComposerBannerStackItem {
+export function branchMismatchBannerItem(
+  input: {
+    readonly mismatchKey: string;
+    readonly mismatch: { readonly threadBranch: string; readonly currentBranch: string };
+    readonly restoreDisabled: boolean;
+    readonly restoring: boolean;
+    readonly onRestore: () => void;
+    readonly onDismiss: () => void;
+  },
+  _resolve?: unknown,
+): ComposerBannerStackItem {
   const { mismatch } = input;
   return {
     id: `branch-mismatch:${input.mismatchKey}`,

@@ -95,11 +95,18 @@ function writeTextWithExecCommand(
   }
 }
 
+export interface ClipboardTargetOptions {
+  readonly target: string;
+  readonly unavailableMessage?: string;
+  readonly failureMessage?: string;
+}
+
 export async function writeTextToClipboard(
   value: string,
-  target = "text",
+  targetInput: string | ClipboardTargetOptions = "text",
   extraFlavors?: Readonly<Record<string, string>>,
 ) {
+  const target = typeof targetInput === "string" ? targetInput : targetInput.target;
   if (typeof window === "undefined") {
     throw new ClipboardApiUnavailableError({
       target,
@@ -200,7 +207,7 @@ export function useCopyToClipboard<TContext = void>({
   extraFlavors,
 }: {
   timeout?: number;
-  target?: string;
+  target?: string | ClipboardTargetOptions;
   onCopy?: (ctx: TContext) => void;
   onError?: (error: Error, ctx: TContext) => void;
   extraFlavors?: Readonly<Record<string, string>>;

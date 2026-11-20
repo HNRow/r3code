@@ -230,6 +230,7 @@ export function resolveWorkEntryToolPresentation(
     "label" | "toolTitle" | "toolData" | "toolLifecycleStatus" | "structuredPayload"
   >,
   fallbackStatus?: "inProgress" | "completed",
+  _resolve?: unknown,
 ) {
   const definition = resolveT3McpToolDefinition(
     workEntryToolName(entry),
@@ -563,7 +564,10 @@ function summaryActionPriority(action: ToolGroupAction | T3McpToolSummaryAction)
   }
 }
 
-export function summarizeToolGroup(entries: ReadonlyArray<WorkLogPresentationEntry>): {
+export function summarizeToolGroup(
+  entries: ReadonlyArray<WorkLogPresentationEntry>,
+  _resolve?: unknown,
+): {
   summary: string;
   hasFailure: boolean;
 } {

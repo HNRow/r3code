@@ -35,7 +35,10 @@ type RecoveryProps = {
   onChange: (recovery: OrchestrationV2LimitRecoveryUpdate) => Promise<void>;
 };
 
-export function usageLimitRecoveryBannerItem(props: RecoveryProps): ComposerBannerStackItem {
+export function usageLimitRecoveryBannerItem(
+  props: RecoveryProps,
+  _resolve?: unknown,
+): ComposerBannerStackItem {
   const {
     runId,
     errorCode,

@@ -150,7 +150,7 @@ export interface ChannelSwitchRelease {
   readonly databaseMigration: number | undefined;
 }
 
-export const channelSwitchLabel = (channel: DesktopUpdateChannel) =>
+export const channelSwitchLabel = (channel: DesktopUpdateChannel, _resolve?: unknown) =>
   channel === "nightly" ? "Nightly" : "Stable";
 
 /** Stable and Nightly each build their own commits, so either can hold migrations the other lacks.
@@ -438,7 +438,7 @@ export function closeFinishedUpdateRun(run: UpdateEverythingRun): UpdateEverythi
 
 const UPDATE_SLOW_AFTER_MS = 3 * 60 * 1000;
 
-export function formatUpdateElapsed(ms: number): string {
+export function formatUpdateElapsed(ms: number, _resolve?: unknown): string {
   const minutes = Math.floor(ms / 60_000);
   if (minutes < 1) return "<1m";
   if (minutes < 60) return `${minutes}m`;
@@ -469,6 +469,7 @@ export function describeUpdateCapsule(
   machines: ReadonlyArray<UpdateRunMachineView>,
   local: UpdateRunLocalState,
   now: number,
+  _resolve?: unknown,
 ): UpdateCapsuleView {
   if (run.phase === "countdown" && run.restartAt !== null) {
     const seconds = Math.max(0, Math.ceil((run.restartAt - now) / 1000));

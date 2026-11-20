@@ -11,7 +11,7 @@ import { environmentSession } from "./session";
 
 export const filesystemEnvironment = createFilesystemEnvironmentAtoms(connectionAtomRuntime);
 
-export function useFilesystemReadAccess(environmentId: EnvironmentId | null) {
+export function useFilesystemReadAccess(environmentId: EnvironmentId | null, _resolve?: unknown) {
   const session = useEnvironmentQuery(
     environmentId === null ? null : environmentSession.sessionStateAtom(environmentId),
   );

@@ -72,12 +72,15 @@ export function resolveNewTaskLocalWorkspaceSelection(input: {
   };
 }
 
-export function resolveNewTaskBranchLabel(input: {
-  readonly branchName: string | null;
-  readonly startFromOrigin: boolean;
-  readonly workspaceMode: WorkspaceMode;
-  readonly pullRequestReference?: string;
-}): string {
+export function resolveNewTaskBranchLabel(
+  input: {
+    readonly branchName: string | null;
+    readonly startFromOrigin: boolean;
+    readonly workspaceMode: WorkspaceMode;
+    readonly pullRequestReference?: string;
+  },
+  _resolve?: unknown,
+): string {
   if (input.workspaceMode === "worktree" && input.pullRequestReference) {
     const parsed = sourceControlClients.parseChangeRequestUrl(input.pullRequestReference);
     if (parsed) return `From ${parsed.definition.changeRequest.shortLabel} #${parsed.link.number}`;

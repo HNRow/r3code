@@ -244,6 +244,7 @@ export function linkRequestTarget(
   item: Pick<LinkRequestItem, "environmentId" | "url">,
   machines: ReadonlyArray<LinkableMachine>,
   choice: string | null,
+  _resolve?: unknown,
 ): LinkRequestTarget {
   const asked = item.url === undefined ? undefined : originOf(item.url);
   // Two machines on separate networks can share a private address.
@@ -288,6 +289,7 @@ export function linkRequestDisplay(
   item: Pick<LinkRequestItem, "linkStatus" | "url" | "linkedLabel" | "linkedAccess" | "failure">,
   visibility: "local" | "inherited" | "synthetic",
   accessLabel: (access: AuthMcpClientAccess) => string,
+  _resolve?: unknown,
 ): LinkRequestDisplay {
   switch (item.linkStatus) {
     case "pending":
@@ -371,7 +373,7 @@ const USER_FACING_FAILURE_TAGS = new Set([
  * through: anything else (transport or encoding failures) gets the generic
  * copy, so the pairing code can never surface in the UI.
  */
-export function linkRequestFailureMessage(failure: unknown): string {
+export function linkRequestFailureMessage(failure: unknown, _resolve?: unknown): string {
   if (
     typeof failure === "object" &&
     failure !== null &&

@@ -76,6 +76,7 @@ const decodeFilter = Schema.decodeUnknownOption(ScheduledTaskWebhookFilter);
  */
 export function parseWebhookFilterDrafts(
   drafts: ReadonlyArray<WebhookFilterDraft>,
+  _resolve?: unknown,
 ): { readonly filters: ReadonlyArray<ScheduledTaskWebhookFilter> } | { readonly error: string } {
   if (drafts.length > MAX_WEBHOOK_FILTERS) {
     return { error: `Use at most ${MAX_WEBHOOK_FILTERS} filters.` };

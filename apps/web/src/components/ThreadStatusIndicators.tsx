@@ -451,6 +451,7 @@ function ThreadPullRequestMiniListItem({
 export function prStatusIndicator(
   pr: ThreadPr,
   provider: VcsStatusResult["sourceControlProvider"] | null | undefined,
+  _resolve?: unknown,
 ): PrStatusIndicator | null {
   if (!pr) return null;
   const { shortLabel } = sourceControlClients.get(provider?.kind).changeRequest;
@@ -531,6 +532,7 @@ export function resolveDisplayedThreadPrProvider(input: {
 
 export function terminalStatusFromRunningIds(
   runningTerminalIds: ReadonlyArray<string>,
+  _resolve?: unknown,
 ): TerminalStatusIndicator | null {
   if (runningTerminalIds.length === 0) {
     return null;

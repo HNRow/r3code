@@ -31,12 +31,12 @@ const linkedIssueRef = ({ projectId, tracker, host, scope, key }: ThreadIssueLin
 export function useLinkedIssueDetail(
   environmentId: EnvironmentId,
   link: ThreadIssueLink | undefined,
-  mountScope?: "sidebar" | "thread-details" | "linked-items" | "sidebar-tooltip",
+  _mountScope?: "sidebar" | "thread-details" | "linked-items" | "sidebar-tooltip",
 ) {
   const configs = useServerConfigs();
   return useEnvironmentQuery(
     link && configs.get(environmentId)?.environment.capabilities.issues === true
-      ? issueEnvironment.detail({ environmentId, input: linkedIssueRef(link) }, mountScope)
+      ? issueEnvironment.detail({ environmentId, input: linkedIssueRef(link) })
       : null,
   ).data;
 }
@@ -55,10 +55,10 @@ export function useSidebarLinkedIssueState(
             (link) =>
               selectEnvironmentQueryData(
                 get(
-                  issueEnvironment.detail(
-                    { environmentId, input: linkedIssueRef(link) },
-                    "sidebar",
-                  ),
+                  issueEnvironment.detail({
+                    environmentId,
+                    input: linkedIssueRef(link),
+                  }),
                 ),
               )?.state,
           );

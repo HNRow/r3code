@@ -1,3 +1,5 @@
+import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
+import { m } from "../../i18n/messages";
 import { DownloadIcon, CopyIcon, CheckIcon, Code2Icon, EyeIcon, Table2Icon } from "lucide-react";
 import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
 import { Spinner } from "~/components/ui/spinner";

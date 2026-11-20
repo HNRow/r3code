@@ -23,11 +23,14 @@ export type AttachmentUploadState =
       readonly previous?: ReadyAttachmentUpload;
     };
 
-export function attachmentUploadBlockReason(input: {
-  readonly imageIds: ReadonlyArray<string>;
-  readonly uploadsByImageId: Readonly<Record<string, AttachmentUploadState>>;
-  readonly environmentId: EnvironmentId;
-}): string | null {
+export function attachmentUploadBlockReason(
+  input: {
+    readonly imageIds: ReadonlyArray<string>;
+    readonly uploadsByImageId: Readonly<Record<string, AttachmentUploadState>>;
+    readonly environmentId: EnvironmentId;
+  },
+  _resolve?: unknown,
+): string | null {
   let pending = 0;
 
   for (const imageId of input.imageIds) {

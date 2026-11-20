@@ -297,18 +297,27 @@ export function formatRelativeElapsed(elapsedMs: number): RelativeTimeParts {
 export function formatRelativeTime(
   isoDate: string,
   nowMs: number = Date.now(),
+  _resolve?: unknown,
 ): RelativeTimeParts | null {
   const elapsedMs = relativeTimeElapsedMs(isoDate, nowMs);
   return elapsedMs === null ? null : formatRelativeElapsed(elapsedMs);
 }
 
-export function formatRelativeTimeLabel(isoDate: string, nowMs: number = Date.now()) {
+export function formatRelativeTimeLabel(
+  isoDate: string,
+  nowMs: number = Date.now(),
+  _resolve?: unknown,
+) {
   const relative = formatRelativeTime(isoDate, nowMs);
   if (!relative) return "";
   return relative.suffix ? `${relative.value} ${relative.suffix}` : relative.value;
 }
 
-export function formatElapsedDurationLabel(isoDate: string, nowMs: number = Date.now()): string {
+export function formatElapsedDurationLabel(
+  isoDate: string,
+  nowMs: number = Date.now(),
+  _resolve?: unknown,
+): string {
   const date = parseTimestampDate(isoDate);
   if (!date) return "";
   const diffMs = nowMs - date.getTime();
@@ -329,7 +338,11 @@ export function formatElapsedDurationLabel(isoDate: string, nowMs: number = Date
 }
 
 /** Pass nowMs to match a parent-driven render tick. */
-export function formatExpiresInLabel(isoDate: string, nowMs: number = Date.now()): string {
+export function formatExpiresInLabel(
+  isoDate: string,
+  nowMs: number = Date.now(),
+  _resolve?: unknown,
+): string {
   const date = parseTimestampDate(isoDate);
   if (!date) return "";
   const diffMs = date.getTime() - nowMs;

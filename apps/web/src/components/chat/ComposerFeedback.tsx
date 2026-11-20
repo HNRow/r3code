@@ -13,6 +13,7 @@ import { T, t } from "gt-react";
 export function feedbackBannerItem(
   submission: CodexFeedbackSubmission,
   onDismiss: () => void,
+  _resolve?: unknown,
 ): ComposerBannerStackItem | null {
   const notice = codexFeedbackNotice(submission);
   if (!notice) return null;

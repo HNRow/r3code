@@ -97,7 +97,7 @@ export function isLiveSubagentTurnItem(item: OrchestrationV2TurnItem): boolean {
   return item.type === "subagent" && isOrchestrationV2WorkActive(item.status);
 }
 
-export function waitingOnSubagentsLabel(count: number): string {
+export function waitingOnSubagentsLabel(count: number, _resolve?: unknown): string {
   return count === 1 ? "Waiting on a subagent" : `Waiting on ${count} subagents`;
 }
 
@@ -362,16 +362,19 @@ export interface WorkflowOpening {
  * shown as the workflow's plan. The coordinator row lives on the parent thread, so
  * `parentSubagents` is the parent projection's subagents, or null when it is not loaded.
  */
-export function resolveWorkflowOpening(input: {
-  readonly thread: Pick<OrchestrationV2AppThread, "id" | "lineage" | "creationSource">;
-  readonly messages: ReadonlyArray<{
-    readonly id: string;
-    readonly role: string;
-    readonly text: string;
-    readonly workflowScript?: boolean | undefined;
-  }>;
-  readonly parentSubagents: ReadonlyArray<ProjectedSubagent> | null;
-}): WorkflowOpening | null {
+export function resolveWorkflowOpening(
+  input: {
+    readonly thread: Pick<OrchestrationV2AppThread, "id" | "lineage" | "creationSource">;
+    readonly messages: ReadonlyArray<{
+      readonly id: string;
+      readonly role: string;
+      readonly text: string;
+      readonly workflowScript?: boolean | undefined;
+    }>;
+    readonly parentSubagents: ReadonlyArray<ProjectedSubagent> | null;
+  },
+  _resolve?: unknown,
+): WorkflowOpening | null {
   if (!isProviderNativeSubagentThread(input.thread)) return null;
   const first = input.messages.find((message) => message.role === "user");
   if (first === undefined) return null;

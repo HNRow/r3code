@@ -57,6 +57,7 @@ export interface LocalChatMessage {
 export function codexFeedbackMessage(
   submission: CodexFeedbackSubmission,
   role: "user" | "assistant" = "user",
+  _resolve?: unknown,
 ): LocalChatMessage {
   const text =
     role === "user"
@@ -78,12 +79,15 @@ export function codexFeedbackMessage(
   };
 }
 
-export async function submitCodexFeedback<E>(input: {
-  readonly submission: CodexFeedbackSubmissionDetails;
-  readonly clearDraft: () => void;
-  readonly onUpdate: (submission: CodexFeedbackSubmission) => void;
-  readonly upload: () => Promise<AtomCommandResult<ProviderUploadFeedbackResult, E>>;
-}): Promise<AtomCommandResult<ProviderUploadFeedbackResult, E>> {
+export async function submitCodexFeedback<E>(
+  input: {
+    readonly submission: CodexFeedbackSubmissionDetails;
+    readonly clearDraft: () => void;
+    readonly onUpdate: (submission: CodexFeedbackSubmission) => void;
+    readonly upload: () => Promise<AtomCommandResult<ProviderUploadFeedbackResult, E>>;
+  },
+  _resolve?: unknown,
+): Promise<AtomCommandResult<ProviderUploadFeedbackResult, E>> {
   input.onUpdate({ ...input.submission, status: "uploading" });
   input.clearDraft();
 

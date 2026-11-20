@@ -20,6 +20,7 @@ export function resolveSnoozePresets(
   now: Date,
   timestampFormat: TimestampFormat,
   environmentId: EnvironmentId,
+  _resolve?: unknown,
 ): ReadonlyArray<SnoozePreset> {
   return resolveSharedSnoozePresets(now, snoozeOptions(timestampFormat, environmentId));
 }

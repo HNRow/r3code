@@ -442,7 +442,11 @@ export function isHostedAppPairingUrl(value: string): boolean {
   }
 }
 
-export function endpointShareHint(endpoint: AdvertisedEndpoint, url: string): string {
+export function endpointShareHint(
+  endpoint: AdvertisedEndpoint,
+  url: string,
+  _resolve?: unknown,
+): string {
   if (isHostedAppPairingUrl(url)) {
     return "Opens the hosted app, no install needed";
   }

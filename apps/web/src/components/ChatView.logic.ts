@@ -438,6 +438,7 @@ export function buildLocalDraftThread(
   threadId: ThreadId,
   draftThread: DraftThreadState,
   fallbackModelSelection: ModelSelection,
+  _resolve?: unknown,
 ): Thread {
   const timestamp = DateTime.makeUnsafe(draftThread.createdAt);
   return presentThreadShell(draftThread.environmentId, {
@@ -535,6 +536,7 @@ export function getAntigravitySendBlockReason(
     | null
     | undefined,
   model: string,
+  _resolve?: unknown,
 ): string | null {
   if (provider?.driver !== "antigravity") return null;
   if (!provider.installed) {

@@ -219,6 +219,7 @@ function run(
 }
 
 export interface FakeThread {
+  readonly issues?: ReadonlyArray<unknown>;
   /** Makes this a side chat of that thread. */
   readonly sideChatOf?: ThreadId;
   /** Makes this an older settled thread the shell leaves out; only its family read returns it. */

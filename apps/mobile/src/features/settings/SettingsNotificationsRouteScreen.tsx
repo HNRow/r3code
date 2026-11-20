@@ -1,5 +1,5 @@
 import { errorDisplayMessage } from "@t3tools/client-runtime/errors";
-import { msg, useGT, useMessages } from "gt-react-native";
+import { msg, useGT } from "gt-react-native";
 import * as Dialog from "../../components/ui/Dialog";
 import { managedCapabilityDenial } from "@t3tools/client-runtime/contract-labels";
 import {
@@ -207,11 +207,10 @@ export function SettingsNotificationsRouteScreen() {
 
 function ConfiguredSettingsNotificationsRouteScreen() {
   const gt = useGT();
-  const m = useMessages();
   const preferencesResult = useAtomValue(mobilePreferencesAtom);
   const savePreferences = useAtomCommand(saveMobilePreferences);
   const agentAwarenessPushAvailable = supportsAgentAwarenessPush();
-  const agentAwarenessPlatform = resolveAgentAwarenessPlatformPresentation(Platform.OS, m);
+  const agentAwarenessPlatform = resolveAgentAwarenessPlatformPresentation(Platform.OS);
   const agentAwarenessSubtitle =
     Platform.OS === "android" && !agentAwarenessPushAvailable
       ? gt("Install a newer app build to enable notifications")

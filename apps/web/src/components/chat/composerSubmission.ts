@@ -9,7 +9,10 @@ type ComposerSubmissionInput = {
   submissionTarget: "provider-turn" | "pending-user-input";
 };
 
-export function getComposerPromptLengthValidationMessage(prompt: string): string | null {
+export function getComposerPromptLengthValidationMessage(
+  prompt: string,
+  _resolve?: unknown,
+): string | null {
   const normalizedPrompt = prompt.trim();
   const inputLength = Math.max(
     normalizedPrompt.length,

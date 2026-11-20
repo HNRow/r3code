@@ -1943,12 +1943,10 @@ describe("provider setup commands", () => {
         Effect.sync(() => registry.dispose()),
       );
 
-      const result = yield* Effect.promise(() =>
-        atoms.skillInventory.run(registry, {
-          environmentId: TARGET.environmentId,
-          input: { instanceId: ProviderInstanceId.make("claude"), cwd: "/repo" },
-        }),
-      );
+      const result = yield* atoms.skillInventory.run(registry, {
+        environmentId: TARGET.environmentId,
+        input: { instanceId: ProviderInstanceId.make("claude"), cwd: "/repo" },
+      });
       const base = {
         instanceId: ProviderInstanceId.make("claude"),
         cwd: "/repo",
@@ -1956,26 +1954,23 @@ describe("provider setup commands", () => {
         expectedRevision: "revision-1",
       };
       const target = <T>(input: T) => ({ environmentId: TARGET.environmentId, input });
-      const installed = yield* Effect.promise(() =>
-        atoms.installSkill.run(registry, target({ ...base, sourceFolder: "/source/review" })),
+      const installed = yield* atoms.installSkill.run(
+        registry,
+        target({ ...base, sourceFolder: "/source/review" }),
       );
-      yield* Effect.promise(() =>
-        atoms.setSkillEnabled.run(registry, target({ ...base, enabled: false })),
-      );
-      yield* Effect.promise(() => atoms.uninstallSkill.run(registry, target(base)));
-      const synced = yield* Effect.promise(() =>
-        atoms.syncSkills.run(
-          registry,
-          target({
-            sourceInstanceId: ProviderInstanceId.make("claude-a"),
-            targetInstanceId: ProviderInstanceId.make("claude-b"),
-            cwd: "/repo",
-            mode: "copy",
-            nativeIds: ["review"] as [string],
-            expectedRevision: "revision-1",
-            onConflict: "backup",
-          }),
-        ),
+      yield* atoms.setSkillEnabled.run(registry, target({ ...base, enabled: false }));
+      yield* atoms.uninstallSkill.run(registry, target(base));
+      const synced = yield* atoms.syncSkills.run(
+        registry,
+        target({
+          sourceInstanceId: ProviderInstanceId.make("claude-a"),
+          targetInstanceId: ProviderInstanceId.make("claude-b"),
+          cwd: "/repo",
+          mode: "copy",
+          nativeIds: ["review"] as [string],
+          expectedRevision: "revision-1",
+          onConflict: "backup",
+        }),
       );
 
       expect(result).toMatchObject({ _tag: "Success", value: inventory });

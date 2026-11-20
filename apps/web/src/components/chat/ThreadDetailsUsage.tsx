@@ -6,12 +6,11 @@ import type {
 } from "@t3tools/contracts";
 import {
   collectProviderUsageLimits,
-  formatDuration,
   type LimitPace,
-  limitsNotice,
   paceOf,
   remainingPercent,
 } from "@t3tools/shared/usageLimits";
+import { formatDuration, limitsNotice } from "@t3tools/shared/usageLimitsCopy";
 import type { ReactNode } from "react";
 
 import { usePrimarySettings } from "../../hooks/useSettings";

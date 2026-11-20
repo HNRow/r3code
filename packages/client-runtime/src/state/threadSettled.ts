@@ -347,7 +347,11 @@ export function pickSnoozePreset(input: {
   return (setting && resolveSnoozePreset(setting, input.now, input.formatTime)) ?? ahead;
 }
 
-export function snoozeWakeLabel(snoozedUntil: string, options: { readonly now: string }): string {
+export function snoozeWakeLabel(
+  snoozedUntil: string,
+  options: { readonly now: string },
+  _resolve?: unknown,
+): string {
   const wakeMs = Date.parse(snoozedUntil);
   const nowMs = Date.parse(options.now);
   if (Number.isNaN(wakeMs) || Number.isNaN(nowMs)) return "now";

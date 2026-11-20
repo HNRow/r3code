@@ -19,6 +19,8 @@ import {
   composerTargetKey,
   useComposerDraftStore,
 } from "../../composerDraftStore";
+import { m } from "../../i18n/messages";
+import { msg } from "gt-react";
 import { type ComposerPromptEditorHandle } from "../ComposerPromptEditorTiptap";
 import type { PendingUserInputProgress } from "../../pendingUserInput";
 import type { ComposerAttachmentInsertion } from "../composerAttachmentInsertion";

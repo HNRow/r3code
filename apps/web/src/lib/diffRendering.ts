@@ -158,6 +158,7 @@ export function getRenderablePatch(
   patch: string | undefined,
   cacheScope = "diff-panel",
   options: RenderablePatchOptions = {},
+  _messages?: unknown,
 ): RenderablePatch | null {
   if (!patch?.trim()) return null;
 

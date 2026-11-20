@@ -10,6 +10,8 @@ import * as Semaphore from "effect/Semaphore";
 
 import * as Electron from "electron";
 
+import { m } from "../i18n/messages.ts";
+import { msg } from "gt-i18n";
 import { type DesktopSnapShotEvent, DEFAULT_CLIENT_SETTINGS } from "@t3tools/contracts";
 
 import * as DesktopAssets from "../app/DesktopAssets.ts";

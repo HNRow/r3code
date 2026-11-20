@@ -29,6 +29,7 @@ export function threadChipCopyTarget(
   threadRef: ScopedThreadRef,
   title: string,
   hostedAppUrl?: string,
+  _resolve?: unknown,
 ): ThreadReferenceCopyTarget {
   const record = threadContextRecord(threadRef, title);
   return {
@@ -42,15 +43,18 @@ export function threadChipCopyTarget(
   };
 }
 
-export function resolveThreadReferenceCopyTarget(input: {
-  readonly threadRef: ScopedThreadRef;
-  readonly title: string;
-  /** Undefined means no PR panel; null means its URL is not available yet. */
-  readonly openPanelPullRequestUrl?: string | null | undefined;
-  readonly pullRequests?: ReadonlyArray<ThreadPullRequestLink> | undefined;
-  readonly linkedPullRequestUrl?: string | null;
-  readonly hostedAppUrl?: string;
-}): ThreadReferenceCopyTarget | null {
+export function resolveThreadReferenceCopyTarget(
+  input: {
+    readonly threadRef: ScopedThreadRef;
+    readonly title: string;
+    /** Undefined means no PR panel; null means its URL is not available yet. */
+    readonly openPanelPullRequestUrl?: string | null | undefined;
+    readonly pullRequests?: ReadonlyArray<ThreadPullRequestLink> | undefined;
+    readonly linkedPullRequestUrl?: string | null;
+    readonly hostedAppUrl?: string;
+  },
+  _resolve?: unknown,
+): ThreadReferenceCopyTarget | null {
   if (input.openPanelPullRequestUrl === null) return null;
   const pullRequestUrl =
     input.openPanelPullRequestUrl ??

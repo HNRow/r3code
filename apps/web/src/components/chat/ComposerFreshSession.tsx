@@ -4,7 +4,10 @@ import type { ComposerBannerStackItem } from "./ComposerBannerStack";
 import { t } from "gt-react";
 
 /** Shown while `/clear` is armed; dismissing it keeps the current conversation. */
-export function freshSessionBannerItem(onUndo: () => void): ComposerBannerStackItem {
+export function freshSessionBannerItem(
+  onUndo: () => void,
+  _resolve?: unknown,
+): ComposerBannerStackItem {
   return {
     id: "fresh-session",
     variant: "info",

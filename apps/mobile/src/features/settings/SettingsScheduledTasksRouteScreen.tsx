@@ -137,8 +137,7 @@ function describeSchedule(
       msg("Once, {date} at {time}", { date: formatRunAtDate(runAt), time: formatRunAtTime(runAt) }),
     );
   }
-  if (task.schedule.type === "interval")
-    return formatScheduledTaskInterval(task.schedule.everyMs, resolve);
+  if (task.schedule.type === "interval") return formatScheduledTaskInterval(task.schedule.everyMs);
   const days = task.schedule.weekdays?.length
     ? repeatLabel(task.schedule.weekdays, resolve, locale)
     : resolve(msg("Every day"));
@@ -354,7 +353,6 @@ function WebhookFilterRows(props: {
             <FormField
               label={filter.op === "in" ? gt("Values, comma-separated") : gt("Value")}
               value={filter.value}
-              // oxlint-disable-next-line t3code/no-untranslated-copy -- webhook action values
               placeholder={filter.op === "in" ? "opened, reopened" : "opened"}
               disabled={props.disabled}
               onChange={(value) => update(filter.id, { value })}

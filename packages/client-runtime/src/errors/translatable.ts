@@ -1,7 +1,10 @@
-import { mFallback } from "gt-i18n";
+import { decodeMsg, decodeOptions, mFallback } from "gt-i18n";
 import type { MFunctionType } from "gt-i18n/types";
 
-// 本 fork 的错误目前只带英文 message；i18nMessage 是上游给已标记文案预留的字段。
+function englishSentence(marked: string): string {
+  return typeof decodeOptions(marked)?.$_source === "string" ? decodeMsg(marked) : marked;
+}
+
 function resolveMarkedText(text: ReadonlyArray<string>, resolve: MFunctionType): string {
   return text.map((sentence) => resolve(sentence)).join(" ");
 }
@@ -12,6 +15,14 @@ function errorI18nMessage(error: unknown): ReadonlyArray<string> | undefined {
   return Array.isArray(text) && text.every((sentence) => typeof sentence === "string")
     ? text
     : undefined;
+}
+
+/** `detail` in English plus the marked text, for errors whose `message` reads `detail`. */
+export function translatableDetail(...text: ReadonlyArray<string>): {
+  readonly detail: string;
+  readonly i18nMessage: ReadonlyArray<string>;
+} {
+  return { detail: text.map(englishSentence).join(" "), i18nMessage: text };
 }
 
 /** What to show for an error: its marked text in the active language, else its message. */

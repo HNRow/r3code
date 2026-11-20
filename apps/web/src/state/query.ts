@@ -35,6 +35,7 @@ function queryUpdatedAt(result: AsyncResult.AsyncResult<unknown, unknown>): numb
 
 export function useEnvironmentQuery<A, E>(
   atom: Atom.Atom<AsyncResult.AsyncResult<A, E>> | null,
+  _resolve?: unknown,
 ): EnvironmentQueryView<A, E> {
   const selectedAtom = atom ?? EMPTY_ASYNC_RESULT_ATOM;
   const result = useAtomValue(selectedAtom);

@@ -56,7 +56,6 @@ import * as Equal from "effect/Equal";
 import { shallow } from "zustand/vanilla/shallow";
 import { t } from "gt-react";
 
-export { formatDuration } from "@t3tools/shared/orchestrationTiming";
 export {
   workEntryDisplayIndicatesToolFailure,
   workEntryIndicatesToolFailure,

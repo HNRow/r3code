@@ -126,7 +126,7 @@ import {
   startQueuedRunEditSave,
   useQueuedRunEdit,
 } from "./queued-run-edit";
-import { msg, useLocale, useMessages } from "gt-react-native";
+import { msg, useMessages } from "gt-react-native";
 import { m } from "../i18n/messages";
 import { setPendingConnectionError } from "./use-remote-environment-registry";
 import { clearThreadComposerError, setThreadComposerError } from "./thread-composer-error";
@@ -236,7 +236,6 @@ export function useThreadComposerState(input: {
     selectedEnvironmentRuntime,
   } = useThreadSelection();
   const resolve = useMessages();
-  const locale = useLocale();
   const selectedThreadProjection = useSelectedThreadProjection();
   const selectedThreadVisibleTurnItems = useSelectedThreadVisibleTurnItems();
   const acknowledgedMessages = useAtomValue(acknowledgedThreadMessagesAtom);
@@ -317,8 +316,6 @@ export function useThreadComposerState(input: {
       nodes: selectedThreadNodes,
       checkpointSummaries,
       cache: feedCache,
-      resolve,
-      locale,
     });
     const pendingAcknowledgments = selectPendingAcknowledgedMessages(acknowledgedMessages, {
       threadKey: selectedThreadKey,
@@ -1003,6 +1000,32 @@ export function useThreadComposerState(input: {
     removeComposerDraftAttachment(threadKey, imageId);
   };
 
+  const onSendCommand = async (text: string): Promise<MessageId | null> => {
+    if (!selectedThreadShell) return null;
+    if (
+      selectedEnvironmentRuntime?.connectionState === "connected" &&
+      !readEnvironmentScope(selectedThreadShell.environmentId, AuthOrchestrationOperateScope)
+    )
+      return null;
+    if (selectedThreadCreation !== null) return null;
+    const metadata = makeQueuedMessageMetadata();
+    const messageId = MessageId.make(metadata.messageId);
+    await enqueueThreadOutboxMessage({
+      environmentId: selectedThreadShell.environmentId,
+      threadId: selectedThreadShell.id,
+      messageId,
+      commandId: CommandId.make(metadata.commandId),
+      text,
+      attachments: [],
+      modelSelection: selectedThreadShell.modelSelection,
+      runtimeMode: selectedThreadShell.runtimeMode,
+      interactionMode: DEFAULT_PROVIDER_INTERACTION_MODE,
+      restoreToDraft: false,
+      createdAt: metadata.createdAt,
+    });
+    return messageId;
+  };
+
   return {
     feedbackSubmissions,
     dismissFeedback,
@@ -1052,6 +1075,7 @@ export function useThreadComposerState(input: {
     onNativePasteText,
     onRemoveDraftImage,
     onSendMessage,
+    onSendCommand,
     sideChatUnavailableReason,
   };
 }

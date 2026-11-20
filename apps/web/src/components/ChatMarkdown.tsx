@@ -681,8 +681,8 @@ function useChatMarkdownState({
       : revealInFileManager === "finder" ||
           revealInFileManager === "file-explorer" ||
           revealInFileManager === "files"
-        ? revealInFileExplorerLabelForKind(revealInFileManager, messages)
-        : revealInFileExplorerLabelForOs(revealInFileManager, messages);
+        ? revealInFileExplorerLabelForKind(revealInFileManager)
+        : revealInFileExplorerLabelForOs(revealInFileManager);
   const projects = useProjects();
   const issueProjects = projects.filter((project) => project.environmentId === environmentId);
   // Only text naming a standalone tracker asks for its bindings, whose read probes the tracker.

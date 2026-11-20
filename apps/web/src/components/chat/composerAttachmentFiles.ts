@@ -207,6 +207,7 @@ export function fileAttachmentCapabilityBlockReason(
   input: FileAttachmentCapabilityState & {
     readonly files: ReadonlyArray<{ readonly name: string; readonly sizeBytes: number }>;
   },
+  _resolve?: unknown,
 ): string | null {
   if (input.files.length === 0) {
     return null;

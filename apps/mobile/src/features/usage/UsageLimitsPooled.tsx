@@ -5,17 +5,19 @@ import { providerClients } from "@t3tools/client-runtime/provider-clients";
 import { normalizeProviderAccentColor } from "@t3tools/client-runtime/state/provider-instance-display";
 import {
   collectLimitAccounts,
-  collectExternalUsageLinks,
-  collectLimitNotices,
   collectLimitPools,
-  cursorUsageWindowDetails,
   displayLimitWindows,
-  formatResetsIn,
   paceRemainingPercent,
   remainingPercent,
   type LimitAccount,
   type LimitPoolWindow,
 } from "@t3tools/shared/usageLimits";
+import {
+  collectExternalUsageLinks,
+  collectLimitNotices,
+  cursorUsageWindowDetails,
+  formatResetsIn,
+} from "@t3tools/shared/usageLimitsCopy";
 import { Fragment, type ReactNode, useId, useState } from "react";
 import { Pressable, View } from "react-native";
 import { tryOpenExternalUrl } from "../../lib/openExternalUrl";

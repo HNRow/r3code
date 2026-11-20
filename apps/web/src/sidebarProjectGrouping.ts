@@ -150,17 +150,14 @@ export function buildSidebarProjectSnapshots(
     isDesktopLocalEnvironment?: (environmentId: EnvironmentId) => boolean;
     isWslEnvironment?: (environmentId: EnvironmentId) => boolean;
   },
-  resolve: MessageResolver = m,
+  _resolve: MessageResolver = m,
 ): SidebarProjectSnapshot[] {
-  return buildProjectGroups(
-    {
-      projects: input.projects,
-      groupScratchProjects: input.groupScratchProjects ?? false,
-      settings: input.settings,
-      preferredEnvironmentId: input.primaryEnvironmentId,
-    },
-    resolve,
-  ).map((group): SidebarProjectSnapshot => {
+  return buildProjectGroups({
+    projects: input.projects,
+    groupScratchProjects: input.groupScratchProjects ?? false,
+    settings: input.settings,
+    preferredEnvironmentId: input.primaryEnvironmentId,
+  }).map((group): SidebarProjectSnapshot => {
     const members = group.members.map(
       ({ physicalProjectKey, project }): SidebarProjectGroupMember => ({
         ...project,

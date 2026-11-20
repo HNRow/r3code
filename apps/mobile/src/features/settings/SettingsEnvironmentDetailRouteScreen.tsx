@@ -1,5 +1,5 @@
 import { errorDisplayMessage } from "@t3tools/client-runtime/errors";
-import { serverUpdateFailureText } from "@t3tools/client-runtime/state/server";
+import { serverUpdateFailureMessage } from "@t3tools/client-runtime/state/server";
 import { T, useGT, useMessages, Var } from "gt-react-native";
 import * as Dialog from "../../components/ui/Dialog";
 import { useAtom, useAtomValue } from "@effect/atom-react";
@@ -279,7 +279,7 @@ function EnvironmentDetail({ environmentId }: { readonly environmentId: Environm
                       </Text>
                     ) : updateState.status === "failed" ? (
                       <Text selectable className="text-sm text-danger-foreground">
-                        {serverUpdateFailureText(updateState, messages)}
+                        {serverUpdateFailureMessage(updateState)}
                       </Text>
                     ) : null}
                     {checkedRelease && !updatesDenial ? (

@@ -5,7 +5,7 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../
 import { useGT, T } from "gt-react";
 
 const languageNames = new Intl.DisplayNames(["en"], { type: "language" });
-export const languageLabel = (code: string) => languageNames.of(code) ?? code;
+export const languageLabel = (code: string, _locale?: unknown) => languageNames.of(code) ?? code;
 
 type ModelLanguages = Pick<
   Extract<EnvironmentSpeechStatus, { supported: true }>,
