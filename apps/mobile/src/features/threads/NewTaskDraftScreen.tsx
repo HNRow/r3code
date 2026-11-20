@@ -1,3 +1,4 @@
+import { T, useGT, Var } from "gt-react-native";
 import { DraftEnvironmentControl } from "./DraftEnvironmentControl";
 import { NativeScrollEdgeEffectsContext } from "../../native/NativeScrollViewMarker";
 import { DraftThreadHeader } from "./DraftThreadHeader";
@@ -98,7 +99,6 @@ import { appAtomRegistry } from "../../state/atom-registry";
 import { mobilePreferencesAtom } from "../../state/preferences";
 
 import { readEnvironmentScope, useEnvironmentScope } from "../../state/session";
-import { T, useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 // Below this (keyboard up on iPad, phone landscape) the hero cannot fit above the composer,
@@ -943,10 +943,17 @@ export function NewTaskDraftScreen(props: {
         <View className="flex-1 justify-end gap-3 p-4">
           {environmentControl}
           <Text className="text-foreground-muted">
-            <T>
-              Your draft is saved on this device. Connect to an environment to choose its first
-              model.
-            </T>
+            {environmentConnected && selectedEnvironmentServerConfig ? (
+              <T>
+                Your draft is saved on this device. <Var>{selectedEnvironmentLabel}</Var> has no
+                model available. Install or sign in to a provider there to choose one.
+              </T>
+            ) : (
+              <T>
+                Your draft is saved on this device. Connect to an environment to choose its first
+                model.
+              </T>
+            )}
           </Text>
           <ComposerEditor
             draftKey={flow.draftKey}
