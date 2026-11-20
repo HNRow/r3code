@@ -34,7 +34,7 @@ import {
   UserPlusIcon,
   UsersIcon,
 } from "lucide-react";
-import { msg, T, useGT, Var } from "gt-react";
+import { msg, T, useGT, useMessages, Var } from "gt-react";
 import { useContext, useState, type ReactNode } from "react";
 
 import { RefreshIcon } from "~/components/ui/refresh-icon";
@@ -392,6 +392,7 @@ export function IssueDetailPanel({
   onSelectPullRequest?: ((reference: PullRequestRef) => void) | undefined;
 }) {
   const gt = useGT();
+  const messages = useMessages();
   const detailAtom = issueEnvironment.detail({ environmentId, input: reference });
   const detailQuery = useEnvironmentQuery(detailAtom);
   const registry = useContext(RegistryContext);
