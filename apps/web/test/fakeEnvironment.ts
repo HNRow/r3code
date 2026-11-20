@@ -103,9 +103,15 @@ export const CLAUDE_PROVIDER = {
 };
 
 const decodeServerConfig = Schema.decodeUnknownSync(ServerConfig);
-const makeServerConfig = (providers: ReadonlyArray<unknown>): ServerConfig => ({
+const makeServerConfig = (
+  providers: ReadonlyArray<unknown>,
+  supportsIssues = false,
+): ServerConfig => ({
   ...decodeServerConfig({
-    environment: descriptor,
+    environment: {
+      ...descriptor,
+      capabilities: { ...descriptor.capabilities, issues: supportsIssues },
+    },
     auth,
     cwd: "/workspace/render",
     keybindingsConfigPath: "/workspace/.t3/keybindings.json",
@@ -219,7 +225,7 @@ function run(
 }
 
 export interface FakeThread {
-  readonly issues?: ReadonlyArray<unknown>;
+  readonly issues?: OrchestrationV2ThreadShell["issues"];
   /** Makes this a side chat of that thread. */
   readonly sideChatOf?: ThreadId;
   /** Makes this an older settled thread the shell leaves out; only its family read returns it. */
@@ -317,6 +323,7 @@ function shellOf(thread: FakeThread): OrchestrationV2ThreadShell {
     branch: "main",
     worktreePath: null,
     activeProviderThreadId: thread.providerThreads?.[0]?.id ?? null,
+    ...(thread.issues === undefined ? {} : { issues: thread.issues }),
     lineage: {
       rootThreadId: thread.sideChatOf ?? thread.id,
       parentThreadId: thread.sideChatOf ?? null,
@@ -600,7 +607,10 @@ export function installFakeEnvironment(
 ): Disposable {
   threads = fixtures;
   baseServerConfig = {
-    ...makeServerConfig(options?.providers ?? [CODEX_PROVIDER]),
+    ...makeServerConfig(
+      options?.providers ?? [CODEX_PROVIDER],
+      fixtures.some((thread) => (thread.issues?.length ?? 0) > 0),
+    ),
     keybindings: options?.keybindings ?? DEFAULT_RESOLVED_KEYBINDINGS,
   };
   dispatched = [];

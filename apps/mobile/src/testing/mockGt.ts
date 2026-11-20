@@ -2,16 +2,105 @@ import { vi } from "vite-plus/test";
 
 // 单元测试里没有启动 GT 的翻译管线，且移动端单测通常只 mock 了 react-native 的一小部分。
 // 这里用等价的轻量实现替换 GT 包，返回英文原文，并支持 msg("...") 与 t`...` 两种写法。
+// ICU 的单复数/选择分支，测试里只取英文分支
+function closeBrace(text: string, open: number): number {
+  let depth = 0;
+  for (let i = open; i < text.length; i++) {
+    if (text[i] === "{") depth++;
+    else if (text[i] === "}") {
+      depth--;
+      if (depth === 0) return i;
+    }
+  }
+  return -1;
+}
+
+function readBranches(body: string): Map<string, string> {
+  const branches = new Map<string, string>();
+  let i = 0;
+  while (i < body.length) {
+    while (i < body.length && /\s/.test(body[i]!)) i++;
+    const start = i;
+    while (i < body.length && !/[\s{]/.test(body[i]!)) i++;
+    if (start === i) break;
+    const name = body.slice(start, i);
+    while (i < body.length && /\s/.test(body[i]!)) i++;
+    if (body[i] !== "{") continue;
+    const end = closeBrace(body, i);
+    if (end < 0) break;
+    branches.set(name, body.slice(i + 1, end));
+    i = end + 1;
+  }
+  return branches;
+}
+
+function resolveIcu(message: string, variables: Record<string, unknown>): string {
+  let text = message;
+  const pattern = /\{(\w+),\s*(plural|selectordinal|select)\s*,/;
+  for (let match = pattern.exec(text); match; match = pattern.exec(text)) {
+    const end = closeBrace(text, match.index);
+    if (end < 0) break;
+    const branches = readBranches(text.slice(match.index + match[0].length, end));
+    const value = variables[match[1]!];
+    const branch =
+      branches.get(`=${String(value)}`) ??
+      (match[2] === "select"
+        ? branches.get(String(value))
+        : Number(value) === 1
+          ? branches.get("one")
+          : branches.get("other")) ??
+      branches.get("other") ??
+      "";
+    text = text.slice(0, match.index) + branch + text.slice(end + 1);
+  }
+  return text;
+}
+
+function decodeBase64(value: string): string {
+  if (typeof atob === "function") {
+    return new TextDecoder().decode(Uint8Array.from(atob(value), (char) => char.charCodeAt(0)));
+  }
+  return Buffer.from(value, "base64").toString("utf8");
+}
+
+// m()/useMessages() 在真实运行时会把编译后的 "<source>:<base64>" 解回原文
+function decodeEncoded(
+  message: string,
+): { source: string; options: Record<string, unknown> } | null {
+  const separator = message.lastIndexOf(":");
+  if (separator < 0) return null;
+  try {
+    const options = JSON.parse(decodeBase64(message.slice(separator + 1))) as Record<
+      string,
+      unknown
+    >;
+    return {
+      source: typeof options.$_source === "string" ? options.$_source : message.slice(0, separator),
+      options,
+    };
+  } catch {
+    return null;
+  }
+}
+
 function identity(message: unknown, ...values: ReadonlyArray<unknown>): string {
   if (typeof message === "string") {
-    const variables = values[0];
-    if (variables !== null && typeof variables === "object" && !Array.isArray(variables)) {
-      return message.replace(/\{(\w+)\}/g, (match, key: string) => {
-        const value = (variables as Record<string, unknown>)[key];
-        return value === undefined ? match : String(value);
+    const decoded = decodeEncoded(message);
+    if (decoded) {
+      return identity(decoded.source, {
+        ...decoded.options,
+        ...(values[0] as Record<string, unknown> | undefined),
       });
     }
-    return message;
+    const variables =
+      values[0] !== null && typeof values[0] === "object" && !Array.isArray(values[0])
+        ? (values[0] as Record<string, unknown>)
+        : {};
+    return resolveIcu(message, variables)
+      .replace(/\{(\w+)\}/g, (match, key: string) =>
+        variables[key] === undefined ? match : String(variables[key]),
+      )
+      .replace(/''/g, "'");
   }
   if (!Array.isArray(message)) return message as string;
   const parts = message as ReadonlyArray<string>;
@@ -55,5 +144,7 @@ vi.mock("@generaltranslation/react-core/pure", () => ({
 vi.mock("gt-i18n", () => ({
   t: identity,
   msg: identity,
+  m: identity,
+  mFallback: identity,
   decodeMsg: (message: unknown) => message,
 }));
