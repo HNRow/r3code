@@ -1,6 +1,12 @@
 import type { IssueCandidatesTarget } from "@t3tools/client-runtime/state/issues";
-import type { IssueInvolvement, IssueListState } from "@t3tools/contracts";
-import { LayersIcon, ListFilterIcon, TagIcon, UserIcon } from "lucide-react";
+import type {
+  EnvironmentId,
+  IssueInvolvement,
+  IssueListState,
+  ProjectId,
+} from "@t3tools/contracts";
+import { FolderGit2Icon, LayersIcon, ListFilterIcon, TagIcon, UserIcon } from "lucide-react";
+import { T, useGT } from "gt-react";
 import { useState } from "react";
 
 import { Button } from "~/components/ui/button";
@@ -20,12 +26,14 @@ import {
 } from "~/components/ui/menu";
 import { useIssueFilterCandidates } from "~/state/issues";
 
+import { ProjectFavicon, type ProjectFaviconProject } from "../ProjectFavicon";
+
 import {
   PullRequestFilterRadioSubmenu,
+  pullRequestProjectKey,
   type PullRequestFilterOption,
 } from "../pullRequest/PullRequestListFilters";
 import { pullRequestLabelColor } from "../pullRequest/pullRequestList.logic";
-import { T, useGT, t } from "gt-react";
 
 const VISIBLE_CHOICES = 30;
 const matches = (needle: string, ...fields: ReadonlyArray<string | null | undefined>) =>
@@ -44,12 +52,16 @@ export function IssueFiltersMenu(props: {
   onLabels: (labels: ReadonlyArray<string>) => void;
   assignee: string | undefined;
   onAssignee: (assignee: string | undefined) => void;
+  projects: ReadonlyArray<ProjectFaviconProject & { readonly id: ProjectId }>;
+  hiddenProjects: ReadonlySet<string>;
+  onHiddenProjects: (hidden: ReadonlyArray<readonly [EnvironmentId, ProjectId]>) => void;
 }) {
   const gt = useGT();
   const [open, setOpen] = useState(false);
   const count = [
     props.state !== "open",
     props.involvement !== "all",
+    props.hiddenProjects.size > 0,
     props.assignee,
     ...props.labels,
   ].filter(Boolean).length;
@@ -70,7 +82,7 @@ export function IssueFiltersMenu(props: {
       </MenuTrigger>
       <MenuPopup align="end" side="bottom">
         <PullRequestFilterRadioSubmenu
-          label={gt("State")}
+          label={gt("State", { $context: "issue state filter" })}
           value={props.state}
           options={props.stateOptions}
           onChange={props.onState}
@@ -81,6 +93,26 @@ export function IssueFiltersMenu(props: {
           options={props.involvementOptions}
           onChange={props.onInvolvement}
         />
+        {props.projects.length > 0 || props.hiddenProjects.size > 0 ? (
+          <MenuSub>
+            <MenuSubTrigger>
+              <FolderGit2Icon aria-hidden className="size-3.5" />
+              <span className="flex-1">{gt("Projects")}</span>
+              <span className="min-w-0 max-w-32 truncate text-xs text-muted-foreground">
+                {props.hiddenProjects.size === 0
+                  ? gt("All projects")
+                  : gt("{hidden} hidden", { hidden: props.hiddenProjects.size })}
+              </span>
+            </MenuSubTrigger>
+            <MenuSubPopup>
+              <ProjectChoices
+                projects={props.projects}
+                hidden={props.hiddenProjects}
+                onChange={props.onHiddenProjects}
+              />
+            </MenuSubPopup>
+          </MenuSub>
+        ) : null}
         <MenuSeparator />
         <MenuSub>
           <MenuSubTrigger>
@@ -90,10 +122,12 @@ export function IssueFiltersMenu(props: {
             </span>
             <span className="min-w-0 max-w-32 truncate text-xs text-muted-foreground">
               {props.labels.length === 0
-                ? t("Any")
+                ? gt("Any", { $context: "no label filter" })
                 : props.labels.length === 1
                   ? props.labels[0]
-                  : `${props.labels.length} labels`}
+                  : gt("{count, plural, one {{count} label} other {{count} labels}}", {
+                      count: props.labels.length,
+                    })}
             </span>
           </MenuSubTrigger>
           <MenuSubPopup>
@@ -107,7 +141,7 @@ export function IssueFiltersMenu(props: {
               <T>Assignee</T>
             </span>
             <span className="min-w-0 max-w-32 truncate text-xs text-muted-foreground">
-              {props.assignee ?? t("Anyone")}
+              {props.assignee ?? gt("Anyone", { $context: "no assignee filter" })}
             </span>
           </MenuSubTrigger>
           <MenuSubPopup>
@@ -116,6 +150,68 @@ export function IssueFiltersMenu(props: {
         </MenuSub>
       </MenuPopup>
     </Menu>
+  );
+}
+
+function ProjectChoices(props: {
+  projects: ReadonlyArray<ProjectFaviconProject & { readonly id: ProjectId }>;
+  hidden: ReadonlySet<string>;
+  onChange: (hidden: ReadonlyArray<readonly [EnvironmentId, ProjectId]>) => void;
+}) {
+  const gt = useGT();
+  const [query, setQuery] = useState("");
+  const needle = query.trim().toLowerCase();
+  const visible = props.projects.filter((project) => matches(needle, project.title));
+  const pairsOf = (keys: Iterable<string>) =>
+    [...keys].map((key) => JSON.parse(key) as readonly [EnvironmentId, ProjectId]);
+  const allShown = props.hidden.size === 0;
+  return (
+    <>
+      {props.projects.length > 8 ? (
+        <MenuSearchInput
+          autoFocus
+          value={query}
+          onChange={(event) => setQuery(event.currentTarget.value)}
+          placeholder={gt("Search projects")}
+          aria-label={gt("Search projects")}
+        />
+      ) : null}
+      <MenuCheckboxItem
+        checked={allShown}
+        onCheckedChange={(shown) =>
+          props.onChange(
+            shown ? [] : pairsOf(props.projects.map((project) => pullRequestProjectKey(project))),
+          )
+        }
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          <LayersIcon aria-hidden className="size-3.5" />
+          <span className="min-w-0 flex-1 truncate">{gt("Show all")}</span>
+        </span>
+      </MenuCheckboxItem>
+      <MenuSeparator />
+      {visible.length === 0 ? <MenuItem disabled>{gt("No matching projects.")}</MenuItem> : null}
+      {visible.map((project) => {
+        const key = pullRequestProjectKey(project);
+        return (
+          <MenuCheckboxItem
+            key={key}
+            checked={!props.hidden.has(key)}
+            onCheckedChange={(shown) => {
+              const next = new Set(props.hidden);
+              if (shown) next.delete(key);
+              else next.add(key);
+              props.onChange(pairsOf(next));
+            }}
+          >
+            <span className="flex min-w-0 items-center gap-2">
+              <ProjectFavicon project={project} className="size-3.5" />
+              <span className="min-w-0 flex-1 truncate">{project.title}</span>
+            </span>
+          </MenuCheckboxItem>
+        );
+      })}
+    </>
   );
 }
 
@@ -148,7 +244,7 @@ function LabelChoices(props: {
       />
       {visible.length === 0 && !known.isPending ? (
         <MenuItem disabled>
-          {known.error === null ? t("No labels found") : t("The labels could not be read")}
+          {known.error === null ? <T>No labels found</T> : <T>The labels could not be read</T>}
         </MenuItem>
       ) : null}
       {visible.map((label) => {
@@ -217,10 +313,8 @@ function AssigneeChoices(props: {
       >
         <MenuRadioItem value="">
           <span className="flex min-w-0 items-center gap-2">
-            <T>
-              <LayersIcon aria-hidden className="size-3.5" />
-              Anyone
-            </T>
+            <LayersIcon aria-hidden className="size-3.5" />
+            <T context="no assignee filter">Anyone</T>
           </span>
         </MenuRadioItem>
         {visible.map((actor) => (
