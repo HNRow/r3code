@@ -63,8 +63,8 @@ function inhibitorCommand(
       return {
         command: "systemd-inhibit",
         args: [
-          "--what=idle:sleep",
-          "--who=R3 Code",
+          "--what=sleep",
+          "--who=T3 Code",
           "--why=Agents are working",
           "--mode=block",
           // systemd-inhibit starts this only after logind grants the lock.
