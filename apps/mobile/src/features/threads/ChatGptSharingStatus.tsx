@@ -1,11 +1,11 @@
 import * as Dialog from "../../components/ui/Dialog";
 import type { ServerProvider } from "@t3tools/contracts";
 import { CHATGPT_USAGE_URL, usesChatGptSharing } from "@t3tools/shared/usageLimits";
-import { Linking, Pressable, View } from "react-native";
+import { T, useGT } from "gt-react-native";
+import { Pressable, View } from "react-native";
+import { tryOpenExternalUrl } from "../../lib/openExternalUrl";
 import { AppText as Text } from "../../components/ui/AppText";
 import { ProviderIcon } from "../../components/ProviderIcon";
-import { useGT, T } from "gt-react-native";
-import { t } from "../../i18n/gt";
 
 export function ChatGptSharingStatus({ provider }: { provider: ServerProvider | null }) {
   const gt = useGT();
@@ -18,11 +18,15 @@ export function ChatGptSharingStatus({ provider }: { provider: ServerProvider | 
         className="min-h-11 flex-row items-center gap-2"
         onPress={() => {
           Dialog.alert(
-            t("ChatGPT sharing is on"),
+            gt("ChatGPT sharing is on"),
             [
               provider?.auth.email,
-              "Eligible usage uses your ChatGPT plan. Credit settings and limits are managed in ChatGPT.",
-              "Fast and Ultrafast are unavailable with this ChatGPT connection. Use an existing Codex CLI login for speed options your account supports.",
+              gt(
+                "Eligible usage uses your ChatGPT plan. Credit settings and limits are managed in ChatGPT.",
+              ),
+              gt(
+                "Fast and Ultrafast are unavailable with this ChatGPT connection. Use an existing Codex CLI login for speed options your account supports.",
+              ),
             ]
               .filter(Boolean)
               .join("\n\n"),
@@ -37,7 +41,7 @@ export function ChatGptSharingStatus({ provider }: { provider: ServerProvider | 
       <Pressable
         accessibilityRole="link"
         className="min-h-11 justify-center"
-        onPress={() => void Linking.openURL(CHATGPT_USAGE_URL).catch(() => undefined)}
+        onPress={() => void tryOpenExternalUrl(CHATGPT_USAGE_URL)}
       >
         <Text className="text-xs font-t3-medium text-primary">
           <T>Manage usage</T>

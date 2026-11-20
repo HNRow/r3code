@@ -1,3 +1,5 @@
+import { errorDisplayMessage } from "@t3tools/client-runtime/errors";
+import { useGT } from "gt-react-native";
 import type { SourceControlSignInPrompt } from "@t3tools/contracts";
 import {
   readHostCredentialSettings,
@@ -7,7 +9,8 @@ import {
 import * as Cause from "effect/Cause";
 import * as Clipboard from "expo-clipboard";
 import { useRef, useState } from "react";
-import { Linking } from "react-native";
+import { tryOpenExternalUrl } from "../../../lib/openExternalUrl";
+import { m } from "../../../i18n/messages";
 
 import * as Dialog from "../../../components/ui/Dialog";
 import { serverEnvironment } from "../../../state/server";
@@ -16,16 +19,14 @@ import { useAtomCommand } from "../../../state/use-atom-command";
 import type { SettingsTarget } from "../settings-environment-filter";
 import { SettingsRow } from "./SettingsRow";
 
-import { t } from "../../../i18n/gt";
-
 const failureMessage = (cause: Cause.Cause<unknown>) => {
   const error = Cause.squash(cause);
-  return error instanceof Error ? error.message : String(error);
+  return error instanceof Error ? (errorDisplayMessage(error, m) ?? error.message) : String(error);
 };
 
-const openUrl = (url: string) => void Linking.openURL(url).catch(() => undefined);
+const openUrl = (url: string) => void tryOpenExternalUrl(url, "provider-auth");
 
-/** Signs an environment in through a forge's own app, such as R3 Code for GitHub. */
+/** Signs an environment in through a forge's own app, such as T3 Code for GitHub. */
 export function AppSignInRow(props: {
   readonly environment: SettingsTarget;
   readonly label: string;
@@ -33,6 +34,7 @@ export function AppSignInRow(props: {
   readonly appSignIn: SourceControlAppSignIn;
   readonly disabled: boolean;
 }) {
+  const gt = useGT();
   const { environment, definition, appSignIn } = props;
   const environmentId = environment.environmentId;
   const host = appSignIn.hosts[0] ?? "";
@@ -56,10 +58,13 @@ export function AppSignInRow(props: {
     void Clipboard.setStringAsync(prompt.userCode).catch(() => undefined);
     Dialog.alert(
       prompt.userCode,
-      t`Enter this code on GitHub, then approve ${appSignIn.appName}. It is copied. The server finishes signing in even if you leave the app.`,
+      gt(
+        "Enter this code on {host}, then approve {app}. It is copied. The server finishes signing in even if you leave the app.",
+        { host: "GitHub", app: appSignIn.appName },
+      ),
       [
         {
-          text: t("Cancel"),
+          text: gt("Cancel"),
           style: "cancel",
           onPress: () => {
             attempt.current = null;
@@ -67,7 +72,10 @@ export function AppSignInRow(props: {
             void cancel({ environmentId, input });
           },
         },
-        { text: t("Open GitHub"), onPress: () => openUrl(prompt.verificationUri) },
+        {
+          text: gt("Open {host}", { host: "GitHub" }),
+          onPress: () => openUrl(prompt.verificationUri),
+        },
       ],
     );
   };
@@ -77,7 +85,7 @@ export function AppSignInRow(props: {
     const started = await start({ environmentId, input });
     if (started._tag !== "Success") {
       setPending(null);
-      Dialog.alert(t("Could not start the sign-in"), failureMessage(started.cause));
+      Dialog.alert(gt("Could not start the sign-in"), failureMessage(started.cause));
       return;
     }
     const prompt = started.value;
@@ -89,7 +97,7 @@ export function AppSignInRow(props: {
     attempt.current = null;
     setPending(null);
     if (finished._tag !== "Success") {
-      Dialog.alert(t("Sign-in did not finish"), failureMessage(finished.cause));
+      Dialog.alert(gt("Sign-in did not finish"), failureMessage(finished.cause));
     }
   };
 
@@ -108,13 +116,14 @@ export function AppSignInRow(props: {
     if (signedIn) {
       Dialog.alert(
         appSignIn.appName,
-        t(
-          "Signed in. GitHub requests use the app's higher rate limit, in repositories where the app is installed.",
+        gt(
+          "Signed in. {host} requests use the app's higher rate limit, in repositories where the app is installed.",
+          { host: "GitHub" },
         ),
         [
-          { text: t("Install on an organization"), onPress: () => openUrl(appSignIn.installUrl) },
-          { text: t("Sign out"), style: "destructive", onPress: signOut },
-          { text: t("Cancel"), style: "cancel" },
+          { text: gt("Install on an organization"), onPress: () => openUrl(appSignIn.installUrl) },
+          { text: gt("Sign out"), style: "destructive", onPress: signOut },
+          { text: gt("Cancel"), style: "cancel" },
         ],
       );
     } else if (pending !== null && pending !== "starting") {
@@ -130,12 +139,12 @@ export function AppSignInRow(props: {
       label={props.label}
       value={
         signedIn
-          ? "Signed in"
+          ? gt("Signed in")
           : pending === "starting"
-            ? "Starting…"
+            ? gt("Starting…")
             : pending !== null
-              ? `Enter ${pending.userCode}`
-              : "Sign in"
+              ? gt("Enter {code}", { code: pending.userCode })
+              : gt("Sign in")
       }
       disabled={props.disabled}
       onPress={onPress}

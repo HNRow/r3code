@@ -3,13 +3,14 @@ import {
   readHostCredentialSettings,
   sourceControlClients,
 } from "@t3tools/client-runtime/source-control-clients";
-import { Linking, Pressable, View } from "react-native";
+import { T, Var } from "gt-react-native";
+import { Pressable, View } from "react-native";
+import { tryOpenExternalUrl } from "../../lib/openExternalUrl";
 
 import { AppText as Text } from "../../components/ui/AppText";
 import { useEnvironmentPresentation } from "../../state/presentation";
 import { useEnvironmentQuery } from "../../state/query";
 import { sourceControlEnvironment } from "../../state/sourceControl";
-import { Var, T } from "gt-react-native";
 
 /**
  * Says when the server's forge app sign-in cannot reach `repository`, so requests there fall back
@@ -53,7 +54,7 @@ export function SourceControlAppAccessNotice(props: {
       </Text>
       <Pressable
         accessibilityRole="link"
-        onPress={() => void Linking.openURL(appSignIn.installUrl).catch(() => undefined)}
+        onPress={() => void tryOpenExternalUrl(appSignIn.installUrl, "provider-auth")}
       >
         <Text className="text-sm font-t3-bold text-foreground">
           <T>
