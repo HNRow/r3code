@@ -36,7 +36,6 @@ import {
   useScopedSettingsMixed,
   useUpdateScopedSettings,
 } from "./useScopedSettings";
-import { t } from "gt-react";
 
 import { translateSnoozeLabel } from "../../lib/snoozeLabel";
 
@@ -440,12 +439,6 @@ function DurationFields(props: { minutes: number; onChange: (minutes: number) =>
     props.minutes % UNIT_MINUTES[chosenUnit] === 0 ? chosenUnit : splitMinutes(props.minutes).unit;
   const amount = props.minutes / UNIT_MINUTES[unit];
   const maxAmount = Math.floor(MAX_SNOOZE_PRESET_MINUTES / UNIT_MINUTES[unit]);
-  const unitLabels = Object.fromEntries(
-    Object.entries(amount === 1 ? SINGULAR_UNIT_LABELS : UNIT_LABELS).map(([key, label]) => [
-      key,
-      m(label),
-    ]),
-  ) as Record<DurationUnit, string>;
   // Typing stays local until the field commits (blur, Enter, or a step), so half-typed
   // values never reach the server.
   const [draft, setDraft] = useState<number | null>(amount);

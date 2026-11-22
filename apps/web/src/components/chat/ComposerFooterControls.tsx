@@ -169,7 +169,7 @@ export function ComposerPermissionsSection(props: {
       {/* Static per-mode descriptions for screen readers; the preview below is visual only. */}
       {props.runtimeModeOptions.map((option) => (
         <span key={option.mode} id={`${descriptionId}-${option.mode}`} className="sr-only">
-          {m(option.disabledReason ?? option.description)}
+          {messages(option.disabledReason ?? option.description)}
         </span>
       ))}
       <div className="grid gap-0.5" aria-hidden="true">
@@ -184,7 +184,7 @@ export function ComposerPermissionsSection(props: {
         </span>
         {/* Two lines reserved so the menu does not shift while you preview modes. */}
         <span className="min-h-8 text-muted-foreground text-xs leading-4">
-          {m(shown.disabledReason ?? shown.description)}
+          {messages(shown.disabledReason ?? shown.description)}
         </span>
       </div>
     </div>

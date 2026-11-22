@@ -2947,7 +2947,3 @@ export function sameRowsInput(
   }
   return Object.keys(left).length === Object.keys(right).length;
 }
-
-export function threadReadLabelPrefix(label: string): string {
-  return label;
-}

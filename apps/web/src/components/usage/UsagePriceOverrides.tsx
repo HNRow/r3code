@@ -41,7 +41,6 @@ import {
   type UsagePriceTarget,
   type UsagePriceWriteResult,
 } from "./usagePriceTargets";
-import { t } from "gt-react";
 
 const priceTargetsAtom = Atom.make((get): readonly UsagePriceTarget[] =>
   [...get(environmentPresentations.presentationsAtom)].map(([environmentId, environment]) => {
@@ -526,7 +525,7 @@ export function UsagePriceOverrides({
                                           ? field.optional
                                             ? gt("Input rate")
                                             : "0.00"
-                                          : m(cell.placeholder)
+                                          : messages(cell.placeholder)
                                       }
                                       autoComplete="off"
                                       disabled={locked}

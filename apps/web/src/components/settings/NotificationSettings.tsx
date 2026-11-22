@@ -5,8 +5,7 @@ import { useState } from "react";
 import {
   hasDesktopNotifications,
   hasNotificationSound,
-  NOTIFICATION_MODES,
-  notificationModeLabel,
+  NOTIFICATION_MODE_LABELS,
   unlockNotificationAudio,
 } from "../../threadNotifications";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
@@ -86,7 +85,7 @@ export function NotificationSettings() {
             <SelectValue>{m(NOTIFICATION_MODE_LABELS[mode])}</SelectValue>
           </SelectTrigger>
           <SelectPopup align="end" alignItemWithTrigger={false}>
-            {NOTIFICATION_MODES.map((value) => (
+            {Object.entries(NOTIFICATION_MODE_LABELS).map(([value, label]) => (
               <SelectItem key={value} hideIndicator value={value}>
                 {m(label)}
               </SelectItem>

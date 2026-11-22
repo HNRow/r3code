@@ -17,7 +17,7 @@ import type {
 import { Link } from "@tanstack/react-router";
 import { RefreshCwIcon } from "lucide-react";
 import { useContext, useEffect, useEffectEvent, useRef, useState } from "react";
-import { useGT, useMessages, t } from "gt-react";
+import { msg, useGT, useMessages } from "gt-react";
 
 import { useProjects } from "../../state/entities";
 import { useEnvironmentProviders, useEnvironments } from "../../state/environments";
@@ -47,21 +47,13 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
 import { SettingsPageContainer, SettingsRow, SettingsSection } from "./settingsLayout";
-import { searchableSetting } from "./settingsSearch";
+import { useSearchableSetting } from "./settingsSearch";
 
 const SKILL_STATE_LABELS: Readonly<Record<SkillInventoryEntry["state"], string>> = {
-  get enabled() {
-    return t("Enabled");
-  },
-  get disabled() {
-    return t("Disabled");
-  },
-  get shadowed() {
-    return t("Shadowed");
-  },
-  get unavailable() {
-    return t("Unavailable");
-  },
+  enabled: msg("Enabled"),
+  disabled: msg("Disabled"),
+  shadowed: msg("Shadowed"),
+  unavailable: msg("Unavailable"),
 };
 
 interface SelectOption {
@@ -567,6 +559,7 @@ function SkillRow(props: {
 export function SkillsSettings() {
   const gt = useGT();
   const m = useMessages();
+  const searchableSetting = useSearchableSetting();
   const registry = useContext(RegistryContext);
   const { environments } = useEnvironments();
   const providersByEnvironment = useEnvironmentProviders();

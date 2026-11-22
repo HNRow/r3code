@@ -135,7 +135,6 @@ import {
   resolveRemoteOperateAccess,
   resolveSelectedProviderEnvironmentId,
 } from "./ProviderSettingsPanel.logic";
-import { t } from "gt-react";
 
 function providerInstanceName(instance: ProviderInstanceConfig): string {
   return (
@@ -1170,7 +1169,7 @@ export function EnvironmentProviderSettings({
           id={searchableSetting("provider-health-check-interval").id}
           title={
             <span className="inline-flex items-center gap-1.5">
-              {m(searchableSetting("provider-health-check-interval").title)}
+              {searchableSetting("provider-health-check-interval").title}
               <PolicyTooltip>
                 {gt(
                   "This interval is configured here, then the shared Background activity policy decides whether provider probes may run when the timer fires. Custom intervals appear as Advanced in Maintenance settings.",

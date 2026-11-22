@@ -130,7 +130,6 @@ function ThemeLibraryCard({
   };
 }) {
   const gt = useGT();
-  const m = useMessages();
   const cardModes = theme.previews.map((preview) => preview.mode);
   const [radialModeOpen, setRadialModeOpen] = useState<ThemeAppearance | null>(null);
   const radialModeGroups = (["light", "dark"] as const).map((mode) => {
