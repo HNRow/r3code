@@ -1,9 +1,10 @@
+import { T, useGT, useMessages, Var } from "gt-react";
 import { useState } from "react";
 
 import { Button } from "~/components/ui/button";
 
 import { describePreviewError } from "./errorCodeMessages";
-import { T, Var, t } from "gt-react";
+import { t } from "gt-react";
 
 interface Props {
   url: string;
@@ -47,7 +48,7 @@ export function PreviewFileNotShown({
           </Button>
           {downloadUrl ? (
             <Button type="button" size="sm" render={<a href={downloadUrl} download={fileName} />}>
-              <T>Download</T>
+              <T context="verb">Download</T>
             </Button>
           ) : null}
         </div>
@@ -57,9 +58,11 @@ export function PreviewFileNotShown({
 }
 
 export function PreviewUnreachable({ url, code, description, onReload, move }: Props) {
+  const gt = useGT();
+  const m = useMessages();
   const [showDetails, setShowDetails] = useState(false);
   const host = safeHost(url) ?? url;
-  const friendly = describePreviewError(description);
+  const friendly = describePreviewError(description, m);
   const errorLabel = description.length > 0 ? description : `ERR_${Math.abs(code) || "FAILED"}`;
 
   return (
@@ -70,7 +73,12 @@ export function PreviewUnreachable({ url, code, description, onReload, move }: P
           <T>This site can&rsquo;t be reached</T>
         </h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          <span className="font-semibold text-foreground">{host}</span>: {friendly}.
+          <T>
+            <span className="font-semibold text-foreground">
+              <Var>{host}</Var>
+            </span>
+            : <Var>{friendly}</Var>.
+          </T>
         </p>
 
         {showDetails ? (
@@ -108,7 +116,7 @@ export function PreviewUnreachable({ url, code, description, onReload, move }: P
             size="sm"
             onClick={() => setShowDetails((value) => !value)}
           >
-            {showDetails ? t("Hide details") : t("Details")}
+            {showDetails ? gt("Hide details") : gt("Details")}
           </Button>
           <div className="flex-1" />
           {move ? (

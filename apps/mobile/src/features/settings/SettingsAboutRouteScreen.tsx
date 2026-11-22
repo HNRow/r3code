@@ -1,3 +1,4 @@
+import { T, useGT } from "gt-react-native";
 import * as Dialog from "../../components/ui/Dialog";
 import { ScreenScrollView as ScrollView } from "../../components/ui/ScreenScrollView";
 import * as Application from "expo-application";
@@ -19,7 +20,6 @@ import {
 import { SettingsRow } from "./components/SettingsRow";
 import { SettingsSection } from "./components/SettingsSection";
 import { SettingsScreen } from "./components/SettingsScreen";
-import { useGT, T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 export function SettingsAboutRouteScreen() {
@@ -74,7 +74,7 @@ function AppSettingsSection() {
     await settlePromise(() =>
       runAppUpdateCheck({
         applyMode: "immediate",
-        onFailure: (message) => Dialog.alert(t("Update failed"), message),
+        onFailure: (message) => Dialog.alert(gt("Update failed"), message),
         onStateChange: (state) =>
           setCheckState({
             state,
@@ -96,15 +96,15 @@ function AppSettingsSection() {
 
   const statusLabel =
     updateState === "checking"
-      ? "Checking…"
+      ? gt("Checking…")
       : updateState === "downloading"
-        ? "Downloading…"
+        ? gt("Downloading…")
         : updateState === "ready"
-          ? "Update ready"
+          ? gt("Update ready")
           : updateState === "restarting"
-            ? "Restarting…"
+            ? gt("Restarting…")
             : updateState === "current"
-              ? "Up to date"
+              ? gt("Up to date")
               : null;
 
   const versionRow = (
@@ -129,7 +129,7 @@ function AppSettingsSection() {
   );
 
   return (
-    <SettingsSection title={gt("App")}>
+    <SettingsSection title={gt("App", { $context: "settings section about this mobile app" })}>
       <SettingsRow
         icon="internaldrive"
         label={gt("Client Storage")}
@@ -144,7 +144,7 @@ function AppSettingsSection() {
       <SettingsRow icon="doc.text" label={gt("Legal")} fullScreenTarget="SettingsLegal" />
       {updateCheckAvailable ? (
         <Pressable
-          accessibilityLabel={`Version ${versionLabel}`}
+          accessibilityLabel={gt("Version {version}", { version: versionLabel })}
           accessibilityRole="text"
           disabled={busy}
           onPress={handleVersionPress}

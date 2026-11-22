@@ -11,7 +11,7 @@ import {
   resolvePullRequestAnchorRange,
   resolvePullRequestReviewAnchor,
 } from "@t3tools/shared/pullRequestAnchor";
-import { T, useGT, Var } from "gt-react-native";
+import { T, useGT, useMessages, Var } from "gt-react-native";
 import { AppActivityIndicator } from "../../components/ui/AppActivityIndicator";
 import { Chip } from "../../components/ui/Chip";
 import { pullRequestTabOffset } from "./pullRequestTabScroll";
@@ -86,6 +86,7 @@ import { useAndroidWorkspaceBack } from "../layout/workspace/useAndroidWorkspace
 import { EmptyState } from "../../components/ui/EmptyState";
 import { SegmentedControl } from "../../components/ui/SegmentedControl";
 import { SymbolView } from "../../components/ui/AppSymbol";
+import { PullRequestGlyph } from "./pullRequestGlyphs";
 import { ScreenContent } from "../../components/ui/ScreenContent";
 import { RelativeTime } from "../../components/RelativeTime";
 import { usePullRequestConnected } from "./usePullRequestConnected";
@@ -147,6 +148,7 @@ import { changeRequestTermKind } from "../../lib/changeRequestTerm";
 
 function usePullRequestActivityRows(params: PullRequestParams, filter: ActivityFilter) {
   const navigation = useNavigation();
+  const messages = useMessages();
   const result = useEnvironmentQuery(composerPullRequests.activity(requestTarget(params)));
   const detail = useEnvironmentQuery(composerPullRequests.detail(requestTarget(params)));
   const permissions = usePullRequestPermissions(params, detail.data);
@@ -159,6 +161,7 @@ function usePullRequestActivityRows(params: PullRequestParams, filter: ActivityF
       navigation,
       { permissions, onChanged: result.refresh },
       filter.newestFirst,
+      messages,
     );
     if (!rows.length)
       rows.push({
@@ -213,7 +216,8 @@ function PullRequestIdentity(props: {
 }) {
   const { pr } = props;
   const gt = useGT();
-  const status = pullRequestStatus({ state: pr.state, isDraft: pr.isDraft === true });
+  const messages = useMessages();
+  const status = pullRequestStatus({ state: pr.state, isDraft: pr.isDraft === true }, messages);
   return (
     <View className="gap-3">
       <View className="flex-row flex-wrap items-center gap-2">
@@ -225,6 +229,16 @@ function PullRequestIdentity(props: {
             <Text className={`text-xs font-t3-medium ${status.text}`}>{status.label}</Text>
           </View>
         )}
+        {"visibility" in pr && pr.visibility === "private" ? (
+          <View className="flex-row items-center gap-1">
+            <SymbolView
+              name={PullRequestGlyph.private}
+              size={12}
+              tintColorClassName="accent-icon-muted"
+            />
+            <Text className="text-xs font-t3-medium text-foreground-muted">{gt("Private")}</Text>
+          </View>
+        ) : null}
         <PullRequestDiffStats additions={pr.additions ?? 0} deletions={pr.deletions ?? 0} compact />
         {"changedFiles" in pr && pr.changedFiles !== undefined ? (
           <Text className="text-2xs text-foreground-muted">
@@ -388,6 +402,7 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
   const { layout } = useAdaptiveWorkspaceLayout();
   const navigation = useNavigation();
   const gt = useGT();
+  const messages = useMessages();
   const insets = useSafeAreaInsets();
   const [toolbarHeight, setToolbarHeight] = usePullRequestToolbarHeight(insets.bottom);
   const contentTopInset = useContentTopInset();
@@ -554,7 +569,7 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
     pr &&
     action.confirm(
       "delete-branch",
-      pullRequestActionLabel("delete-branch", terminology),
+      pullRequestActionLabel("delete-branch", terminology, messages),
       gt("Delete {branch} from {repository}? Local branches and worktrees are not changed.", {
         branch: pr.headBranch,
         repository: pr.headRepositoryNameWithOwner ?? pr.repository,
@@ -661,7 +676,7 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
         ? [
             {
               id: "open-on-provider",
-              title: openOnProviderLabel(identity.provider),
+              title: openOnProviderLabel(identity.provider, messages),
               icon: "arrow.up.right",
               onPress: () => void tryOpenExternalUrl(identity.url, "pull-request"),
             },
@@ -683,7 +698,7 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
         ? [
             {
               id: "state",
-              title: pullRequestActionLabel(stateAction, terminology),
+              title: pullRequestActionLabel(stateAction, terminology, messages),
               icon: PR_ACTION_ICONS[stateAction],
               destructive: stateAction === "close",
               onPress: runStateAction,
@@ -694,7 +709,7 @@ export function PullRequestRouteScreen({ route }: StaticScreenProps<PullRequestP
         ? [
             {
               id: "delete-branch",
-              title: pullRequestActionLabel("delete-branch", terminology),
+              title: pullRequestActionLabel("delete-branch", terminology, messages),
               icon: PR_ACTION_ICONS["delete-branch"],
               destructive: true,
               disabled: !action.available("delete-branch"),
@@ -1003,6 +1018,7 @@ export function PullRequestFileRouteScreen(props: PullRequestFileRouteProps) {
 function PullRequestFileRouteContent({ route }: PullRequestFileRouteProps) {
   const navigation = useNavigation();
   const gt = useGT();
+  const messages = useMessages();
   const insets = useSafeAreaInsets();
   const contentTopInset = useContentTopInset();
   const [toolbarHeight, setToolbarHeight] = usePullRequestToolbarHeight(insets.bottom);
@@ -1060,6 +1076,7 @@ function PullRequestFileRouteContent({ route }: PullRequestFileRouteProps) {
         staleDiff || commit ? [] : (activity.data?.reviewThreads ?? []),
         commit ? [] : reviewDraft.draft.comments,
         diffHead.sha ?? undefined,
+        messages,
       ),
     [
       baseData,
@@ -1069,6 +1086,7 @@ function PullRequestFileRouteContent({ route }: PullRequestFileRouteProps) {
       activity.data?.reviewThreads,
       reviewDraft.draft.comments,
       diffHead.sha,
+      messages,
     ],
   );
   const viewedIds = data.files
@@ -1473,7 +1491,7 @@ function PullRequestFileRouteContent({ route }: PullRequestFileRouteProps) {
               <Button
                 label={gt("Retry loading remaining files")}
                 tone="text"
-                onPress={result.refresh}
+                onPress={result.retry}
               />
             </View>
           ) : null}

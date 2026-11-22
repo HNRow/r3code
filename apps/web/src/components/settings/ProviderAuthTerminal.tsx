@@ -1,10 +1,10 @@
 import type { ProviderAuthResponse } from "@t3tools/contracts";
+import { useGT } from "gt-react";
 import { useEffect, useRef, useState } from "react";
 import { GhosttyTerminalSurface } from "../../terminal/ghostty/surface";
 import { ensureLocalApi } from "../../localApi";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { terminalThemeFromApp } from "../ThreadTerminalDrawer";
-import { useGT } from "gt-react";
 
 export default function ProviderAuthTerminal({
   output,
@@ -46,7 +46,7 @@ export default function ProviderAuthTerminal({
         if (/^https?:\/\//i.test(url))
           void ensureLocalApi()
             .shell.openExternal(url)
-            .catch(() => setError("Could not open the provider link."));
+            .catch(() => setError(gt("Could not open the provider link.")));
       },
     })
       .then((terminal) => {
@@ -58,7 +58,7 @@ export default function ProviderAuthTerminal({
         written.current = 0;
         setSurface(terminal);
       })
-      .catch(() => setError("Could not load the sign-in terminal. Cancel and retry sign-in."));
+      .catch(() => setError(gt("Could not load the sign-in terminal. Cancel and retry sign-in.")));
     return () => {
       disposed = true;
       created?.dispose();

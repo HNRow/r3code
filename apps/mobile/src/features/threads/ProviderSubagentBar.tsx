@@ -3,6 +3,7 @@ import {
   type ProviderSubagentStatus,
 } from "@t3tools/client-runtime/state/thread-execution";
 import { isOrchestrationV2WorkActive, type EnvironmentId, type ThreadId } from "@t3tools/contracts";
+import { T, useGT, useMessages, Var } from "gt-react-native";
 import { useState } from "react";
 import { View } from "react-native";
 
@@ -10,8 +11,8 @@ import { AppText as Text } from "../../components/ui/AppText";
 import { ProviderIcon } from "../../components/ProviderIcon";
 import { Button } from "../../components/ui/Button";
 import { NativeChildWorkSheet } from "./NativeChildWorkSheet";
+import { ReadOnlyComposerBar } from "./ReadOnlyComposerBar";
 import { useVisibleSecondClock } from "./use-visible-second-clock";
-import { Var, T, useGT } from "gt-react-native";
 
 export function ProviderSubagentBar(props: {
   readonly provider: { readonly driver: string; readonly iconUrl?: string | undefined } | null;
@@ -23,19 +24,22 @@ export function ProviderSubagentBar(props: {
   readonly inspect: { readonly environmentId: EnvironmentId; readonly threadId: ThreadId } | null;
 }) {
   const gt = useGT();
+  const messages = useMessages();
   const [inspecting, setInspecting] = useState(false);
   const live = props.status !== null && isOrchestrationV2WorkActive(props.status.status);
   const nowMs = useVisibleSecondClock(live);
-  const statusLabel = formatProviderSubagentStatus(props.status, nowMs);
+  const statusLabel = formatProviderSubagentStatus(props.status, nowMs, messages);
   const modelDescription =
     props.effortLabel === null ? props.modelLabel : `${props.modelLabel}, ${props.effortLabel}`;
 
   return (
-    <View className="flex-row items-center gap-3 rounded-[20px] border border-border-subtle bg-card-alt py-2 pe-2 ps-4">
-      {}
+    <ReadOnlyComposerBar>
       <View
         accessible
-        accessibilityLabel={`${modelDescription} subagent, ${statusLabel}. It runs on its own and cannot take messages.`}
+        accessibilityLabel={gt(
+          "{modelDescription} subagent, {statusLabel}. It runs on its own and cannot take messages.",
+          { modelDescription, statusLabel },
+        )}
         className="min-w-0 flex-1 gap-0.5"
       >
         <View className="min-w-0 flex-row items-center gap-1.5">
@@ -69,7 +73,11 @@ export function ProviderSubagentBar(props: {
         </Text>
       </View>
       {props.inspect ? (
-        <Button label={gt("Work")} tone="secondary" onPress={() => setInspecting(true)} />
+        <Button
+          label={gt("Work", { $context: "noun, opens the subagent's work log" })}
+          tone="secondary"
+          onPress={() => setInspecting(true)}
+        />
       ) : null}
       {props.onOpenParent ? (
         <Button label={gt("Open parent")} tone="secondary" onPress={props.onOpenParent} />
@@ -77,6 +85,6 @@ export function ProviderSubagentBar(props: {
       {props.inspect && inspecting ? (
         <NativeChildWorkSheet {...props.inspect} onClose={() => setInspecting(false)} />
       ) : null}
-    </View>
+    </ReadOnlyComposerBar>
   );
 }

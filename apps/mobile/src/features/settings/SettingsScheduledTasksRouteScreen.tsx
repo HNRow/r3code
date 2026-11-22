@@ -137,7 +137,8 @@ function describeSchedule(
       msg("Once, {date} at {time}", { date: formatRunAtDate(runAt), time: formatRunAtTime(runAt) }),
     );
   }
-  if (task.schedule.type === "interval") return formatScheduledTaskInterval(task.schedule.everyMs);
+  if (task.schedule.type === "interval")
+    return formatScheduledTaskInterval(task.schedule.everyMs, resolve);
   const days = task.schedule.weekdays?.length
     ? repeatLabel(task.schedule.weekdays, resolve, locale)
     : resolve(msg("Every day"));
@@ -353,6 +354,7 @@ function WebhookFilterRows(props: {
             <FormField
               label={filter.op === "in" ? gt("Values, comma-separated") : gt("Value")}
               value={filter.value}
+              // oxlint-disable-next-line t3code/no-untranslated-copy -- webhook action values
               placeholder={filter.op === "in" ? "opened, reopened" : "opened"}
               disabled={props.disabled}
               onChange={(value) => update(filter.id, { value })}
@@ -836,7 +838,7 @@ function TaskForm({
         gt("Once is not available here"),
         gt(
           "This environment runs an older {product}. Update it to schedule a one-time task, or pick another schedule.",
-          { product: "T3 Code" },
+          { product: "R3 Code" },
         ),
       );
       return;
@@ -1226,6 +1228,7 @@ function TaskForm({
                   display={Platform.OS === "ios" ? "spinner" : "default"}
                   onDismiss={() => setTimePickerOpen(false)}
                   onValueChange={(_, selected) => {
+                    if (Platform.OS === "android") setTimePickerOpen(false);
                     const timeOfDay = `${String(selected.getHours()).padStart(2, "0")}:${String(selected.getMinutes()).padStart(2, "0")}`;
                     setDraft((current) => ({
                       ...current,

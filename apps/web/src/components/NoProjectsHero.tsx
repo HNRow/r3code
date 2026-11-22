@@ -1,4 +1,5 @@
 import { workspaceAreaProps } from "../lib/workspaceFocus";
+import { T, useGT } from "gt-react";
 import { MessageSquareDashedIcon, PlusIcon } from "lucide-react";
 
 import { openCommandPalette } from "../commandPaletteBus";
@@ -9,10 +10,11 @@ import { Button } from "./ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "./ui/empty";
 import { SidebarInset } from "./ui/sidebar";
 import { WorkspacePageHeader } from "./WorkspacePageHeader";
-import { T, t } from "gt-react";
+import { t } from "gt-react";
 
 export function NoProjectsHero() {
-  const contentArea = workspaceAreaProps("home", 1, "Home");
+  const gt = useGT();
+  const contentArea = workspaceAreaProps("home", 1, gt("Home"));
   const primaryEnvironmentId = usePrimaryEnvironmentId();
   const { scratchEnvironmentId, startScratchThread } = useScratchProject();
   const scratchTargetEnvironmentId = scratchEnvironmentId(primaryEnvironmentId);
@@ -34,15 +36,13 @@ export function NoProjectsHero() {
               </EmptyTitle>
               <EmptyDescription>
                 {scratchTargetEnvironmentId === null
-                  ? t("Add a project to start your first thread.")
-                  : t("Add a project, or start without one.")}
+                  ? gt("Add a project to start your first thread.")
+                  : gt("Add a project, or start without one.")}
               </EmptyDescription>
               <div className="mt-6 flex justify-center gap-2">
                 <Button size="sm" onClick={() => openCommandPalette({ open: "add-project" })}>
-                  <T>
-                    <PlusIcon className="size-4" />
-                    Add project
-                  </T>
+                  <PlusIcon className="size-4" />
+                  <T>Add project</T>
                 </Button>
                 {scratchTargetEnvironmentId === null ? null : (
                   <Button
@@ -50,10 +50,8 @@ export function NoProjectsHero() {
                     variant="outline"
                     onClick={() => void startScratchThread(scratchTargetEnvironmentId)}
                   >
-                    <T>
-                      <MessageSquareDashedIcon className="size-4" />
-                      Start without a project
-                    </T>
+                    <MessageSquareDashedIcon className="size-4" />
+                    <T>Start without a project</T>
                   </Button>
                 )}
               </div>

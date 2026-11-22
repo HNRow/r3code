@@ -4,7 +4,7 @@ import * as NodePath from "node:path";
 import * as NodeURL from "node:url";
 import * as NodeUtil from "node:util";
 
-export interface T3CodePublicConfig {
+export interface R3CodePublicConfig {
   readonly clerkPublishableKey: string | undefined;
   readonly clerkJwtTemplate: string | undefined;
   readonly clerkCliOAuthClientId: string | undefined;
@@ -101,7 +101,7 @@ export function loadRepoEnv({
   };
 }
 
-function resolvePublicConfig(...sources: readonly Environment[]): T3CodePublicConfig {
+function resolvePublicConfig(...sources: readonly Environment[]): R3CodePublicConfig {
   return {
     clerkPublishableKey: firstNonEmpty(
       sources,

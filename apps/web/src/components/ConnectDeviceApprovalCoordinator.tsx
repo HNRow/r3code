@@ -1,3 +1,4 @@
+import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
 import { useNavigate } from "@tanstack/react-router";
 import {
   type AtomCommandResult,
@@ -7,7 +8,9 @@ import {
 import { AuthAccessWriteScope, type EnvironmentId } from "@t3tools/contracts";
 import * as DateTime from "effect/DateTime";
 import { useEffect, useRef, useState } from "react";
+import { msg } from "gt-react";
 
+import { m } from "../i18n/messages";
 import { authEnvironment } from "../state/auth";
 import { useEnvironments } from "../state/environments";
 import { useEnvironmentQuery } from "../state/query";
@@ -54,7 +57,7 @@ async function reportFailure(
       stackedThreadToast({
         type: "error",
         title,
-        description: error instanceof Error ? error.message : "An error occurred.",
+        description: thrownErrorMessage(error, m) ?? m(msg("An error occurred.")),
       }),
     );
   }
@@ -116,16 +119,21 @@ function ConnectDeviceRequestToasts({
       };
       const options = stackedThreadToast({
         type: "info",
-        title: t`A device wants to connect to ${environmentLabel}`,
-        description: t`${device}. Approve only if it shows code ${request.verificationCode}.`,
+        title: m(msg("A device wants to connect to {environmentLabel}", { environmentLabel })),
+        description: m(
+          msg("{device}. Approve only if it shows code {code}.", {
+            device,
+            code: request.verificationCode,
+          }),
+        ),
         timeout: remainingMs,
         actionProps: {
-          children: "Approve",
+          children: m(msg("Approve")),
           onClick: () => {
             close();
             void settle(
               id,
-              reportFailure("Could not approve the device", () =>
+              reportFailure(m(msg("Could not approve the device")), () =>
                 approve({ environmentId, input: { pairingLinkId: id } }),
               ),
             );
@@ -134,12 +142,12 @@ function ConnectDeviceRequestToasts({
         data: {
           hideCopyButton: true,
           secondaryActionProps: {
-            children: "Deny",
+            children: m(msg("Deny")),
             onClick: () => {
               close();
               void settle(
                 id,
-                reportFailure("Could not deny the device", () =>
+                reportFailure(m(msg("Could not deny the device")), () =>
                   deny({ environmentId, input: { id } }),
                 ),
               );
@@ -149,7 +157,7 @@ function ConnectDeviceRequestToasts({
             {
               id: "review",
               props: {
-                children: "Review",
+                children: m(msg("Review", { $context: "verb, opens the device in settings" })),
                 onClick: () =>
                   void navigate({ to: "/settings/access", search: { machine: environmentId } }),
               },

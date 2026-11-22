@@ -2,6 +2,7 @@ import type { DeviceHubAccess } from "@t3tools/client-runtime/state/deviceHubAcc
 import type { DevicePermission, DeviceSummary, DeviceTextSize } from "@t3tools/contracts";
 import { ChevronDown, X } from "lucide-react";
 import { useAtomValue } from "@effect/atom-react";
+import { msg, T, useGT, useMessages } from "gt-react";
 import { useState } from "react";
 
 import { Button } from "~/components/ui/button";
@@ -20,251 +21,64 @@ import { Toggle, ToggleGroup } from "~/components/ui/toggle-group";
 import { cn } from "~/lib/utils";
 import type { DeviceControls } from "./useDeviceControls";
 import { deviceEventLogAtom } from "./deviceHubAtoms";
-import { T, useGT, t } from "gt-react";
 
 const TEXT_SIZES: ReadonlyArray<{ value: DeviceTextSize; label: string }> = [
-  {
-    value: "small",
-    get label() {
-      return t("Small");
-    },
-  },
-  {
-    value: "default",
-    get label() {
-      return t("Default");
-    },
-  },
-  {
-    value: "large",
-    get label() {
-      return t("Large");
-    },
-  },
-  {
-    value: "extra-large",
-    get label() {
-      return t("Extra large");
-    },
-  },
+  { value: "small", label: msg("Small") },
+  { value: "default", label: msg("Default") },
+  { value: "large", label: msg("Large") },
+  { value: "extra-large", label: msg("Extra large") },
 ];
 
 const COLOR_FILTERS = [
-  {
-    value: "none",
-    get label() {
-      return t("None");
-    },
-  },
-  {
-    value: "grayscale",
-    get label() {
-      return t("Grayscale");
-    },
-  },
-  {
-    value: "red-green",
-    get label() {
-      return t("Red / green (protanopia)");
-    },
-  },
-  {
-    value: "green-red",
-    get label() {
-      return t("Green / red (deuteranopia)");
-    },
-  },
-  {
-    value: "blue-yellow",
-    get label() {
-      return t("Blue / yellow (tritanopia)");
-    },
-  },
+  { value: "none", label: msg("None") },
+  { value: "grayscale", label: msg("Grayscale") },
+  { value: "red-green", label: msg("Red / green (protanopia)") },
+  { value: "green-red", label: msg("Green / red (deuteranopia)") },
+  { value: "blue-yellow", label: msg("Blue / yellow (tritanopia)") },
 ] as const;
 
 const ORIENTATIONS = [
-  {
-    value: "portrait",
-    get label() {
-      return t("Portrait");
-    },
-  },
-  {
-    value: "landscape_left",
-    get label() {
-      return t("Landscape left");
-    },
-  },
-  {
-    value: "portrait_upside_down",
-    get label() {
-      return t("Upside down");
-    },
-  },
-  {
-    value: "landscape_right",
-    get label() {
-      return t("Landscape right");
-    },
-  },
+  { value: "portrait", label: msg("Portrait") },
+  { value: "landscape_left", label: msg("Landscape left") },
+  { value: "portrait_upside_down", label: msg("Upside down") },
+  { value: "landscape_right", label: msg("Landscape right") },
 ] as const;
 
 const IOS_PERMISSIONS: ReadonlyArray<{ value: DevicePermission; label: string }> = [
-  {
-    value: "camera",
-    get label() {
-      return t("Camera");
-    },
-  },
-  {
-    value: "microphone",
-    get label() {
-      return t("Microphone");
-    },
-  },
-  {
-    value: "photos",
-    get label() {
-      return t("Photos");
-    },
-  },
-  {
-    value: "contacts",
-    get label() {
-      return t("Contacts");
-    },
-  },
-  {
-    value: "calendar",
-    get label() {
-      return t("Calendar");
-    },
-  },
-  {
-    value: "reminders",
-    get label() {
-      return t("Reminders");
-    },
-  },
-  {
-    value: "location",
-    get label() {
-      return t("Location");
-    },
-  },
-  {
-    value: "notifications",
-    get label() {
-      return t("Notifications");
-    },
-  },
-  {
-    value: "motion",
-    get label() {
-      return t("Motion");
-    },
-  },
-  {
-    value: "media-library",
-    get label() {
-      return t("Media library");
-    },
-  },
-  {
-    value: "faceid",
-    get label() {
-      return t("Face ID");
-    },
-  },
+  { value: "camera", label: msg("Camera") },
+  { value: "microphone", label: msg("Microphone") },
+  { value: "photos", label: msg("Photos") },
+  { value: "contacts", label: msg("Contacts") },
+  { value: "calendar", label: msg("Calendar") },
+  { value: "reminders", label: msg("Reminders") },
+  { value: "location", label: msg("Location") },
+  { value: "notifications", label: msg("Notifications") },
+  { value: "motion", label: msg("Motion") },
+  { value: "media-library", label: msg("Media library") },
+  { value: "faceid", label: msg("Face ID") },
 ];
 
 const ANDROID_PERMISSIONS: ReadonlyArray<{ value: DevicePermission; label: string }> = [
-  {
-    value: "camera",
-    get label() {
-      return t("Camera");
-    },
-  },
-  {
-    value: "microphone",
-    get label() {
-      return t("Microphone");
-    },
-  },
-  {
-    value: "photos",
-    get label() {
-      return t("Photos");
-    },
-  },
-  {
-    value: "contacts",
-    get label() {
-      return t("Contacts");
-    },
-  },
-  {
-    value: "calendar",
-    get label() {
-      return t("Calendar");
-    },
-  },
-  {
-    value: "location",
-    get label() {
-      return t("Location");
-    },
-  },
-  {
-    value: "notifications",
-    get label() {
-      return t("Notifications");
-    },
-  },
-  {
-    value: "motion",
-    get label() {
-      return t("Physical activity");
-    },
-  },
+  { value: "camera", label: msg("Camera") },
+  { value: "microphone", label: msg("Microphone") },
+  { value: "photos", label: msg("Photos") },
+  { value: "contacts", label: msg("Contacts") },
+  { value: "calendar", label: msg("Calendar") },
+  { value: "location", label: msg("Location") },
+  { value: "notifications", label: msg("Notifications") },
+  { value: "motion", label: msg("Physical activity") },
 ];
 
 const LOCATION_PRESETS = [
   {
-    get label() {
-      return t("San Francisco");
-    },
+    label: msg("San Francisco", { $context: "city name" }),
     latitude: 37.7749,
     longitude: -122.4194,
   },
-  {
-    get label() {
-      return t("New York");
-    },
-    latitude: 40.7128,
-    longitude: -74.006,
-  },
-  {
-    get label() {
-      return t("London");
-    },
-    latitude: 51.5074,
-    longitude: -0.1278,
-  },
-  {
-    get label() {
-      return t("Stockholm");
-    },
-    latitude: 59.3293,
-    longitude: 18.0686,
-  },
-  {
-    get label() {
-      return t("Tokyo");
-    },
-    latitude: 35.6762,
-    longitude: 139.6503,
-  },
+  { label: msg("New York", { $context: "city name" }), latitude: 40.7128, longitude: -74.006 },
+  { label: msg("London", { $context: "city name" }), latitude: 51.5074, longitude: -0.1278 },
+  { label: msg("Stockholm", { $context: "city name" }), latitude: 59.3293, longitude: 18.0686 },
+  { label: msg("Tokyo", { $context: "city name" }), latitude: 35.6762, longitude: 139.6503 },
 ] as const;
 
 export function DeviceToolsPanel(props: {
@@ -277,11 +91,11 @@ export function DeviceToolsPanel(props: {
   readonly onClose: () => void;
   readonly className?: string;
 }) {
-  const gt = useGT();
   const { device, controls } = props;
   const { detail, pending, error, foregroundApp, disabled, act } = controls;
   const settings = detail?.settings;
   const isIos = device.platform === "ios";
+  const gt = useGT();
 
   return (
     <div
@@ -308,9 +122,7 @@ export function DeviceToolsPanel(props: {
         ) : null}
         {detail === null && !error ? (
           <div className="flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground">
-            <T>
-              <Spinner size="sm" /> Reading device settings…
-            </T>
+            <Spinner size="sm" /> <T>Reading device settings…</T>
           </div>
         ) : null}
 
@@ -322,8 +134,8 @@ export function DeviceToolsPanel(props: {
           </Section>
         ) : null}
 
-        <Section title={gt("App")}>
-          <Row label={gt("Foreground")}>
+        <Section title={gt("App", { $context: "section heading for the foreground app" })}>
+          <Row label={gt("Foreground", { $context: "the app currently in the foreground" })}>
             <span className="truncate font-mono text-xs">{foregroundApp?.id ?? "-"}</span>
           </Row>
           {foregroundApp ? (
@@ -347,20 +159,20 @@ export function DeviceToolsPanel(props: {
             </div>
           ) : null}
           <SubmitRow
-            placeholder="https://… or myapp://"
-            action="Open"
+            placeholder={gt("https://… or myapp://")}
+            action={gt("Open", { $context: "verb, opens a URL" })}
             disabled={disabled}
             onSubmit={(url) => act({ type: "openUrl", url })}
           />
           <SubmitRow
-            placeholder={isIos ? "Bundle ID to launch" : "Package name to launch"}
-            action="Launch"
+            placeholder={isIos ? gt("Bundle ID to launch") : gt("Package name to launch")}
+            action={gt("Launch", { $context: "verb, launches an app" })}
             disabled={disabled}
             onSubmit={(appId) => act({ type: "launchApp", appId })}
           />
         </Section>
 
-        <Section title={isIos ? "Simulator" : "Emulator"}>
+        <Section title={isIos ? gt("Simulator") : gt("Emulator")}>
           <Row label={gt("Appearance")}>
             <ToggleGroup
               aria-label={gt("Appearance")}
@@ -373,10 +185,10 @@ export function DeviceToolsPanel(props: {
               }}
             >
               <Toggle value="light">
-                <T>Light</T>
+                <T context="appearance mode">Light</T>
               </Toggle>
               <Toggle value="dark">
-                <T>Dark</T>
+                <T context="appearance mode">Dark</T>
               </Toggle>
             </ToggleGroup>
           </Row>
@@ -391,9 +203,9 @@ export function DeviceToolsPanel(props: {
           </Row>
           {isIos ? (
             <>
-              <Row label={gt("Liquid Glass")}>
+              <Row label="Liquid Glass">
                 <ToggleGroup
-                  aria-label={gt("Liquid Glass")}
+                  aria-label="Liquid Glass"
                   value={settings?.liquidGlass ? [settings.liquidGlass] : []}
                   disabled={disabled || settings?.liquidGlass === undefined}
                   onValueChange={(value) => {
@@ -404,10 +216,10 @@ export function DeviceToolsPanel(props: {
                   }}
                 >
                   <Toggle value="clear">
-                    <T>Clear</T>
+                    <T context="Liquid Glass style">Clear</T>
                   </Toggle>
                   <Toggle value="tinted">
-                    <T>Tinted</T>
+                    <T context="Liquid Glass style">Tinted</T>
                   </Toggle>
                 </ToggleGroup>
               </Row>
@@ -511,7 +323,7 @@ export function DeviceToolsPanel(props: {
           <Section title={gt("Push notification")}>
             <SubmitRow
               placeholder={gt("Alert text")}
-              action="Send"
+              action={gt("Send", { $context: "verb, sends a push notification" })}
               disabled={disabled || !foregroundApp}
               onSubmit={(payload) =>
                 foregroundApp
@@ -578,6 +390,8 @@ function ChoiceSelect<V extends string>(props: {
   readonly placeholder?: string;
   readonly onChange: (value: V) => Promise<unknown>;
 }) {
+  const gt = useGT();
+  const m = useMessages();
   const current = props.options.find((option) => option.value === props.value);
   return (
     <Select
@@ -590,16 +404,16 @@ function ChoiceSelect<V extends string>(props: {
       <SelectTrigger size="xs" className="w-40" aria-label={props.ariaLabel}>
         <SelectValue>
           {current ? (
-            current.label
+            m(current.label)
           ) : (
-            <span className="text-muted-foreground">{props.placeholder ?? t("Unknown")}</span>
+            <span className="text-muted-foreground">{props.placeholder ?? gt("Unknown")}</span>
           )}
         </SelectValue>
       </SelectTrigger>
       <SelectPopup align="end" alignItemWithTrigger={false}>
         {props.options.map((option) => (
           <SelectItem key={option.value} value={option.value}>
-            {option.label}
+            {m(option.label)}
           </SelectItem>
         ))}
       </SelectPopup>
@@ -657,6 +471,7 @@ function LocationSection(props: {
   readonly onClear: () => Promise<unknown>;
 }) {
   const gt = useGT();
+  const m = useMessages();
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const parsed = { latitude: Number(latitude), longitude: Number(longitude) };
@@ -711,7 +526,7 @@ function LocationSection(props: {
           <SelectPopup align="start" alignItemWithTrigger={false}>
             {LOCATION_PRESETS.map((preset) => (
               <SelectItem key={preset.label} value={preset.label}>
-                {preset.label}
+                {m(preset.label)}
               </SelectItem>
             ))}
           </SelectPopup>
@@ -722,7 +537,7 @@ function LocationSection(props: {
           disabled={props.disabled || !valid}
           onClick={() => void props.onSet(parsed.latitude, parsed.longitude)}
         >
-          <T>Set</T>
+          <T context="verb, applies the location">Set</T>
         </Button>
         {props.canClear ? (
           <Button
@@ -735,7 +550,7 @@ function LocationSection(props: {
               void props.onClear();
             }}
           >
-            <T>Clear</T>
+            <T context="verb, clears the location">Clear</T>
           </Button>
         ) : null}
       </div>
@@ -765,7 +580,7 @@ function PermissionsSection(props: {
       <Input
         size="compact"
         font="mono"
-        placeholder={props.defaultAppId || "App ID"}
+        placeholder={props.defaultAppId || gt("App ID")}
         value={appId}
         disabled={props.disabled}
         onChange={(event) => setAppId(event.target.value)}
@@ -804,7 +619,7 @@ function PermissionsSection(props: {
             disabled={props.disabled || !resolvedAppId}
             onClick={() => decide("reset")}
           >
-            <T>Reset</T>
+            <T context="verb, resets the permission">Reset</T>
           </Button>
         ) : null}
       </div>
@@ -821,12 +636,10 @@ function EventLogSection(props: {
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger className="flex w-full items-center gap-1.5 border-b px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">
-        <T>
-          Event log
-          <ChevronDown
-            className={cn("ml-auto size-3.5 transition-transform", open && "rotate-180")}
-          />
-        </T>
+        <T>Event log</T>
+        <ChevronDown
+          className={cn("ml-auto size-3.5 transition-transform", open && "rotate-180")}
+        />
       </CollapsibleTrigger>
       <CollapsiblePanel>
         <EventLogEntries access={props.access} device={props.device} />

@@ -1,5 +1,6 @@
 import { memo, useRef, useState, type ReactNode, type KeyboardEvent } from "react";
 import { flushSync } from "react-dom";
+import { T, useGT } from "gt-react";
 import {
   ArrowLeftIcon,
   ChevronLeftIcon,
@@ -32,7 +33,7 @@ import { expandedImageKey } from "./ExpandedImagePreview";
 import { registerThreadOverlay } from "./threadOverlayRetention";
 import { mediaReferenceFileName } from "@t3tools/client-runtime/media-reference";
 import { mediaMimeType, mediaMimeTypeFromExtension } from "@t3tools/shared/mediaPreview";
-import { Var, T, useGT, t } from "gt-react";
+import { Var, t } from "gt-react";
 
 interface ExpandedImageDialogProps {
   preview: ExpandedImagePreview;
@@ -113,7 +114,7 @@ export const ExpandedImageDialog = memo(function ExpandedImageDialog({
   const item = preview.images[index];
   const source: MediaActionSource = item?.actionsSource ?? {
     kind: item?.type === "video" ? "video" : "image",
-    name: item?.name ?? "Media",
+    name: item?.name ?? gt("Media"),
     src: item?.src ?? null,
   };
   const openFile = source.onOpenFile;
@@ -153,7 +154,7 @@ export const ExpandedImageDialog = memo(function ExpandedImageDialog({
   };
 
   if (!item) return null;
-  const mediaLabel = item.type === "video" ? "video" : "image";
+  const isVideo = item.type === "video";
   const openOriginalLink =
     item.originalUrl && resolveExternalWebLinkHost(item.originalUrl) !== null ? (
       <OpenMediaLink originalUrl={item.originalUrl} />
@@ -162,10 +163,10 @@ export const ExpandedImageDialog = memo(function ExpandedImageDialog({
   const showingAccessibilityDetails =
     Boolean(accessibilityDetails) && accessibilityDetailsSrc === item.src;
   const contentsLabel = showingAccessibilityDetails
-    ? "Show screenshot"
+    ? gt("Show screenshot")
     : accessibilityDetails?.format === "json"
-      ? "Show accessibility JSON"
-      : "Show extracted text";
+      ? gt("Show accessibility JSON")
+      : gt("Show extracted text");
 
   return (
     <Dialog
@@ -195,9 +196,7 @@ export const ExpandedImageDialog = memo(function ExpandedImageDialog({
         }}
       >
         <DialogTitle className="sr-only">
-          <T>
-            Expanded <Var>{mediaLabel}</Var> preview
-          </T>
+          {isVideo ? gt("Expanded video preview") : gt("Expanded image preview")}
         </DialogTitle>
         <Button
           type="button"
@@ -206,12 +205,10 @@ export const ExpandedImageDialog = memo(function ExpandedImageDialog({
           variant="media-close"
           className="absolute left-0 top-0 z-20 max-[8rem]:left-1/2 max-[8rem]:-translate-x-1/2"
           onClick={close}
-          aria-label={`Back, close ${mediaLabel} preview`}
+          aria-label={isVideo ? gt("Back, close video preview") : gt("Back, close image preview")}
         >
-          <T>
-            <ArrowLeftIcon aria-hidden="true" />
-            Back
-          </T>
+          <ArrowLeftIcon aria-hidden="true" />
+          <T>Back</T>
         </Button>
         {preview.images.length > 1 && (
           <Button
@@ -240,8 +237,8 @@ export const ExpandedImageDialog = memo(function ExpandedImageDialog({
               <ExpandedMediaFailure>
                 <p>
                   {openOriginalLink
-                    ? t("This image could not be loaded.")
-                    : t("Image unavailable. The file may have been moved or deleted.")}
+                    ? gt("This image could not be loaded.")
+                    : gt("Image unavailable. The file may have been moved or deleted.")}
                 </p>
                 {openOriginalLink}
               </ExpandedMediaFailure>

@@ -1,7 +1,7 @@
+import { T } from "gt-react";
 import { type ReactNode } from "react";
 
 import { Sheet, SheetHeader, SheetPopup, SheetTitle } from "./ui/sheet";
-import { T } from "gt-react";
 
 export function RightPanelSheet(props: {
   animationDurationMs: number;

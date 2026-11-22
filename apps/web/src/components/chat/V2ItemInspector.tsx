@@ -1,3 +1,4 @@
+import { T, Var, useGT } from "gt-react";
 import type { ToolCallDiffTarget } from "../../diffPanelStore";
 import type {
   EnvironmentId,
@@ -34,7 +35,7 @@ import { resolveExternalWebLinkHref } from "./externalLinkContextMenu";
 import type { ExpandedImagePreview } from "./ExpandedImagePreview";
 import { ShellCommandBlock } from "./ShellCommandBlock";
 import { useInitialOutputReady, type TurnItemSource } from "./timelineRowContext";
-import { useGT, useMessages, msg, T, Var, t } from "gt-react";
+import { useMessages, msg, t } from "gt-react";
 
 interface V2ItemInspectorProps {
   readonly onInitialOutputReady?: (() => void) | undefined;
@@ -167,6 +168,7 @@ function useFetchedTurnItem(
   source: TurnItemSource | undefined,
   skip = false,
 ) {
+  const gt = useGT();
   const wireItem = projectedItem.item;
   const fetches = !skip && turnItemNeedsDetailFetch(wireItem);
   const detail = useTurnItemDetail(
@@ -193,7 +195,7 @@ function useFetchedTurnItem(
         item !== wireItem
           ? null
           : detail.data?.item === null
-            ? "Output is no longer available."
+            ? gt("Output is no longer available.")
             : detail.error,
       empty: fetches && item !== wireItem,
     },
@@ -308,11 +310,13 @@ function ToolCallBody(
 }
 
 export const V2ItemInspector = memo(function V2ItemInspector(props: V2ItemInspectorProps) {
-  const m = useMessages();
+  const gt = useGT();
   // Command rows stream their output, including the final output, from the server.
   const environmentStreamsOutput = useCommandOutputStreaming(props.environmentId);
   const streamsOutput =
-    (props.source !== undefined || environmentStreamsOutput) &&
+    (props.source === undefined
+      ? environmentStreamsOutput
+      : props.source.commandOutput !== undefined) &&
     props.projectedItem.item.type === "command_execution";
   const fetched = useFetchedTurnItem(
     props.projectedItem,
@@ -449,7 +453,7 @@ export const V2ItemInspector = memo(function V2ItemInspector(props: V2ItemInspec
                   </a>
                 ) : (
                   <p className="font-medium text-foreground">
-                    {result.title ?? result.url ?? t("Search result")}
+                    {result.title ?? result.url ?? gt("Search result")}
                   </p>
                 )}
                 {result.snippet ? <p className="text-muted-foreground">{result.snippet}</p> : null}

@@ -28,48 +28,23 @@ import {
   resolveCustomSnooze,
   type CustomSnoozeInput,
 } from "@t3tools/client-runtime/state/thread-settled";
+import { msg, useGT, useMessages } from "gt-react-native";
 import { useState, type ReactNode } from "react";
 import { StandaloneStack } from "../layout/nested-stacks";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
-import { useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 const durationAmounts = Array.from({ length: 99 }, (_, index) => index + 1);
 const modes = [
-  {
-    value: "date",
-    get label() {
-      return t("Date and time");
-    },
-  },
-  {
-    value: "duration",
-    get label() {
-      return t("Duration");
-    },
-  },
+  { value: "date", label: msg("Date and time") },
+  { value: "duration", label: msg("Duration") },
 ] as const;
 const units = [
-  {
-    value: "minutes",
-    get label() {
-      return t("Minutes");
-    },
-  },
-  {
-    value: "hours",
-    get label() {
-      return t("Hours");
-    },
-  },
-  {
-    value: "days",
-    get label() {
-      return t("Days");
-    },
-  },
+  { value: "minutes", label: msg("Minutes") },
+  { value: "hours", label: msg("Hours") },
+  { value: "days", label: msg("Days") },
 ] as const;
 
 export function CustomSnoozeSheet(props: {
@@ -77,6 +52,7 @@ export function CustomSnoozeSheet(props: {
   readonly onSnooze: (snoozedUntil: string) => void;
 }) {
   const gt = useGT();
+  const m = useMessages();
   const { width, height } = useWindowDimensions();
   const [mode, setMode] = useState<CustomSnoozeInput["mode"]>("date");
   const [date, setDate] = useState(() => new Date(Date.now() + 3_600_000));
@@ -99,7 +75,9 @@ export function CustomSnoozeSheet(props: {
     const snoozedUntil = resolveCustomSnooze(input, new Date());
     if (!snoozedUntil) {
       setError(
-        mode === "date" ? "Choose a date and time in the future." : "Enter a positive duration.",
+        mode === "date"
+          ? gt("Choose a date and time in the future.")
+          : gt("Enter a positive duration."),
       );
       return;
     }
@@ -151,7 +129,7 @@ export function CustomSnoozeSheet(props: {
                 >
                   {modes.map((option) => (
                     <Text key={option.value} modifiers={[tag(option.value)]}>
-                      {option.label}
+                      {m(option.label)}
                     </Text>
                   ))}
                 </Picker>
@@ -214,7 +192,7 @@ export function CustomSnoozeSheet(props: {
                             foregroundStyle(colors["--color-foreground"]),
                           ]}
                         >
-                          {option.label}
+                          {m(option.label)}
                         </Text>
                       ))}
                     </Picker>
@@ -256,7 +234,10 @@ function SnoozePopoverNavigation(props: {
               title={gt("Custom snooze")}
               onCancel={props.onClose}
               accessibilityLabel={gt("Cancel custom snooze")}
-              confirm={{ label: t("Snooze"), onPress: props.onSubmit }}
+              confirm={{
+                label: gt("Snooze", { $context: "verb, confirm button" }),
+                onPress: props.onSubmit,
+              }}
             />
             <ScrollView
               contentInsetAdjustmentBehavior="automatic"

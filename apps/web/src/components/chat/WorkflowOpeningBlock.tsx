@@ -1,3 +1,6 @@
+import { T, useGT, useMessages } from "gt-react";
+import type { SideThreadOpenIntent } from "@t3tools/client-runtime/side-thread";
+import { useSideThreadTrigger } from "../../hooks/useSideThreadTrigger";
 import { useAtomValue } from "@effect/atom-react";
 import {
   isTerminalSubagentStatus,
@@ -26,7 +29,7 @@ import { findRevealRef } from "./markdownFindContext";
 import { useTallEnoughToFold } from "./useTallEnoughToFold";
 import { SubagentTooltipContent } from "./SubagentTooltipContent";
 import { EnvironmentSubagentAvatar } from "./V2LifecycleRow";
-import { T, t } from "gt-react";
+import { t } from "gt-react";
 
 const FOLDED_SCRIPT_MASK = "linear-gradient(to bottom, black calc(100% - 1.75rem), transparent)";
 
@@ -39,11 +42,13 @@ function scriptMarkdown(script: string) {
 export function WorkflowOpeningBlock(props: {
   readonly opening: WorkflowOpening;
   readonly environmentId: EnvironmentId;
-  readonly onOpenThread: (threadId: string) => void;
+  readonly onOpenThread: (threadId: string, intent?: SideThreadOpenIntent) => void;
 }) {
+  const gt = useGT();
   const { opening } = props;
+  const m = useMessages();
   const providers = useAtomValue(providersIgnoringCheckedAtAtom(props.environmentId));
-  const headline = workflowOpeningHeadline(opening);
+  const headline = workflowOpeningHeadline(opening, m);
   const phases = opening.group?.phases.filter((phase) => phase.members.length > 0) ?? [];
   const memberRow = (member: RuntimeSubagent) =>
     opening.providerInstanceId === null ? null : (
@@ -59,7 +64,7 @@ export function WorkflowOpeningBlock(props: {
     );
   return (
     <section
-      aria-label={`Workflow started: ${headline.title}`}
+      aria-label={gt("Workflow started: {title}", { title: headline.title })}
       className="flex min-w-0 flex-col gap-3 px-1 py-0.5"
       data-workflow-opening
     >
@@ -85,7 +90,7 @@ export function WorkflowOpeningBlock(props: {
         ) : null}
       </header>
       {phases.map((phase) => (
-        <section key={phase.index} aria-label={`${phase.title} phase`}>
+        <section key={phase.index} aria-label={gt("{title} phase", { title: phase.title })}>
           <h4 className="flex items-baseline gap-2 px-2 pb-0.5 text-2xs font-medium text-muted-foreground">
             <span className="min-w-0 truncate" data-thread-find-text="true">
               {phase.title}
@@ -111,8 +116,10 @@ function WorkflowMemberRow(props: {
   readonly providerInstanceId: ProviderInstanceId;
   readonly providers: ReadonlyArray<ServerProvider>;
   readonly driver: ProviderDriverKind | undefined;
-  readonly onOpenThread: (threadId: string) => void;
+  readonly onOpenThread: (threadId: string, intent?: SideThreadOpenIntent) => void;
 }) {
+  const gt = useGT();
+  const trigger = useSideThreadTrigger();
   const { member } = props;
   const threadId = member.childThreadId;
   const failed = member.status === "failed";
@@ -137,9 +144,9 @@ function WorkflowMemberRow(props: {
             ) : (
               <button
                 type="button"
-                aria-label={`Open ${member.title}`}
+                aria-label={gt("Open {title}", { title: member.title })}
                 aria-description={member.status}
-                onClick={() => props.onOpenThread(threadId)}
+                {...trigger((intent) => props.onOpenThread(threadId, intent))}
                 className={cn(
                   className,
                   "cursor-pointer transition-colors hover:bg-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/70",
@@ -205,6 +212,7 @@ function WorkflowMemberRow(props: {
 }
 
 function WorkflowScript(props: { readonly script: string }) {
+  const gt = useGT();
   const [expanded, setExpanded] = useState(false);
   const revealRef = findRevealRef(() => setExpanded(true));
   const { ref: contentRef, tallEnough: canFold } = useTallEnoughToFold();
@@ -236,7 +244,7 @@ function WorkflowScript(props: { readonly script: string }) {
             data-scroll-anchor-ignore
             onClick={() => setExpanded((value) => !value)}
           >
-            {expanded ? t("Show less") : t("Show full script")}
+            {expanded ? gt("Show less") : gt("Show full script")}
           </Button>
         </div>
       ) : null}

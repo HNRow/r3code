@@ -48,8 +48,8 @@ Use one of these per machine:
 
 | OS      | Native policy                                                                                        | Policy file                                       |
 | ------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| macOS   | Configuration profile for `com.t3tools.t3code`                                                       | `/Library/Application Support/T3Code/policy.json` |
-| Windows | Group Policy template, or a `Policy` JSON value (both under `HKLM\SOFTWARE\Policies\T3Tools\T3Code`) | `C:\Program Files\T3Code\policy.json`             |
+| macOS   | Configuration profile for `com.t3tools.t3code`                                                       | `/Library/Application Support/R3Code/policy.json` |
+| Windows | Group Policy template, or a `Policy` JSON value (both under `HKLM\SOFTWARE\Policies\T3Tools\R3Code`) | `C:\Program Files\R3Code\policy.json`             |
 | Linux   |                                                                                                      | `/etc/t3code/policy.json`                         |
 
 R3 Code does not merge sources. If a machine has both a native policy and a policy file, R3 Code
@@ -87,8 +87,8 @@ PowerShell, as an administrator:
 
 ```powershell
 $json = (Get-Content -Raw -Encoding UTF8 policy.json) -replace '\r?\n\s*', ''
-New-Item -Path HKLM:\SOFTWARE\Policies\T3Tools\T3Code -Force | Out-Null
-Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\T3Tools\T3Code -Name Policy -Value $json -Type String
+New-Item -Path HKLM:\SOFTWARE\Policies\T3Tools\R3Code -Force | Out-Null
+Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\T3Tools\R3Code -Name Policy -Value $json -Type String
 ```
 
 ## Check what the server loaded
@@ -127,8 +127,8 @@ cannot enforce, so upgrade R3 Code before you deploy a policy that uses them.
 ## Settings
 
 Each key under `settings` is a setting's path in the server's `settings.json`, such as
-`storageCleanup.logsAfterDays`. To find a path, change the setting in R3 Code and look in
-`settings.json` under `~/.t3/userdata`.
+`storageCleanup.logsAfterDays`. Run `t3 policy settings` to list every path a policy can manage,
+with its default.
 
 - `"locked": false` sets a default. It applies wherever the user has not chosen a value of their
   own, and users can change it.

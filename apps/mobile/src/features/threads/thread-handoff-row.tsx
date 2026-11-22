@@ -21,6 +21,7 @@ import type {
   ServerProvider,
 } from "@t3tools/contracts";
 import { Atom } from "effect/reactivity";
+import { useGT } from "gt-react-native";
 import { useMemo } from "react";
 import { Pressable, View, type ColorValue } from "react-native";
 import { AppText as Text } from "../../components/ui/AppText";
@@ -29,7 +30,6 @@ import { ProviderIcon, ProviderInstanceIcon } from "../../components/ProviderIco
 import { environmentThreadDetails } from "../../state/threads";
 import { serverEnvironment } from "../../state/server";
 import { ThreadContextDivider } from "./thread-context-divider";
-import { useGT } from "gt-react-native";
 
 type HandoffProvider = ServerProvider & {
   readonly driverKind: ServerProvider["driver"];

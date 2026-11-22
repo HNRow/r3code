@@ -5,6 +5,7 @@ import {
   htmlRenderFrameHeight,
   type HtmlRenderReference,
 } from "@t3tools/shared/htmlRender";
+import { T, useGT, Var } from "gt-react";
 import { Maximize2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -17,7 +18,7 @@ import { toastManager } from "../ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { HtmlRenderDialog } from "./HtmlRenderDialog";
 import { observeResize } from "~/lib/observeResize";
-import { useGT, T, Var, t } from "gt-react";
+import { t } from "gt-react";
 
 const MIN_URL_LIFE_MS = 5 * 60_000;
 const MAX_MEASURED_CONTENT_HEIGHTS = 200;
@@ -116,8 +117,8 @@ export function HtmlRenderFrame(props: {
                       else
                         toastManager.add({
                           type: "error",
-                          title: t("Page unavailable"),
-                          description: t("Reconnect to the environment and try again."),
+                          title: gt("Page unavailable"),
+                          description: gt("Reconnect to the environment and try again."),
                         });
                     }}
                   />

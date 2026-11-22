@@ -1,3 +1,5 @@
+import { msg } from "gt-i18n";
+import { translatableMessage } from "../errors/translatable.ts";
 import type { QueryPersistence } from "./queryPersistence.ts";
 import { createCommandPermissions } from "./commandPermissions.ts";
 import { followStreamInEnvironment } from "./environmentStreams.ts";
@@ -100,10 +102,14 @@ interface EnvironmentQueryAtomOptions<Input, A, E, R> extends Omit<
   readonly staleTimeMs?: number;
   readonly idleTtlMs?: number;
   readonly refreshIntervalMs?: number;
-  readonly refreshTrigger?: (target: {
-    readonly environmentId: EnvironmentIdType;
-    readonly input: Input;
-  }) => Atom.Atom<unknown> | undefined;
+  /** Each change of the returned signal refreshes the query; `query` is the data it refreshes. */
+  readonly refreshTrigger?: (
+    target: {
+      readonly environmentId: EnvironmentIdType;
+      readonly input: Input;
+    },
+    query: Atom.Atom<AsyncResult.AsyncResult<A, unknown>>,
+  ) => Atom.Atom<unknown> | undefined;
   readonly isFinal?: (value: A) => boolean;
   /**
    * Runs where each server answer lands, before readers see it, so derived records (summaries,
@@ -844,9 +850,19 @@ export function createEnvironmentQueryAtomFamily<R, ER, Input, A, E>(
               return Effect.fail(
                 new EnvironmentRpcUnavailableError({
                   environmentId: target.environmentId,
-                  message: `Environment ${target.environmentId} is ${
-                    connectionState.phase === "available" ? "not connected" : connectionState.phase
-                  }.`,
+                  ...translatableMessage(
+                    connectionState.phase === "offline"
+                      ? msg("Environment {environmentId} is offline.", {
+                          environmentId: target.environmentId,
+                        })
+                      : connectionState.phase === "blocked"
+                        ? msg("Environment {environmentId} is blocked.", {
+                            environmentId: target.environmentId,
+                          })
+                        : msg("Environment {environmentId} is not connected.", {
+                            environmentId: target.environmentId,
+                          }),
+                  ),
                 }),
               );
           }
@@ -893,7 +909,7 @@ export function createEnvironmentQueryAtomFamily<R, ER, Input, A, E>(
       options.refreshIntervalMs === undefined
         ? queryAtom
         : queryAtom.pipe(refreshEveryUntilFinal(options.refreshIntervalMs, isFinal));
-    const refreshTrigger = options.refreshTrigger?.(target);
+    const refreshTrigger = options.refreshTrigger?.(target, intervalQuery);
     return (
       refreshTrigger === undefined
         ? intervalQuery
@@ -1134,6 +1150,7 @@ export function createEnvironmentRpcCommand<
         readonly input: NoInfer<Input>;
       },
       registry: AtomRegistry.AtomRegistry,
+      exit: Exit.Exit<EnvironmentRpcSuccess<TTag>, unknown>,
     ) => Effect.Effect<void, never, R>;
   },
 ) {
@@ -1164,7 +1181,7 @@ export function createEnvironmentRpcCommand<
         Effect.tap(
           (result) => options.onSuccess?.(target, registry, result, started) ?? Effect.void,
         ),
-        Effect.ensuring(options.onSettled?.(target, registry) ?? Effect.void),
+        Effect.onExit((exit) => options.onSettled?.(target, registry, exit) ?? Effect.void),
       );
     },
   });

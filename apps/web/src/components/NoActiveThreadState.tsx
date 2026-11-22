@@ -1,8 +1,8 @@
+import { T } from "gt-react";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "./ui/empty";
 import { SidebarInset } from "./ui/sidebar";
 import { isElectron } from "../env";
 import { WorkspacePageHeader } from "./WorkspacePageHeader";
-import { T } from "gt-react";
 
 export function NoActiveThreadState() {
   return (

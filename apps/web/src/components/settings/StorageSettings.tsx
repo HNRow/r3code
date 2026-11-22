@@ -21,6 +21,8 @@ import { useDebouncedValue } from "../../state/queries";
 import { AnimatedHeight } from "../AnimatedHeight";
 import { Button } from "../ui/button";
 import { toastManager } from "../ui/toast";
+import { msg, T, useGT, useMessages, Var } from "gt-react";
+import { m, type MessageResolver } from "../../i18n/messages";
 
 import { Input } from "../ui/input";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
@@ -40,7 +42,7 @@ import { SettingsScopeNotice } from "./SettingsScopeNotice";
 import { SettingsGroup } from "./SettingsGroup";
 import type { ScopedSettingsTarget } from "./scopedSettings";
 import { useSettingsScope } from "./SettingsScopeContext";
-import { searchableSetting } from "./settingsSearch";
+import { useSearchableSetting } from "./settingsSearch";
 import {
   useClearScopedSettings,
   useScopedSettings,
@@ -48,9 +50,10 @@ import {
   useUpdateScopedSettings,
 } from "./useScopedSettings";
 import { settingsScopeEnvironmentLabel } from "./settingsScopeAxis";
-import { useGT, T, Var, t } from "gt-react";
+import { t } from "gt-react";
 
 export function WorktreesDirectoryRow() {
+  const setting = useSearchableSetting();
   const gt = useGT();
   const { connectedEnvironments, targets } = useSettingsScope();
   const settings = useScopedSettings();
@@ -69,7 +72,7 @@ export function WorktreesDirectoryRow() {
 
   return (
     <SettingsRow
-      {...searchableSetting("storage-worktrees-location")}
+      {...setting("storage-worktrees-location")}
       description={gt(
         "Folder where new worktrees are created, on any drive, such as D:\\worktrees or ~/worktrees. Existing worktrees stay where they are. Leave empty to use the T3 home folder.",
       )}
@@ -78,7 +81,7 @@ export function WorktreesDirectoryRow() {
       resetAction={
         mixed || settings.worktreesDirectory !== "" ? (
           <SettingResetButton
-            label={gt("worktree location")}
+            ariaLabel={gt("Reset worktree location to default")}
             onClick={() => updateSettings({ worktreesDirectory: "" })}
           />
         ) : null
@@ -124,6 +127,7 @@ function RetentionControl({
   onChange: (value: number | null, onFailed: () => void) => void;
   minimum?: number;
 }) {
+  const gt = useGT();
   const [draft, setDraft] = useState(value);
   const [savedValue, setSavedValue] = useState(value);
   // Saving an age can start a cleanup sweep, so turning a rule on only opens a draft.
@@ -206,9 +210,9 @@ function RetentionControl({
           }}
         >
           <NumberFieldGroup>
-            <NumberFieldDecrement aria-label={`Decrease ${label}`} />
+            <NumberFieldDecrement aria-label={gt("Decrease {label}", { label })} />
             <NumberFieldInput
-              aria-label={`${label} in days`}
+              aria-label={gt("{label} in days", { label })}
               autoFocus={value === null}
               size={5}
               className="w-auto grow-0 text-right"
@@ -239,7 +243,7 @@ function RetentionControl({
             <span aria-hidden="true" className="self-center pr-2 text-xs">
               <T>days</T>
             </span>
-            <NumberFieldIncrement aria-label={`Increase ${label}`} />
+            <NumberFieldIncrement aria-label={gt("Increase {label}", { label })} />
           </NumberFieldGroup>
         </NumberField>
       ) : (
@@ -264,9 +268,9 @@ function RetentionControl({
 }
 
 const KEEP_WHEN_LABELS = {
-  "any-local-files": "Any local files",
-  "uncommitted-changes": "Uncommitted changes",
-  "tracked-changes": "Edited tracked files",
+  "any-local-files": msg("Any local files"),
+  "uncommitted-changes": msg("Uncommitted changes"),
+  "tracked-changes": msg("Edited tracked files"),
 } as const;
 
 function cleanupCountsLabel(report: StorageCleanupReport): string {
@@ -289,12 +293,13 @@ function cleanupRunDescription(report: StorageCleanupReport, nowMs: number): str
 function lastRunSummary(
   entries: readonly { readonly label: string; readonly counts: string }[],
   machineCount: number,
+  resolve: MessageResolver = m,
 ) {
   const first = entries[0];
   if (!first) return "";
   if (machineCount <= 1) return first.counts;
   if (entries.length === machineCount && entries.every((entry) => entry.counts === first.counts)) {
-    return t("{counts} on every machine", { counts: first.counts });
+    return resolve(msg("{counts} on every machine", { counts: first.counts }));
   }
   return entries.map((entry) => `${entry.label}: ${entry.counts}`).join(" · ");
 }
@@ -306,6 +311,7 @@ function CleanupResults({
   report: StorageCleanupReport;
   environmentLabel: string;
 }) {
+  const gt = useGT();
   return (
     <>
       {report.entries.map((entry, index) => {
@@ -313,10 +319,10 @@ function CleanupResults({
           entry.kind === "worktree"
             ? ((entry.threadId === null
                 ? entry.path
-                : entry.path?.split(/[\\/]/).findLast(Boolean)) ?? "Worktrees")
+                : entry.path?.split(/[\\/]/).findLast(Boolean)) ?? gt("Worktrees"))
             : entry.kind === "logs"
-              ? "Rotated logs"
-              : "Browser artifacts";
+              ? gt("Rotated logs")
+              : gt("Browser artifacts");
         return (
           <SettingsRow
             key={`${entry.path ?? entry.kind}:${entry.threadId ?? index}`}
@@ -364,7 +370,10 @@ function CleanupResults({
                 <span className="text-xs text-muted-foreground">
                   {[
                     entry.kind !== "worktree" && entry.files !== null
-                      ? `${entry.files.toLocaleString()} ${entry.files === 1 ? "file" : "files"}`
+                      ? gt("{count, plural, one {{formatted} file} other {{formatted} files}}", {
+                          count: entry.files,
+                          formatted: entry.files.toLocaleString(),
+                        })
                       : null,
                     entry.bytes !== null ? formatBytes(entry.bytes) : null,
                   ]
@@ -378,10 +387,14 @@ function CleanupResults({
       })}
       {report.omittedCount > 0 && (
         <p className="px-3 py-2.5 text-xs text-muted-foreground sm:px-4">
-          <T>
-            <Var>{environmentLabel}</Var>: <Var>{report.omittedCount.toLocaleString()}</Var> more
-            results.
-          </T>
+          {gt(
+            "{omitted, plural, one {{environment}: {count} more results.} other {{environment}: {count} more results.}}",
+            {
+              omitted: report.omittedCount,
+              environment: environmentLabel,
+              count: report.omittedCount.toLocaleString(),
+            },
+          )}
         </p>
       )}
       {report.entries.length === 0 && report.omittedCount === 0 && (
@@ -405,6 +418,8 @@ const storageCleanupPermissionsAtom = environmentAtomList(
 );
 
 function CleanupSection() {
+  const messages = useMessages();
+  const setting = useSearchableSetting();
   const gt = useGT();
   const nowMinute = useNowMinute();
   const nowMs = Date.parse(`${nowMinute}:00.000Z`);
@@ -454,14 +469,30 @@ function CleanupSection() {
       environment,
       report,
       label: settingsScopeEnvironmentLabel(environment, connectedEnvironments),
-      counts: report ? cleanupCountsLabel(report) : "",
+      counts: report
+        ? report.counts.failed > 0
+          ? gt("{removed} removed, {kept} kept, {failed} failed", report.counts)
+          : gt("{removed} removed, {kept} kept", report.counts)
+        : "",
       description: report
-        ? cleanupRunDescription(report, nowMs)
+        ? report.counts.failed > 0
+          ? gt(
+              "{count, plural, one {Last run {when}. {bytes} recovered. {count} item couldn't be removed.} other {Last run {when}. {bytes} recovered. {count} items couldn't be removed.}}",
+              {
+                count: report.counts.failed,
+                when: formatRelativeTimeLabel(report.finishedAt, nowMs, messages),
+                bytes: formatBytes(report.bytesFreed),
+              },
+            )
+          : gt("Last run {when}. {bytes} recovered.", {
+              when: formatRelativeTimeLabel(report.finishedAt, nowMs, messages),
+              bytes: formatBytes(report.bytesFreed),
+            })
         : query?.failed
-          ? t("Could not load the last run.")
+          ? gt("Could not load the last run.")
           : query?.loading
-            ? t("Loading last run…")
-            : t("Cleanup hasn't run yet."),
+            ? gt("Loading last run…")
+            : gt("Cleanup hasn't run yet."),
     };
   });
   const deleteNow = async () => {
@@ -479,13 +510,13 @@ function CleanupSection() {
             if (failures.length > 0)
               toastManager.add({
                 type: "error",
-                title: t`Cleanup failed on ${environment.label}`,
+                title: gt("Cleanup failed on {label}", { label: environment.label }),
                 description: failures[0]!.reason,
               });
           } else if (!isAtomCommandInterrupted(result)) {
             toastManager.add({
               type: "error",
-              title: t`Could not run cleanup on ${environment.label}`,
+              title: gt("Could not run cleanup on {label}", { label: environment.label }),
               description: String(squashAtomCommandFailure(result)),
             });
           }
@@ -496,19 +527,17 @@ function CleanupSection() {
     <SettingsSection id="storage-cleanup" title={gt("Cleanup")} variant="plain">
       <SettingsGroup>
         <SettingsRow
-          {...searchableSetting("storage-delete-now")}
+          {...setting("storage-delete-now")}
           description={
             <span>
-              {!hasRules ? (
-                <T>Turn on a cleanup rule to use this.</T>
-              ) : (
-                summaries.map(({ environment, label, description }) => (
-                  <span key={environment.environmentId} className="block">
-                    {supported.length > 1 ? `${label}: ` : ""}
-                    {description}
-                  </span>
-                ))
-              )}
+              {!hasRules
+                ? gt("Turn on a cleanup rule to use this.")
+                : summaries.map(({ environment, label, description }) => (
+                    <span key={environment.environmentId} className="block">
+                      {supported.length > 1 ? `${label}: ` : ""}
+                      {description}
+                    </span>
+                  ))}
             </span>
           }
           control={
@@ -518,7 +547,7 @@ function CleanupSection() {
               disabled={pending || !hasRules || !state.some((entry) => entry.allowed)}
               onClick={() => void deleteNow()}
             >
-              {pending ? <T>Deleting…</T> : <T>Delete now</T>}
+              {pending ? gt("Deleting…") : gt("Delete now")}
             </Button>
           }
         />
@@ -531,6 +560,7 @@ function CleanupSection() {
           summary={lastRunSummary(
             summaries.filter(({ report }) => report !== null),
             connectedEnvironments.length,
+            messages,
           )}
         >
           {summaries.map(
@@ -584,6 +614,8 @@ function StorageCleanupScopeNotice() {
 }
 
 export function WorktreeCleanupSection() {
+  const messages = useMessages();
+  const setting = useSearchableSetting();
   const gt = useGT();
   const { scope, environments, connectedEnvironments, targets, target } = useSettingsScope();
   const scopedSettings = useScopedSettings();
@@ -607,7 +639,7 @@ export function WorktreeCleanupSection() {
           key
         ] !== settings[key],
     )
-      ? "Mixed across selected machines"
+      ? gt("Mixed across selected machines")
       : undefined;
   // A policy locks these through worktreeCleanup, which also reaches each project's own rules.
   const lockablePath = (key: keyof WorktreeCleanupRules) =>
@@ -650,10 +682,10 @@ export function WorktreeCleanupSection() {
             title={gt("Automatic worktree cleanup")}
             description={
               mode === "off"
-                ? t("Keep this project's worktrees until you delete them manually.")
+                ? gt("Keep this project's worktrees until you delete them manually.")
                 : mode === "custom"
-                  ? t("Use these rules for this project.")
-                  : t("Use each machine's worktree cleanup settings.")
+                  ? gt("Use these rules for this project.")
+                  : gt("Use each machine's worktree cleanup settings.")
             }
             serverScoped
             settingKeys={["worktreeCleanup"]}
@@ -671,12 +703,12 @@ export function WorktreeCleanupSection() {
                 <SelectTrigger size="sm" aria-label={gt("Automatic worktree cleanup")}>
                   <SelectValue>
                     {mixedModes
-                      ? t("Mixed")
+                      ? gt("Mixed")
                       : mode === "inherit"
-                        ? t("Inherit")
+                        ? gt("Inherit")
                         : mode === "off"
-                          ? t("Off")
-                          : t("Custom")}
+                          ? gt("Off")
+                          : gt("Custom")}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -748,7 +780,7 @@ export function WorktreeCleanupSection() {
             />
             <AdvancedSettings
               // The keep-when search result lands on this section, not its row.
-              targetIds={["storage-worktrees", searchableSetting("storage-worktree-keep-when").id]}
+              targetIds={["storage-worktrees", setting("storage-worktree-keep-when").id]}
             >
               {connectedEnvironments.length > 0 &&
                 connectedEnvironments.every(
@@ -762,7 +794,7 @@ export function WorktreeCleanupSection() {
                     status={[
                       ruleStatus("worktreeSettledAfterDays"),
                       environments.length > connectedEnvironments.length
-                        ? "Offline machines will not get this setting"
+                        ? gt("Offline machines will not get this setting")
                         : undefined,
                     ]
                       .filter(Boolean)
@@ -802,15 +834,15 @@ export function WorktreeCleanupSection() {
                   environment.serverConfig?.environment.capabilities.storageCleanupRun === true,
               ) && (
                 <SettingsRow
-                  {...searchableSetting("storage-worktree-keep-when")}
+                  {...setting("storage-worktree-keep-when")}
                   status={ruleStatus("worktreeKeepWhen")}
                   managedPaths={lockablePath("worktreeKeepWhen")}
                   description={
                     settings.worktreeKeepWhen === "any-local-files"
-                      ? t("Includes ignored files, except node_modules.")
+                      ? gt("Includes ignored files, except node_modules.")
                       : settings.worktreeKeepWhen === "tracked-changes"
-                        ? t("Deletes untracked and ignored files, including .env.")
-                        : t(
+                        ? gt("Deletes untracked and ignored files, including .env.")
+                        : gt(
                             "Keeps edits and untracked files. Deletes ignored files, including .env.",
                           )
                   }
@@ -830,8 +862,8 @@ export function WorktreeCleanupSection() {
                       <SelectTrigger size="sm" aria-label={gt("Keep worktrees with local changes")}>
                         <SelectValue>
                           {ruleStatus("worktreeKeepWhen")
-                            ? t("Mixed")
-                            : KEEP_WHEN_LABELS[settings.worktreeKeepWhen]}
+                            ? gt("Mixed")
+                            : messages(KEEP_WHEN_LABELS[settings.worktreeKeepWhen])}
                         </SelectValue>
                       </SelectTrigger>
                       <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -881,11 +913,11 @@ export function StorageCleanupSections() {
   const settledLogsStatus = useDebouncedValue(`${targetIdsKey}:${logsMixed}`, 300);
   const artifactsStatus =
     targets.length > 1 && settledArtifactsStatus === `${targetIdsKey}:true`
-      ? "Mixed across selected machines"
+      ? gt("Mixed across selected machines")
       : undefined;
   const logsStatus =
     targets.length > 1 && settledLogsStatus === `${targetIdsKey}:true`
-      ? "Mixed across selected machines"
+      ? gt("Mixed across selected machines")
       : undefined;
   if (scope.kind === "project" || scope.kind === "checkout") return null;
   const update = (patch: Partial<StorageCleanupSettings>, options: SaveOptions) =>

@@ -1,6 +1,6 @@
 ---
 name: test-t3-mobile
-description: Test T3 Code's native iOS and Android app through its Device panel and returned AgentDevice command. Use for mobile verification, native-client builds, Metro launch, and mobile pairing against isolated development state.
+description: Test R3 Code's native iOS and Android app through its Device panel and returned AgentDevice command. Use for mobile verification, native-client builds, Metro launch, and mobile pairing against isolated development state.
 ---
 
 # Test T3 Mobile
@@ -26,7 +26,7 @@ Test with meaningful project and thread data. Read the shared
 [SQLite fixture reference](../test-t3-app/references/sqlite-fixtures.md) only
 when inspecting or seeding SQLite. Stop the test server before fixture writes.
 
-## Launch T3 Code Dev
+## Launch R3 Code Dev
 
 From the checkout being tested on the selected device host, run:
 
@@ -73,7 +73,7 @@ arguments stored in `agent_device_command` and the Bash array
   "$agent_device_command" "${agent_device_target_args[@]}"
 ```
 
-It issues a fresh credential and opens T3 Code Dev's existing pairing route
+It issues a fresh credential and opens R3 Code Dev's existing pairing route
 through AgentDevice. For a backend on the device host, use
 `http://127.0.0.1:<server-port>` on iOS or `http://10.0.2.2:<server-port>`
 on Android. For a remote backend, use its reachable origin.
@@ -82,3 +82,27 @@ Confirm the intended projects appear, exercise the affected flow, and capture
 evidence. Retain the app and environment while iterating. At teardown, remove
 the disposable connection, close the AgentDevice session, call `device_close`,
 and stop only your backend and Metro processes.
+
+## Accessibility audit
+
+For mobile UI changes, run the local `mobile:audit` CLI on the touched screens
+with the session's AgentDevice launcher:
+
+```bash
+vp run mobile:audit capture --platform <ios|android> --screen <name> \
+  --out /tmp/mobile-audit/after --agent-device "$agent_device_command" \
+  -- "${agent_device_target_args[@]}"
+
+# Compare against a base capture (exits non-zero on regressions):
+vp run mobile:audit compare --before /tmp/mobile-audit/before \
+  --after /tmp/mobile-audit/after --out /tmp/mobile-audit/diff \
+  --fail-on-regression
+
+# Or annotate a single capture when there is no baseline:
+vp run mobile:audit report --dir /tmp/mobile-audit/after \
+  --out /tmp/mobile-audit/report
+```
+
+Attach the generated `report.md` summary and annotated PNG(s) to your response
+to the user (embedded by absolute file path) and to the PR description (uploaded
+via `ghdrop` or forge assets; never commit generated audit artifacts).

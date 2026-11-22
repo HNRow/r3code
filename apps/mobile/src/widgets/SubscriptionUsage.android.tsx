@@ -56,9 +56,19 @@ export function SubscriptionUsage(props: SubscriptionUsageProps, environment: Wi
         track: material.surfaceVariant,
         error: material.error,
       };
+  // English until the app publishes its first snapshot in the UI language.
+  const text = props.text ?? {
+    refresh: "Open T3 to refresh",
+    left: "left",
+    asOf: "As of {time}",
+    tapToConnect: "Tap to connect in T3",
+    moreInApp: {} as Record<string, string>,
+  };
   const providers = props.providers ?? [
-    { name: "Codex", detail: labels.openToConnect, windows: [], expiresAt: 0, totalWindows: 0 },
-    { name: "Claude", detail: labels.openToConnect, windows: [], expiresAt: 0, totalWindows: 0 },
+    // oxlint-disable-next-line t3code/no-untranslated-copy -- widget fallback until the app publishes translated text
+    { name: "Codex", detail: "Open T3 to connect", windows: [], expiresAt: 0, totalWindows: 0 },
+    // oxlint-disable-next-line t3code/no-untranslated-copy -- widget fallback until the app publishes translated text
+    { name: "Claude", detail: "Open T3 to connect", windows: [], expiresAt: 0, totalWindows: 0 },
   ];
 
   const pad = 14;
@@ -85,7 +95,7 @@ export function SubscriptionUsage(props: SubscriptionUsageProps, environment: Wi
         {
           type: "note",
           provider: provider.name,
-          text: stale ? "Open T3 to refresh" : provider.detail,
+          text: stale ? text.refresh : provider.detail,
         },
       ];
     return [...provider.windows]
@@ -307,7 +317,7 @@ export function SubscriptionUsage(props: SubscriptionUsageProps, environment: Wi
               style={{ fontSize: 10 }}
               modifiers={[padding(3, 0, 0, 3)]}
             >
-              {`left${paceArrow(line.window.accounts ?? [])}`}
+              {`${text.left}${paceArrow(line.window.accounts ?? [])}`}
             </Text>
           </Row>
         </Column>
@@ -329,7 +339,8 @@ export function SubscriptionUsage(props: SubscriptionUsageProps, environment: Wi
           {shown.map(row)}
           {hidden > 0 ? (
             <Text color={colors.muted} maxLines={1} style={{ fontSize: 10 }}>
-              {labels.moreInT3.replace("%count%", String(hidden))}
+              {/* oxlint-disable-next-line t3code/no-untranslated-copy -- widget fallback until the app publishes translated text */}
+              {text.moreInApp[String(hidden)] ?? `${hidden} more in T3`}
             </Text>
           ) : null}
         </Column>
@@ -340,8 +351,8 @@ export function SubscriptionUsage(props: SubscriptionUsageProps, environment: Wi
           modifiers={[height(footer)]}
         >
           {props.checkedAt
-            ? labels.asOf.replace(
-                "%time%",
+            ? text.asOf.replace(
+                "{time}",
                 new Date(props.checkedAt).toLocaleString(undefined, {
                   hour: "numeric",
                   minute: "2-digit",
@@ -349,7 +360,7 @@ export function SubscriptionUsage(props: SubscriptionUsageProps, environment: Wi
                   day: "numeric",
                 }),
               )
-            : labels.tapToConnect}
+            : text.tapToConnect}
         </Text>
       </Column>
     </Button>

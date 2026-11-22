@@ -1,6 +1,9 @@
+import { msg, T, Var } from "gt-react";
+
+import { m } from "../i18n/messages";
 import { type SlowRpcAckRequest, subscribeSlowRpcAckRequests } from "../rpc/requestLatencyState";
 import { toastManager } from "./ui/toast";
-import { Var, T, t } from "gt-react";
+import { t } from "gt-react";
 
 function describeSlowRequests(requests: ReadonlyArray<SlowRpcAckRequest>): string {
   const count = requests.length;
@@ -8,7 +11,12 @@ function describeSlowRequests(requests: ReadonlyArray<SlowRpcAckRequest>): strin
     Math.min(...requests.map((request) => request.thresholdMs)) / 1000,
   );
 
-  return `${count} request${count === 1 ? "" : "s"} waiting longer than ${thresholdSeconds}s.`;
+  return m(
+    msg(
+      "{count, plural, one {{count} request} other {{count} requests}} waiting longer than {thresholdSeconds}s.",
+      { count, thresholdSeconds },
+    ),
+  );
 }
 
 function SlowRequestDetails({ requests }: { requests: ReadonlyArray<SlowRpcAckRequest> }) {
@@ -48,11 +56,11 @@ export function startSlowRpcRequestToasts(): () => void {
       data: {
         expandableContent: <SlowRequestDetails requests={slowRequests} />,
         expandableDescriptionTrigger: true,
-        expandableLabels: { collapse: "Hide requests", expand: "Show requests" },
+        expandableLabels: { collapse: m(msg("Hide requests")), expand: m(msg("Show requests")) },
       },
       description: describeSlowRequests(slowRequests),
       timeout: 0,
-      title: t("Some requests are slow"),
+      title: m(msg("Some requests are slow")),
       type: "warning" as const,
     };
 

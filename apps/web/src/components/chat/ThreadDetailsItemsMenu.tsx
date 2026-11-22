@@ -1,3 +1,4 @@
+import { T, useMessages } from "gt-react";
 import {
   getClientSettings,
   updateClientSettings,
@@ -11,11 +12,11 @@ import {
   setThreadDetailsItem,
   THREAD_DETAILS_ITEMS,
 } from "./threadDetailsItems";
-import { T } from "gt-react";
 
 /** Menu body that shows and hides thread details items. The card's context menu and Settings share it. */
 export function ThreadDetailsItemsMenuItems() {
   const visibility = useClientSettings(resolveThreadDetailsVisibility);
+  const m = useMessages();
   return (
     <>
       <MenuGroup>
@@ -32,7 +33,7 @@ export function ThreadDetailsItemsMenuItems() {
               })
             }
           >
-            {item.label}
+            {m(item.label)}
           </MenuCheckboxItem>
         ))}
       </MenuGroup>

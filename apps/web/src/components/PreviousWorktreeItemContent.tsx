@@ -1,7 +1,7 @@
+import { T } from "gt-react";
 import { HistoryIcon } from "lucide-react";
 
 import { MiddleTruncate } from "./ui/middle-truncate";
-import { T } from "gt-react";
 
 export function PreviousWorktreeItemContent({ branch }: { branch: string | null }) {
   return (

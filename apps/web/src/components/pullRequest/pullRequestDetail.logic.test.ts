@@ -1280,6 +1280,15 @@ describe("adding a remark to the chat", () => {
     });
 
     expect(context?.text).toBe("octocat: This leaks the token.\n\n```html\n<!-- kept -->\n```");
+    // A stray backtick before the comment opens no code span across the paragraphs.
+    const stray = buildPullRequestCommentContext(pullRequest, {
+      kind: "comment",
+      comment: remark(
+        "c2",
+        "Avoid `foo.\n\n<!-- bot state -->\nSee `bar` and `` a ` <!-- b --> ``.",
+      ),
+    });
+    expect(stray?.text).toBe("octocat: Avoid `foo.\n\nSee `bar` and `` a ` <!-- b --> ``.");
   });
 
   it("keeps comments inside a quoted fence as code", () => {
@@ -1630,7 +1639,7 @@ describe("pull request panel context beside a thread", () => {
 
   it("recognizes an unsynced manual link, and matches host and repository case-insensitively", () => {
     const thread = { projectId: "proj-a", pullRequests: [link(7, { host: "GitHub.com" })] };
-    expect(pullRequestPanelContext(thread, surface(7, { repository: "PingDotGG/T3Code" }))).toBe(
+    expect(pullRequestPanelContext(thread, surface(7, { repository: "PingDotGG/R3Code" }))).toBe(
       "thread",
     );
     expect(pullRequestPanelContext(thread, surface(7, { host: undefined }))).toBe("thread");

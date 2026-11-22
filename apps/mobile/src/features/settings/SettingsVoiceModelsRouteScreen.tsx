@@ -1,3 +1,4 @@
+import { T, useGT, Var } from "gt-react-native";
 import { NativeScrollView } from "../../native/NativeScrollViewMarker";
 import { LegendList } from "@legendapp/list/react-native";
 import { useAtomValue } from "@effect/atom-react";
@@ -15,7 +16,6 @@ import { useEnvironments } from "../../state/environments";
 import { voiceSpeechBenchmarksAtom } from "../voice-input/voiceDestination";
 import { PullRequestSearchSheet } from "../pull-requests/PullRequestSearchSheet";
 import { useVoiceModels, VoiceModelRow } from "./VoiceModelSection";
-import { useGT, Var, T } from "gt-react-native";
 
 export function SettingsVoiceModelsRouteScreen({
   route,
@@ -24,7 +24,7 @@ export function SettingsVoiceModelsRouteScreen({
   const { environments } = useEnvironments();
   const label =
     environments.find((environment) => environment.environmentId === route.params.environmentId)
-      ?.label ?? "This environment";
+      ?.label ?? gt("This environment");
   const voice = useVoiceModels(route.params.environmentId, label);
   const benchmarks = new Map(
     (
@@ -52,7 +52,7 @@ export function SettingsVoiceModelsRouteScreen({
     <PullRequestSearchSheet
       title={gt("Transcription models")}
       placeholder={gt("Search models or languages")}
-      closeAccessibilityLabel="Close transcription models"
+      closeAccessibilityLabel={gt("Close transcription models")}
       clearAccessibilityLabel={gt("Clear model search")}
       query={query}
       onQueryChange={setQuery}
@@ -97,9 +97,11 @@ export function SettingsVoiceModelsRouteScreen({
               <AppActivityIndicator className="my-8" />
             ) : (
               <EmptyState
-                title={needle ? "No models match" : "No transcription models"}
+                title={needle ? gt("No models match") : gt("No transcription models")}
                 detail={
-                  needle ? "Try another name or language." : `${label} has no models to list.`
+                  needle
+                    ? gt("Try another name or language.")
+                    : gt("{environment} has no models to list.", { environment: label })
                 }
                 variant="plain"
               />

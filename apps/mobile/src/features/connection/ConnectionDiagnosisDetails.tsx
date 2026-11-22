@@ -1,3 +1,4 @@
+import { T, useGT, useMessages } from "gt-react-native";
 import { useAtomValue } from "@effect/atom-react";
 import {
   AVAILABLE_CONNECTION_STATE,
@@ -19,16 +20,15 @@ import { Button } from "../../components/ui/Button";
 import { environmentCatalog } from "../../connection/catalog";
 import { cn } from "../../lib/cn";
 import { copyTextWithHaptic } from "../../lib/copyTextWithHaptic";
-import { T, useGT } from "gt-react-native";
 
 const HOP_MARK = { ok: "✓", failed: "✕", unchecked: "–" } as const;
-const HOP_NOTE = { ok: "", failed: " · Failed", unchecked: " · Not checked" } as const;
 
 /** Same model as the web Settings row; null while connected, off, or not failed. */
 export function useConnectionDiagnosis(
   environmentId: EnvironmentId,
   presentation: EnvironmentPresentation | null,
 ) {
+  const messages = useMessages();
   const state = AsyncResult.getOrElse(
     useAtomValue(environmentCatalog.stateAtom(environmentId)),
     () => AVAILABLE_CONNECTION_STATE,
@@ -38,13 +38,16 @@ export function useConnectionDiagnosis(
   if (phase === "connected" || phase === "unsupported") return { diagnosis: null, state };
   const relayOnly =
     connectionRoutes(presentation.entry).length === 1 && hasRelayRoute(presentation.entry);
-  const diagnosis = presentConnectionDiagnosis({
-    hostLabel: presentation.entry.target.label,
-    state,
-    via: relayOnly ? "relay" : "direct",
-    clientVersion: Constants.expoConfig?.version,
-    serverVersion: presentation.serverConfig?.environment.serverVersion,
-  });
+  const diagnosis = presentConnectionDiagnosis(
+    {
+      hostLabel: presentation.entry.target.label,
+      state,
+      via: relayOnly ? "relay" : "direct",
+      clientVersion: Constants.expoConfig?.version,
+      serverVersion: presentation.serverConfig?.environment.serverVersion,
+    },
+    messages,
+  );
   return { diagnosis, state };
 }
 
@@ -66,7 +69,11 @@ export function ConnectionDiagnosisDetails(props: {
               hop.result === "failed" ? "text-danger-foreground" : "text-foreground-muted",
             )}
           >
-            {`${HOP_MARK[hop.result]}  ${hop.label}${HOP_NOTE[hop.result]}`}
+            {hop.result === "failed"
+              ? gt("{mark}  {hop} · Failed", { mark: HOP_MARK[hop.result], hop: hop.label })
+              : hop.result === "unchecked"
+                ? gt("{mark}  {hop} · Not checked", { mark: HOP_MARK[hop.result], hop: hop.label })
+                : `${HOP_MARK[hop.result]}  ${hop.label}`}
           </Text>
         ))}
       </View>

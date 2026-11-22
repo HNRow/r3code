@@ -1,9 +1,9 @@
+import { useGT } from "gt-react-native";
 import { View } from "react-native";
 
 import { Button } from "../../../components/ui/Button";
 import { AppText as Text } from "../../../components/ui/AppText";
 import { SettingsSection } from "./SettingsSection";
-import { useGT } from "gt-react-native";
 
 export function SettingsProjectOverridesSection(props: {
   readonly projectLabel: string;

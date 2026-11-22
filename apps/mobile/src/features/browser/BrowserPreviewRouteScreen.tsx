@@ -5,7 +5,7 @@ import { useIsFocused, useNavigation, type StaticScreenProps } from "@react-navi
 import { EnvironmentId, ThreadId } from "@t3tools/contracts";
 import { normalizePreviewUrl, previewPdfAssetUrl } from "@t3tools/shared/preview";
 import * as Option from "effect/Option";
-import { msg, useGT } from "gt-react-native";
+import { msg, useGT, useMessages } from "gt-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Platform, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -83,6 +83,7 @@ function BrowserPreviewScreen({
   readonly onClose: () => void;
 }) {
   const gt = useGT();
+  const resolveMessage = useMessages();
   const { themeVariables } = useAppearancePreferences();
   const prepared = usePreparedConnection(environmentId);
   const httpBaseUrl = Option.isSome(prepared) ? prepared.value.httpBaseUrl : null;
@@ -172,7 +173,7 @@ function BrowserPreviewScreen({
                   accessibilityRole="button"
                   actions={tabs.map((entry) => ({
                     id: entry.tabId,
-                    title: browserTabTitle(entry),
+                    title: browserTabTitle(entry, resolveMessage),
                     subtitle: browserTabUrl(entry),
                     state: entry.tabId === tabId ? "on" : "off",
                   }))}

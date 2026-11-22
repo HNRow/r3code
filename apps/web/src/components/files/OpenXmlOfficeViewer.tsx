@@ -1,13 +1,15 @@
 import { useStableCallback } from "~/hooks/useStableCallback";
 import type { OfficePreviewKind } from "@t3tools/shared/filePreview";
+import { msg, T, useGT } from "gt-react";
 import { lazy, Suspense, useEffect, useState } from "react";
+import { m } from "~/i18n/messages";
 import {
   FileSurfaceLoading,
   FileSurfaceNotice,
   FILE_SURFACE_SUBHEADER_CLASS,
 } from "./fileSurfaceChrome";
 import { OFFICE_PREVIEW_MAX_BYTES, type OfficeWorkerResult } from "./officePreviewProtocol";
-import { msg, T, useMessages, Var } from "gt-react";
+import { previewErrorText, previewFailureText } from "./previewFailureMessages";
 const WordDocument = lazy(() => import("./office/WordDocument"));
 const Spreadsheet = lazy(() => import("./office/Spreadsheet"));
 const Presentation = lazy(() => import("./office/Presentation"));
@@ -24,11 +26,12 @@ void [
 
 async function readOfficeFile(src: string, signal: AbortSignal) {
   const response = await fetch(src, { signal });
-  if (!response.ok) throw new Error(msg("The file could not be loaded. Close it and try again."));
+  if (!response.ok)
+    throw new Error(m(msg("The file could not be loaded. Close it and try again.")));
   if (Number(response.headers.get("content-length")) > OFFICE_PREVIEW_MAX_BYTES)
-    throw new Error(msg("Preview limited to files under 50 MB."));
+    throw new Error(m(msg("Preview limited to files under 50 MB.")));
   const reader = response.body?.getReader();
-  if (!reader) throw new Error(msg("The file is unavailable."));
+  if (!reader) throw new Error(m(msg("The file is unavailable.")));
   const chunks: Uint8Array<ArrayBuffer>[] = [];
   let size = 0;
   try {
@@ -37,7 +40,7 @@ async function readOfficeFile(src: string, signal: AbortSignal) {
       if (done) break;
       size += value.length;
       if (size > OFFICE_PREVIEW_MAX_BYTES)
-        throw new Error(msg("Preview limited to files under 50 MB."));
+        throw new Error(m(msg("Preview limited to files under 50 MB.")));
       chunks.push(value);
     }
   } finally {
@@ -52,21 +55,19 @@ export default function OfficeViewer(props: {
   readonly kind: Extract<OfficePreviewKind, "docx" | "xlsx" | "pptx">;
   readonly sizeBytes?: number;
 }) {
-  const m = useMessages();
+  const gt = useGT();
   const [error, setError] = useState<string | null>(null);
   const [prepared, setPrepared] = useState<Extract<OfficeWorkerResult, { bytes: ArrayBuffer }>>();
   const [details, setDetails] = useState("");
   const fail = useStableCallback((cause: unknown) =>
-    setError(
-      cause instanceof Error ? cause.message : msg("Could not render this Office document."),
-    ),
+    setError(previewErrorText(cause, m(msg("Could not render this Office document.")))),
   );
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- Own the Open XML fetch, preparation worker, and timeout for this source and release them on cleanup.
   useEffect(() => {
     if ((props.sizeBytes ?? 0) > OFFICE_PREVIEW_MAX_BYTES) {
       // Metadata bounds are checked before fetching or starting an engine.
       // oxlint-disable-next-line react/set-state-in-effect
-      setError(msg("Preview limited to files under 50 MB."));
+      setError(m(msg("Preview limited to files under 50 MB.")));
       return;
     }
     const controller = new AbortController();
@@ -79,19 +80,22 @@ export default function OfficeViewer(props: {
       worker.terminate();
     };
     const timer = setTimeout(
-      () => failure(new Error("This document took too long to preview. Open it in another app.")),
+      () =>
+        failure(
+          new Error(m(msg("This document took too long to preview. Open it in another app."))),
+        ),
       30000,
     );
     worker.addEventListener("error", () =>
-      failure(new Error(msg("Could not load the Office viewer."))),
+      failure(new Error(m(msg("Could not load the Office viewer.")))),
     );
     worker.addEventListener("messageerror", () =>
-      failure(new Error("Could not read the Office viewer response.")),
+      failure(new Error(m(msg("Could not read the Office viewer response.")))),
     );
     worker.addEventListener("message", (event: MessageEvent<OfficeWorkerResult>) => {
       if (controller.signal.aborted) return;
       clearTimeout(timer);
-      if (event.data.type === "error") failure(new Error(event.data.message));
+      if (event.data.type === "error") failure(new Error(previewFailureText(event.data)));
       else if ("bytes" in event.data) {
         setPrepared(event.data);
         worker.terminate();
@@ -119,9 +123,7 @@ export default function OfficeViewer(props: {
           <T>No preview for this file</T>
         </p>
         <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">
-          <T>
-            <Var>{m(error)}</Var> Save it or open it in another app.
-          </T>
+          {gt("{error} Save it or open it in another app.", { error })}
         </p>
       </div>
     );
@@ -133,7 +135,7 @@ export default function OfficeViewer(props: {
         <div className={FILE_SURFACE_SUBHEADER_CLASS}>
           <span className="text-xs text-muted-foreground" aria-live="polite">
             {details}
-            {props.kind !== "xlsx" ? " · Fit to width" : ""}
+            {props.kind !== "xlsx" ? ` · ${gt("Fit to width")}` : ""}
           </span>
         </div>
       ) : null}

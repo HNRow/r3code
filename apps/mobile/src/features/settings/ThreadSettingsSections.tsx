@@ -1,3 +1,4 @@
+import { T, useGT } from "gt-react-native";
 import { Button } from "../../components/ui/Button";
 import {
   AuthSettingsWriteScope,
@@ -30,7 +31,6 @@ import {
   resolveMobileSettingsTargets,
   uniformMobileSetting,
 } from "./settings-scoped-server";
-import { useGT, T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 export function SettingsLabsRouteScreen() {
@@ -128,7 +128,7 @@ export function AutoSettleSettingsRows(props: {
 
   const disabled = !canWriteSettings || props.pending;
   const disabledFor = (...keys: string[]) =>
-    disabled || managedSettingReason(displayTargets, ...keys) !== undefined;
+    disabled || managedSettingReason(displayTargets, keys) !== undefined;
   const afterDays = referenceSettings.sidebarAutoSettleAfterDays;
 
   return (
@@ -278,6 +278,7 @@ function MachineBetaSection({
   readonly setting: MachineBetaSetting;
   readonly description: string;
 }) {
+  const gt = useGT();
   const { environments } = useEnvironments();
   const supported = environments.filter(
     (environment) =>
@@ -292,7 +293,7 @@ function MachineBetaSection({
   if (supported.length === 0) return null;
   return (
     <View className="gap-3">
-      <SettingsSection title={t`Beta: ${title}`}>
+      <SettingsSection title={gt("Beta: {feature}", { feature: title })}>
         {supported.map((environment) => {
           const policy = environment.serverConfig?.managedPolicy;
           const managed = isManagedSettingPath(policy, setting);
@@ -301,7 +302,13 @@ function MachineBetaSection({
               key={environment.environmentId}
               icon={icon}
               label={environment.label}
-              {...(managed ? { subtitle: t`Managed by ${policy?.organization}.` } : {})}
+              {...(managed
+                ? {
+                    subtitle: gt("Managed by {organization}.", {
+                      organization: policy?.organization,
+                    }),
+                  }
+                : {})}
               value={environment.serverConfig?.settings[setting] === true}
               disabled={managed || !writable.has(environment.environmentId)}
               onValueChange={(value) =>

@@ -1,5 +1,5 @@
 import { errorDisplayMessage } from "@t3tools/client-runtime/errors";
-import { msg, useGT } from "gt-react-native";
+import { msg, useGT, useMessages } from "gt-react-native";
 import * as Dialog from "../../components/ui/Dialog";
 import { managedCapabilityDenial } from "@t3tools/client-runtime/contract-labels";
 import {
@@ -61,7 +61,6 @@ import { hasCloudPublicConfig, resolveRelayClerkTokenOptions } from "../cloud/pu
 import { makePermissionStatusAtom } from "../../lib/permissionStatusAtom";
 import { runtime } from "../../lib/runtime";
 import { mobilePreferencesAtom, saveMobilePreferences } from "../../state/preferences";
-import { useAtomCommand } from "../../state/use-atom-command";
 import { useSavedRemoteConnections } from "../../state/use-remote-environment-registry";
 import { SettingsRow } from "./components/SettingsRow";
 import { SettingsSection } from "./components/SettingsSection";
@@ -102,6 +101,8 @@ const updateEnvironmentPreference = Effect.fn("updateEnvironmentPreference")(fun
   );
 });
 
+const saveLocalPreference = (liveActivitiesEnabled: boolean) =>
+  saveMobilePreferences.run(appAtomRegistry, { liveActivitiesEnabled });
 const linkEnvironmentWithPreference = Effect.fn("linkEnvironmentWithPreference")(function* (
   environmentId: EnvironmentId,
   input: { readonly clerkToken: string; readonly liveActivitiesEnabled: boolean },
@@ -207,10 +208,10 @@ export function SettingsNotificationsRouteScreen() {
 
 function ConfiguredSettingsNotificationsRouteScreen() {
   const gt = useGT();
+  const m = useMessages();
   const preferencesResult = useAtomValue(mobilePreferencesAtom);
-  const savePreferences = useAtomCommand(saveMobilePreferences);
   const agentAwarenessPushAvailable = supportsAgentAwarenessPush();
-  const agentAwarenessPlatform = resolveAgentAwarenessPlatformPresentation(Platform.OS);
+  const agentAwarenessPlatform = resolveAgentAwarenessPlatformPresentation(Platform.OS, m);
   const agentAwarenessSubtitle =
     Platform.OS === "android" && !agentAwarenessPushAvailable
       ? gt("Install a newer app build to enable notifications")
@@ -385,6 +386,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
         setLiveActivityUpdatesEnabled({
           updateEnvironment: updateEnvironmentPreference,
           linkEnvironment: linkEnvironmentWithPreference,
+          saveLocalPreference,
           canConfigureEnvironment: (id) =>
             canManageConnect(id, AuthRelayConfigureScope) &&
             canManageConnect(id, AuthRelayWriteScope),
@@ -413,7 +415,6 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       return;
     }
 
-    void savePreferences({ liveActivitiesEnabled: true });
     refreshManagedRelayEnvironments();
     setLiveActivityStatus("enabled");
     // Environment linking can precede device registration; only registered devices can receive Live Activities.
@@ -456,7 +457,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
 
     Dialog.alert(
       gt("Disable notifications"),
-      gt("Open system Settings to disable notifications for {product}.", { product: "T3 Code" }),
+      gt("Open system Settings to disable notifications for {product}.", { product: "R3 Code" }),
       [
         { text: gt("Cancel"), style: "cancel" },
         { text: gt("Open Settings"), onPress: () => void Linking.openSettings() },
@@ -483,6 +484,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
         setLiveActivityUpdatesEnabled({
           updateEnvironment: updateEnvironmentPreference,
           linkEnvironment: linkEnvironmentWithPreference,
+          saveLocalPreference,
           canConfigureEnvironment: (id) =>
             canManageConnect(id, AuthRelayConfigureScope) &&
             canManageConnect(id, AuthRelayWriteScope),
@@ -503,7 +505,6 @@ function ConfiguredSettingsNotificationsRouteScreen() {
       }
       return;
     }
-    void savePreferences({ liveActivitiesEnabled: false });
     refreshManagedRelayEnvironments();
     setLiveActivityStatus("disabled");
     if (updateResult.value) {
@@ -617,7 +618,7 @@ function ConfiguredSettingsNotificationsRouteScreen() {
                     gt("Couldn't open Settings"),
                     gt(
                       "Open Android Settings, select {product}, then enable Live Updates in Notifications.",
-                      { product: "T3 Code" },
+                      { product: "R3 Code" },
                     ),
                   );
                 });

@@ -10,6 +10,7 @@ import {
   useNavigate,
   useRouter,
 } from "@tanstack/react-router";
+import { msg, T, useGT, Var } from "gt-react";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
@@ -60,7 +61,6 @@ import { readProject } from "../state/entities";
 import { getDesktopSnapShotBridge } from "../lib/desktopSnapShot";
 import { isChunkLoadError } from "../lib/chunkReloadGuard";
 import { shouldResumeSnapShotSetupOnStartup } from "../lib/snapShotSetupResume";
-import { T, Var, useGT, t } from "gt-react";
 
 export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
@@ -244,9 +244,9 @@ function RootRouteBranch() {
 }
 
 function RootRouteErrorView({ error }: ErrorComponentProps) {
-  const gt = useGT();
   const router = useRouter();
-  const message = errorMessage(error);
+  const gt = useGT();
+  const message = errorMessage(error) ?? gt("An unexpected router error occurred.");
   // Router pathname rather than window.location: desktop uses hash history, where the window path is always "/".
   const pathname = useLocation({ select: (location) => location.pathname });
   const report = errorReport(error, pathname);
@@ -283,17 +283,24 @@ function RootRouteErrorView({ error }: ErrorComponentProps) {
 }
 
 function CopyErrorButton({ report }: { report: string }) {
-  const { copyToClipboard, isCopied } = useCopyToClipboard({ target: "error-report" });
+  const { copyToClipboard, isCopied } = useCopyToClipboard({
+    target: {
+      target: "error-report",
+      unavailableMessage: msg("Clipboard API is unavailable while copying error-report."),
+      failureMessage: msg("Failed to copy error-report to the clipboard."),
+    },
+  });
+  const gt = useGT();
 
   return (
     <Button size="sm" variant="outline" onClick={() => copyToClipboard(report)}>
       {isCopied ? <CheckIcon className="text-success" /> : <CopyIcon />}
-      {isCopied ? t("Copied") : t("Copy error")}
+      {isCopied ? gt("Copied") : gt("Copy error")}
     </Button>
   );
 }
 
-function errorMessage(error: unknown): string {
+function errorMessage(error: unknown): string | null {
   if (error instanceof Error && error.message.trim().length > 0) {
     return error.message;
   }
@@ -302,7 +309,7 @@ function errorMessage(error: unknown): string {
     return error;
   }
 
-  return "An unexpected router error occurred.";
+  return null;
 }
 
 function errorDetails(error: unknown): string {
@@ -317,6 +324,7 @@ function errorDetails(error: unknown): string {
   try {
     return JSON.stringify(error, null, 2);
   } catch {
+    // oxlint-disable-next-line t3code/no-untranslated-copy -- error report pasted into bug reports
     return "No additional error details are available.";
   }
 }

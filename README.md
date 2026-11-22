@@ -46,8 +46,8 @@ It works with Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kir
 | Platform       | Command                                                              |
 | -------------- | -------------------------------------------------------------------- |
 | macOS          | `brew install --cask t3-code`                                        |
-| Windows        | `winget install T3Tools.T3Code` or `scoop install extras/t3code`     |
-| Arch Linux     | `yay -S t3code-bin`                                                  |
+| Windows        | `winget install T3Tools.R3Code` or `scoop install extras/t3code`     |
+| Arch Linux     | `yay -S r3code-bin`                                                  |
 | Nix            | `nix profile add github:NixOS/nixpkgs/nixos-unstable#t3code`         |
 | Debian, Ubuntu | `.deb` from [Releases](https://github.com/pingdotgg/t3code/releases) |
 

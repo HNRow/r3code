@@ -1,9 +1,9 @@
 import type { ManagedPolicySummary } from "@t3tools/contracts";
+import { T, Var } from "gt-react";
 import { BuildingIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
-import { Var, T } from "gt-react";
 
 /**
  * A control an administrator's policy turns off: shown inert, with the policy's reason on hover
@@ -55,22 +55,20 @@ export function ManagedByOrganization({ policy }: { policy: ManagedPolicySummary
     <ManagedNotice>
       <T>
         This environment is managed by <Var>{policy.organization}</Var>.
-        <Var>
-          {policy.supportUrl ? (
-            <>
-              {" "}
-              <a
-                href={policy.supportUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-foreground underline underline-offset-2"
-              >
-                Get help
-              </a>
-            </>
-          ) : null}
-        </Var>
       </T>
+      {policy.supportUrl ? (
+        <>
+          {" "}
+          <a
+            href={policy.supportUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="text-foreground underline underline-offset-2"
+          >
+            <T>Get help</T>
+          </a>
+        </>
+      ) : null}
     </ManagedNotice>
   );
 }

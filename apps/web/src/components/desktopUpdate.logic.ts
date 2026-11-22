@@ -1,3 +1,4 @@
+import { desktopTrackMismatchText } from "@t3tools/client-runtime/state/server";
 import type { DesktopUpdateActionResult, DesktopUpdateState } from "@t3tools/contracts";
 import { desktopUpdateChannelOf } from "@t3tools/shared/cliRelease";
 import { msg } from "gt-react";
@@ -88,20 +89,20 @@ export function getArm64IntelBuildWarningDescription(
   if (action === "download") {
     return resolve(
       msg(
-        "This Mac has Apple Silicon, but T3 Code is still running the Intel build under Rosetta. Download the available update to switch to the native Apple Silicon build.",
+        "This Mac has Apple Silicon, but R3 Code is still running the Intel build under Rosetta. Download the available update to switch to the native Apple Silicon build.",
       ),
     );
   }
   if (action === "install") {
     return resolve(
       msg(
-        "This Mac has Apple Silicon, but T3 Code is still running the Intel build under Rosetta. Restart to install the downloaded Apple Silicon build.",
+        "This Mac has Apple Silicon, but R3 Code is still running the Intel build under Rosetta. Restart to install the downloaded Apple Silicon build.",
       ),
     );
   }
   return resolve(
     msg(
-      "This Mac has Apple Silicon, but T3 Code is still running the Intel build under Rosetta. The next app update will replace it with the native Apple Silicon build.",
+      "This Mac has Apple Silicon, but R3 Code is still running the Intel build under Rosetta. The next app update will replace it with the native Apple Silicon build.",
     ),
   );
 }
@@ -159,6 +160,14 @@ export function getDesktopUpdateButtonTooltip(
         }),
       );
     }
+    if (state.trackMismatch !== undefined) {
+      return resolve(
+        desktopTrackMismatchText({
+          buildChannel: state.trackMismatch.buildChannel,
+          savedChannel: state.channel,
+        }),
+      );
+    }
     return state.message ?? resolve(msg("Update failed"));
   }
   // The updater discards every release of the other track, so "up to date" would be false here.
@@ -185,13 +194,13 @@ export function getDesktopUpdateInstallConfirmationMessage(
   return version
     ? resolve(
         msg(
-          "Install update {version} and restart T3 Code?\n\nAny running tasks will be interrupted. Make sure you're ready before continuing.",
+          "Install update {version} and restart R3 Code?\n\nAny running tasks will be interrupted. Make sure you're ready before continuing.",
           { version },
         ),
       )
     : resolve(
         msg(
-          "Install update and restart T3 Code?\n\nAny running tasks will be interrupted. Make sure you're ready before continuing.",
+          "Install update and restart R3 Code?\n\nAny running tasks will be interrupted. Make sure you're ready before continuing.",
         ),
       );
 }
@@ -222,32 +231,9 @@ export function getDesktopUpdateDisabledReason(
 ): string | null {
   if (managedDenial !== undefined) return managedDenial;
   if (!state || (state.enabled && state.status !== "disabled")) return null;
-  const message = state.message?.trim();
-  return message
-    ? localizeDesktopUpdateMessage(message, resolve)
-    : resolve(msg("Automatic updates are not available in this build."));
-}
-
-/** Desktop sends these reasons in English. Translate the ones the settings page shows. */
-function localizeDesktopUpdateMessage(message: string, resolve: MessageResolver): string {
-  switch (message) {
-    case "Automatic updates are not available because no update feed is configured.":
-      return resolve(
-        msg("Automatic updates are not available because no update feed is configured."),
-      );
-    case "Automatic updates are only available in packaged production builds.":
-      return resolve(msg("Automatic updates are only available in packaged production builds."));
-    case "Automatic updates are disabled by the T3CODE_DISABLE_AUTO_UPDATE setting.":
-      return resolve(
-        msg("Automatic updates are disabled by the T3CODE_DISABLE_AUTO_UPDATE setting."),
-      );
-    case "Automatic updates on Linux require the AppImage or the .deb package.":
-      return resolve(msg("Automatic updates on Linux require the AppImage or the .deb package."));
-    case "Updates are turned off on this machine.":
-      return resolve(msg("Updates are turned off on this machine."));
-    default:
-      return message;
-  }
+  return (
+    state.message?.trim() || resolve(msg("Automatic updates are not available in this build."))
+  );
 }
 
 export function getDesktopUpdateIdleTooltip(

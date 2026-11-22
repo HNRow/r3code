@@ -1,9 +1,9 @@
+import { T, useGT } from "gt-react-native";
 import { Pressable, type StyleProp, type ViewStyle } from "react-native";
 
 import { cn } from "../lib/cn";
 import { AppText } from "./ui/AppText";
 import { SymbolView } from "./ui/AppSymbol";
-import { useGT, T } from "gt-react-native";
 
 export function NewThreadButton(props: {
   readonly onPress: () => void;

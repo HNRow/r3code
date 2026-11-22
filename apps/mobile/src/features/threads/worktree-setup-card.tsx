@@ -1,12 +1,15 @@
+import { msg, T, useGT, useMessages } from "gt-react-native";
+
+import type { MessageResolver } from "../../i18n/messages";
+
 import { Button } from "../../components/ui/Button";
 import {
   WORKTREE_SETUP_STAGE_ORDER,
-  worktreeSetupStageLabel,
   type WorktreeSetupSnapshot,
   type WorktreeSetupStage,
 } from "@t3tools/contracts";
 import { worktreeSetupAgentStarted } from "@t3tools/client-runtime/worktree-setup";
-import { formatDuration } from "@t3tools/shared/orchestrationTiming";
+import { formatDuration } from "@t3tools/shared/orchestrationTimingCopy";
 import { Platform, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppActivityIndicator } from "../../components/ui/AppActivityIndicator";
@@ -15,7 +18,6 @@ import { SymbolView, type AppSymbolName } from "../../components/ui/AppSymbol";
 import { Sheet } from "../../components/ui/Sheet";
 import { ShimmeringWorkContent } from "./thread-work-log";
 import { useVisibleSecondClock } from "./use-visible-second-clock";
-import { useGT, T } from "gt-react-native";
 
 export interface WorktreeSetupCardProps {
   snapshot: WorktreeSetupSnapshot;
@@ -24,10 +26,27 @@ export interface WorktreeSetupCardProps {
   onWorkLocally: (() => void) | null;
 }
 
-function elapsed(start: string | null, end: string | null, now: number) {
+function elapsed(start: string | null, end: string | null, now: number, resolve: MessageResolver) {
   const duration = (end ? Date.parse(end) : now) - (start ? Date.parse(start) : NaN);
-  return Number.isFinite(duration) ? formatDuration(Math.max(0, duration)) : null;
+  return Number.isFinite(duration) ? formatDuration(Math.max(0, duration), resolve) : null;
 }
+
+const statusLabels = {
+  pending: msg("pending", { $context: "setup stage status" }),
+  running: msg("running", { $context: "setup stage status" }),
+  done: msg("done", { $context: "setup stage status" }),
+  skipped: msg("skipped", { $context: "setup stage status" }),
+  failed: msg("failed", { $context: "setup stage status" }),
+  warning: msg("warning", { $context: "setup stage status" }),
+} as const satisfies Record<WorktreeSetupStage["status"], string>;
+
+const stageLabels = {
+  fetch: msg("Fetch base branch"),
+  checkout: msg("Check out files"),
+  submodules: msg("Init submodules"),
+  "setup-script": msg("Run setup script"),
+  agent: msg("Start agent"),
+} as const satisfies Record<WorktreeSetupStage["id"], string>;
 
 const icons: Record<WorktreeSetupStage["status"], AppSymbolName> = {
   pending: "circle",
@@ -54,21 +73,22 @@ export function WorktreeSetupCard(props: WorktreeSetupCardProps & SetupDetailsCo
 }
 
 function WorktreeSetupHeaderCard(props: WorktreeSetupCardProps & SetupDetailsControl) {
-  const gt = useGT();
   const { snapshot, detailsOpen } = props;
+  const gt = useGT();
+  const messages = useMessages();
   const running = snapshot.phase === "running";
   const now = useVisibleSecondClock(running);
   const failed =
     snapshot.phase === "failed" || snapshot.stages.some((stage) => stage.status === "failed");
   const label = running
-    ? "Setting up worktree…"
+    ? gt("Setting up worktree…")
     : snapshot.phase === "cancelled"
-      ? "Worktree setup cancelled"
+      ? gt("Worktree setup cancelled")
       : snapshot.phase === "failed"
-        ? "Worktree setup failed"
+        ? gt("Worktree setup failed")
         : failed
-          ? "Setup script failed"
-          : "Worktree ready";
+          ? gt("Setup script failed")
+          : gt("Worktree ready");
 
   return (
     <View accessibilityLabel={gt("Worktree setup")} className="py-1">
@@ -78,7 +98,7 @@ function WorktreeSetupHeaderCard(props: WorktreeSetupCardProps & SetupDetailsCon
           className="text-2xs text-foreground-secondary"
           style={{ fontVariant: ["tabular-nums"] }}
         >
-          {elapsed(snapshot.startedAt, snapshot.endedAt, now)}
+          {elapsed(snapshot.startedAt, snapshot.endedAt, now, messages)}
         </Text>
         <Pressable
           accessibilityRole="button"
@@ -127,11 +147,15 @@ export function worktreeSetupHandedOff(props: WorktreeSetupCardProps): boolean {
 
 /** The card's state on the turn's fold row: setup still running, or a failure to look at. */
 export function WorktreeSetupFoldChip(props: WorktreeSetupCardProps & SetupDetailsControl) {
-  const scriptName = props.snapshot.setupScript?.name ?? "Setup script";
+  const gt = useGT();
+  const scriptName = props.snapshot.setupScript?.name ?? gt("Setup script");
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Background setup is still running: ${scriptName}. Show setup progress.`}
+      accessibilityLabel={gt(
+        "Background setup is still running: {scriptName}. Show setup progress.",
+        { scriptName },
+      )}
       onPress={props.onOpenDetails}
       hitSlop={8}
       className="ml-2 min-w-0 max-w-[55%] flex-row items-center gap-1 rounded-full border border-border px-2 py-1 active:opacity-70"
@@ -167,17 +191,19 @@ function setupWentWrong(snapshot: WorktreeSetupSnapshot): boolean {
 
 function WorktreeSetupSummaryRow(props: WorktreeSetupCardProps & SetupDetailsControl) {
   const { snapshot } = props;
+  const gt = useGT();
+  const messages = useMessages();
   const now = useVisibleSecondClock(false);
   const label =
     snapshot.phase === "failed"
-      ? "Worktree setup failed"
+      ? gt("Worktree setup failed")
       : snapshot.phase === "cancelled"
-        ? "Worktree setup cancelled"
-        : "Worktree ready, setup script failed";
+        ? gt("Worktree setup cancelled")
+        : gt("Worktree ready, setup script failed");
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${label}. Show setup details.`}
+      accessibilityLabel={gt("{label}. Show setup details.", { label })}
       onPress={props.onOpenDetails}
       className="mb-1 min-h-8 flex-row items-center px-1 active:opacity-70"
       style={{ columnGap: 8 }}
@@ -192,7 +218,7 @@ function WorktreeSetupSummaryRow(props: WorktreeSetupCardProps & SetupDetailsCon
         className="text-2xs text-foreground-secondary"
         style={{ fontVariant: ["tabular-nums"] }}
       >
-        {elapsed(snapshot.startedAt, snapshot.endedAt, now)}
+        {elapsed(snapshot.startedAt, snapshot.endedAt, now, messages)}
       </Text>
       <SymbolView name="chevron.right" size={10} tintColorClassName="accent-icon-muted" />
     </Pressable>
@@ -347,21 +373,23 @@ function StageRow({
   compact?: boolean;
   animate?: boolean;
 }) {
+  const gt = useGT();
+  const m = useMessages();
   const label =
     stage.id === "setup-script"
-      ? (scriptName ?? worktreeSetupStageLabel(stage.id))
-      : worktreeSetupStageLabel(stage.id);
+      ? (scriptName ?? m(stageLabels[stage.id]))
+      : m(stageLabels[stage.id]);
   const detail =
     stage.status === "pending"
       ? null
       : stage.status === "skipped"
-        ? (stage.detail ?? "skipped")
+        ? (stage.detail ?? m(statusLabels.skipped))
         : stage.id === "checkout" && stage.status === "running" && stage.percent !== null
           ? `${stage.percent}%`
           : stage.detail;
   return (
     <View
-      accessibilityLabel={`${label}, ${stage.status}`}
+      accessibilityLabel={gt("{label}, {status}", { label, status: m(statusLabels[stage.status]) })}
       className={compact ? "min-h-8 flex-row items-center" : "min-h-11 flex-row items-center"}
       style={{ columnGap: 8, opacity: stage.status === "pending" ? 0.4 : 1 }}
     >
@@ -415,7 +443,7 @@ function StageRow({
           className="text-2xs text-foreground-secondary"
           style={{ fontVariant: ["tabular-nums"] }}
         >
-          {elapsed(stage.startedAt, stage.endedAt, now)}
+          {elapsed(stage.startedAt, stage.endedAt, now, m)}
         </Text>
       ) : null}
     </View>

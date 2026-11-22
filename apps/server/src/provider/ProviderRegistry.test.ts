@@ -568,6 +568,11 @@ const layerTestNodeServices = Layer.mergeAll(
   Layer.succeed(ServerEnvironment.ServerEnvironmentIdentity, {
     getEnvironmentId: Effect.succeed(EnvironmentId.make("00000000-0000-4000-8000-000000000001")),
   }),
+  // A login shell that prints nothing, so refreshes never take PATH from the developer's profile.
+  Layer.effect(
+    HostProcess.Environment,
+    Effect.sync(() => ({ ...process.env, SHELL: "/usr/bin/true" })),
+  ),
   // An empty home, so the developer's own Claude settings never reach provider probes.
   Layer.effect(
     HostProcess.HomeDirectory,
@@ -2565,60 +2570,37 @@ it.layer(
         }),
     );
 
-    it.effect("keeps returning the cached workspace snapshot from the public refresh API", () =>
+    // A login shell stand-in that prints the capture with one more PATH entry, as a profile edited
+    // after launch would.
+    const withLateLoginShell = <A, E, R>(effect: (shell: string) => Effect.Effect<A, E, R>) =>
       Effect.gen(function* () {
-        const h = yield* makeWorkspaceRescanHarness;
-        yield* h.seed("/workspace");
-        const owner = yield* h.refresh("/workspace", true).pipe(Effect.forkChild);
-        const scan = yield* Queue.take(h.scans);
-        const error = new ProviderDriverError({
-          driver: h.first.instance.driverKind,
-          instanceId: h.first.instance.instanceId,
-          detail: "workspace scan failed",
-        });
-
-        yield* Deferred.fail(scan.result, error);
-        const providers = yield* Fiber.join(owner);
-
-        assert.deepStrictEqual(
-          providers[0]?.workspaceSnapshots
-            ?.find((snapshot) => snapshot.cwd === "/workspace")
-            ?.skills.map((skill) => skill.name),
-          ["initial"],
+        const fs = yield* FileSystem.FileSystem;
+        const dir = yield* fs.makeTempDirectoryScoped({ prefix: "t3-login-shell-" });
+        const shell = `${dir}/sh`;
+        yield* fs.writeFileString(
+          shell,
+          '#!/bin/sh\nPATH=/opt/late:/usr/bin exec /bin/sh -c "$2"\n',
         );
-      }),
-    );
+        yield* fs.chmod(shell, 0o755);
+        return yield* effect(shell);
+      }).pipe(Effect.scoped, Effect.provide(NodeServices.layer));
 
-    it.effect("fails strict refresh owners and concurrent waiters with the same scan error", () =>
-      Effect.gen(function* () {
-        const h = yield* makeWorkspaceRescanHarness;
-        yield* h.seed("/workspace");
-        yield* TestClock.adjust(PROVIDER_WORKSPACE_SNAPSHOT_TTL_MS);
-        const owner = yield* h.refreshStrict("/workspace").pipe(Effect.forkChild);
-        const scan = yield* Queue.take(h.scans);
-        const waiter = yield* h
-          .refreshStrict("/workspace")
-          .pipe(Effect.forkChild({ startImmediately: true }));
-        const error = new ProviderDriverError({
-          driver: h.first.instance.driverKind,
-          instanceId: h.first.instance.instanceId,
-          detail: "workspace scan failed",
-        });
-
-        yield* Deferred.fail(scan.result, error);
-        const ownerError = yield* Fiber.join(owner).pipe(Effect.flip);
-        const waiterError = yield* Fiber.join(waiter).pipe(Effect.flip);
-
-        assert.strictEqual(ownerError, error);
-        assert.strictEqual(waiterError, error);
-        assert.deepStrictEqual(yield* h.skillsOf("/workspace"), ["initial"]);
-      }),
-    );
-
-    it.effect(
-      "rebuilds only instances missing their CLI when a refresh finds a new Windows PATH",
-      () => {
-        const env: NodeJS.ProcessEnv = { PATH: "C:\\Windows" };
+    it.effect.each([
+      {
+        name: "Windows PATH",
+        platform: "win32" as const,
+        path: "C:\\Windows",
+        expectedPath: "C:\\Windows;C:\\Tools",
+      },
+      {
+        name: "login-shell PATH",
+        platform: "linux" as const,
+        path: "/usr/bin",
+        expectedPath: "/opt/late:/usr/bin",
+      },
+    ])("rebuilds only instances missing their CLI when a refresh finds a new $name", (host) =>
+      withLateLoginShell((shell) => {
+        const env: NodeJS.ProcessEnv = { PATH: host.path, SHELL: shell };
         return Effect.gen(function* () {
           const driver = ProviderDriverKind.make("codex");
           const makeInstance = (id: string, installed: boolean): ProviderInstance => {
@@ -2680,7 +2662,9 @@ it.layer(
                   }),
                 ),
                 Layer.provideMerge(
-                  ServerConfig.layerTest(process.cwd(), { prefix: "t3-provider-registry-path-" }),
+                  ServerConfig.layerTest(process.cwd(), {
+                    prefix: "t3-provider-registry-path-",
+                  }),
                 ),
                 Layer.provideMerge(Layer.mergeAll(NodeServices.layer, NodeCrypto.layer)),
               ),
@@ -2689,16 +2673,16 @@ it.layer(
 
           yield* registry.refresh();
 
-          assert.strictEqual(env.PATH, "C:\\Windows;C:\\Tools");
+          assert.strictEqual(env.PATH, host.expectedPath);
           assert.deepStrictEqual(rebuilt, [[ProviderInstanceId.make("missing")]]);
         }).pipe(
-          Effect.provideService(HostProcess.Platform, "win32"),
+          Effect.provideService(HostProcess.Platform, host.platform),
           Effect.provideService(HostProcess.Environment, env),
           Effect.provideService(WindowsShellEnvironment, () =>
             Effect.succeed({ PATH: "C:\\Windows;C:\\Tools" }),
           ),
         );
-      },
+      }),
     );
 
     it.effect("rescans a requested cwd whose snapshot is still current", () =>

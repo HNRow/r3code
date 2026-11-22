@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import { cn } from "../../lib/cn";
 import { MOBILE_MOTION, MOBILE_SHAPE } from "../../lib/designTokens";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
@@ -22,7 +23,6 @@ import { useControlTheme } from "./useControlTheme";
 import { IconButton } from "./IconButton";
 import { AppActivityIndicator } from "./AppActivityIndicator";
 import { SymbolView } from "./AppSymbol";
-import { useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 export type ToastProps = {
@@ -149,6 +149,7 @@ const ENTER_TIMING = {
 };
 const TOAST_EXITING = FadeOut.duration(MOBILE_MOTION.exit).reduceMotion(ReduceMotion.System);
 function SwipeableToast(props: ToastProps & { readonly onDismiss: () => void }) {
+  const gt = useGT();
   const [glassReady, setGlassReady] = useState(Platform.OS !== "ios");
   const finishEntering = useCallback(() => setGlassReady(true), []);
   // UIKit can skip glass on a moving host; remount the surface after entry so its blur installs.
@@ -217,7 +218,7 @@ function SwipeableToast(props: ToastProps & { readonly onDismiss: () => void }) 
               accessibilityRole="alert"
               accessibilityLiveRegion="assertive"
               accessibilityLabel={props.message}
-              accessibilityActions={[{ name: "dismiss", label: t("Dismiss message") }]}
+              accessibilityActions={[{ name: "dismiss", label: gt("Dismiss message") }]}
               onAccessibilityAction={({ nativeEvent }) => {
                 if (nativeEvent.actionName === "dismiss") onDismiss();
               }}

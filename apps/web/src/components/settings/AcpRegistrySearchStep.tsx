@@ -16,9 +16,11 @@ import type {
   ProviderInstanceConfig,
 } from "@t3tools/contracts";
 import { ExternalLinkIcon, SearchIcon } from "lucide-react";
+import { msg, T, useGT, useMessages, Var } from "gt-react";
 import { type FormEvent, useState } from "react";
 
 import { useDeadlinePassed } from "../../hooks/useDeadline";
+import { m } from "../../i18n/messages";
 import { serverEnvironment } from "../../state/server";
 import { useEnvironmentQuery } from "../../state/query";
 import { useAtomCommand } from "../../state/use-atom-command";
@@ -31,12 +33,12 @@ import { isConfiguredAcpRegistryAgent } from "./AddProviderInstanceDialog.logic"
 import { ProviderDriverKind } from "@t3tools/contracts";
 import { ProviderInstanceIcon } from "../chat/ProviderInstanceIcon";
 import { providerClients } from "./providerDriverMeta";
-import { T, useGT, Var, t } from "gt-react";
+import { t } from "gt-react";
 
 function errorMessage(error: unknown): string {
   return error instanceof Error && error.message.trim()
     ? error.message
-    : "The ACP could not be prepared.";
+    : m(msg("The ACP could not be prepared."));
 }
 
 const ACP_REGISTRY_SEARCH_DEBOUNCE_MS = 300;
@@ -83,6 +85,7 @@ export function useAcpRegistrySearch(environmentId: EnvironmentId, enabled: bool
             : { query: "", limit: ACP_REGISTRY_MAX_AGENTS },
         })
       : null,
+    useMessages(),
   );
   const prepareAgent = useAtomCommand(serverEnvironment.prepareAcpRegistryAgent, {
     reportFailure: false,
@@ -211,11 +214,14 @@ export function AcpRegistrySearchStep({
 
       <div className="sr-only" role="status">
         {isInitialSearch
-          ? t("Searching the ACP Registry.")
+          ? gt("Searching the ACP Registry.")
           : isRefreshing
-            ? t("Refreshing ACP Registry results.")
+            ? gt("Refreshing ACP Registry results.")
             : results
-              ? `${resultCount} compatible ${resultCount === 1 ? "agent" : "agents"} found.`
+              ? gt(
+                  "{count, plural, one {{count} compatible agent found.} other {{count} compatible agents found.}}",
+                  { count: resultCount },
+                )
               : ""}
       </div>
 
@@ -275,7 +281,8 @@ function AcpRegistryAgentRow({
   readonly isPreparing: boolean;
   readonly onAdd: (agent: AcpRegistrySearchAgent) => void;
 }) {
-  const progressLabel = agent.distribution === "binary" ? "Downloading" : "Preparing";
+  const gt = useGT();
+  const progressLabel = agent.distribution === "binary" ? gt("Downloading") : gt("Preparing");
   const aboutUrl = agent.website || agent.repository;
   return (
     <article className="min-w-0 py-2.5">
@@ -305,7 +312,7 @@ function AcpRegistryAgentRow({
                   <Button
                     size="icon-xs"
                     variant="ghost-muted"
-                    aria-label={`About ${agent.name}`}
+                    aria-label={gt("About {name}", { name: agent.name })}
                     render={<a href={aboutUrl} target="_blank" rel="noreferrer" />}
                   >
                     <ExternalLinkIcon />
@@ -320,13 +327,25 @@ function AcpRegistryAgentRow({
             </Tooltip>
           ) : null}
           <Button
-            aria-label={`${alreadyAdded ? "Already added" : isPreparing ? progressLabel : "Add"} ${agent.name}`}
+            aria-label={
+              alreadyAdded
+                ? gt("Already added {name}", { name: agent.name })
+                : isPreparing
+                  ? agent.distribution === "binary"
+                    ? gt("Downloading {name}", { name: agent.name })
+                    : gt("Preparing {name}", { name: agent.name })
+                  : gt("Add {name}", { name: agent.name })
+            }
             disabled={!canAdd || alreadyAdded}
             onClick={() => onAdd(agent)}
             size="xs"
             variant={isPreparing ? "secondary" : "outline"}
           >
-            {alreadyAdded ? t("Added") : isPreparing ? progressLabel : t("Add")}
+            {alreadyAdded
+              ? gt("Added")
+              : isPreparing
+                ? progressLabel
+                : gt("Add", { $context: "verb, adds an agent" })}
           </Button>
         </div>
       </div>

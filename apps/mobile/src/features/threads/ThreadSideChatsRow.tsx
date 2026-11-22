@@ -1,4 +1,5 @@
 import type { EnvironmentId, ThreadId } from "@t3tools/contracts";
+import { T, useGT } from "gt-react-native";
 import { Platform, Pressable, ScrollView, View } from "react-native";
 
 import { AppText as Text } from "../../components/ui/AppText";
@@ -6,7 +7,6 @@ import { SymbolView } from "../../components/ui/AppSymbol";
 import { cn } from "../../lib/cn";
 import { useSideChats } from "../../state/entities";
 import { useOpenLinkedThread } from "./useOpenLinkedThread";
-import { T } from "gt-react-native";
 
 /**
  * The thread's side chats, started on web or desktop. Each opens as a normal thread, so its
@@ -18,6 +18,7 @@ export function ThreadSideChatsRow(props: {
 }) {
   const sideChats = useSideChats({ environmentId: props.environmentId, threadId: props.threadId });
   const openLinkedThread = useOpenLinkedThread();
+  const gt = useGT();
   if (sideChats.length === 0) return null;
   return (
     <View
@@ -47,7 +48,13 @@ export function ThreadSideChatsRow(props: {
               <Pressable
                 key={sideChat.id}
                 accessibilityRole="button"
-                accessibilityLabel={`Open side chat ${sideChat.title}${needs === null ? "" : `, needs ${needs}`}`}
+                accessibilityLabel={
+                  needs === null
+                    ? gt("Open side chat {title}", { title: sideChat.title })
+                    : needs === "approval"
+                      ? gt("Open side chat {title}, needs approval", { title: sideChat.title })
+                      : gt("Open side chat {title}, needs input", { title: sideChat.title })
+                }
                 className="max-w-48 flex-row items-center gap-1.5 rounded-full bg-subtle px-2.5 py-1"
                 onPress={() =>
                   openLinkedThread({ environmentId: props.environmentId, threadId: sideChat.id })

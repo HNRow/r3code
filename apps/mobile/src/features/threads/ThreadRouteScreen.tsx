@@ -1,4 +1,5 @@
 import * as Dialog from "../../components/ui/Dialog";
+import { errorDisplayMessage } from "@t3tools/client-runtime/errors";
 import { useRememberThreadProject } from "./useRememberThreadProject";
 import { useOpenPullRequest } from "../../native/useOpenPullRequest";
 import { makeTurnCommandMetadata } from "../../lib/commandMetadata";
@@ -21,6 +22,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useGT, useMessages } from "gt-react-native";
 import * as Option from "effect/Option";
 import {
   AuthOrchestrationOperateScope,
@@ -57,6 +59,7 @@ import { scopeThreadRef } from "@t3tools/client-runtime/environment";
 import { useThreadShell } from "../../state/entities";
 import { NATIVE_LIQUID_GLASS_SUPPORTED } from "../../native/native-glass";
 import { connectionTone } from "../connection/connectionTone";
+import { runtimeConnectionErrorText } from "../connection/environmentStatusText";
 import {
   useRemoteConnections,
   useRemoteConnectionStatus,
@@ -95,7 +98,10 @@ import { useThreadComposerState } from "../../state/use-thread-composer-state";
 import { resolveMergeBackTargetThreadId } from "@t3tools/client-runtime/state/thread-relationships";
 import { resolveLatestMergeBackRun } from "@t3tools/client-runtime/state/thread-workflows";
 import { threadEnvironment } from "../../state/threads";
-import { EMPTY_ENVIRONMENT_THREAD_STATE } from "@t3tools/client-runtime/state/threads";
+import {
+  EMPTY_ENVIRONMENT_THREAD_STATE,
+  threadErrorText,
+} from "@t3tools/client-runtime/state/threads";
 import { useProjects } from "../../state/entities";
 import {
   projectThreadContentPresentation,
@@ -121,17 +127,12 @@ import {
   useWorkspaceBackNavigation,
 } from "../layout/workspace/useAndroidWorkspaceNavigation";
 import { openSettings } from "../settings/settings-navigation";
-import {
-  InspectorContentScope,
-  ThreadInspectorHeader,
-  ThreadInspectorPreview,
-  type ThreadInspectorPresentation,
-} from "./thread-inspector-preview";
+import { ThreadInspectorHeader, type ThreadInspectorPresentation } from "./thread-inspector-header";
+import { InspectorContentScope, ThreadInspectorPreview } from "./thread-inspector-preview";
 import { useStartSideChat } from "./useStartSideChat";
 import { useThreadStatusAnnouncements } from "./useThreadStatusAnnouncements";
 import type { ThreadInspectorMode, ThreadInspectorTarget } from "./thread-inspector-navigation";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
-import { useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 function firstRouteParam(value: string | string[] | undefined): string | null {
@@ -253,6 +254,7 @@ export function ThreadRouteScreen(props: ThreadRouteScreenProps) {
 }
 
 function LiveThreadRouteController(props: ThreadRouteScreenProps) {
+  const gt = useGT();
   useAndroidWorkspaceBack();
   const connectionsReady = useConnectionsReady();
   const { connectionState } = useRemoteConnectionStatus();
@@ -288,7 +290,7 @@ function LiveThreadRouteController(props: ThreadRouteScreenProps) {
     props.inspectorPresentation ? (
       <InspectorHeaderShownContext value>
         <ThreadInspectorHeader
-          title={selectedThread?.title ?? "Thread"}
+          title={selectedThread?.title ?? gt("Thread")}
           {...props.inspectorPresentation}
         />
         {content}
@@ -345,7 +347,7 @@ function LiveThreadRouteController(props: ThreadRouteScreenProps) {
   return withInspectorHeader(
     <ThreadUnavailableScreen
       actionLabel={
-        routeEnvironmentRuntime === null ? "Manage environments" : "Reconnect environment"
+        routeEnvironmentRuntime === null ? gt("Manage environments") : gt("Reconnect environment")
       }
       onAction={() => {
         if (routeEnvironmentRuntime !== null) {
@@ -363,6 +365,8 @@ function ThreadRouteContent(
     readonly selectedThreadDetailState: ReturnType<typeof useSelectedThreadDetailState>;
   },
 ) {
+  const gt = useGT();
+  const m = useMessages();
   const { layout, showInspector, toggleAuxiliaryPane } = useAdaptiveWorkspaceLayout();
   const { connectionState } = useRemoteConnectionStatus();
   const { onReconnectEnvironment } = useRemoteConnections();
@@ -444,7 +448,7 @@ function ThreadRouteContent(
     return {
       hasMoreHistory: history.hasMoreHistory,
       loading: history.loading,
-      error: history.error,
+      error: history.error === null ? null : threadErrorText(history.error, m),
       onLoadEarlier: () => {
         void loadEarlierHistory({
           environmentId: selectedThread.environmentId,
@@ -523,7 +527,9 @@ function ThreadRouteContent(
   const routeEnvironmentRuntime = useRemoteEnvironmentRuntime(environmentId);
   const routeConnectionState =
     routeEnvironmentRuntime?.connectionState ?? (environmentId ? "available" : connectionState);
-  const routeConnectionError = routeEnvironmentRuntime?.connectionError ?? null;
+  const routeConnectionError = routeEnvironmentRuntime
+    ? runtimeConnectionErrorText(routeEnvironmentRuntime, m)
+    : null;
   const selectedThreadWithDraftSettings = selectedThread
     ? {
         ...selectedThread,
@@ -546,9 +552,9 @@ function ThreadRouteContent(
     selectedEnvironmentConnection?.environmentLabel ?? null,
     // A linked environment's delegated task names its parent; other linked work its origin.
     delegatedFrom !== null
-      ? `Subagent of ${delegatedFromThread?.title ?? delegatedFrom.title}`
+      ? gt("Subagent of {title}", { title: delegatedFromThread?.title ?? delegatedFrom.title })
       : selectedThread?.linkOrigin
-        ? `From ${selectedThread.linkOrigin.label}`
+        ? gt("From {origin}", { origin: selectedThread.linkOrigin.label })
         : null,
   ]
     .filter(Boolean)
@@ -565,10 +571,13 @@ function ThreadRouteContent(
     environmentId: selectedThread?.environmentId ?? null,
     threadId: selectedThread?.id ?? null,
   });
-  const terminalMenuSessions = buildTerminalMenuSessions({
-    knownSessions: knownTerminalSessions ?? [],
-    workspaceRoot: selectedThreadProject?.workspaceRoot ?? null,
-  });
+  const terminalMenuSessions = buildTerminalMenuSessions(
+    {
+      knownSessions: knownTerminalSessions ?? [],
+      workspaceRoot: selectedThreadProject?.workspaceRoot ?? null,
+    },
+    m,
+  );
   const selectedThreadDetailWorktreePath = selectedThreadDetail?.thread.worktreePath ?? null;
   const handleReconnectEnvironment = () => {
     if (!environmentId) {
@@ -581,7 +590,12 @@ function ThreadRouteContent(
     environmentId: selectedThread?.environmentId ?? null,
     cwd: selectedThreadCwd,
   };
-  const gitActionProgress = useGitActionProgress(gitActionProgressTarget);
+  const gitActionProgress = useGitActionProgress(
+    gitActionProgressTarget,
+    selectedThread === null
+      ? null
+      : { environmentId: selectedThread.environmentId, threadId: selectedThread.id },
+  );
 
   const handleOpenGitInspector = () => {
     navigation.setParams({ inspector: undefined });
@@ -620,7 +634,7 @@ function ThreadRouteContent(
           <ThreadFileNavigatorPane
             cwd={selectedThreadCwd}
             environmentId={selectedThread.environmentId}
-            projectName={selectedThreadProject?.title ?? "Files"}
+            projectName={selectedThreadProject?.title ?? gt("Files")}
             selectedPath={null}
             onSelectFile={(path) =>
               closeInspectorSheet
@@ -710,8 +724,8 @@ function ThreadRouteContent(
     if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
       const error = squashAtomCommandFailure(result);
       Dialog.alert(
-        t("Could not resume thread"),
-        error instanceof Error ? error.message : "Try again.",
+        gt("Could not resume thread"),
+        errorDisplayMessage(error, m) ?? gt("Try again."),
       );
     }
   };
@@ -818,6 +832,7 @@ function ThreadRouteContent(
         ? () => void handleMergeBack()
         : undefined,
     currentBranch: selectedThread?.branch ?? null,
+    tracksRepositories: (selectedThreadProject?.trackedFolders?.length ?? 0) > 0,
     gitStatus: gitStatus.data,
     gitOperationLabel: gitState.gitOperationLabel,
     canOpenTerminal:
@@ -846,10 +861,7 @@ function ThreadRouteContent(
     try {
       await recoverFailedThreadDraft(creation);
     } catch (error) {
-      Dialog.alert(
-        t("Could not restore draft"),
-        error instanceof Error ? error.message : String(error),
-      );
+      Dialog.alert(gt("Could not restore draft"), errorDisplayMessage(error, m) ?? String(error));
       return;
     }
     clearPendingThreadCreationOutcome(routeThreadIdentity);
@@ -968,6 +980,7 @@ function ThreadRouteContent(
           detailError: Option.getOrNull(selectedThreadDetailState.error),
           detailDeleted: selectedThreadDetailState.status === "deleted",
           connectionState: routeConnectionState,
+          resolve: m,
         });
   const connectionRetrying =
     routeConnectionState === "connecting" || routeConnectionState === "reconnecting";
@@ -977,15 +990,23 @@ function ThreadRouteContent(
     connectionRetrying ? routeConnectionError : null,
     RECONNECT_ERROR_DELAY_MS,
   );
-  const connectionStatusLabel = connectionRetryLabel({
-    connectionError: retryConnectionError,
-    connectionState: routeConnectionState,
-    connectionAwaitingApproval: routeEnvironmentRuntime?.connectionAwaitingApproval === true,
-  });
+  const connectionStatusLabel = connectionRetryLabel(
+    {
+      connectionError: retryConnectionError,
+      connectionState: routeConnectionState,
+      connectionAwaitingApproval: routeEnvironmentRuntime?.connectionAwaitingApproval === true,
+    },
+    m,
+  );
   // A thread this client is creating has nothing older to sync.
   const threadSyncLabel =
     creationState === null
-      ? threadSyncStatusLabel(selectedThreadDetailState.status, contentPresentation.kind)
+      ? threadSyncStatusLabel(
+          selectedThreadDetailState.status,
+          contentPresentation.kind,
+          Option.isSome(selectedThreadDetailState.error),
+          m,
+        )
       : null;
   // Transient states go in the header subtitle so the composer's status slot doesn't jump.
   const threadStatusLabel = useDelayedStatus(
@@ -994,7 +1015,7 @@ function ThreadRouteContent(
   );
   const inspectorHeader = props.inspectorPresentation ? (
     <ThreadInspectorHeader
-      title={selectedThread?.title ?? "Thread"}
+      title={selectedThread?.title ?? gt("Thread")}
       subtitle={threadStatusLabel ?? undefined}
       {...props.inspectorPresentation}
     />
@@ -1039,6 +1060,7 @@ function ThreadRouteContent(
           screenTone={connectionTone(
             routeConnectionState,
             routeEnvironmentRuntime?.connectionAwaitingApproval === true,
+            m,
           )}
           connectionError={routeConnectionError}
           environmentLabel={selectedEnvironmentConnection?.environmentLabel ?? null}

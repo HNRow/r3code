@@ -6,22 +6,24 @@ import {
   isAtomCommandInterrupted,
   squashAtomCommandFailure,
 } from "@t3tools/client-runtime/state/runtime";
+import { T, useGT, useMessages, Var } from "gt-react";
 import { useState } from "react";
 import { useEnvironmentScope } from "../../state/session";
 import { childThreadApprovalsAtom, threadEnvironment } from "../../state/threads";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { ComposerPendingApprovalActions } from "./ComposerPendingApprovalActions";
-import { Var, T } from "gt-react";
 
 function ChildApproval({ entry }: { entry: ChildThreadApproval }) {
   const canRespond = useEnvironmentScope(entry.thread.environmentId, AuthOrchestrationOperateScope);
   const respond = useAtomCommand(threadEnvironment.respondToApproval, { reportFailure: false });
+  const gt = useGT();
+  const messages = useMessages();
   const [responding, setResponding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { approval } = entry;
   return (
     <section
-      aria-label={`Approval from ${entry.title}`}
+      aria-label={gt("Approval from {title}", { title: entry.title })}
       className="rounded-lg border border-border bg-background p-3 text-xs"
     >
       <p className="mb-2 font-medium">
@@ -41,7 +43,7 @@ function ChildApproval({ entry }: { entry: ChildThreadApproval }) {
       {approval.reason ? <p className="mt-2 text-muted-foreground">{approval.reason}</p> : null}
       {approval.fullAccessOverride ? (
         <p className="mt-2 text-muted-foreground">
-          {fullAccessOverrideExplanation(approval.fullAccessOverride)}
+          {fullAccessOverrideExplanation(approval.fullAccessOverride, messages)}
         </p>
       ) : null}
       <div className="mt-2 flex flex-wrap gap-2">
@@ -63,7 +65,9 @@ function ChildApproval({ entry }: { entry: ChildThreadApproval }) {
             if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
               const failure = squashAtomCommandFailure(result);
               setError(
-                failure instanceof Error ? failure.message : "Failed to submit approval decision.",
+                failure instanceof Error
+                  ? failure.message
+                  : gt("Failed to submit approval decision."),
               );
             }
             setResponding(false);

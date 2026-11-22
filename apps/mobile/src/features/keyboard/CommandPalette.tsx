@@ -19,6 +19,8 @@ import {
   pickedQuery,
   threadRecentUse,
 } from "@t3tools/shared/paletteSearch";
+import { searchMatchHintLabel } from "@t3tools/shared/paletteSearchCopy";
+import { T, useGT, useMessages } from "gt-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -76,8 +78,6 @@ import { PullRequestGlyph } from "../pull-requests/pullRequestGlyphs";
 import { openSettings } from "../settings/settings-navigation";
 import { useSelectWorkspaceTab } from "../layout/workspace/useSelectWorkspaceTab";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
-import { useGT, T } from "gt-react-native";
-import { t } from "../../i18n/gt";
 
 const PALETTE_COMMANDS: ReadonlyArray<HardwareKeyboardCommand> = [
   "commandPalette",
@@ -124,6 +124,7 @@ function PaletteRow(props: {
   const mutedForegroundClassName = props.selected
     ? "text-thread-selected-foreground-muted"
     : "text-foreground-muted";
+  const m = useMessages();
   return (
     <RowPressable
       accessibilityRole="button"
@@ -159,15 +160,10 @@ function PaletteRow(props: {
       </View>
       <View className="flex-1">
         <View className="flex-row items-baseline gap-2">
-          <Text
-            translate={false}
-            numberOfLines={1}
-            className={cn("shrink text-base", foregroundClassName)}
-          >
+          <Text numberOfLines={1} className={cn("shrink text-base", foregroundClassName)}>
             {props.item.titleRanges?.length
               ? splitSearchText(props.item.title, props.item.titleRanges).map((part) => (
                   <Text
-                    translate={false}
                     key={part.start}
                     className={cn("text-base", part.highlighted && "font-t3-bold")}
                   >
@@ -180,11 +176,10 @@ function PaletteRow(props: {
               lives, unless the hint already names it. */}
           {(props.searchMatch ||
             (props.item.matchHint &&
-              props.item.matchHint.label !== "Project" &&
-              props.item.matchHint.label !== "Environment")) &&
+              props.item.matchHint.field !== "project" &&
+              props.item.matchHint.field !== "environment")) &&
           props.item.detail ? (
             <Text
-              translate={false}
               numberOfLines={1}
               className={cn("max-w-[45%] shrink-0 text-sm", mutedForegroundClassName)}
             >
@@ -201,23 +196,15 @@ function PaletteRow(props: {
           />
         ) : props.item.matchHint ? (
           <Text numberOfLines={1} className={cn("text-sm", mutedForegroundClassName)}>
-            {props.item.matchHint.label}:{" "}
+            {searchMatchHintLabel(props.item.matchHint.field, m)}:{" "}
             {splitSearchText(props.item.matchHint.text, props.item.matchHint.ranges).map((part) => (
-              <Text
-                translate={false}
-                key={part.start}
-                className={cn("text-sm", part.highlighted && "font-t3-bold")}
-              >
+              <Text key={part.start} className={cn("text-sm", part.highlighted && "font-t3-bold")}>
                 {part.text}
               </Text>
             ))}
           </Text>
         ) : props.item.detail ? (
-          <Text
-            translate={false}
-            numberOfLines={1}
-            className={cn("text-sm", mutedForegroundClassName)}
-          >
+          <Text numberOfLines={1} className={cn("text-sm", mutedForegroundClassName)}>
             {props.item.detail}
           </Text>
         ) : null}
@@ -239,8 +226,8 @@ export function CommandPalette(props: {
   readonly onClose: () => void;
   readonly onCommand: (command: HardwareKeyboardCommand) => void;
 }) {
-  const gt = useGT();
   const navigation = useNavigation();
+  const gt = useGT();
   const selectTab = useSelectWorkspaceTab();
   const { themeVariables } = useAppearancePreferences();
   const selectDetail = useSelectWorkspaceDetail();
@@ -315,67 +302,71 @@ export function CommandPalette(props: {
       {
         key: "newTask",
         kind: "action",
-        title: t("New thread in…"),
+        title: gt("New thread in…"),
         searchTerms: ["new task", "chat", "create", "project"],
         run: () => runCommand("newTask"),
       },
       {
         key: "addProject",
         kind: "action",
-        title: t("Add project"),
+        title: gt("Add project"),
         searchTerms: ["folder", "clone", "repository", "git"],
         run: () => navigation.navigate("AddProject"),
       },
       {
         key: "settings",
         kind: "action",
-        title: t("Open settings"),
+        title: gt("Open settings"),
         searchTerms: ["preferences", "configuration"],
         run: () => selectTab("settings"),
       },
       {
         key: "appearance",
         kind: "action",
-        title: t("Appearance"),
+        title: gt("Appearance"),
         searchTerms: ["theme", "colors", "dark", "light"],
         run: () => openSettings(navigation, "SettingsAppearance"),
       },
       {
         key: "environments",
         kind: "action",
-        title: t("Manage environments"),
+        title: gt("Manage environments"),
         searchTerms: ["connections", "server", "remote"],
         run: () => openSettings(navigation, "SettingsEnvironments"),
       },
       {
         key: "scheduledTasks",
         kind: "action",
-        title: t("Scheduled tasks"),
+        title: gt("Scheduled tasks"),
         searchTerms: ["schedule", "automations", "recurring"],
         run: () => openSettings(navigation, "SettingsScheduledTasks"),
       },
       {
         key: "usage",
         kind: "action",
-        title: t("Usage"),
+        title: gt("Usage", { $context: "command, opens usage settings" }),
         searchTerms: ["limits", "accounts", "quota"],
         run: () => openSettings(navigation, "SettingsUsage"),
       },
       {
         key: "archive",
         kind: "action",
-        title: t("Archived threads"),
+        title: gt("Archived threads"),
         searchTerms: ["restore", "history"],
         run: () => openSettings(navigation, "SettingsArchive"),
       },
     ];
     if (canTriage) {
+      const triageEnvironmentLabel = savedConnectionsById[triageEnvironmentId]?.environmentLabel;
       actions.push({
         key: "triage",
         kind: "action",
-        title: t("Triage an issue"),
+        title: gt("Triage an issue"),
         // Mobile has no triage hero, so name the machine before it starts.
-        detail: `On ${savedConnectionsById[triageEnvironmentId]?.environmentLabel ?? "this machine"}`,
+        detail:
+          triageEnvironmentLabel !== undefined
+            ? gt("On {environment}", { environment: triageEnvironmentLabel })
+            : gt("On this machine"),
         searchTerms: ["triage", "bug", "issue", "report", "broken", "debug", "help", "support"],
         run: () => void startTriage(triageEnvironmentId),
       });
@@ -390,7 +381,7 @@ export function CommandPalette(props: {
       actions.unshift({
         key: "newThread",
         kind: "action",
-        title: t`New thread in ${activeProject.title}`,
+        title: gt("New thread in {project}", { project: activeProject.title }),
         searchTerms: ["new task", "chat", "create"],
         run: () =>
           selectDetail({
@@ -408,10 +399,10 @@ export function CommandPalette(props: {
     }
     if (activeThreadRef) {
       const threadActions = [
-        ["files", "Go to file", ["open", "files", "browse", "search"]],
-        ["terminal", "Open terminal", ["shell", "console"]],
-        ["review", "Review changes", ["diff", "git", "pull request"]],
-        ["copyThreadReference", "Copy PR link or thread", ["reference", "clipboard"]],
+        ["files", gt("Go to file"), ["open", "files", "browse", "search"]],
+        ["terminal", gt("Open terminal"), ["shell", "console"]],
+        ["review", gt("Review changes"), ["diff", "git", "pull request"]],
+        ["copyThreadReference", gt("Copy PR link or thread"), ["reference", "clipboard"]],
       ] as const;
       actions.push(
         ...threadActions.map(([command, title, searchTerms]) => ({
@@ -441,7 +432,10 @@ export function CommandPalette(props: {
       kind: "project",
       project,
       title: project.title,
-      detail: `New thread · ${savedConnectionsById[project.environmentId]?.environmentLabel ?? project.environmentId}`,
+      detail: gt("New thread · {environment}", {
+        environment:
+          savedConnectionsById[project.environmentId]?.environmentLabel ?? project.environmentId,
+      }),
       searchTerms: [project.workspaceRoot, "new thread", "project"],
       run: () =>
         selectDetail({
@@ -473,7 +467,7 @@ export function CommandPalette(props: {
         return {
           key: scopedThreadKey(thread.environmentId, thread.id),
           kind: "thread",
-          title: thread.title || "Untitled thread",
+          title: thread.title || gt("Untitled thread"),
           detail: [project?.title, environment].filter(Boolean).join(" · "),
           searchTerms: [],
           threadSearch: threadSearchSubject(
@@ -512,10 +506,10 @@ export function CommandPalette(props: {
     savedConnectionsById,
     selectDetail,
     startTriage,
-    gt,
     threads,
     delegatedUnderParent,
     triageEnvironmentId,
+    gt,
   ]);
   const rankedMessageKeys = useMemo(() => {
     const subjectByKey = new Map(
@@ -725,10 +719,10 @@ export function CommandPalette(props: {
                 ListEmptyComponent={
                   <Text className="p-5 text-center text-foreground-muted">
                     {search.isPending
-                      ? t("Searching…")
+                      ? gt("Searching…")
                       : search.failed
-                        ? t("Couldn't search messages")
-                        : "No results"}
+                        ? gt("Couldn't search messages")
+                        : gt("No results")}
                   </Text>
                 }
                 // Message results from slower environments may still arrive below.

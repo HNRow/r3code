@@ -1,6 +1,7 @@
 import type { CommandOutputView } from "@t3tools/client-runtime/state/command-output";
 import type { EnvironmentId, ThreadId, TurnItemId } from "@t3tools/contracts";
 import { TERMINAL_PALETTES, terminalOutputSpans } from "@t3tools/shared/terminalOutput";
+import { T, Var } from "gt-react";
 import { useLayoutEffect, useRef } from "react";
 
 import { useTheme } from "../../hooks/useTheme";
@@ -8,7 +9,6 @@ import { useServerConfigs } from "../../state/entities";
 import { orchestrationEnvironment } from "../../state/orchestration";
 import { useEnvironmentQuery } from "../../state/query";
 import { useInitialOutputReady, type TurnItemSource } from "./timelineRowContext";
-import { Var, T } from "gt-react";
 
 const FOLLOW_SLACK_PX = 8;
 
@@ -50,7 +50,7 @@ export function CommandOutputPanel(props: {
   });
 
   if (text.length === 0) {
-    if (error)
+    if (error) {
       return (
         <div className="text-destructive">
           <T>
@@ -58,12 +58,14 @@ export function CommandOutputPanel(props: {
           </T>
         </div>
       );
-    if (data === null)
+    }
+    if (data === null) {
       return (
         <div className="text-muted-foreground italic">
           <T>Loading output…</T>
         </div>
       );
+    }
     return data.running ? null : (
       <div className="text-muted-foreground italic">
         <T>No output.</T>

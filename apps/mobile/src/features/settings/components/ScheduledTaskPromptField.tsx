@@ -1,3 +1,4 @@
+import { T, useGT, useMessages } from "gt-react-native";
 import { TextInput, View } from "react-native";
 
 import { AppText as Text } from "../../../components/ui/AppText";
@@ -12,7 +13,6 @@ import {
 } from "../../voice-input/ComposerDictationControl";
 import type { useVoiceInputController } from "../../voice-input/useVoiceInputController";
 import { resolveVoiceComposerPresentation } from "../../voice-input/voiceInputPresentation";
-import { T, useGT } from "gt-react-native";
 
 export function ScheduledTaskPromptField(props: {
   readonly value: string;
@@ -23,8 +23,9 @@ export function ScheduledTaskPromptField(props: {
   readonly voiceInput: ReturnType<typeof useVoiceInputController>;
 }) {
   const gt = useGT();
+  const m = useMessages();
   const voice = props.voiceInput;
-  const presentation = resolveVoiceComposerPresentation(voice.state, voice.elapsedSeconds);
+  const presentation = resolveVoiceComposerPresentation(voice.state, voice.elapsedSeconds, m);
   const showsDictation = presentation.statusKind === "active";
   const showsIdleTrigger = voice.isAvailable && !showsDictation;
 

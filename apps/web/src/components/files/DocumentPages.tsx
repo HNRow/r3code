@@ -1,10 +1,10 @@
 import DOMPurify from "dompurify";
 import { MinusIcon, PlusIcon, RotateCcwIcon } from "lucide-react";
 import { FileSurfaceAction } from "./fileSurfaceChrome";
+import { useGT } from "gt-react";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "~/hooks/useTheme";
 import { observeResize } from "~/lib/observeResize";
-import { useGT } from "gt-react";
 
 export function sanitizeDocumentHtml(source: string): string {
   const fragment = DOMPurify.sanitize(source, {

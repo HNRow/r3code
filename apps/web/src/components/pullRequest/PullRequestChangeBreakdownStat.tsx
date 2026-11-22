@@ -1,4 +1,5 @@
 import type { EnvironmentId, PullRequestRef } from "@t3tools/contracts";
+import { T } from "gt-react";
 import { useState } from "react";
 
 import { pullRequestEnvironment } from "~/state/pullRequests";
@@ -7,7 +8,6 @@ import { useEnvironmentQuery } from "~/state/query";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { ChangeBreakdownGrid } from "./ChangeBreakdownGrid";
 import { PullRequestDiffStat } from "./pullRequestPresentation";
-import { T } from "gt-react";
 
 /**
  * The pull request's diff stat, with a hover split into code, tests, mocks, and generated files.

@@ -1,4 +1,5 @@
 import { DEFAULT_UNIFIED_SETTINGS } from "@t3tools/contracts/settings";
+import { useGT } from "gt-react";
 
 import { AdvancedSettings } from "./AdvancedSettings";
 import { BranchNamingSettings } from "./BranchNamingSettings";
@@ -11,13 +12,13 @@ import {
   SettingsRow,
   SettingsSection,
 } from "./settingsLayout";
-import { searchableSetting } from "./settingsSearch";
+import { useSearchableSetting } from "./settingsSearch";
 import { WorktreeCleanupSection, WorktreesDirectoryRow } from "./StorageSettings";
 import { useScopedSettings, useUpdateScopedSettings } from "./useScopedSettings";
-import { useGT } from "gt-react";
 
 function StartFromRemoteRow() {
   const gt = useGT();
+  const searchableSetting = useSearchableSetting();
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
   return (
@@ -32,7 +33,7 @@ function StartFromRemoteRow() {
         settings.newWorktreesStartFromOrigin !==
         DEFAULT_UNIFIED_SETTINGS.newWorktreesStartFromOrigin ? (
           <SettingResetButton
-            label={gt("new worktrees start from remote")}
+            ariaLabel={gt("Reset new worktrees start from remote to default")}
             onClick={() =>
               updateSettings({
                 newWorktreesStartFromOrigin: DEFAULT_UNIFIED_SETTINGS.newWorktreesStartFromOrigin,
@@ -57,12 +58,16 @@ function StartFromRemoteRow() {
 
 export function WorktreesSettingsPanel() {
   const gt = useGT();
+  const searchableSetting = useSearchableSetting();
   const { scope } = useSettingsScope();
   const isProjectScope = scope.kind === "project" || scope.kind === "checkout";
 
   return (
     <SettingsPageContainer>
-      <SettingsSection id="worktree-creation" title={gt("Creation")}>
+      <SettingsSection
+        id="worktree-creation"
+        title={gt("Creation", { $context: "settings section about creating worktrees" })}
+      >
         {!isProjectScope && <WorktreesDirectoryRow />}
         <StartFromRemoteRow />
         <AdvancedSettings targetIds={[searchableSetting("worktree-submodules").id]}>

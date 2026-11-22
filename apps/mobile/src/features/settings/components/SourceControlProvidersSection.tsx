@@ -1,4 +1,5 @@
 import { useAtomValue } from "@effect/atom-react";
+import { sourceControlInstallHintText } from "@t3tools/client-runtime/contract-labels";
 import { isSourceControlProviderOffered } from "@t3tools/client-runtime/operations/projects";
 import { squashAtomCommandFailure } from "@t3tools/client-runtime/state/runtime";
 import {
@@ -15,6 +16,7 @@ import type {
 import * as Option from "effect/Option";
 import * as Schema from "effect/Schema";
 import { useNavigation } from "@react-navigation/native";
+import { msg, useGT, useMessages } from "gt-react-native";
 import { useState } from "react";
 import { Platform, View } from "react-native";
 import { tryOpenExternalUrl } from "../../../lib/openExternalUrl";
@@ -22,6 +24,7 @@ import { tryOpenExternalUrl } from "../../../lib/openExternalUrl";
 import { AppText as Text } from "../../../components/ui/AppText";
 import { Button } from "../../../components/ui/Button";
 import { SecretTextInput } from "../../../components/ui/SecretTextInput";
+import { m, type MessageResolver } from "../../../i18n/messages";
 import { useEnvironmentQuery } from "../../../state/query";
 import { serverEnvironment } from "../../../state/server";
 import { sourceControlEnvironment } from "../../../state/sourceControl";
@@ -31,12 +34,11 @@ import { SourceControlIcon } from "../../projects/SourceControlIcon";
 import type { SettingsTarget } from "../settings-environment-filter";
 import { SettingsProviderRow } from "./SettingsProviderRow";
 import { SettingsSection } from "./SettingsSection";
-import { useGT } from "gt-react-native";
 import { t } from "../../../i18n/gt";
 
 const saveFailure = (result: Parameters<typeof squashAtomCommandFailure>[0]) => {
   const error = squashAtomCommandFailure(result);
-  return error instanceof Error ? error.message : "The settings could not be saved.";
+  return error instanceof Error ? error.message : m(msg("The settings could not be saved."));
 };
 
 const hasToken = (token: SettingsSecretValue | undefined) =>
@@ -46,23 +48,42 @@ export const sourceControlProviderReady = (item: SourceControlProviderDiscoveryI
   item.status === "available" && item.auth.status === "authenticated";
 
 /** The line under a provider's name: whether it works on this server, and what to do if not. */
-export function sourceControlProviderSummary(item: SourceControlProviderDiscoveryItem): string {
-  if (item.status !== "available") return `Not available on this server: ${item.installHint}`;
+export function sourceControlProviderSummary(
+  item: SourceControlProviderDiscoveryItem,
+  resolve: MessageResolver = m,
+): string {
+  const installHint = sourceControlInstallHintText(item.installHint, resolve);
+  if (item.status !== "available")
+    return resolve(msg("Not available on this server: {hint}", { hint: installHint }));
   const { auth } = item;
   const detail = Option.getOrNull(auth.detail);
   if (auth.status === "authenticated") {
     const account = Option.getOrNull(auth.account);
-    return ["Authenticated", account ? `as ${account}` : null, detail ? `· ${detail}` : null]
-      .filter(Boolean)
-      .join(" ");
+    if (account && detail)
+      return resolve(msg("Authenticated as {account} · {detail}", { account, detail }));
+    if (account) return resolve(msg("Authenticated as {account}", { account }));
+    if (detail) return resolve(msg("Authenticated · {detail}", { detail }));
+    return resolve(msg("Authenticated"));
   }
   if (auth.status === "unauthenticated") {
-    if (!item.executable) return `Available. ${item.installHint}`;
+    if (!item.executable) return resolve(msg("Available. {hint}", { hint: installHint }));
     if (auth.accounts?.some((entry) => entry.authenticated))
-      return detail ?? `Every ${item.label} host is turned off.`;
-    return `Not authenticated on this server. Sign in with the ${item.executable} tool on the server host, or save a token here.`;
+      return (
+        detail ?? resolve(msg("Every {provider} host is turned off.", { provider: item.label }))
+      );
+    return resolve(
+      msg(
+        "Not authenticated on this server. Sign in with the {tool} tool on the server host, or save a token here.",
+        { tool: item.executable },
+      ),
+    );
   }
-  return `Could not verify ${item.label}. ${detail ?? item.installHint}`;
+  return resolve(
+    msg("Could not verify {provider}. {detail}", {
+      provider: item.label,
+      detail: detail ?? installHint,
+    }),
+  );
 }
 
 /**
@@ -73,6 +94,7 @@ export function SourceControlProvidersSection(props: {
   readonly environments: readonly SettingsTarget[];
   readonly canWrite: (environmentId: EnvironmentId) => boolean;
 }) {
+  const gt = useGT();
   return (
     <>
       {props.environments.map((environment) => (
@@ -81,8 +103,8 @@ export function SourceControlProvidersSection(props: {
           environment={environment}
           title={
             props.environments.length > 1
-              ? `Source control providers · ${environment.label}`
-              : "Source control providers"
+              ? gt("Source control providers · {environment}", { environment: environment.label })
+              : gt("Source control providers")
           }
           disabled={!props.canWrite(environment.environmentId)}
         />
@@ -97,6 +119,7 @@ function EnvironmentProviders(props: {
   readonly disabled: boolean;
 }) {
   const gt = useGT();
+  const messages = useMessages();
   const { environment } = props;
   const { environmentId } = environment;
   const discovery = useEnvironmentQuery(
@@ -135,7 +158,7 @@ function EnvironmentProviders(props: {
             }
             label={item.label}
             detail={Option.getOrNull(item.version)}
-            description={sourceControlProviderSummary(item)}
+            description={sourceControlProviderSummary(item, messages)}
             ready={sourceControlProviderReady(item)}
             separated={index > 0}
             {...(definition?.credentials || definition?.settings
@@ -148,7 +171,9 @@ function EnvironmentProviders(props: {
                 }
               : {})}
             toggle={{
-              accessibilityLabel: `Offer ${item.label} when adding or publishing a project`,
+              accessibilityLabel: gt("Offer {provider} when adding or publishing a project", {
+                provider: item.label,
+              }),
               value: isSourceControlProviderOffered(offered, item.kind),
               disabled,
               onValueChange: (value) =>
@@ -174,6 +199,11 @@ export function SourceControlTokenForm(props: {
   const gt = useGT();
   const { definition, credentials } = props;
   const { environmentId } = props.environment;
+  // Translates the GitHub definition's English `tokenAccess`, as the web settings do.
+  const tokenAccess =
+    definition.kind === "github"
+      ? gt("read and write access to pull requests and contents")
+      : credentials.tokenAccess;
   const { tokens } = readHostCredentialSettings(
     props.environment.serverConfig.settings,
     definition.kind,
@@ -217,10 +247,19 @@ export function SourceControlTokenForm(props: {
   return (
     <View className="gap-3 p-4">
       <Text className="text-xs leading-relaxed text-foreground-muted">
-        {t`A token saved here is used before ${credentials.tokenEnvVar} and the ${credentials.cliName} login, so ${definition.label} works without the ${credentials.cliLabel}. Give it ${credentials.tokenAccess}.`}
+        {gt(
+          "A token saved here is used before {envVar} and the {cliName} login, so {provider} works without the {cliLabel}. Give it {access}.",
+          {
+            envVar: credentials.tokenEnvVar,
+            cliName: credentials.cliName,
+            provider: definition.label,
+            cliLabel: credentials.cliLabel,
+            access: tokenAccess,
+          },
+        )}
       </Text>
       <ConnectionFormField
-        label={gt("Host")}
+        label={gt("Host", { $context: "source control host name field" })}
         autoCapitalize="none"
         autoCorrect={false}
         keyboardType="url"
@@ -230,8 +269,12 @@ export function SourceControlTokenForm(props: {
         onChangeText={setHost}
       />
       <SecretTextInput
-        accessibilityLabel={`${definition.label} token`}
-        placeholder={saved ? "Saved. Enter a new token to replace it" : "Token"}
+        accessibilityLabel={gt("{provider} token", { provider: definition.label })}
+        placeholder={
+          saved
+            ? gt("Saved. Enter a new token to replace it")
+            : gt("Token", { $context: "access token field" })
+        }
         value={draft}
         onChangeText={setDraft}
         onSubmitEditing={(value) => {
@@ -241,8 +284,11 @@ export function SourceControlTokenForm(props: {
       />
       <Text className="text-xs text-foreground-muted">
         {savedHosts.length === 0
-          ? `No token saved; the server uses ${credentials.tokenEnvVar} or the ${credentials.cliName} login.`
-          : `Saved for ${savedHosts.join(", ")}.`}
+          ? gt("No token saved; the server uses {envVar} or the {cliName} login.", {
+              envVar: credentials.tokenEnvVar,
+              cliName: credentials.cliName,
+            })
+          : gt("Saved for {hosts}.", { hosts: savedHosts.join(", ") })}
       </Text>
       {failure ? (
         <Text selectable className="text-xs text-danger-foreground">
@@ -265,7 +311,7 @@ export function SourceControlTokenForm(props: {
         ) : null}
         {saved ? (
           <Button
-            label={gt("Remove")}
+            label={gt("Remove", { $context: "verb, removes a saved token" })}
             tone="secondary"
             size="compact"
             disabled={locked}
@@ -369,7 +415,7 @@ export function SourceControlHostFieldsForm(props: {
               <SecretTextInput
                 accessibilityLabel={field.label}
                 placeholder={
-                  isSet(field.key) ? "Saved. Enter a new value to replace it" : field.label
+                  isSet(field.key) ? gt("Saved. Enter a new value to replace it") : field.label
                 }
                 value={drafts[field.key] ?? ""}
                 onChangeText={(value) => setDrafts({ ...drafts, [field.key]: value })}
@@ -406,7 +452,7 @@ export function SourceControlHostFieldsForm(props: {
       <View className="flex-row flex-wrap justify-end gap-2">
         {fields.some((field) => isSet(field.key)) ? (
           <Button
-            label={gt("Remove")}
+            label={gt("Remove", { $context: "verb, removes saved credentials" })}
             tone="secondary"
             size="compact"
             disabled={locked}

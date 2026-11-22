@@ -8,7 +8,10 @@ import {
 import { type AuthMcpApprovalDetails, EnvironmentId } from "@t3tools/contracts";
 import * as Result from "effect/Result";
 import * as Schema from "effect/Schema";
+import { msg, T, useGT } from "gt-react";
 import { type ReactNode, useEffect, useEffectEvent, useRef, useState } from "react";
+
+import { m } from "../../i18n/messages";
 
 import { isElectron } from "../../env";
 import { runConnectMcpApproval } from "../../state/connectMcpApproval";
@@ -23,7 +26,6 @@ import {
   McpConsent,
   readAuthorizationRequest,
 } from "./ConnectAgentSurface";
-import { useGT, T } from "gt-react";
 
 const isUnavailable = Schema.is(ConnectMcpApprovalUnavailableError);
 
@@ -46,7 +48,7 @@ function connectTransport(
         kind: "error",
         message: isUnavailable(result.failure)
           ? result.failure.message
-          : "Could not reach this environment. Try again.",
+          : m(msg("Could not reach this environment. Try again.")),
       };
     }
     onEnvironment({
@@ -126,7 +128,7 @@ export function ApproveAgentSurface() {
     return (
       <Message
         title={gt("Could not load sign-in")}
-        description={gt("R3 Connect sign-in did not load. Check your connection, then try again.")}
+        description={gt("T3 Connect sign-in did not load. Check your connection, then try again.")}
       >
         <div className="mt-6">
           <Button type="button" onClick={retryClerkLoad}>
@@ -141,8 +143,8 @@ export function ApproveAgentSurface() {
     return (
       <StandalonePage>
         <StandalonePageHeader
-          context="Agent sign-in"
-          title={gt("Connecting to R3 Connect")}
+          context={gt("Agent sign-in")}
+          title={gt("Connecting to T3 Connect")}
           description={gt("One moment while your account loads.")}
         />
         <Spinner className="mt-6" size="lg" tone="muted" />
@@ -154,7 +156,7 @@ export function ApproveAgentSurface() {
     return (
       <Message
         title={gt("Sign in to approve")}
-        description={gt("Sign in to R3 Connect with the account this environment is linked to.")}
+        description={gt("Sign in to T3 Connect with the account this environment is linked to.")}
       >
         <div className="mt-6">
           <Button type="button" onClick={openSignIn}>
@@ -209,9 +211,10 @@ function Message({
   readonly description: string;
   readonly children?: ReactNode;
 }) {
+  const gt = useGT();
   return (
     <StandalonePage>
-      <StandalonePageHeader context="Agent sign-in" title={title} description={description} />
+      <StandalonePageHeader context={gt("Agent sign-in")} title={title} description={description} />
       {children}
     </StandalonePage>
   );

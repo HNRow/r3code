@@ -1,3 +1,5 @@
+import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
+import { msg, T, useMessages } from "gt-react";
 import { useState } from "react";
 
 import {
@@ -7,15 +9,15 @@ import {
 } from "~/state/desktopCliCommand";
 import { useEnvironmentQuery } from "~/state/query";
 import { Button } from "../ui/button";
+import { m } from "../../i18n/messages";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { SettingsRow } from "./settingsLayout";
-import { searchableSetting } from "./settingsSearch";
-import { T, t, useGT } from "gt-react";
+import { useSearchableSetting } from "./settingsSearch";
 
 const FAILURE_TITLES = {
-  install: "Could not install t3",
-  uninstall: "Could not remove t3",
-  addToPath: "Could not add t3 to PATH",
+  install: msg("Could not install t3"),
+  uninstall: msg("Could not remove t3"),
+  addToPath: msg("Could not add t3 to PATH"),
 } as const;
 
 /** The desktop `t3` command's state, and its actions with a toast on failure. */
@@ -34,13 +36,11 @@ export function useDesktopCliCommand() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title:
-              action === "install"
-                ? gt("Could not install t3")
-                : action === "uninstall"
-                  ? gt("Could not remove t3")
-                  : gt("Could not add t3 to PATH"),
-            description: error instanceof Error ? error.message : gt("Something went wrong."),
+            title: m(FAILURE_TITLES[action]),
+            description:
+              error instanceof Error
+                ? (thrownErrorMessage(error, m) ?? error.message)
+                : m(msg("Something went wrong.")),
           }),
         );
       })
@@ -55,31 +55,44 @@ export function useDesktopCliCommand() {
 }
 
 export function CliCommandSettingsRow() {
-  const gt = useGT();
+  const searchableSetting = useSearchableSetting();
   const { state, busy, run } = useDesktopCliCommand();
+  const resolve = useMessages();
 
   if (!state?.supported) return null;
   const installed = state.installedPath !== null;
   const description = state.shadowedBy
-    ? gt("Another t3 at {path} runs first in a new terminal. Remove it to use R3 Code's.", {
-        path: state.shadowedBy,
-      })
+    ? resolve(
+        msg("Another t3 at {path} runs first in a new terminal. Remove it to use R3 Code's.", {
+          path: state.shadowedBy,
+        }),
+      )
     : !installed
-      ? gt("Run R3 Code's CLI as `t3` from any terminal.")
+      ? resolve(msg("Run R3 Code's CLI as `t3` from any terminal."))
       : state.onPath
-        ? gt("Installed at {path}. Open a new terminal to use it.", { path: state.installedPath })
-        : state.pathSetup?.added
-          ? gt("Installed at {path} and added to PATH in {file}. Open a new terminal to use it.", {
+        ? resolve(
+            msg("Installed at {path}. Open a new terminal to use it.", {
               path: state.installedPath,
-              file: state.pathSetup.file,
-            })
+            }),
+          )
+        : state.pathSetup?.added
+          ? resolve(
+              msg(
+                "Installed at {path} and added to PATH in {file}. Open a new terminal to use it.",
+                { path: state.installedPath, file: state.pathSetup.file },
+              ),
+            )
           : state.pathSetup
-            ? gt("Installed at {path}, which is not on your PATH yet.", {
-                path: state.installedPath,
-              })
-            : gt(
-                "Installed at {path}, which is not on your PATH yet. Add its folder to your PATH to run `t3`.",
-                { path: state.installedPath },
+            ? resolve(
+                msg("Installed at {path}, which is not on your PATH yet.", {
+                  path: state.installedPath,
+                }),
+              )
+            : resolve(
+                msg(
+                  "Installed at {path}, which is not on your PATH yet. Add its folder to your PATH to run `t3`.",
+                  { path: state.installedPath },
+                ),
               );
 
   return (
@@ -99,7 +112,9 @@ export function CliCommandSettingsRow() {
             disabled={busy || (!installed && Boolean(state.shadowedBy))}
             onClick={() => run(installed ? "uninstall" : "install")}
           >
-            {installed ? t("Remove") : t("Install")}
+            {installed
+              ? resolve(msg("Remove", { $context: "verb, uninstalls the t3 command" }))
+              : resolve(msg("Install", { $context: "verb, installs the t3 command" }))}
           </Button>
         </div>
       }

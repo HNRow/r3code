@@ -1,4 +1,5 @@
 import { DownloadIcon } from "lucide-react";
+import { msg, T, useGT, useMessages, Var } from "gt-react";
 import { useSyncExternalStore } from "react";
 import type { RelayClientInstallProgressStage } from "@t3tools/contracts";
 
@@ -19,62 +20,27 @@ import {
   DialogPopup,
   DialogTitle,
 } from "../ui/dialog";
-import { Var, T, useGT, t } from "gt-react";
 const installSteps: ReadonlyArray<{
   readonly stage: RelayClientInstallProgressStage;
   readonly label: string;
 }> = [
-  {
-    stage: "checking",
-    get label() {
-      return t("Checking current installation");
-    },
-  },
-  {
-    stage: "waiting_for_lock",
-    get label() {
-      return t("Waiting for installer");
-    },
-  },
-  {
-    stage: "downloading",
-    get label() {
-      return t("Downloading relay client");
-    },
-  },
-  {
-    stage: "verifying",
-    get label() {
-      return t("Verifying download");
-    },
-  },
-  {
-    stage: "installing",
-    get label() {
-      return t("Installing relay client");
-    },
-  },
-  {
-    stage: "validating",
-    get label() {
-      return t("Validating executable");
-    },
-  },
-  {
-    stage: "activating",
-    get label() {
-      return t("Activating installation");
-    },
-  },
+  { stage: "checking", label: msg("Checking current installation") },
+  { stage: "waiting_for_lock", label: msg("Waiting for installer") },
+  { stage: "downloading", label: msg("Downloading relay client") },
+  { stage: "verifying", label: msg("Verifying download") },
+  { stage: "installing", label: msg("Installing relay client") },
+  { stage: "validating", label: msg("Validating executable") },
+  { stage: "activating", label: msg("Activating installation") },
 ];
 
 export function RelayClientInstallDialog() {
-  const gt = useGT();
   const state = useSyncExternalStore(
     subscribeRelayClientInstallDialog,
     readRelayClientInstallDialogState,
     readRelayClientInstallDialogState,
   );
+  const gt = useGT();
+  const m = useMessages();
   const view = state.status === "closing" ? state.view : state;
   const isConfirming = view.status === "confirming";
   const isInstalling = view.status === "installing";
@@ -103,13 +69,13 @@ export function RelayClientInstallDialog() {
             <DownloadIcon aria-hidden className="size-4.5 text-muted-foreground" />
           </div>
           <DialogTitle>
-            {isInstalling ? t("Installing relay client") : t("Install relay client?")}
+            {isInstalling ? gt("Installing relay client") : gt("Install relay client?")}
           </DialogTitle>
           <DialogDescription>
             {isInstalling
-              ? t("R3 Code is preparing this environment for secure access through R3 Connect.")
-              : t(
-                  "R3 Code needs the relay client to make this environment available through R3 Connect.",
+              ? gt("R3 Code is preparing this environment for secure access through T3 Connect.")
+              : gt(
+                  "R3 Code needs the relay client to make this environment available through T3 Connect.",
                 )}
           </DialogDescription>
         </DialogHeader>
@@ -118,12 +84,13 @@ export function RelayClientInstallDialog() {
             <div className="space-y-2.5">
               <div className="flex items-center justify-between gap-3 text-sm">
                 <p aria-live="polite" className="font-medium text-foreground">
-                  {activeStep?.label}
+                  {activeStep ? m(activeStep.label) : null}
                 </p>
                 <p className="shrink-0 tabular-nums text-muted-foreground">
-                  <T>
-                    <Var>{activeStepIndex + 1}</Var> of <Var>{installSteps.length}</Var>
-                  </T>
+                  {gt("{step} of {total}", {
+                    step: activeStepIndex + 1,
+                    total: installSteps.length,
+                  })}
                 </p>
               </div>
               <progress
@@ -143,7 +110,7 @@ export function RelayClientInstallDialog() {
               </p>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                 <T>
-                  R3 Code will download and install version<Var> </Var>
+                  R3 Code will download and install version{" "}
                   <Var>{view.status === "confirming" ? view.version : ""}</Var> locally.
                 </T>
               </p>

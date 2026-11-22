@@ -1,5 +1,6 @@
 import { useAtomValue } from "@effect/atom-react";
 import type { EnvironmentId, ProviderInstanceId } from "@t3tools/contracts";
+import { T, useGT, useMessages } from "gt-react";
 
 import { useEnvironmentQuery } from "../../state/query";
 import { EMPTY_SERVER_PROVIDERS, serverEnvironment } from "../../state/server";
@@ -8,7 +9,7 @@ import { WizardFooter, WizardPanel } from "../ui/wizard";
 import { ProviderAuthenticationSection } from "./ProviderAuthenticationSection";
 import { SettingsGroup } from "./SettingsGroup";
 import { SettingsRow } from "./settingsLayout";
-import { useGT, T, t } from "gt-react";
+import { t } from "gt-react";
 
 export function ProviderWizardAuthenticationStep({
   environmentId,
@@ -27,6 +28,7 @@ export function ProviderWizardAuthenticationStep({
   const provider = providers.find((candidate) => candidate.instanceId === instanceId);
   const query = useEnvironmentQuery(
     serverEnvironment.providerAuthState({ environmentId, input: { instanceId } }),
+    useMessages(),
   );
   const auth = query.data;
   const active =
@@ -61,10 +63,10 @@ export function ProviderWizardAuthenticationStep({
               title={gt("Account")}
               description={
                 isDiscovering
-                  ? t("Discovering sign-in methods…")
+                  ? gt("Discovering sign-in methods…")
                   : (query.error ??
                     auth?.message ??
-                    "No in-app sign-in advertised. Follow the provider's docs to finish setup.")
+                    gt("No in-app sign-in advertised. Follow the provider's docs to finish setup."))
               }
               control={
                 isDiscovering ? (
@@ -94,7 +96,7 @@ export function ProviderWizardAuthenticationStep({
           disabled={active}
           onClick={onFinish}
         >
-          {signedIn ? t("Done") : t("Skip for now")}
+          {signedIn ? gt("Done") : gt("Skip for now")}
         </Button>
       </WizardFooter>
     </>

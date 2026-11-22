@@ -1,9 +1,9 @@
 /* oxlint-disable react/no-array-index-key -- Captured table cells have stable positions and may contain identical values. */
+import { useGT } from "gt-react-native";
 import { ScrollView, View } from "react-native";
 import type { parseDelimitedPreview } from "@t3tools/shared/delimitedPreview";
 import { AppText as Text } from "../../components/ui/AppText";
 import { FilePreviewNotice } from "./FilePreviewFeedback";
-import { useGT } from "gt-react-native";
 
 export function DelimitedFilePreview(props: {
   readonly table: ReturnType<typeof parseDelimitedPreview>;

@@ -1,3 +1,5 @@
+import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
+import { m } from "~/i18n/messages";
 import { useScopedSettingsWriteAllowed } from "./useScopedSettings";
 import { AuthSettingsWriteScope } from "@t3tools/contracts";
 import { EnvironmentId, type T3ProjectFileScript } from "@t3tools/contracts";
@@ -7,6 +9,7 @@ import {
 } from "@t3tools/client-runtime/state/runtime";
 import { DEFAULT_RESOLVED_KEYBINDINGS } from "@t3tools/shared/keybindings";
 import { ChevronDownIcon, PlusIcon } from "lucide-react";
+import { T, useGT } from "gt-react";
 import { useState } from "react";
 import { useT3ProjectFileState } from "../../hooks/useT3ProjectFileScripts";
 import { useEnvironments } from "../../state/environments";
@@ -32,7 +35,6 @@ import { ProjectActionsList } from "./ProjectActionsList";
 import { useProjectScriptSettings } from "./useProjectScriptSettings";
 import { SettingsRow, SettingsSection } from "./settingsLayout";
 import { useSettingsScope } from "./SettingsScopeContext";
-import { useGT, T } from "gt-react";
 
 export function ProjectActionsSettings() {
   const gt = useGT();
@@ -104,7 +106,10 @@ export function ProjectActionsSettings() {
       setRequest({
         scriptId: null,
         initial: payload,
-        error: error instanceof Error ? error.message : "Failed to import action.",
+        error:
+          error instanceof Error
+            ? (thrownErrorMessage(error, m) ?? error.message)
+            : gt("Failed to import action."),
       });
     }
   };
@@ -135,10 +140,8 @@ export function ProjectActionsSettings() {
                     />
                   }
                 >
-                  <T>
-                    Import scripts
-                    <ChevronDownIcon className="size-3.5" />
-                  </T>
+                  <T>Import scripts</T>
+                  <ChevronDownIcon className="size-3.5" />
                 </MenuTrigger>
                 <MenuPopup align="end">
                   <MenuGroup>
@@ -173,10 +176,8 @@ export function ProjectActionsSettings() {
               disabled={saving || !canWriteSettings || targets.length === 0}
               onClick={() => setRequest({ scriptId: null, initial: EMPTY_PROJECT_SCRIPT_INPUT })}
             >
-              <T>
-                <PlusIcon className="size-3.5" />
-                Add action
-              </T>
+              <PlusIcon className="size-3.5" />
+              <T>Add action</T>
             </Button>
           </div>
         }

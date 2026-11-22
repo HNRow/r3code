@@ -1,4 +1,5 @@
 import type { EnvironmentId, PullRequestRef, PullRequestReviewGuideStop } from "@t3tools/contracts";
+import { msg, T, useGT, useMessages } from "gt-react";
 import { ScrollTextIcon, TriangleAlertIcon } from "lucide-react";
 import { useEffect, useEffectEvent } from "react";
 
@@ -18,7 +19,7 @@ import {
   usePullRequestReviewStore,
 } from "./pullRequestReviewStore";
 import type { PullRequestCompletionScope } from "./PullRequestMarkdownTextarea";
-import { T, t } from "gt-react";
+import { t } from "gt-react";
 
 export function PullRequestGuideTab({
   environmentId,
@@ -51,6 +52,8 @@ export function PullRequestGuideTab({
   onOpenFile: (path: string) => void;
   onTourShown?: (() => void) | undefined;
 }) {
+  const gt = useGT();
+  const resolve = useMessages();
   const { query, data, running, canWrite, write } = useReviewGuideWriter({
     environmentId,
     reference,
@@ -96,40 +99,48 @@ export function PullRequestGuideTab({
     canWrite ? (
       <Button size={size} variant="outline" disabled={running} onClick={() => void write()}>
         {running ? <Spinner /> : <ScrollTextIcon aria-hidden className="size-3.5" />}
-        {running ? t("Reading the change...") : label}
+        {running ? gt("Reading the change...") : label}
       </Button>
     ) : null;
 
   if (guide === null) {
     if (query.isPending && data === null) {
       return (
-        <div className="flex min-h-48 items-center justify-center">
+        <div
+          tabIndex={-1}
+          data-workspace-focus-default
+          className="flex min-h-48 items-center justify-center outline-none"
+        >
           <Spinner />
         </div>
       );
     }
     return (
-      <div className="scrollbar-gutter-both flex h-full flex-col items-center justify-center-safe gap-2 overflow-y-auto px-4 py-10 text-center">
+      <div
+        tabIndex={-1}
+        data-workspace-focus-default
+        className="scrollbar-gutter-both flex h-full flex-col items-center justify-center-safe gap-2 overflow-y-auto px-4 py-10 text-center outline-none"
+      >
         <p className="text-sm font-medium text-foreground">
           {running
-            ? t("Writing a review guide")
+            ? gt("Writing a review guide")
             : failure === null
-              ? t("No review guide yet")
-              : t("Could not write a review guide")}
+              ? gt("No review guide yet")
+              : gt("Could not write a review guide")}
         </p>
         <p className="max-w-md text-xs text-muted-foreground">
           {running
-            ? t(
+            ? gt(
                 "An agent is reading the change. A large one takes a few minutes. You can leave; you will be told when it is ready.",
               )
             : failure === null
               ? (query.error ??
-                t(
+                gt(
                   "A guide is a tour of the change: stops through the code in reading order, with the calls only a maintainer can make.",
                 ))
-              : FAILURE_HINT}
+              : resolve(FAILURE_HINT)}
         </p>
-        {writeButton(failure === null ? "Write guide" : "Try again", "sm")}
+        {writeButton(failure === null ? gt("Write guide") : gt("Try again"), "sm")}
         {failure === null || running ? null : <FailureDetails detail={failure} />}
       </div>
     );
@@ -141,17 +152,21 @@ export function PullRequestGuideTab({
         {running ? <Spinner /> : <TriangleAlertIcon />}
         <AlertDescription>
           {running ? (
-            t("Rewriting this guide. You will be told when the new one is ready.")
+            gt("Rewriting this guide. You will be told when the new one is ready.")
           ) : failure === null ? (
-            t("Written before the latest push.")
+            gt("Written before the latest push.")
           ) : (
             <>
-              {t`Could not rewrite this guide. ${FAILURE_HINT}`}
+              {gt(
+                "Could not rewrite this guide. Check the review guide model in Settings → Source control.",
+              )}
               <FailureDetails detail={failure} />
             </>
           )}
         </AlertDescription>
-        {!running && canWrite ? <AlertAction>{writeButton("Rewrite", "xs")}</AlertAction> : null}
+        {!running && canWrite ? (
+          <AlertAction>{writeButton(gt("Rewrite"), "xs")}</AlertAction>
+        ) : null}
       </Alert>
     ) : null;
 
@@ -179,7 +194,7 @@ export function PullRequestGuideTab({
   );
 }
 
-const FAILURE_HINT = "Check the review guide model in Settings → Source control & issues.";
+const FAILURE_HINT = msg("Check the review guide model in Settings → Source control & issues.");
 
 function FailureDetails({ detail }: { detail: string }) {
   return (

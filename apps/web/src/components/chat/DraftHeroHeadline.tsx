@@ -3,6 +3,7 @@ import { composerDraftHasUserContent, useComposerDraftStore } from "~/composerDr
 import { resolveEnvironmentMachineKind, type ScopedProjectRef } from "@t3tools/contracts";
 import { scopedProjectKey, scopeProjectRef } from "@t3tools/client-runtime/environment";
 import { isScratchProject } from "@t3tools/client-runtime/state/projects";
+import { T, useGT, Var } from "gt-react";
 import { FolderPlusIcon } from "lucide-react";
 import { useAtomValue } from "@effect/atom-react";
 import { useRef, useState } from "react";
@@ -47,7 +48,7 @@ import { InlineButton } from "../ui/button";
 import { DraftProjectName } from "./DraftProjectName";
 import { DraftHeroProjectHeading } from "./DraftHeroProjectHeading";
 import { TriageDraftHero } from "./TriageDraftHero";
-import { useGT, T, Var, t } from "gt-react";
+import { t } from "gt-react";
 
 const ADD_PROJECT_VALUE = "add-project";
 
@@ -145,7 +146,7 @@ export function DraftHeroHeadline({
   const pickerItems: readonly PickerItem[] = useOrderWhileOpen(
     [
       ...menuEntries.map(({ group }) => ({ value: group.projectKey, label: group.displayName })),
-      { value: ADD_PROJECT_VALUE, label: t("Add project") },
+      { value: ADD_PROJECT_VALUE, label: gt("Add project") },
     ],
     (item) => item.value,
     pickerOpen,
@@ -243,7 +244,9 @@ export function DraftHeroHeadline({
           }
         >
           <DraftProjectName
-            value={isScratchDraft ? "No project" : (activeProjectTitle ?? "Choose a project")}
+            value={
+              isScratchDraft ? gt("No project") : (activeProjectTitle ?? gt("Choose a project"))
+            }
             singleLine
           />
         </TooltipTrigger>
@@ -314,7 +317,7 @@ export function DraftHeroHeadline({
       onClick={openAddProject}
       className="pointer-events-auto inline min-w-0 max-w-full cursor-pointer border-muted-foreground/35 border-b border-dotted text-muted-foreground/60 transition-colors hover:border-muted-foreground/60 hover:text-muted-foreground/80 focus-visible:rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
     >
-      <DraftProjectName value={activeProjectTitle ?? "Add a project"} singleLine />
+      <DraftProjectName value={activeProjectTitle ?? gt("Add a project")} singleLine />
     </button>
   );
 
@@ -358,25 +361,19 @@ export function DraftHeroHeadline({
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col items-center">
       {hasResolvedProject && !isScratchDraft ? (
-        <DraftHeroProjectHeading projectName={activeProjectTitle ?? "Choose a project"}>
+        <DraftHeroProjectHeading projectName={activeProjectTitle ?? gt("Choose a project")}>
           {projectSelector}
         </DraftHeroProjectHeading>
       ) : (
         <h1 className="w-full text-center font-normal text-2xl text-foreground tracking-tight sm:text-3xl">
           {isScratchDraft ? (
-            <>
-              <T>What should we work on?</T>
-            </>
+            <T>What should we work on?</T>
           ) : canChooseProject ? (
-            <>
-              <T>
-                <Var>{projectSelector}</Var> to start
-              </T>
-            </>
+            <T>
+              <Var>{projectSelector}</Var> to start
+            </T>
           ) : (
-            <>
-              <T>Add a project to start</T>
-            </>
+            <T>Add a project to start</T>
           )}
         </h1>
       )}

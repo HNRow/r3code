@@ -1,3 +1,4 @@
+import { T } from "gt-react";
 import { useState } from "react";
 
 import {
@@ -12,7 +13,7 @@ import {
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Spinner } from "../ui/spinner";
-import { T, Var } from "gt-react";
+import { Var } from "gt-react";
 
 export interface ConnectDeviceRevokeRequest {
   readonly title: string;
@@ -82,7 +83,7 @@ function RevokeConnectDeviceDialogPopup({
         <AlertDialogTitle>{request.title}</AlertDialogTitle>
         <AlertDialogDescription>
           <T>
-            Approval for new devices is off, so a revoked device signed in to your R3 Connect
+            Approval for new devices is off, so a revoked device signed in to your T3 Connect
             account can connect again on its own.
           </T>
         </AlertDialogDescription>
@@ -108,10 +109,8 @@ function RevokeConnectDeviceDialogPopup({
           <T>Cancel</T>
         </AlertDialogClose>
         <Button variant="destructive" disabled={busy} onClick={() => void confirm()}>
-          <T>
-            <Var>{busy && <Spinner size="sm" />}</Var>
-            Revoke
-          </T>
+          {busy && <Spinner size="sm" />}
+          <T>Revoke</T>
         </Button>
       </AlertDialogFooter>
     </AlertDialogPopup>

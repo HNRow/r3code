@@ -18,6 +18,7 @@ import type {
   IssueComment,
   IssueDetail,
   IssueEvent,
+  IssueEventReference,
   IssueLabelCandidate,
   IssueLinkedPullRequest,
   IssueListEntry,
@@ -376,12 +377,44 @@ function LinkedPullRequestRow({
   );
 }
 
+/** The sentence for an event, its source shown as a link where the tracker named one. */
+function IssueEventText({
+  event,
+  sentence,
+  onOpen,
+}: {
+  event: IssueEvent;
+  sentence: string;
+  /** Opens the source beside this issue, and says whether it did; if not, the link goes to the host. */
+  onOpen: (source: IssueEventReference) => boolean;
+}) {
+  const source = event.reference;
+  const at = event.detail === null ? -1 : sentence.indexOf(event.detail);
+  if (source === undefined || event.detail === null || at < 0) return <span>{sentence}</span>;
+  return (
+    <span>
+      {sentence.slice(0, at)}
+      <InlineButton
+        tone="muted"
+        render={<a href={source.url} target="_blank" rel="noopener noreferrer" />}
+        onClick={(click) => {
+          if (!click.metaKey && !click.ctrlKey && onOpen(source)) click.preventDefault();
+        }}
+      >
+        {event.detail}
+      </InlineButton>
+      {sentence.slice(at + event.detail.length)}
+    </span>
+  );
+}
+
 export function IssueDetailPanel({
   environmentId,
   reference,
   threadRef = null,
   listEntry = null,
   onSelectPullRequest,
+  onSelectIssue,
 }: {
   environmentId: EnvironmentId;
   reference: IssueRef;
@@ -390,6 +423,8 @@ export function IssueDetailPanel({
   threadRef?: ScopedThreadRef | null;
   /** Opens a linked change request beside this one; absent, the link goes to the host. */
   onSelectPullRequest?: ((reference: PullRequestRef) => void) | undefined;
+  /** Opens a referenced issue beside this one; absent, the link goes to the host. */
+  onSelectIssue?: ((reference: IssueRef & { readonly url: string }) => void) | undefined;
 }) {
   const gt = useGT();
   const messages = useMessages();
@@ -431,7 +466,7 @@ export function IssueDetailPanel({
     ...detail.events.map((e): TimelineItem => ({ kind: "event", at: e.createdAt, event: e })),
   ].sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
 
-  const access = issueWriteAccess(detail, canWrite);
+  const access = issueWriteAccess(detail, canWrite, messages);
   const { blocked } = access;
   const canComment = access.comment;
   const canEdit = access.edit;
@@ -441,6 +476,30 @@ export function IssueDetailPanel({
   const otherStates = access.states;
   const tracker = issueTrackerPresentation(detail.tracker);
   const currentState = issueStatePresentation(detail.state);
+
+  const host = reference.host === undefined ? {} : { host: reference.host };
+  const openEventSource = (source: IssueEventReference) => {
+    if (source.kind === "pull-request") {
+      if (!onSelectPullRequest) return false;
+      onSelectPullRequest({
+        projectId: reference.projectId,
+        ...host,
+        repository: source.repository,
+        number: source.number,
+      });
+      return true;
+    }
+    if (!onSelectIssue) return false;
+    onSelectIssue({
+      projectId: reference.projectId,
+      tracker: reference.tracker,
+      ...host,
+      scope: source.repository,
+      key: String(source.number),
+      url: source.url,
+    });
+    return true;
+  };
 
   const loadOlder = async () => {
     const failure = await pager.loadOlder(registry, (cursor) =>
@@ -650,13 +709,13 @@ export function IssueDetailPanel({
             <PullRequestActorLabel actor={detail.author} />
             <span>
               <T>
-                opened <Var>{formatRelativeTimeLabel(detail.createdAt)}</Var>
+                opened <Var>{formatRelativeTimeLabel(detail.createdAt, undefined, messages)}</Var>
               </T>
             </span>
             {detail.closedAt ? (
               <span>
                 <T>
-                  closed <Var>{formatRelativeTimeLabel(detail.closedAt)}</Var>
+                  closed <Var>{formatRelativeTimeLabel(detail.closedAt, undefined, messages)}</Var>
                 </T>
               </span>
             ) : null}
@@ -869,8 +928,12 @@ export function IssueDetailPanel({
                   className="px-1 text-xs text-muted-foreground"
                 >
                   <PullRequestActorLabel actor={item.event.actor} />
-                  <span>{issueEventSentence(item.event)}</span>
-                  <span>{formatRelativeTimeLabel(item.event.createdAt)}</span>
+                  <IssueEventText
+                    event={item.event}
+                    sentence={issueEventSentence(item.event, messages)}
+                    onOpen={openEventSource}
+                  />
+                  <span>{formatRelativeTimeLabel(item.event.createdAt, undefined, messages)}</span>
                 </PullRequestMetaLine>
               ),
             )}

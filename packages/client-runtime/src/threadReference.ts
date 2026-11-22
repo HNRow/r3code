@@ -7,6 +7,8 @@ import { threadContextRecord } from "@t3tools/shared/composerContextReferences";
 import { hostedThreadLink } from "@t3tools/shared/threadLinks";
 
 import { resolveThreadCurrentPullRequestLink } from "./threadPullRequests.ts";
+import { mFallback, msg } from "gt-i18n";
+import type { MFunctionType } from "gt-i18n/types";
 
 export interface ThreadReferenceCopyTarget {
   readonly kind: "pull-request" | "thread";
@@ -29,7 +31,7 @@ export function threadChipCopyTarget(
   threadRef: ScopedThreadRef,
   title: string,
   hostedAppUrl?: string,
-  _resolve?: unknown,
+  resolve: MFunctionType = mFallback,
 ): ThreadReferenceCopyTarget {
   const record = threadContextRecord(threadRef, title);
   return {
@@ -38,8 +40,8 @@ export function threadChipCopyTarget(
     description: record.title,
     fragment: { version: 1, source: { environmentId: threadRef.environmentId }, records: [record] },
     clipboardTarget: "thread",
-    successTitle: "Thread copied",
-    failureTitle: "Failed to copy thread",
+    successTitle: resolve(msg("Thread copied")),
+    failureTitle: resolve(msg("Failed to copy thread")),
   };
 }
 
@@ -53,7 +55,7 @@ export function resolveThreadReferenceCopyTarget(
     readonly linkedPullRequestUrl?: string | null;
     readonly hostedAppUrl?: string;
   },
-  _resolve?: unknown,
+  resolve: MFunctionType = mFallback,
 ): ThreadReferenceCopyTarget | null {
   if (input.openPanelPullRequestUrl === null) return null;
   const pullRequestUrl =
@@ -66,8 +68,8 @@ export function resolveThreadReferenceCopyTarget(
         value: pullRequestUrl,
         description: pullRequestUrl,
         clipboardTarget: "pull request link",
-        successTitle: "PR link copied",
-        failureTitle: "Failed to copy PR link",
+        successTitle: resolve(msg("PR link copied")),
+        failureTitle: resolve(msg("Failed to copy PR link")),
       }
-    : threadChipCopyTarget(input.threadRef, input.title, input.hostedAppUrl);
+    : threadChipCopyTarget(input.threadRef, input.title, input.hostedAppUrl, resolve);
 }

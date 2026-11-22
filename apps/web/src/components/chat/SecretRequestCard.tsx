@@ -24,6 +24,7 @@ import type {
   SecretProviderId,
 } from "@t3tools/contracts";
 import { useAtomValue } from "@effect/atom-react";
+import { hasFeatureFlag } from "@t3tools/client-runtime/state/server";
 import { T, useGT, useMessages, Var } from "gt-react";
 import {
   CheckIcon,
@@ -36,7 +37,6 @@ import {
 } from "lucide-react";
 import { useId, useRef, useState, type FormEvent } from "react";
 
-import { isSecretsFeatureEnabled } from "../../env";
 import { serverEnvironment } from "../../state/server";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { Button } from "../ui/button";
@@ -51,7 +51,8 @@ export function SecretRequestCard(props: {
   readonly visibility: OrchestrationV2ProjectedTurnItem["visibility"];
 }) {
   const { item } = props;
-  const display = secretRequestDisplay(item, props.visibility);
+  const messages = useMessages();
+  const display = secretRequestDisplay(item, props.visibility, messages);
   if (display.kind === "answered" || display.kind === "pending-elsewhere") {
     const Icon =
       display.kind === "pending-elsewhere"
@@ -78,8 +79,9 @@ const NO_SOURCES: ReadonlyArray<SecretRequestSource> = [];
 
 function useSecretRequestSources(environmentId: EnvironmentId) {
   const config = useAtomValue(serverEnvironment.configValueAtom(environmentId));
-  return isSecretsFeatureEnabled
-    ? secretRequestSources(config, config?.settings.secretProviders ?? {})
+  const messages = useMessages();
+  return hasFeatureFlag(config, "secretProviders")
+    ? secretRequestSources(config, config?.settings.secretProviders ?? {}, messages)
     : NO_SOURCES;
 }
 
@@ -138,7 +140,11 @@ function PendingSecretRequestForm(props: {
     }
     setValues(typed);
     if (!isAtomCommandInterrupted(result)) {
-      pipe(squashAtomCommandFailure(result), secretRequestFailureMessage, setError);
+      pipe(
+        squashAtomCommandFailure(result),
+        (failure) => secretRequestFailureMessage(failure, messages),
+        setError,
+      );
     }
   };
 
@@ -212,8 +218,8 @@ function PendingSecretRequestForm(props: {
           >
             <T>
               Open <Var>{link.host}</Var>
-              <ExternalLinkIcon aria-hidden />
             </T>
+            <ExternalLinkIcon aria-hidden />
           </Button>
           {/* A link found in the reason is already shown there. */}
           {item.url !== undefined ? (
@@ -274,7 +280,7 @@ function PendingSecretRequestForm(props: {
           className="flex min-w-0 grow basis-52 items-center gap-1.5 text-xs text-muted-foreground"
         >
           <ShieldCheckIcon className="size-3.5 shrink-0" aria-hidden />
-          {secretRequestPrivacyNote(item)}
+          {secretRequestPrivacyNote(item, messages)}
         </p>
         <div className="ms-auto flex shrink-0 items-center gap-2">
           <Button

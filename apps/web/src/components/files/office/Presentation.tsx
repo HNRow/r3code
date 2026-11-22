@@ -1,4 +1,5 @@
 /* oxlint-disable react/no-unstable-nested-components -- These callbacks return overlays, and are invoked as render functions. */
+import { msg, T, useGT } from "gt-react";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import {
@@ -10,7 +11,7 @@ import { OfficePages, type PaintPage } from "./OfficePages";
 import { createWorkerClient } from "./worker-rpc";
 import type { SlideMethods, SlideSummary } from "./slide-protocol";
 import { rasterize } from "./vector-pictures";
-import { useGT, Var, T } from "gt-react";
+import { m } from "~/i18n/messages";
 
 type Opened = { slides: readonly SlideSummary[]; paint: PaintPage };
 export default function Presentation(props: {
@@ -18,8 +19,8 @@ export default function Presentation(props: {
   onDetails: (text: string) => void;
   onError: (cause: unknown) => void;
 }) {
-  const gt = useGT();
   const { onError, bytes: source, onDetails } = props;
+  const gt = useGT();
   const [opened, setOpened] = useState<Opened>();
   const [page, setPage] = useState(0);
   const [failed, setFailed] = useState<Record<number, boolean>>({});
@@ -57,7 +58,7 @@ export default function Presentation(props: {
       const context = canvas.getContext("bitmaprenderer");
       if (!context) {
         result.bitmap.close();
-        throw new Error("This browser cannot draw slides.");
+        throw new Error(m(msg("This browser cannot draw slides.")));
       }
       canvas.width = result.bitmap.width;
       canvas.height = result.bitmap.height;
@@ -79,9 +80,15 @@ export default function Presentation(props: {
       .call("open", { bytes }, { transfer: [bytes], signal: controller.signal })
       .then((slides) => {
         if (slides.length === 0 || slides.length > 500)
-          throw new Error("Preview limited to presentations with 1 to 500 slides.");
+          throw new Error(m(msg("Preview limited to presentations with 1 to 500 slides.")));
         setOpened({ slides, paint });
-        onDetails(`${slides.length} slide${slides.length === 1 ? "" : "s"}`);
+        onDetails(
+          m(
+            msg("{count, plural, one {{count} slide} other {{count} slides}}", {
+              count: slides.length,
+            }),
+          ),
+        );
       })
       .catch(fail);
     return () => {
@@ -105,9 +112,10 @@ export default function Presentation(props: {
           <ChevronLeftIcon className="size-3.5" />
         </FileSurfaceAction>
         <span className="flex-1 text-center text-xs tabular-nums" aria-live="polite">
-          <T>
-            Slide <Var>{page + 1}</Var> of <Var>{opened.slides.length}</Var>
-          </T>
+          {gt("Slide {page} of {count}", {
+            page: String(page + 1),
+            count: String(opened.slides.length),
+          })}
         </span>
         <FileSurfaceAction
           label={gt("Next slide")}
@@ -120,7 +128,7 @@ export default function Presentation(props: {
       <OfficePages
         pages={opened.slides}
         paint={opened.paint}
-        label={gt("Slide")}
+        kind="slide"
         scrollRef={scroll}
         onPageChange={setPage}
         onError={onError}

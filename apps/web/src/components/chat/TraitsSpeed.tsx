@@ -1,6 +1,8 @@
 import type { ProviderDriverKind, ProviderOptionDescriptor } from "@t3tools/contracts";
 import { getProviderOptionCurrentValue } from "@t3tools/shared/model";
+import { msg, T } from "gt-react";
 import { ZapIcon } from "lucide-react";
+import { m, type MessageResolver } from "~/i18n/messages";
 import { UltrafastIcon } from "../Icons";
 import { cn } from "~/lib/utils";
 import { ComposerControlIcon, type ComposerControlSize } from "./ComposerControl";
@@ -8,10 +10,14 @@ import { t } from "gt-react";
 
 export function getTraitsSpeedDisplay(
   descriptor: ProviderOptionDescriptor,
+  resolve: MessageResolver = m,
 ): { label: string; speedIcon: "fast" | "ultrafast" | null } | null {
   if (descriptor.id === "fastMode" && descriptor.type === "boolean") {
     return {
-      label: descriptor.currentValue === true ? "Fast" : "Normal",
+      label:
+        descriptor.currentValue === true
+          ? resolve(msg("Fast", { $context: "model speed" }))
+          : resolve(msg("Normal", { $context: "model speed" })),
       speedIcon: descriptor.currentValue === true ? "fast" : null,
     };
   }
@@ -27,7 +33,9 @@ export function getTraitsSpeedDisplay(
     (ultrafastTier && currentValue === ultrafastTier.id)
   ) {
     return {
-      label: descriptor.options.find(({ id }) => id === currentValue)?.label ?? "Normal",
+      label:
+        descriptor.options.find(({ id }) => id === currentValue)?.label ??
+        resolve(msg("Normal", { $context: "model speed" })),
       speedIcon:
         ultrafastTier && currentValue === ultrafastTier.id
           ? "ultrafast"
@@ -63,7 +71,7 @@ export function TraitsSpeedIcon({
         )}
       />
       <span className="sr-only">
-        {speedIcon === "ultrafast" ? t("Ultrafast mode on") : t("Fast mode on")}
+        {speedIcon === "ultrafast" ? <T>Ultrafast mode on</T> : <T>Fast mode on</T>}
       </span>
     </>
   );

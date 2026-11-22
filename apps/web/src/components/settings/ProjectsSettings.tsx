@@ -1,4 +1,5 @@
 import { EnvironmentId } from "@t3tools/contracts";
+import { T, useGT } from "gt-react";
 import { LayersIcon } from "lucide-react";
 
 import { Button } from "../ui/button";
@@ -7,7 +8,6 @@ import { useSettingsScope } from "./SettingsScopeContext";
 import { SettingsScopeNotice } from "./SettingsScopeNotice";
 import { SettingsPageContainer } from "./settingsLayout";
 import { ALL_ENVIRONMENTS_VALUE, selectEnvironmentAxis } from "./settingsScopeAxis";
-import { T, useGT } from "gt-react";
 
 export function ProjectsSettings() {
   const gt = useGT();
@@ -23,10 +23,8 @@ export function ProjectsSettings() {
               size="xs"
               onClick={() => selectScope(selectEnvironmentAxis(value, ALL_ENVIRONMENTS_VALUE))}
             >
-              <T>
-                <LayersIcon />
-                Show all environments
-              </T>
+              <LayersIcon />
+              <T>Show all environments</T>
             </Button>
           ) : null}
         </div>

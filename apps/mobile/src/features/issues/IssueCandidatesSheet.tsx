@@ -1,4 +1,5 @@
 import { LegendList } from "@legendapp/list/react-native";
+import { useGT } from "gt-react-native";
 import type { ReactNode } from "react";
 import { Platform, View } from "react-native";
 
@@ -9,7 +10,7 @@ import { EmptyState } from "../../components/ui/EmptyState";
 import { SelectionRow } from "../../components/ui/SelectionRow";
 import { NativeScrollView } from "../../native/NativeScrollViewMarker";
 import { PullRequestSearchSheet } from "../pull-requests/PullRequestSearchSheet";
-import { useGT, Var, T } from "gt-react-native";
+import { Var, T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 interface Candidate {
@@ -36,12 +37,13 @@ export function IssueCandidatesSheet(props: {
   readonly onToggle: (key: string) => void;
 }) {
   const gt = useGT();
+  const labels = props.noun === "labels";
   const searching = props.query.trim().length > 0;
   return (
     <PullRequestSearchSheet
       title={props.title}
-      placeholder={t`Search ${props.noun}`}
-      closeAccessibilityLabel={`Close ${props.title.toLowerCase()}`}
+      placeholder={labels ? gt("Search labels") : gt("Search people")}
+      closeAccessibilityLabel={gt("Close {title}", { title: props.title.toLowerCase() })}
       clearAccessibilityLabel={gt("Clear search")}
       query={props.query}
       onQueryChange={props.onQueryChange}
@@ -92,16 +94,22 @@ export function IssueCandidatesSheet(props: {
                 <EmptyState
                   title={
                     props.loadError
-                      ? `Couldn't load ${props.noun}`
+                      ? labels
+                        ? gt("Couldn't load labels")
+                        : gt("Couldn't load people")
                       : searching
-                        ? `No matching ${props.noun}`
-                        : props.noun === "labels"
-                          ? "This tracker has no labels"
-                          : "Nobody can be assigned here"
+                        ? labels
+                          ? gt("No matching labels")
+                          : gt("No matching people")
+                        : labels
+                          ? gt("This tracker has no labels")
+                          : gt("Nobody can be assigned here")
                   }
                   detail={
                     props.loadError ??
-                    (searching ? "Try another name." : "Add them on the tracker to use them here.")
+                    (searching
+                      ? gt("Try another name.")
+                      : gt("Add them on the tracker to use them here."))
                   }
                   variant="plain"
                 />
@@ -112,9 +120,9 @@ export function IssueCandidatesSheet(props: {
           ListFooterComponent={
             props.truncated ? (
               <Text className="py-4 text-xs text-foreground-muted">
-                <T>
-                  More <Var>{props.noun}</Var> exist than are listed here.
-                </T>
+                {labels
+                  ? gt("More labels exist than are listed here.")
+                  : gt("More people exist than are listed here.")}
               </Text>
             ) : undefined
           }

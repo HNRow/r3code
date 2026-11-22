@@ -1,3 +1,5 @@
+import { msg } from "gt-react";
+import { m } from "~/i18n/messages";
 import type { ChatComposerProps } from "./ChatComposer";
 import {
   type ChatFileAttachment,
@@ -19,8 +21,6 @@ import {
   composerTargetKey,
   useComposerDraftStore,
 } from "../../composerDraftStore";
-import { m } from "../../i18n/messages";
-import { msg } from "gt-react";
 import { type ComposerPromptEditorHandle } from "../ComposerPromptEditorTiptap";
 import type { PendingUserInputProgress } from "../../pendingUserInput";
 import type { ComposerAttachmentInsertion } from "../composerAttachmentInsertion";
@@ -57,6 +57,7 @@ import {
   addPreparingComposerImages,
   getPreparingComposerImages,
   isPreparingComposerImage,
+  joinPreparedImagesToDraft,
   movedPreparingImageThread,
   removePreparingComposerImages,
 } from "./preparingComposerImages";
@@ -140,7 +141,7 @@ export function useComposerAttachmentIntake(input: {
     ) {
       toastManager.add({
         type: "error",
-        title: t("This question cannot accept attachments."),
+        title: m(msg("This question cannot accept attachments.")),
       });
       return false;
     }
@@ -187,26 +188,35 @@ export function useComposerAttachmentIntake(input: {
         replacedReattachMarkerIds.add(matchingReattachMarker.id);
       }
       if (!matchingReattachMarker && reservedCount >= PROVIDER_SEND_TURN_MAX_ATTACHMENTS) {
-        error = `You can attach up to ${PROVIDER_SEND_TURN_MAX_ATTACHMENTS} files per message.`;
+        error = m(
+          msg("You can attach up to {max} files per message.", {
+            max: PROVIDER_SEND_TURN_MAX_ATTACHMENTS,
+          }),
+        );
         continue;
       }
       if (attachmentKind === "unsupported-image") {
-        error = `'${file.name}' is not a supported image type. Attach GIF, HEIC, HEIF, JPEG, PNG, or WebP images.`;
+        error = m(
+          msg(
+            "''{name}'' is not a supported image type. Attach GIF, HEIC, HEIF, JPEG, PNG, or WebP images.",
+            { name: file.name },
+          ),
+        );
         continue;
       }
       if (attachmentKind === "image") {
         acceptedImages.push(normalizeComposerImageFileMimeType(file));
       } else {
         if (fileStagingLimit === null) {
-          error = "This server does not support file attachments.";
+          error = m(msg("This server does not support file attachments."));
           continue;
         }
         if (file.size <= 0) {
-          error = `'${file.name}' is empty or could not be read.`;
+          error = m(msg("''{name}'' is empty or could not be read.", { name: file.name }));
           continue;
         }
         if (file.size > fileStagingLimit) {
-          error = fileAttachmentTooLargeMessage(file.name, fileStagingLimit);
+          error = fileAttachmentTooLargeMessage(file.name, fileStagingLimit, m);
           continue;
         }
         const attachmentFile =
@@ -242,10 +252,13 @@ export function useComposerAttachmentIntake(input: {
         const attached = storedFiles[0]!;
         toastManager.add({
           type: "info",
-          title: t`Large paste attached as ${attached.name}`,
-          description: t`${formatAttachmentSize(attached.sizeBytes)} · Use ${
-            isMacPlatform(navigator.platform) ? "⌘⇧V" : "Ctrl+Shift+V"
-          } to keep a large paste inline.`,
+          title: m(msg("Large paste attached as {name}", { name: attached.name })),
+          description: m(
+            msg("{size} · Use {shortcut} to keep a large paste inline.", {
+              size: formatAttachmentSize(attached.sizeBytes, m),
+              shortcut: isMacPlatform(navigator.platform) ? "⌘⇧V" : "Ctrl+Shift+V",
+            }),
+          ),
           data: { hideCopyButton: true },
         });
       }
@@ -297,8 +310,12 @@ export function useComposerAttachmentIntake(input: {
         compressionErrors.set(
           id,
           result.reason === "unreadable"
-            ? `'${file.name}' could not be read as an image.`
-            : `'${file.name}' is too large to attach, even after compression.`,
+            ? m(msg("''{name}'' could not be read as an image.", { name: file.name }))
+            : m(
+                msg("''{name}'' is too large to attach, even after compression.", {
+                  name: file.name,
+                }),
+              ),
         );
         continue;
       }
@@ -323,16 +340,19 @@ export function useComposerAttachmentIntake(input: {
       }));
     const unrestoredImageNames: string[] = [];
     const draftStore = useComposerDraftStore.getState();
-    const storedImageIds = new Set(
-      movedThread
-        ? draftStore.addImages(movedThread, nextImages, {
-            onCapacityExceeded: (image) => unrestoredImageNames.push(image.name),
-          })
-        : nextImages.length === 1 && nextImages[0]
-          ? addComposerImage(nextImages[0])
-          : nextImages.length > 1
-            ? addComposerImagesToDraft(nextImages)
-            : [],
+    const storedImageIds = joinPreparedImagesToDraft(
+      () =>
+        new Set(
+          movedThread
+            ? draftStore.addImages(movedThread, nextImages, {
+                onCapacityExceeded: (image) => unrestoredImageNames.push(image.name),
+              })
+            : nextImages.length === 1 && nextImages[0]
+              ? addComposerImage(nextImages[0])
+              : nextImages.length > 1
+                ? addComposerImagesToDraft(nextImages)
+                : [],
+        ),
     );
     // Keep the placeholders until the draft decides whether the recovered images fit,
     // so a held send can be cancelled before the last placeholder disappears.
@@ -350,10 +370,12 @@ export function useComposerAttachmentIntake(input: {
     }
     if (storedImages.length > 0 && imageAttachmentsGetChips && !movedThread) {
       insertedAny =
-        insertAttachmentReferences(
-          storedImages.map(imageContextReference),
-          undefined,
-          pendingInsertion,
+        joinPreparedImagesToDraft(() =>
+          insertAttachmentReferences(
+            storedImages.map(imageContextReference),
+            undefined,
+            pendingInsertion,
+          ),
         ) || insertedAny;
     }
     // Only failures are reported here. Success must not pass `null`: by
@@ -404,7 +426,18 @@ export function useComposerAttachmentIntake(input: {
       return;
     }
     const confirmation = requestConfirmDialog(
-      `Remove ${image?.name ?? "this image"} from the message?\nIt is referenced in your text; removing it also removes every reference.`,
+      image?.name != null
+        ? m(
+            msg(
+              "Remove {name} from the message?\nIt is referenced in your text; removing it also removes every reference.",
+              { name: image.name },
+            ),
+          )
+        : m(
+            msg(
+              "Remove this image from the message?\nIt is referenced in your text; removing it also removes every reference.",
+            ),
+          ),
       { variant: "destructive" },
     );
     if (!confirmation) {
@@ -457,8 +490,8 @@ export function useComposerAttachmentIntake(input: {
       }
       toastManager.add({
         type: "error",
-        title: t("Pasted text is too large for this message"),
-        description: t("Remove some text or an attachment, then paste again."),
+        title: m(msg("Pasted text is too large for this message")),
+        description: m(msg("Remove some text or an attachment, then paste again.")),
         data: { hideCopyButton: true },
       });
       return true;
@@ -479,8 +512,8 @@ export function useComposerAttachmentIntake(input: {
       if (!wouldExceedInputLimit) return false;
       toastManager.add({
         type: "error",
-        title: t("Pasted text is too large to attach"),
-        description: t("Reduce the clipboard contents or save a smaller excerpt as a file."),
+        title: m(msg("Pasted text is too large to attach")),
+        description: m(msg("Reduce the clipboard contents or save a smaller excerpt as a file.")),
         data: { hideCopyButton: true },
       });
       return true;

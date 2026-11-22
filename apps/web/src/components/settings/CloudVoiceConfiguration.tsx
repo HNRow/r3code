@@ -1,5 +1,7 @@
 import { useAtomRefresh, useAtomValue } from "@effect/atom-react";
+import { cloudSpeechDisclosure } from "@t3tools/shared/speechCopy";
 import type { PreparedConnection } from "@t3tools/client-runtime/connection";
+import { hasFeatureFlag } from "@t3tools/client-runtime/state/server";
 import {
   configuredSecretSources,
   secretRequestReference,
@@ -29,7 +31,7 @@ import * as Schema from "effect/Schema";
 import type { HttpClient } from "effect/http";
 import { Atom, AsyncResult } from "effect/reactivity";
 import { useId, useState } from "react";
-import { isSecretsFeatureEnabled } from "../../env";
+import { T, useGT, useMessages, Var } from "gt-react";
 import {
   inEnvironmentSpeechRuntime,
   runEnvironmentSpeech,
@@ -64,7 +66,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { SecretInput } from "./SecretInput";
 import { SecretSourceSelect } from "./SecretSourceInput";
-import { useGT, T, Var, t } from "gt-react";
+import { t } from "gt-react";
 
 // Per dialog instance, not an Atom.family: key presence must be read fresh each time it opens.
 function useCloudRead<A, E>(
@@ -166,6 +168,7 @@ export function CloudVoiceConfiguration({
   close: () => void;
 }) {
   const gt = useGT();
+  const messages = useMessages();
   const id = environment.environmentId;
   const name = CLOUD_SPEECH_LABELS[provider];
   const company = CLOUD_SPEECH_PROVIDER_NAMES[provider];
@@ -192,8 +195,9 @@ export function CloudVoiceConfiguration({
   const saved = AsyncResult.isSuccess(presence) ? presence.value?.[provider] : undefined;
   const existing = environment.serverConfig?.settings?.cloudSpeechCredentials?.[provider];
   const sources =
-    isSecretsFeatureEnabled && environment.serverConfig?.secretReferences
-      ? configuredSecretSources(environment.serverConfig.settings?.secretProviders ?? {})
+    hasFeatureFlag(environment.serverConfig, "secretProviders") &&
+    environment.serverConfig?.secretReferences
+      ? configuredSecretSources(environment.serverConfig.settings?.secretProviders ?? {}, messages)
       : [];
   const reference =
     isSecretReference(existing) && sources.some((s) => s.id === existing.provider)
@@ -242,7 +246,7 @@ export function CloudVoiceConfiguration({
       commit?.();
       close();
     } catch {
-      setError("Couldn’t save this change. Check your connection and try again.");
+      setError(gt("Couldn’t save this change. Check your connection and try again."));
     }
     setBusy(false);
   };
@@ -259,14 +263,14 @@ export function CloudVoiceConfiguration({
   const keyField = (
     <>
       <Label htmlFor="voice-cloud-key">
-        {routed && saved ? t("Replace API key") : t("API key")}
+        {routed && saved ? gt("Replace API key") : gt("API key")}
       </Label>
       <div className="flex min-w-0 items-start gap-2">
         {sources.length > 0 && (
           <SecretSourceSelect
             value={sourceId}
             sources={sources}
-            label={t`${company} API key`}
+            label={gt("{company} API key", { company })}
             disabled={busy}
             onValueChange={(next) => {
               setSourceId(next);
@@ -281,7 +285,7 @@ export function CloudVoiceConfiguration({
               key={sourceId}
               id="voice-cloud-key"
               name="reference"
-              aria-label={`${company} API key reference`}
+              aria-label={gt("{company} API key reference", { company })}
               autoFocus={!routed}
               placeholder={source?.referencePlaceholder}
               value={draft}
@@ -294,7 +298,7 @@ export function CloudVoiceConfiguration({
             <SecretInput
               id="voice-cloud-key"
               name="key"
-              aria-label={`${company} API key`}
+              aria-label={gt("{company} API key", { company })}
               autoFocus={!routed}
               placeholder={gt("Enter API key")}
               value={draft}
@@ -309,11 +313,11 @@ export function CloudVoiceConfiguration({
       <p className="text-sm text-muted-foreground">
         {draft.trim() && !credential
           ? (source?.invalidReferenceMessage ??
-            t("Enter an API key, not a URL or secret reference."))
+            gt("Enter an API key, not a URL or secret reference."))
           : active && !routed
-            ? t("Updating the key keeps dictation enabled.")
+            ? gt("Updating the key keeps dictation enabled.")
             : routed && saved
-              ? t("Leave blank to keep the saved key.")
+              ? gt("Leave blank to keep the saved key.")
               : gt("Anyone with dictation access to {environment} can bill this key.", {
                   environment: environment.label,
                 })}
@@ -335,27 +339,21 @@ export function CloudVoiceConfiguration({
               ? gt("Remove the {company} key?", { company })
               : active
                 ? routed
-                  ? t("Manage OpenRouter dictation")
+                  ? gt("Manage OpenRouter dictation")
                   : gt("Manage {company} key", { company })
                 : gt("Use {name} for dictation?", { name })}
           </DialogTitle>
           <DialogDescription>
             {remove
-              ? `Everyone using ${name} for dictation on ${environment.label} will lose access.`
+              ? gt("Everyone using {name} for dictation on {environment} will lose access.", {
+                  name,
+                  environment: environment.label,
+                })
               : active && !routed
-                ? `Anyone with dictation access to ${environment.label} can use this API key.`
-                : provider === "openrouter"
-                  ? gt(
-                      "After you stop, {environment} sends the recording to OpenRouter. OpenRouter chooses who runs your model. T3 requests zero data retention; your OpenRouter account may allow safety retention.",
-                      { environment: environment.label },
-                    )
-                  : gt(
-                      "After you stop, {environment} sends your recording and vocabulary hints, including project names, to {provider}.",
-                      {
-                        environment: environment.label,
-                        provider: name,
-                      },
-                    )}
+                ? gt("Anyone with dictation access to {environment} can use this API key.", {
+                    environment: environment.label,
+                  })
+                : cloudSpeechDisclosure(provider, environment.label, messages)}
           </DialogDescription>
         </DialogHeader>
         {!remove && (
@@ -491,12 +489,12 @@ export function CloudVoiceConfiguration({
             ) : routed ? (
               saved !== undefined && (saved || canManage) ? (
                 <Button type="submit" form={formId} size="sm" disabled={busy || !canSubmit}>
-                  {active ? t("Save") : t("Save and enable")}
+                  {active ? gt("Save", { $context: "verb" }) : gt("Save and enable")}
                 </Button>
               ) : null
             ) : editingKey ? (
               <Button type="submit" form={formId} size="sm" disabled={busy || !credential}>
-                {active ? t("Save key") : t("Save and enable")}
+                {active ? gt("Save key") : gt("Save and enable")}
               </Button>
             ) : saved && !active ? (
               <Button

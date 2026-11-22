@@ -1,8 +1,10 @@
 import type { EnvironmentId, UsageLimitsReport } from "@t3tools/contracts";
 import type { TimestampFormat } from "@t3tools/contracts/settings";
 import { limitsNotice } from "@t3tools/shared/usageLimitsCopy";
+import { msg, T, useGT, useMessages } from "gt-react";
 import { GaugeIcon } from "lucide-react";
 
+import { m, type MessageResolver } from "../../i18n/messages";
 import { ensureLocalApi } from "../../localApi";
 import { formatUpcomingTimestamp } from "../../timestampFormat";
 import { Button } from "../ui/button";
@@ -11,7 +13,7 @@ import { RedactedSensitiveText } from "../settings/RedactedSensitiveText";
 import { LimitWindows, ResetCredits } from "../usage/UsageLimits";
 import { ComposerBanner } from "./ComposerBanner";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
-import { useGT, useMessages, Var, T, t } from "gt-react";
+import { Var, t } from "gt-react";
 import "../usage/usageNoticeMessages";
 
 function accountLabel(account: UsageLimitsReport["accounts"][number]): string {
@@ -52,21 +54,26 @@ export function usageLimitsBannerItem(
   report: UsageLimitsReport,
   environmentId: EnvironmentId,
   onDismiss: () => void,
+  resolve: MessageResolver = m,
 ): ComposerBannerStackItem {
   const [first] = report.accounts;
   const single = report.accounts.length === 1 && first ? first : null;
   const summary = single ? (
     <AccountSummary account={single} />
   ) : (
-    `${report.accounts.length} accounts`
+    resolve(
+      msg("{count, plural, one {{count} account} other {{count} accounts}}", {
+        count: report.accounts.length,
+      }),
+    )
   );
   return {
     id,
     variant: "info",
     icon: <GaugeIcon />,
-    title: t("Usage limits"),
+    title: resolve(msg("Usage limits")),
     description: summary,
-    dismissLabel: "Dismiss usage limits",
+    dismissLabel: resolve(msg("Dismiss usage limits")),
     onDismiss,
     children: <UsageLimitsBannerBody report={report} environmentId={environmentId} />,
   };
@@ -90,37 +97,45 @@ export function modelFallbackBannerItem(
     readonly onUseDefault: () => void;
     readonly onDismiss: () => void;
   },
-  _resolve?: unknown,
+  resolve: MessageResolver = m,
 ): ComposerBannerStackItem {
   return {
     id: "fallback-model",
     variant: "info",
     icon: <GaugeIcon />,
-    title: t`Using ${fallbackModelName}`,
-    description: `${defaultProviderName} is out of usage${resetsAt ? ` · resets ${formatUpcomingTimestamp(resetsAt, timestampFormat)}` : ""}`,
+    title: resolve(msg("Using {model}", { model: fallbackModelName })),
+    description: resetsAt
+      ? resolve(
+          msg("{provider} is out of usage · resets {time}", {
+            provider: defaultProviderName,
+            time: formatUpcomingTimestamp(
+              resetsAt,
+              timestampFormat,
+              Date.now(),
+              undefined,
+              resolve,
+            ),
+          }),
+        )
+      : resolve(msg("{provider} is out of usage", { provider: defaultProviderName })),
     actions: (
       <Button size="xs" variant="ghost" onClick={onUseDefault}>
-        <T>
-          Use <Var>{defaultModelName}</Var>
-        </T>
+        {resolve(msg("Use {model}", { model: defaultModelName }))}
       </Button>
     ),
-    dismissLabel: "Dismiss fallback model notice",
+    dismissLabel: resolve(msg("Dismiss fallback model notice")),
     onDismiss,
   };
 }
 
-function UsageLimitsBannerBody(
-  {
-    report,
-    environmentId,
-  }: {
-    readonly report: UsageLimitsReport;
-    readonly environmentId: EnvironmentId;
-  },
-  _resolve?: unknown,
-) {
-  const m = useMessages();
+function UsageLimitsBannerBody({
+  report,
+  environmentId,
+}: {
+  readonly report: UsageLimitsReport;
+  readonly environmentId: EnvironmentId;
+}) {
+  const messages = useMessages();
   const now = Date.parse(report.createdAt);
   return (
     <ComposerBanner.Scroll>
@@ -129,7 +144,7 @@ function UsageLimitsBannerBody(
           const resetCreditInput =
             account.resetCreditInput ??
             (account.instanceId ? { instanceId: account.instanceId } : undefined);
-          const notice = limitsNotice(account.limits);
+          const notice = limitsNotice(account.limits, messages);
           const externalUsage = account.limits.externalUsage;
           return (
             <div key={account.id} className="flex min-w-0 flex-col gap-1">

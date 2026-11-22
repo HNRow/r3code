@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import {
   WorkspaceColumnsRendererContext,
   WorkspacePresentationHostContext,
@@ -119,7 +120,6 @@ import { workspaceTabOf, type WorkspaceTab } from "./workspace/workspace-tabs-st
 import { workspaceRoutesOf } from "./workspace-overlay-routes";
 import { SettingsWorkspaceLayout } from "../settings/SettingsWorkspaceLayout";
 import { WorkspaceThreadSidebar } from "./workspace/WorkspaceThreadSidebar";
-import { useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 export { useAdaptiveWorkspaceLayout, useWorkspacePaneState };
@@ -1035,7 +1035,7 @@ function AdaptiveWorkspaceLayoutContent(
                   <RenderFailureView
                     {...fallback}
                     title={gt("The sidebar couldn't be displayed")}
-                    exit={{ label: t("Open settings"), onPress: handleOpenSettings }}
+                    exit={{ label: gt("Open settings"), onPress: handleOpenSettings }}
                   />
                 )}
               >

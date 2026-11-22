@@ -1,10 +1,10 @@
 import { useAtomValue } from "@effect/atom-react";
 import type { EnvironmentId, ProviderDriverKind } from "@t3tools/contracts";
+import { T, Var } from "gt-react";
 import { InfoIcon } from "lucide-react";
 
 import { serverEnvironment } from "../../state/server";
 import { Alert, AlertDescription } from "../ui/alert";
-import { Var, T } from "gt-react";
 
 const MULTIPLE_ACCOUNTS_FAQ_URL =
   "https://github.com/pingdotgg/t3code/blob/main/docs/user/faq.md#can-i-add-a-bunch-of-accounts-for-one-provider";
@@ -36,8 +36,7 @@ export function MultipleAccountsNote({
       <AlertDescription>
         <p>
           <T>
-            We do not recommend managing multiple <Var>{providerName}</Var> accounts in R3 Code.
-            <Var> </Var>
+            We do not recommend managing multiple <Var>{providerName}</Var> accounts in R3 Code.{" "}
             <a
               href={MULTIPLE_ACCOUNTS_FAQ_URL}
               target="_blank"

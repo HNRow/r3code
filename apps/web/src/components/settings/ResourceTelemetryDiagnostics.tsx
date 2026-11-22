@@ -1,3 +1,4 @@
+import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
 import { ProcessSignalActions } from "./ProcessSignalActions";
 import { AuthEnvironmentMaintainScope } from "@t3tools/contracts";
 import { RefreshIcon } from "~/components/ui/refresh-icon";
@@ -35,6 +36,8 @@ import {
   isAtomCommandInterrupted,
   squashAtomCommandFailure,
 } from "@t3tools/client-runtime/state/runtime";
+import { msg, T, useGT, useMessages, Var } from "gt-react";
+import { m, type MessageResolver } from "../../i18n/messages";
 
 import {
   useResourceTelemetry,
@@ -62,7 +65,7 @@ import {
   visibleResourceTelemetryProcesses,
 } from "./ResourceTelemetryDiagnostics.logic";
 import { SettingsSection } from "./settingsLayout";
-import { T, Var, useGT, t } from "gt-react";
+import { t } from "gt-react";
 
 const HISTORY_WINDOWS = [
   {
@@ -112,28 +115,31 @@ function formatProcessName(process: Pick<ResourceTelemetryProcess, "command" | "
   return normalized.split(/[\\/]/).findLast((segment) => segment.length > 0) ?? normalized;
 }
 
-function categoryLabel(category: ResourceTelemetryProcessCategory): string {
+function categoryLabel(
+  category: ResourceTelemetryProcessCategory,
+  resolve: MessageResolver = m,
+): string {
   switch (category) {
     case "server":
-      return "Server";
+      return resolve(msg("Server"));
     case "server-child":
-      return "Backend child";
+      return resolve(msg("Backend child"));
     case "provider-root":
-      return "Provider";
+      return resolve(msg("Provider"));
     case "terminal-root":
-      return "Terminal";
+      return resolve(msg("Terminal"));
     case "electron-main":
-      return "Electron main";
+      return resolve(msg("Electron main"));
     case "electron-renderer":
-      return "Renderer";
+      return resolve(msg("Renderer"));
     case "electron-gpu":
       return "GPU";
     case "electron-utility":
-      return "Electron utility";
+      return resolve(msg("Electron utility"));
     case "resource-monitor":
-      return "Monitor";
+      return resolve(msg("Monitor"));
     case "unknown-t3":
-      return "T3 process";
+      return resolve(msg("T3 process"));
   }
 }
 
@@ -144,26 +150,30 @@ function categoryDotClass(category: ResourceTelemetryProcessCategory): string {
   return "bg-success";
 }
 
-function ioSemanticsLabel(semantics: ResourceTelemetryIoSemantics): string {
+function ioSemanticsLabel(
+  semantics: ResourceTelemetryIoSemantics,
+  resolve: MessageResolver = m,
+): string {
   switch (semantics) {
     case "storage":
-      return "Storage bytes";
+      return resolve(msg("Storage bytes"));
     case "logical":
-      return "Logical bytes";
+      return resolve(msg("Logical bytes"));
     case "all-io":
-      return "All I/O bytes";
+      return resolve(msg("All I/O bytes"));
     case "unavailable":
-      return "Unavailable";
+      return resolve(msg("Unavailable"));
   }
 }
 
 function booleanStateLabel(
   value: BackgroundBooleanState,
   labels: { readonly true: string; readonly false: string },
+  resolve: MessageResolver = m,
 ): string {
   if (value === "true") return labels.true;
   if (value === "false") return labels.false;
-  return "Unknown";
+  return resolve(msg("Unknown"));
 }
 
 function sourceStatusTone(status: ResourceTelemetrySourceStatus): "default" | "warning" | "danger" {
@@ -222,13 +232,22 @@ function LastSampleLabel({ sampledAt }: { sampledAt: DateTime.Utc | null }) {
   }
   return (
     <span className="text-2xs text-muted-foreground/60">
-      <T>
-        Updated{" "}
-        <span className="font-mono tabular-nums">
-          <Var>{relative.value}</Var>
-        </span>
-        <Var>{relative.suffix ? ` ${relative.suffix}` : ""}</Var>
-      </T>
+      {relative.suffix ? (
+        <T context="the time is an elapsed time such as 5m">
+          Updated{" "}
+          <span className="font-mono tabular-nums">
+            <Var>{relative.value}</Var>
+          </span>{" "}
+          ago
+        </T>
+      ) : (
+        <T>
+          Updated{" "}
+          <span className="font-mono tabular-nums">
+            <Var>{relative.value}</Var>
+          </span>
+        </T>
+      )}
     </span>
   );
 }
@@ -315,6 +334,7 @@ function MetricPair({ label, value }: { label: string; value: string }) {
 }
 
 function HealthSource({ label, health }: { label: string; health: ResourceTelemetrySourceHealth }) {
+  const gt = useGT();
   const expectedInBrowser =
     health.status === "unavailable" &&
     Option.exists(health.lastError, (error) => error.includes("'web' mode"));
@@ -324,9 +344,9 @@ function HealthSource({ label, health }: { label: string; health: ResourceTeleme
         <div className="text-sm font-medium text-foreground">{label}</div>
         <div className="mt-1 text-2xs leading-relaxed text-muted-foreground/65">
           {expectedInBrowser
-            ? t("Available when this page runs inside the desktop app.")
+            ? gt("Available when this page runs inside the desktop app.")
             : Option.match(health.lastError, {
-                onNone: () => "No reported errors",
+                onNone: () => gt("No reported errors"),
                 onSome: (error) => error,
               })}
         </div>
@@ -337,7 +357,7 @@ function HealthSource({ label, health }: { label: string; health: ResourceTeleme
         presentation={
           expectedInBrowser
             ? {
-                label: t("Desktop only"),
+                label: gt("Desktop only"),
                 tone: "neutral",
               }
             : undefined
@@ -403,6 +423,7 @@ function ResourceHistoryChart({
 }: {
   buckets: ReadonlyArray<ResourceTelemetryHistoryBucket>;
 }) {
+  const gt = useGT();
   const maxCpu = resourceHistoryCpuScaleMax(buckets);
   const maxIo = Math.max(1, ...buckets.map((bucket) => bucket.ioReadBytes + bucket.ioWriteBytes));
 
@@ -410,19 +431,13 @@ function ResourceHistoryChart({
     <div className="border-t border-border/60 px-4 py-4 sm:px-5">
       <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-3xs text-muted-foreground/65">
         <span className="inline-flex items-center gap-1.5">
-          <T>
-            <span className="h-1.5 w-3 rounded-full bg-foreground/70" /> CPU average
-          </T>
+          <span className="h-1.5 w-3 rounded-full bg-foreground/70" /> <T>CPU average</T>
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <T>
-            <span className="h-1.5 w-3 rounded-full bg-info/70" /> I/O reads
-          </T>
+          <span className="h-1.5 w-3 rounded-full bg-info/70" /> <T>I/O reads</T>
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <T>
-            <span className="h-1.5 w-3 rounded-full bg-warning/80" /> I/O writes
-          </T>
+          <span className="h-1.5 w-3 rounded-full bg-warning/80" /> <T>I/O writes</T>
         </span>
       </div>
       <div className="flex h-32 items-end gap-1 overflow-hidden rounded-lg border border-border/40 bg-muted/8 px-2 pt-3 pb-2">
@@ -465,25 +480,13 @@ function ResourceHistoryChart({
               <TooltipPopup side="top" className="text-left">
                 <div className="space-y-0.5">
                   <div>
-                    <T>
-                      CPU avg <Var>{bucket.avgCpuPercent.toFixed(1)}</Var>%
-                    </T>
+                    {gt("CPU avg {percent}%", { percent: bucket.avgCpuPercent.toFixed(1) })}
                   </div>
                   <div>
-                    <T>
-                      CPU peak <Var>{bucket.maxCpuPercent.toFixed(1)}</Var>%
-                    </T>
+                    {gt("CPU peak {percent}%", { percent: bucket.maxCpuPercent.toFixed(1) })}
                   </div>
-                  <div>
-                    <T>
-                      Read <Var>{formatBytes(bucket.ioReadBytes)}</Var>
-                    </T>
-                  </div>
-                  <div>
-                    <T>
-                      Write <Var>{formatBytes(bucket.ioWriteBytes)}</Var>
-                    </T>
-                  </div>
+                  <div>{gt("Read {bytes}", { bytes: formatBytes(bucket.ioReadBytes) })}</div>
+                  <div>{gt("Write {bytes}", { bytes: formatBytes(bucket.ioWriteBytes) })}</div>
                 </div>
               </TooltipPopup>
             </Tooltip>
@@ -503,6 +506,7 @@ function ProcessTreeName({
   collapsed: boolean;
   onToggle: (process: ResourceTelemetryProcess) => void;
 }) {
+  const gt = useGT();
   const name = formatProcessName(process);
   const hasChildren = process.childPids.length > 0;
   return (
@@ -515,7 +519,7 @@ function ProcessTreeName({
           size="icon-micro"
           variant="ghost-muted"
           onClick={() => onToggle(process)}
-          aria-label={collapsed ? `Expand ${name}` : `Collapse ${name}`}
+          aria-label={collapsed ? gt("Expand {name}", { name }) : gt("Collapse {name}", { name })}
         >
           {collapsed ? (
             <ChevronRightIcon className="size-3.5" />
@@ -581,6 +585,7 @@ function ProcessTable({
   signalingKeys: ReadonlySet<string>;
   onSignal: (process: ResourceTelemetryProcess, signal: ServerProcessSignal) => void;
 }) {
+  const messages = useMessages();
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(() => new Set());
   const visible = visibleResourceTelemetryProcesses(processes, collapsed);
   const toggle = (process: ResourceTelemetryProcess) => {
@@ -673,13 +678,13 @@ function ProcessTable({
                   />
                 </td>
                 <td className="truncate px-3 py-2 text-2xs text-muted-foreground">
-                  {categoryLabel(process.category)}
+                  {categoryLabel(process.category, messages)}
                 </td>
                 <td className="px-3 py-2 text-right font-mono tabular-nums">
                   {process.cpuPercent.toFixed(1)}%
                 </td>
                 <td className="px-3 py-2 text-right font-mono tabular-nums">
-                  {formatCpuTime(process.cpuTimeMs / 1_000)}
+                  {formatCpuTime(process.cpuTimeMs / 1_000, messages)}
                 </td>
                 <td className="px-3 py-2 text-right font-mono tabular-nums">
                   {formatBytes(process.residentBytes)}
@@ -696,7 +701,9 @@ function ProcessTable({
                 <td className="px-3 py-2 text-right font-mono tabular-nums text-muted-foreground">
                   <Tooltip>
                     <TooltipTrigger render={<span>{formatBytes(process.ioWriteBytes)}</span>} />
-                    <TooltipPopup side="top">{ioSemanticsLabel(process.ioSemantics)}</TooltipPopup>
+                    <TooltipPopup side="top">
+                      {ioSemanticsLabel(process.ioSemantics, messages)}
+                    </TooltipPopup>
                   </Tooltip>
                 </td>
                 <td className="px-3 py-2 text-right font-mono tabular-nums text-muted-foreground">
@@ -724,6 +731,7 @@ function HistoryProcessTable({
 }: {
   processes: ReadonlyArray<ResourceTelemetryProcessSummary>;
 }) {
+  const messages = useMessages();
   return (
     <div className="border-t border-border/60">
       <ScrollArea
@@ -800,10 +808,10 @@ function HistoryProcessTable({
                   </Tooltip>
                 </td>
                 <td className="truncate px-3 py-2 text-2xs text-muted-foreground">
-                  {categoryLabel(process.category)}
+                  {categoryLabel(process.category, messages)}
                 </td>
                 <td className="px-3 py-2 text-right font-mono tabular-nums">
-                  {formatCpuTime(process.cpuTimeMs / 1_000)}
+                  {formatCpuTime(process.cpuTimeMs / 1_000, messages)}
                 </td>
                 <td className="px-3 py-2 text-right font-mono tabular-nums">
                   {process.maxCpuPercent.toFixed(1)}%
@@ -916,6 +924,7 @@ function ResourceTelemetryDiagnosticsBody({
 }: {
   environmentId: EnvironmentId | null;
 }) {
+  const messages = useMessages();
   const gt = useGT();
   const registry = useContext(RegistryContext);
   const [windowMs, setWindowMs] = useState(15 * 60_000);
@@ -963,15 +972,20 @@ function ResourceTelemetryDiagnosticsBody({
       let confirmed = false;
       try {
         confirmed = await ensureLocalApi().dialogs.confirm(
-          t`Send SIGKILL to process ${process.identity.pid}? This cannot be handled by the process.`,
+          gt("Send SIGKILL to process {pid}? This cannot be handled by the process.", {
+            pid: process.identity.pid,
+          }),
           { variant: "destructive" },
         );
       } catch (error) {
         clearSignaling();
         toastManager.add({
           type: "error",
-          title: t("Could not confirm signal"),
-          description: error instanceof Error ? error.message : `Failed to send ${signal}.`,
+          title: gt("Could not confirm signal"),
+          description:
+            error instanceof Error
+              ? (thrownErrorMessage(error, m) ?? error.message)
+              : gt("Failed to send {signal}.", { signal }),
         });
         return;
       }
@@ -1000,18 +1014,23 @@ function ResourceTelemetryDiagnosticsBody({
         if (result.value.signaled) return;
         toastManager.add({
           type: "error",
-          title: t`Could not send ${signal}`,
-          description: Option.getOrElse(
-            result.value.message,
-            () => `Failed to send ${signal} to process ${process.identity.pid}.`,
+          title: gt("Could not send {signal}", { signal }),
+          description: Option.getOrElse(result.value.message, () =>
+            gt("Failed to send {signal} to process {pid}.", {
+              signal,
+              pid: process.identity.pid,
+            }),
           ),
         });
       })
       .catch((error: unknown) => {
         toastManager.add({
           type: "error",
-          title: t`Could not send ${signal}`,
-          description: error instanceof Error ? error.message : `Failed to send ${signal}.`,
+          title: gt("Could not send {signal}", { signal }),
+          description:
+            error instanceof Error
+              ? (thrownErrorMessage(error, m) ?? error.message)
+              : gt("Failed to send {signal}.", { signal }),
         });
       })
       .finally(() => {
@@ -1042,9 +1061,11 @@ function ResourceTelemetryDiagnosticsBody({
       .catch((error: unknown) => {
         toastManager.add({
           type: "error",
-          title: t("Could not restart resource monitor"),
+          title: gt("Could not restart resource monitor"),
           description:
-            error instanceof Error ? error.message : "The resource monitor retry failed.",
+            error instanceof Error
+              ? (thrownErrorMessage(error, m) ?? error.message)
+              : gt("The resource monitor retry failed."),
         });
       })
       .finally(() => {
@@ -1119,7 +1140,9 @@ function ResourceTelemetryDiagnosticsBody({
                     : "bg-muted-foreground/55",
                 )}
               />
-              {snapshot ? formatSamplingStatus(snapshot.sampleIntervalMs) : t("Sampling every ...")}
+              {snapshot
+                ? formatSamplingStatus(snapshot.sampleIntervalMs, messages)
+                : gt("Sampling every ...")}
             </div>
           </div>
           <div className="grid grid-cols-2 divide-x divide-y divide-border/55 md:grid-cols-3">
@@ -1128,7 +1151,11 @@ function ResourceTelemetryDiagnosticsBody({
               label={gt("Current CPU")}
               value={allT3 ? `${allT3.currentCpuPercent.toFixed(1)}%` : "..."}
               detail={
-                allT3 ? `${formatCpuTime(allT3.cpuTimeMs / 1_000)} observed CPU time` : undefined
+                allT3
+                  ? gt("{time} observed CPU time", {
+                      time: formatCpuTime(allT3.cpuTimeMs / 1_000, messages),
+                    })
+                  : undefined
               }
             />
             <IconStat
@@ -1136,7 +1163,9 @@ function ResourceTelemetryDiagnosticsBody({
               label={gt("Resident memory")}
               value={allT3 ? formatBytes(allT3.currentRssBytes) : "..."}
               detail={
-                allT3 ? `${formatBytes(allT3.peakRssBytes)} combined process peaks` : undefined
+                allT3
+                  ? gt("{bytes} combined process peaks", { bytes: formatBytes(allT3.peakRssBytes) })
+                  : undefined
               }
             />
             <IconStat
@@ -1144,7 +1173,12 @@ function ResourceTelemetryDiagnosticsBody({
               label={gt("Process count")}
               value={allT3 ? String(allT3.processCount) : "..."}
               detail={
-                allT3 ? `${allT3.processStarts} starts · ${allT3.processExits} exits` : undefined
+                allT3
+                  ? gt("{processStarts} starts · {processExits} exits", {
+                      processStarts: allT3.processStarts,
+                      processExits: allT3.processExits,
+                    })
+                  : undefined
               }
             />
             <IconStat
@@ -1170,9 +1204,19 @@ function ResourceTelemetryDiagnosticsBody({
               icon={<GaugeIcon className="size-3.5" />}
               label={gt("CPU speed limit")}
               value={
-                snapshot ? (speedLimit === null ? "Unknown" : `${speedLimit.toFixed(0)}%`) : "..."
+                snapshot
+                  ? speedLimit === null
+                    ? gt("Unknown")
+                    : `${speedLimit.toFixed(0)}%`
+                  : "..."
               }
-              detail={snapshot ? `${snapshot.power.thermalState} thermal state` : undefined}
+              detail={
+                snapshot
+                  ? gt("{thermalState} thermal state", {
+                      thermalState: snapshot.power.thermalState,
+                    })
+                  : undefined
+              }
               tone={speedLimit !== null && speedLimit < 80 ? "warning" : "default"}
             />
           </div>
@@ -1210,10 +1254,8 @@ function ResourceTelemetryDiagnosticsBody({
         headerAction={
           collectorNeedsRetry ? (
             <Button size="xs" variant="outline" disabled={isRetrying} onClick={retryCollector}>
-              <T>
-                <RefreshIcon size="xs" refreshing={isRetrying} />
-                Retry monitor
-              </T>
+              <RefreshIcon size="xs" refreshing={isRetrying} />
+              <T>Retry monitor</T>
             </Button>
           ) : null
         }
@@ -1221,35 +1263,39 @@ function ResourceTelemetryDiagnosticsBody({
         <div className="grid overflow-hidden rounded-[inherit] md:grid-cols-2 md:divide-x md:divide-border/60">
           <div className="px-4 py-4 sm:px-5">
             <div className="mb-3 flex items-center gap-2 text-3xs font-semibold uppercase tracking-widest text-muted-foreground/70">
-              <T>
-                <span className="flex size-6 items-center justify-center rounded-md bg-muted/60">
-                  <BatteryIcon className="size-3.5" />
-                </span>
-                Host state
-              </T>
+              <span className="flex size-6 items-center justify-center rounded-md bg-muted/60">
+                <BatteryIcon className="size-3.5" />
+              </span>
+              <T>Host state</T>
             </div>
             {hasHostPowerSignal && snapshot ? (
               <>
                 <DetailRow
                   label={gt("Power source")}
-                  value={booleanStateLabel(snapshot.power.onBattery, {
-                    true: "Battery",
-                    false: "External power",
-                  })}
+                  value={booleanStateLabel(
+                    snapshot.power.onBattery,
+                    { true: gt("Battery"), false: gt("External power") },
+                    messages,
+                  )}
                 />
                 <DetailRow
                   label={gt("Low power mode")}
-                  value={booleanStateLabel(snapshot.power.lowPowerMode, {
-                    true: "Enabled",
-                    false: "Disabled",
-                  })}
+                  value={booleanStateLabel(
+                    snapshot.power.lowPowerMode,
+                    { true: gt("Enabled"), false: gt("Disabled") },
+                    messages,
+                  )}
                 />
                 <DetailRow
                   label={gt("Idle")}
-                  value={`${booleanStateLabel(snapshot.power.idle, {
-                    true: "Idle",
-                    false: "Active",
-                  })}${
+                  value={`${booleanStateLabel(
+                    snapshot.power.idle,
+                    {
+                      true: gt("Idle", { $context: "host power state" }),
+                      false: gt("Active", { $context: "host power state" }),
+                    },
+                    messages,
+                  )}${
                     snapshot.power.idleSeconds === null
                       ? ""
                       : ` · ${Math.round(snapshot.power.idleSeconds)}s`
@@ -1259,11 +1305,12 @@ function ResourceTelemetryDiagnosticsBody({
                   label={gt("Session")}
                   value={
                     snapshot.power.suspended
-                      ? "Suspended"
-                      : booleanStateLabel(snapshot.power.locked, {
-                          true: "Locked",
-                          false: "Unlocked",
-                        })
+                      ? gt("Suspended")
+                      : booleanStateLabel(
+                          snapshot.power.locked,
+                          { true: gt("Locked"), false: gt("Unlocked") },
+                          messages,
+                        )
                   }
                 />
                 <DetailRow
@@ -1293,12 +1340,10 @@ function ResourceTelemetryDiagnosticsBody({
           </div>
           <div className="border-t border-border/60 px-4 py-4 md:border-t-0 sm:px-5">
             <div className="mb-3 flex items-center gap-2 text-3xs font-semibold uppercase tracking-widest text-muted-foreground/70">
-              <T>
-                <span className="flex size-6 items-center justify-center rounded-md bg-muted/60">
-                  <GaugeIcon className="size-3.5" />
-                </span>
-                Collection health
-              </T>
+              <span className="flex size-6 items-center justify-center rounded-md bg-muted/60">
+                <GaugeIcon className="size-3.5" />
+              </span>
+              <T>Collection health</T>
             </div>
             {snapshot ? (
               <>
@@ -1330,7 +1375,7 @@ function ResourceTelemetryDiagnosticsBody({
                 <DetailRow
                   label={gt("Sidecar")}
                   value={Option.match(snapshot.health.sidecarVersion, {
-                    onNone: () => "Unavailable",
+                    onNone: () => gt("Unavailable"),
                     onSome: (version) =>
                       `${version}${Option.match(snapshot.health.sidecarPid, {
                         onNone: () => "",

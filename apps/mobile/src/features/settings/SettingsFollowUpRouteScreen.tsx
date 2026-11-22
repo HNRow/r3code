@@ -1,3 +1,4 @@
+import { msg, T, useGT, useMessages, Var } from "gt-react-native";
 import { ScreenScrollView as ScrollView } from "../../components/ui/ScreenScrollView";
 import { useAtomValue } from "@effect/atom-react";
 import { AsyncResult } from "effect/reactivity";
@@ -11,7 +12,6 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { ListChoiceRow as SettingsChoiceRow } from "../../components/ui/ListChoiceRow";
 import { SettingsSection } from "./components/SettingsSection";
 import { SettingsScreen } from "./components/SettingsScreen";
-import { useGT, Var, T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 const FOLLOW_UP_OPTIONS: ReadonlyArray<{
@@ -21,26 +21,19 @@ const FOLLOW_UP_OPTIONS: ReadonlyArray<{
 }> = [
   {
     behavior: "queue",
-    get label() {
-      return t("Queue");
-    },
-    get description() {
-      return t("Your message waits and runs after the current turn finishes.");
-    },
+    label: msg("Queue", { $context: "verb, follow-up behavior" }),
+    description: msg("Your message waits and runs after the current turn finishes."),
   },
   {
     behavior: "steer",
-    get label() {
-      return t("Steer");
-    },
-    get description() {
-      return t("Your message reaches the agent right away, changing what it is working on.");
-    },
+    label: msg("Steer", { $context: "verb, follow-up behavior" }),
+    description: msg("Your message reaches the agent right away, changing what it is working on."),
   },
 ];
 
 export function SettingsFollowUpRouteScreen() {
   const gt = useGT();
+  const m = useMessages();
   const insets = useSafeAreaInsets();
   const preferencesResult = useAtomValue(mobilePreferencesAtom);
   const savePreferences = useAtomCommand(saveMobilePreferences);
@@ -61,8 +54,8 @@ export function SettingsFollowUpRouteScreen() {
         {FOLLOW_UP_OPTIONS.map((option, index) => (
           <SettingsChoiceRow
             key={option.behavior}
-            label={option.label}
-            description={option.description}
+            label={m(option.label)}
+            description={m(option.description)}
             selected={selectedBehavior === option.behavior}
             separated={index > 0}
             disabled={!preferencesReady}
@@ -75,8 +68,7 @@ export function SettingsFollowUpRouteScreen() {
       <Text className="px-2 text-sm text-foreground-muted">
         <T>
           Long-press the send button to use the other option for a single message. With a hardware
-          keyboard, hold <Var>{Platform.OS === "android" ? t("Ctrl") : t("Command")}</Var> while
-          sending.
+          keyboard, hold <Var>{Platform.OS === "android" ? "Ctrl" : "Command"}</Var> while sending.
         </T>
       </Text>
     </ScrollView>

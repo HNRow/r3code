@@ -8,6 +8,7 @@ import {
   derivePhysicalProjectKey,
   isPickableProjectMember,
   resolveScratchProjectScopeKey,
+  selectGroupDefaultProject,
   type ProjectGroupingSettings,
 } from "@t3tools/client-runtime/state/project-grouping";
 import { msg } from "gt-react";
@@ -151,14 +152,17 @@ export function buildSidebarProjectSnapshots(
     isDesktopLocalEnvironment?: (environmentId: EnvironmentId) => boolean;
     isWslEnvironment?: (environmentId: EnvironmentId) => boolean;
   },
-  _resolve: MessageResolver = m,
+  resolve: MessageResolver = m,
 ): SidebarProjectSnapshot[] {
-  return buildProjectGroups({
-    projects: input.projects,
-    groupScratchProjects: input.groupScratchProjects ?? false,
-    settings: input.settings,
-    preferredEnvironmentId: input.primaryEnvironmentId,
-  }).map((group): SidebarProjectSnapshot => {
+  return buildProjectGroups(
+    {
+      projects: input.projects,
+      groupScratchProjects: input.groupScratchProjects ?? false,
+      settings: input.settings,
+      preferredEnvironmentId: input.primaryEnvironmentId,
+    },
+    resolve,
+  ).map((group): SidebarProjectSnapshot => {
     const members = group.members.map(
       ({ physicalProjectKey, project }): SidebarProjectGroupMember => ({
         ...project,
@@ -232,7 +236,10 @@ export function buildSidebarProjectPickerEntries(input: {
           (project) =>
             project.environmentId === preferredProjectRef.environmentId &&
             project.id === preferredProjectRef.projectId,
-        ) ?? members.find((project) => project.environmentId === preferredProjectRef.environmentId))
+        ) ??
+        selectGroupDefaultProject(
+          members.filter((project) => project.environmentId === preferredProjectRef.environmentId),
+        ))
       : null;
     const targetProject =
       preferredProject ??

@@ -14,12 +14,12 @@ import {
   tag,
   tint,
 } from "@expo/ui/swift-ui/modifiers";
+import { useGT } from "gt-react-native";
 import { useState } from "react";
 
 import { NativeThemeHost } from "./NativeThemeHost";
 import { useControlTheme } from "./useControlTheme";
 import type { NumberFieldProps } from "./NumberField.types";
-import { useGT } from "gt-react-native";
 
 export function NumberField(props: NumberFieldProps) {
   const gt = useGT();

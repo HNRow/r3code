@@ -1,18 +1,24 @@
+import { T, useGT } from "gt-react";
+
 import type { PullRequestReplyAvailability } from "./pullRequestDetail.logic";
-import { T, t } from "gt-react";
+import { t } from "gt-react";
 
 export function PullRequestMoreReplies({
   moreReplies,
   hasMoreReplies,
   url,
 }: PullRequestReplyAvailability) {
+  const gt = useGT();
   if (!hasMoreReplies) return null;
   return (
     <div className="flex flex-wrap items-baseline gap-2 py-1 text-xs text-muted-foreground">
       <span>
         {moreReplies > 0
-          ? `${moreReplies.toLocaleString()} more ${moreReplies === 1 ? "reply" : "replies"}`
-          : t("More replies")}
+          ? gt("{count, plural, one {{formatted} more reply} other {{formatted} more replies}}", {
+              count: moreReplies,
+              formatted: moreReplies.toLocaleString(),
+            })
+          : gt("More replies")}
       </span>
       {url ? (
         <a

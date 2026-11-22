@@ -27,10 +27,12 @@ const reports = (dataset: string) =>
     `    version = strcat(tostring(${field("service.version", "''")}), ' (', tostring(${field("resource.expo.app.build_number", "''")}), ')')`,
     `| where isnotempty(source) and isnotempty(platform)`,
     // A fatal JS error also ends in a native abort; counting both would double every JS crash.
-    `| extend kind = case(source == 'nativeCrash' and js_fatal, 'abort after JS crash', source == 'nativeCrash', 'native crash', fatal, 'JS crash', 'handled error')`,
+    // Android reports every OS kill (low memory, swiped away, background limits) as SIGKILL on next launch.
+    `| extend kind = case(source == 'nativeCrash' and js_fatal, 'abort after JS crash', source == 'nativeCrash' and platform == 'Android' and error_type == 'SIGKILL', 'OS kill', source == 'nativeCrash', 'native crash', fatal, 'JS crash', 'handled error')`,
   ].join("\n");
 const crashes = (dataset: string) =>
   `${reports(dataset)}\n| where kind in ('JS crash', 'native crash')`;
+const osKills = (dataset: string) => `${reports(dataset)}\n| where kind == 'OS kill'`;
 const handledErrors = (dataset: string) => `${reports(dataset)}\n| where kind == 'handled error'`;
 const ingest = (traces: string) =>
   `['${traces}']\n| where name == 'relay.mobile_telemetry.ingest'\n| extend signal = tostring(['attributes.custom']['relay.mobile_telemetry.signal']), outcome = tostring(['attributes.custom']['relay.mobile_telemetry.outcome'])`;
@@ -60,6 +62,7 @@ interface MobileMonitor {
     | "tolerance"
     | "alertOnNoData"
     | "triggerFromNRuns"
+    | "triggerAfterNPositiveResults"
   >;
 }
 
@@ -69,7 +72,7 @@ const mobileMonitors: ReadonlyArray<MobileMonitor> = [
   {
     id: "MobileCrashSpikeMonitor",
     severity: "page",
-    name: "T3 Code mobile: crash spike",
+    name: "R3 Code mobile: crash spike",
     description:
       "Crashes (JS and native, each counted once) per 15 min well above the same time over the last 7 days. Usually a bad OTA update or store build: compare app versions on the dashboard.",
     query: ({ logs }) => `${crashes(logs)}\n| summarize crashes = count() by bin_auto(_time)`,
@@ -85,7 +88,7 @@ const mobileMonitors: ReadonlyArray<MobileMonitor> = [
   {
     id: "MobileCrashSpreadMonitor",
     severity: "page",
-    name: "T3 Code mobile: one crash hitting many installs",
+    name: "R3 Code mobile: one crash hitting many installs",
     description:
       "The most widespread crash reached this many installs in an hour. Its message and versions are at the top of the dashboard's Top crashes table.",
     query: ({ logs }) =>
@@ -99,9 +102,27 @@ const mobileMonitors: ReadonlyArray<MobileMonitor> = [
     },
   },
   {
+    id: "MobileOsKillSpikeMonitor",
+    severity: "warn",
+    name: "R3 Code mobile: Android OS kills spike",
+    description:
+      "Android killing the app (low memory, freezes) per hour well above the same time over the last 7 days. Usually a release that leaks memory or blocks the main thread: compare app versions on the dashboard.",
+    query: ({ logs }) => `${osKills(logs)}\n| summarize kills = count() by bin_auto(_time)`,
+    props: {
+      type: "AnomalyDetection",
+      operator: "Above",
+      compareDays: 7,
+      tolerance: 50,
+      rangeMinutes: 60,
+      intervalMinutes: 60,
+      triggerAfterNPositiveResults: 2,
+      triggerFromNRuns: 2,
+    },
+  },
+  {
     id: "MobileTelemetryStoppedMonitor",
     severity: "warn",
-    name: "T3 Code mobile: reports stopped",
+    name: "R3 Code mobile: reports stopped",
     description:
       "No startup metrics forwarded in an hour. Every launch sends some, so the relay route, the Axiom token, or the app's endpoint is broken, and crashes go unseen too.",
     query: ({ traces }) =>
@@ -119,7 +140,7 @@ const mobileMonitors: ReadonlyArray<MobileMonitor> = [
   {
     id: "MobileSymbolicationFailingMonitor",
     severity: "warn",
-    name: "T3 Code mobile: crash stacks not symbolicated",
+    name: "R3 Code mobile: crash stacks not symbolicated",
     description:
       "Share of release JS exceptions over 6 h whose stack stayed minified. Map uploads are failing or the relay cannot read them; relay.symbolication.status says which.",
     query: ({ logs }) =>
@@ -218,6 +239,13 @@ const mobileDashboardCharts = ({ logs, traces }: Datasets): ReadonlyArray<QueryC
   chart(
     "TimeSeries",
     12,
+    "os-kills",
+    "Android OS kills by app version",
+    `${osKills(logs)}\n| summarize count() by bin_auto(_time), version`,
+  ),
+  chart(
+    "TimeSeries",
+    12,
     "ingest",
     "Reports reaching the relay",
     `${ingest(traces)}\n| summarize count() by bin_auto(_time), series = strcat(signal, ' ', outcome)`,
@@ -284,7 +312,7 @@ export const MobileMonitoring = Effect.fn("MobileMonitoring")(function* (
       return {
         name: relayResourceNameForStage("t3-code-mobile-health", stage),
         owner: "X-AXIOM-EVERYONE",
-        description: `T3 Code mobile app crashes and errors. Crashes count JS and native once each. Runbook: ${RUNBOOK_URL}`,
+        description: `R3 Code mobile app crashes and errors. Crashes count JS and native once each. Runbook: ${RUNBOOK_URL}`,
         refreshTime: 300,
         schemaVersion: 2,
         timeWindowStart: "qr-now-7d",

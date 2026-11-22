@@ -326,8 +326,8 @@ export type RestartNotice =
 const LEGACY_RESTART_SUMMARIES: ReadonlySet<string> = new Set([
   "R3 Code restarted and resumed this turn",
   "R3 Code restarted and stopped background work",
-  "T3 Code restarted and resumed this turn",
-  "T3 Code restarted and stopped background work",
+  "R3 Code restarted and resumed this turn",
+  "R3 Code restarted and stopped background work",
 ]);
 
 /**

@@ -1,15 +1,12 @@
 import { Button } from "../../components/ui/Button";
-import {
-  projectCloneDisplayName,
-  projectCloneProgressSummary,
-  type ProjectCloneSnapshot,
-} from "@t3tools/contracts";
+import { projectCloneDisplayName, type ProjectCloneSnapshot } from "@t3tools/contracts";
+import { projectCloneProgressSummary } from "@t3tools/client-runtime/contract-labels";
+import { T, useGT, useMessages, Var } from "gt-react-native";
 import { View } from "react-native";
 
 import { AppActivityIndicator } from "../../components/ui/AppActivityIndicator";
 import { cn } from "../../lib/cn";
 import { AppText as Text } from "../../components/ui/AppText";
-import { Var, T, useGT } from "gt-react-native";
 
 export function ProjectCloneBanner(props: {
   readonly clone: ProjectCloneSnapshot;
@@ -18,6 +15,7 @@ export function ProjectCloneBanner(props: {
   readonly onRemove: () => void;
 }) {
   const gt = useGT();
+  const m = useMessages();
   const { clone } = props;
   const name = projectCloneDisplayName(clone);
   if (clone.phase === "running") {
@@ -31,7 +29,7 @@ export function ProjectCloneBanner(props: {
             </T>
           </Text>
           <Text className="text-xs text-foreground-muted" numberOfLines={1}>
-            {projectCloneProgressSummary(clone)}
+            {projectCloneProgressSummary(clone, m)}
           </Text>
         </View>
         <BannerAction label={gt("Cancel")} onPress={props.onCancel} />
@@ -53,7 +51,9 @@ export function ProjectCloneBanner(props: {
         )}
         numberOfLines={1}
       >
-        {cancelled ? `Cancelled cloning ${name}` : `Failed to clone ${name}`}
+        {cancelled
+          ? gt("Cancelled cloning {name}", { name })
+          : gt("Failed to clone {name}", { name })}
       </Text>
       {clone.error ? (
         <Text className="mt-0.5 text-xs text-danger-foreground" numberOfLines={3}>

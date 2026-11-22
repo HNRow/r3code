@@ -2,7 +2,7 @@
 
 ## Context
 
-T3 Code 的所有客户端（Web、Desktop、Mobile）和营销站点目前都显示 “T3 Code”。用户要求把品牌展示统一改为 “R3 Code”，但不改动代码中的标识符、协议名、包名、bundle ID、URL scheme、环境变量和本地存储键。
+R3 Code 的所有客户端（Web、Desktop、Mobile）和营销站点目前都显示 “R3 Code”。用户要求把品牌展示统一改为 “R3 Code”，但不改动代码中的标识符、协议名、包名、bundle ID、URL scheme、环境变量和本地存储键。
 
 已确认：
 
@@ -14,7 +14,7 @@ T3 Code 的所有客户端（Web、Desktop、Mobile）和营销站点目前都�
 
 采用**混合式 rebranding**：
 
-1. 用脚本批量替换用户可见文本 `"T3 Code"` → `"R3 Code"`。
+1. 用脚本批量替换用户可见文本 `"R3 Code"` → `"R3 Code"`。
 2. 手动修改 SVG 字形文件，把 “T” 换成 “R”、保留 “3”。
 3. 更新 manifest、title、branding 常量、安装素材文案。
 4. 用现有脚本重新生成各平台图标。
@@ -26,10 +26,10 @@ T3 Code 的所有客户端（Web、Desktop、Mobile）和营销站点目前都�
 
 **文本与品牌名**
 
-- 所有用户可见的 `"T3 Code"` 字符串（UI 文案、HTML title、CLI 帮助、About 窗口、空状态、设置页）。
+- 所有用户可见的 `"R3 Code"` 字符串（UI 文案、HTML title、CLI 帮助、About 窗口、空状态、设置页）。
 - 营销站点文案（`apps/marketing/src/pages/*.astro`、`apps/marketing/src/i18n/*.ts`）。
 - 用户文档（`docs/user/*.md`、`docs/README.md`）。
-- i18n 翻译文件中的 `"T3 Code"`（`apps/web/src/i18n/translations/*.json`、`apps/mobile/src/i18n/translations/*.json`）。
+- i18n 翻译文件中的 `"R3 Code"`（`apps/web/src/i18n/translations/*.json`、`apps/mobile/src/i18n/translations/*.json`）。
 
 **配置与常量**
 
@@ -75,7 +75,7 @@ T3 Code 的所有客户端（Web、Desktop、Mobile）和营销站点目前都�
 | -------------------------------- | ---------------------------------------------------------------- |
 | 批量替换误伤代码标识符           | 替换时只针对用户可见字符串，排除代码变量/常量名；diff 后人工抽查 |
 | SVG 字形改后不美观               | 采用简单 “T→R” 替换，保留原有 “3” 和排版；生成后截图检查         |
-| 测试 fixture 断言 “T3 Code” 失败 | 运行相关测试并同步更新 fixture                                   |
+| 测试 fixture 断言 “R3 Code” 失败 | 运行相关测试并同步更新 fixture                                   |
 | 原生图标生成失败                 | 使用现有脚本；若失败则回退到手动替换已有 PNG                     |
 | i18n 结构破坏                    | 替换只改值，不改 key 和插值结构；跑 `vp run i18n:check`          |
 | 中文/其他语言翻译中的品牌名      | 统一替换为 `"R3 Code"`，不翻译为其他形式                         |

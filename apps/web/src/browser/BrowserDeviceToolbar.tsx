@@ -7,6 +7,7 @@ import {
 import { PREVIEW_VIEWPORT_PRESETS, resolvePreviewViewport } from "@t3tools/shared/previewViewport";
 import { Link2, Unlink2, X } from "lucide-react";
 import { useState } from "react";
+import { msg, T, useGT, useMessages } from "gt-react";
 
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -25,15 +26,13 @@ import { cn } from "~/lib/utils";
 import { BROWSER_DEVICE_TOOLBAR_HEIGHT, resizeFreeformViewport } from "./browserViewportLayout";
 import { commitViewportAndAspectRatio } from "./browserDeviceToolbarState";
 import { ScreenRotationIcon } from "./ScreenRotationIcon";
-import { useGT, T, t } from "gt-react";
+import { t } from "gt-react";
 
 const RESPONSIVE_VALUE = "responsive";
 const SELECT_ITEMS = [
   {
     value: RESPONSIVE_VALUE,
-    get label() {
-      return t("Responsive");
-    },
+    label: msg("Responsive", { $context: "browser viewport preset that follows the panel size" }),
   },
   ...PREVIEW_VIEWPORT_PRESETS.map((preset) => ({ value: preset.id, label: preset.label })),
 ];
@@ -54,6 +53,7 @@ export function BrowserDeviceToolbar({
   onChange,
 }: Props) {
   const gt = useGT();
+  const m = useMessages();
   const [pending, setPending] = useState(false);
   const [customSize, setCustomSize] = useState<{
     readonly width: string;
@@ -204,7 +204,7 @@ export function BrowserDeviceToolbar({
         modal={false}
         value={selectedValue}
         onValueChange={selectViewport}
-        items={SELECT_ITEMS}
+        items={SELECT_ITEMS.map((item) => ({ ...item, label: m(item.label) }))}
         disabled={pending}
       >
         <SelectTrigger
@@ -216,12 +216,10 @@ export function BrowserDeviceToolbar({
           <SelectValue />
         </SelectTrigger>
         <SelectPopup align="start" alignItemWithTrigger={false}>
-          <SelectItem value={RESPONSIVE_VALUE}>
-            <T>Responsive</T>
-          </SelectItem>
+          <SelectItem value={RESPONSIVE_VALUE}>{m(SELECT_ITEMS[0]!.label)}</SelectItem>
           <SelectGroup>
             <SelectGroupLabel>
-              <T>Standard</T>
+              <T context="group of standard device sizes">Standard</T>
             </SelectGroupLabel>
             {PREVIEW_VIEWPORT_PRESETS.map((preset) => (
               <SelectItem key={preset.id} value={preset.id}>
@@ -304,7 +302,9 @@ export function BrowserDeviceToolbar({
               size="icon-xs"
               type="button"
               aria-label={
-                aspectRatio === null ? "Lock viewport aspect ratio" : "Unlock viewport aspect ratio"
+                aspectRatio === null
+                  ? gt("Lock viewport aspect ratio")
+                  : gt("Unlock viewport aspect ratio")
               }
               aria-pressed={aspectRatio !== null}
               disabled={pending || !customValid}
@@ -320,7 +320,7 @@ export function BrowserDeviceToolbar({
           )}
         </TooltipTrigger>
         <TooltipPopup side="top">
-          {aspectRatio === null ? t("Lock aspect ratio") : t("Unlock aspect ratio")}
+          {aspectRatio === null ? <T>Lock aspect ratio</T> : <T>Unlock aspect ratio</T>}
         </TooltipPopup>
       </Tooltip>
       <Button

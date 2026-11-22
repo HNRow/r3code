@@ -1,4 +1,3 @@
-import { pipe } from "effect/Function";
 import {
   secretRequestAnswerInput,
   secretRequestDisplay,
@@ -23,6 +22,7 @@ import type {
   SecretProviderId,
 } from "@t3tools/contracts";
 import { useAtomValue } from "@effect/atom-react";
+import { useGT, useMessages } from "gt-react-native";
 import { useRef, useState } from "react";
 import { View, type ColorValue } from "react-native";
 
@@ -35,7 +35,6 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { tryOpenExternalUrl } from "../../lib/openExternalUrl";
 import { Button } from "../../components/ui/Button";
 import { Chip } from "../../components/ui/Chip";
-import { useGT, useMessages } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 const LOCK_SYMBOL: AppSymbolName = { ios: "lock", android: "lock" };
@@ -47,9 +46,10 @@ export function SecretRequestCard(props: {
   readonly projectedItem: OrchestrationV2ProjectedTurnItem;
   readonly iconColor: ColorValue;
 }) {
+  const m = useMessages();
   const { item, visibility } = props.projectedItem;
   if (item.type !== "secret_request") return null;
-  const display = secretRequestDisplay(item, visibility);
+  const display = secretRequestDisplay(item, visibility, m);
   if (display.kind === "pending") {
     return (
       <PendingSecretRequestForm
@@ -81,6 +81,7 @@ function PendingSecretRequestForm(props: {
   readonly iconColor: ColorValue;
 }) {
   const gt = useGT();
+  const m = useMessages();
   const { item } = props;
   const answer = useAtomCommand(serverEnvironment.answerSecretRequest, {
     label: t("answer secret request"),
@@ -88,14 +89,13 @@ function PendingSecretRequestForm(props: {
     reportFailure: false,
     reportDefect: false,
   });
-  const messages = useMessages();
-  const inputs = secretRequestInputs(item, messages);
+  const inputs = secretRequestInputs(item, m);
   const multiple = item.fields !== undefined;
   const config = useAtomValue(serverEnvironment.configValueAtom(props.environmentId));
   // A reference answers one value, so a card with fields is always typed.
   const sources = multiple
     ? NO_SOURCES
-    : secretRequestSources(config, config?.settings.secretProviders ?? {});
+    : secretRequestSources(config, config?.settings.secretProviders ?? {}, m);
   const [sourceId, setSourceId] = useState<SecretProviderId | null>(null);
   const source = sources.find((candidate) => candidate.id === sourceId) ?? null;
   const [values, setValues] = useState<Readonly<Record<string, string>>>({});
@@ -126,7 +126,7 @@ function PendingSecretRequestForm(props: {
     }
     setValues(typed);
     if (!isAtomCommandInterrupted(result)) {
-      pipe(squashAtomCommandFailure(result), secretRequestFailureMessage, setError);
+      setError(secretRequestFailureMessage(squashAtomCommandFailure(result), m));
     }
   };
   const save = (typed: Readonly<Record<string, string>>) => {
@@ -163,7 +163,7 @@ function PendingSecretRequestForm(props: {
       {link !== null ? (
         <View className="gap-1.5">
           <Button
-            label={t`Open ${link.host}`}
+            label={gt("Open {host}", { host: link.host })}
             tone="secondary"
             fullWidth
             onPress={() => void tryOpenExternalUrl(link.href, "secret-request")}
@@ -179,7 +179,7 @@ function PendingSecretRequestForm(props: {
       {sources.length > 0 ? (
         <View className="flex-row flex-wrap gap-2">
           <Chip
-            label={gt("Value")}
+            label={gt("Value", { $context: "noun, enter the secret value directly" })}
             size="small"
             selected={source === null}
             disabled={submitting}
@@ -239,7 +239,10 @@ function PendingSecretRequestForm(props: {
       ) : (
         <TextInput
           key={source.id}
-          accessibilityLabel={`${item.label} reference in ${source.label}`}
+          accessibilityLabel={gt("{label} reference in {source}", {
+            label: item.label,
+            source: source.label,
+          })}
           placeholder={source.referencePlaceholder}
           value={reference}
           onChangeText={(next) => {
@@ -282,11 +285,11 @@ function PendingSecretRequestForm(props: {
             type="monochrome"
           />
           <Text className="flex-1 font-sans text-xs text-foreground-muted">
-            {secretRequestPrivacyNote(item)}
+            {secretRequestPrivacyNote(item, m)}
           </Text>
         </View>
         <Button
-          label={gt("Decline")}
+          label={gt("Decline", { $context: "verb, refuses the secret request" })}
           tone="text"
           disabled={submitting}
           onPress={() => void send({ type: "decline" })}

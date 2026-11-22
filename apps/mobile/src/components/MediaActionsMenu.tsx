@@ -1,11 +1,11 @@
 import { MenuView } from "@react-native-menu/menu";
+import { useGT } from "gt-react-native";
 import type { ReactElement } from "react";
 import { Platform, View, type PressableProps, type StyleProp, type ViewStyle } from "react-native";
 
 import type { useMediaActions } from "../state/mediaActions";
 import { SymbolView } from "./ui/AppSymbol";
 import { Menu } from "./ui/Menu";
-import { useGT } from "gt-react-native";
 
 export function MediaActionsMenu(props: {
   readonly media: ReturnType<typeof useMediaActions>;

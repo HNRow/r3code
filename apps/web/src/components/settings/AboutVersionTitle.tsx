@@ -1,18 +1,25 @@
+import { msg, T, useGT } from "gt-react";
+
 import { APP_VERSION } from "../../branding";
 import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
 import { InlineButton } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
-import { T, t } from "gt-react";
+import { t } from "gt-react";
 
 export function AboutVersionTitle() {
+  const gt = useGT();
   const { copyToClipboard } = useCopyToClipboard<void>({
-    target: "version",
+    target: {
+      target: "version",
+      unavailableMessage: msg("Clipboard API is unavailable while copying version."),
+      failureMessage: msg("Failed to copy version to the clipboard."),
+    },
     onError: (error) => {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: t("Could not copy version"),
+          title: gt("Could not copy version"),
           description: error.message,
         }),
       );
@@ -30,7 +37,7 @@ export function AboutVersionTitle() {
             render={
               <InlineButton
                 tone="muted"
-                aria-label={`Copy version ${APP_VERSION}`}
+                aria-label={gt("Copy version {version}", { version: APP_VERSION })}
                 onClick={() => copyToClipboard(APP_VERSION, undefined)}
               >
                 {APP_VERSION}

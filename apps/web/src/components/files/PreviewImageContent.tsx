@@ -1,10 +1,11 @@
+import { useGT } from "gt-react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { MaximizeIcon, MinusIcon, PlusIcon, ScanIcon } from "lucide-react";
 import { ExpandedImageDialog } from "~/components/chat/ExpandedImageDialog";
 import { observeResize } from "~/lib/observeResize";
 import { AttachmentImage } from "../media/AttachmentImage";
 import { FileSurfaceAction, FileSurfaceFailure } from "./fileSurfaceChrome";
-import { useGT, t } from "gt-react";
+import { t } from "gt-react";
 
 export default function PreviewImageContent(props: {
   readonly src: string;
@@ -43,7 +44,7 @@ export default function PreviewImageContent(props: {
         <span className="tabular-nums">
           {natural.width
             ? `${natural.width.toLocaleString()} × ${natural.height.toLocaleString()}`
-            : t("Loading image…")}
+            : gt("Loading image…")}
         </span>
         <div className="flex items-center gap-1">
           <FileSurfaceAction
@@ -87,7 +88,7 @@ export default function PreviewImageContent(props: {
         >
           <button
             type="button"
-            aria-label={`Zoom ${props.name}`}
+            aria-label={gt("Zoom {name}", { name: props.name })}
             className="shrink-0 cursor-zoom-in"
             onClick={() => setExpanded(true)}
           >

@@ -1,7 +1,7 @@
+import { useGT } from "gt-react";
 import { type CSSProperties, useState } from "react";
 
 import { cn } from "~/lib/utils";
-import { useGT } from "gt-react";
 
 export function PanelAnimationsPreview({ durationMs }: { durationMs: number }) {
   const gt = useGT();

@@ -1,11 +1,11 @@
 import type { ProviderDriverKind } from "@t3tools/contracts";
+import { T } from "gt-react";
 import { FolderGit2Icon, FolderIcon, GitBranchIcon } from "lucide-react";
 import { ProjectFavicon, type ProjectFaviconProject } from "./ProjectFavicon";
 import { ProviderInstanceIcon } from "./chat/ProviderInstanceIcon";
 import { cn } from "~/lib/utils";
 
 import { MiddleTruncate } from "./ui/middle-truncate";
-import { T } from "gt-react";
 
 export type ThreadCommandSubtitleVariant =
   | "favicon-workspace-harness"

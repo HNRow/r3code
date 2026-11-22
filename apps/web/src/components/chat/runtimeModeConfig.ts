@@ -51,7 +51,7 @@ export function resolveCompatibleRuntimeMode(
   return { modes, mode: modes.includes(runtimeMode) ? runtimeMode : (modes[0] ?? runtimeMode) };
 }
 
-function resolveRuntimeModeOption(
+export function resolveRuntimeModeOption(
   mode: RuntimeMode,
   resolve: MessageResolver = m,
 ): {

@@ -4,6 +4,7 @@ import {
   htmlRenderFrameHeight,
   type HtmlRenderReference,
 } from "@t3tools/shared/htmlRender";
+import { useGT } from "gt-react";
 import { MinusIcon, PlusIcon, XIcon } from "lucide-react";
 import { useRef, useState } from "react";
 
@@ -12,7 +13,7 @@ import { observeResize } from "~/lib/observeResize";
 import { HtmlRenderDocument } from "../files/BrowserDocumentFrame";
 import { Button } from "../ui/button";
 import { Dialog, DialogPopup, DialogTitle } from "../ui/dialog";
-import { Var, T, useGT } from "gt-react";
+import { Var, T } from "gt-react";
 
 export function HtmlRenderDialog(props: {
   readonly src: string;
@@ -46,11 +47,7 @@ export function HtmlRenderDialog(props: {
         className="row-start-1"
         initialFocus={closeButtonRef}
       >
-        <DialogTitle className="sr-only">
-          <T>
-            Expanded <Var>{title}</Var> preview
-          </T>
-        </DialogTitle>
+        <DialogTitle className="sr-only">{gt("Expanded {title} preview", { title })}</DialogTitle>
         {/* 1144px is the widest the server measures a page; pages are written for the reply column and stretch badly beyond it. */}
         <div className="relative w-[min(92vw,1176px)]">
           <Button

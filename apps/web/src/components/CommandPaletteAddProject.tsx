@@ -6,6 +6,7 @@ import { sourceControlClients } from "@t3tools/client-runtime/source-control-cli
 import type { SourceControlProviderKind } from "@t3tools/contracts";
 import { FolderGit2Icon, LinkIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
+import { T, useGT } from "gt-react";
 
 import { sourceControlIcon } from "~/sourceControlPresentation";
 import { ITEM_ICON_CLASS } from "./CommandPalette.logic";
@@ -14,7 +15,7 @@ import { Button } from "./ui/button";
 import { Kbd, KbdGroup } from "./ui/kbd";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "./ui/select";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
-import { useGT, T, t } from "gt-react";
+import { t } from "gt-react";
 
 export function remoteProjectSourceIcon(
   source: AddProjectRemoteSource,
@@ -130,6 +131,8 @@ export function NewProjectSummary(props: {
   readonly projectsRoot: string | null;
   readonly environmentLabel: string | null;
 }) {
+  const gt = useGT();
+  const environment = props.environmentLabel;
   return (
     <div className="p-2 pb-0">
       <div className="flex min-h-8 items-center gap-2 rounded-sm px-2 py-1.5">
@@ -138,13 +141,19 @@ export function NewProjectSummary(props: {
         </CommandPaletteTitleIcon>
         <span className="flex min-w-0 flex-1 flex-col">
           <span className="truncate text-foreground text-sm">
-            {props.name.length > 0 ? props.name : t("New project")}
+            {props.name.length > 0 ? props.name : gt("New project")}
           </span>
           <span className="truncate text-muted-foreground/85 text-xs">
             {props.name.length > 0
-              ? `Creates ${props.pathPreview}`
-              : `Goes in ${props.projectsRoot}`}
-            {props.environmentLabel === null ? null : ` on ${props.environmentLabel}`}
+              ? environment === null
+                ? gt("Creates {path}", { path: props.pathPreview })
+                : gt("Creates {path} on {environment}", { path: props.pathPreview, environment })
+              : environment === null
+                ? gt("Goes in {root}", { root: String(props.projectsRoot) })
+                : gt("Goes in {root} on {environment}", {
+                    root: String(props.projectsRoot),
+                    environment,
+                  })}
           </span>
         </span>
       </div>

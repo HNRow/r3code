@@ -1,3 +1,4 @@
+import { T, useGT, useMessages } from "gt-react-native";
 import { NativeScrollView } from "../../native/NativeScrollViewMarker";
 import { useSearchToolbarInset } from "../../components/ui/useBarInset";
 import { ScreenScrollView as ScrollView } from "../../components/ui/ScreenScrollView";
@@ -21,7 +22,6 @@ import { ListRow } from "../../components/ui/ListRow";
 import { SettingsScreen } from "./components/SettingsScreen";
 
 import { getMobileThirdPartyLicenses } from "./mobileThirdPartyLicenses";
-import { useGT, T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 function useMobileThirdPartyLicenses() {
@@ -57,9 +57,9 @@ export function SettingsOpenSourceLicensesRouteScreen() {
   const search = {
     value: query,
     onChangeText: setQuery,
-    placeholder: t("Search packages"),
-    accessibilityLabel: t("Search open-source licenses"),
-    clearAccessibilityLabel: "Clear package search",
+    placeholder: gt("Search packages"),
+    accessibilityLabel: gt("Search open-source licenses"),
+    clearAccessibilityLabel: gt("Clear package search"),
   };
   const searchInset = useSearchToolbarInset(search);
   const manifest = useMobileThirdPartyLicenses();
@@ -121,6 +121,7 @@ type LicenseDetailProps = StaticScreenProps<{ readonly entryKey: string }>;
 
 export function SettingsOpenSourceLicenseRouteScreen({ route }: LicenseDetailProps) {
   const gt = useGT();
+  const messages = useMessages();
   const insets = useSafeAreaInsets();
   const manifest = useMobileThirdPartyLicenses();
   const entry = manifest
@@ -150,11 +151,9 @@ export function SettingsOpenSourceLicenseRouteScreen({ route }: LicenseDetailPro
         showsVerticalScrollIndicator={false}
       >
         <View className="gap-2 px-1">
-          <Text translate={false} className="text-2xl font-t3-bold text-foreground">
-            {entry.name}
-          </Text>
-          <Text translate={false} className="text-base leading-normal text-foreground-muted">
-            {[entry.version, entry.license, formatLicenseBundles(entry.bundles)]
+          <Text className="text-2xl font-t3-bold text-foreground">{entry.name}</Text>
+          <Text className="text-base leading-normal text-foreground-muted">
+            {[entry.version, entry.license, formatLicenseBundles(entry.bundles, messages)]
               .filter((value): value is string => Boolean(value))
               .join(" · ")}
           </Text>

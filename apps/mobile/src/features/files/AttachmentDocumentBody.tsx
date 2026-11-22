@@ -1,4 +1,5 @@
 import type { EnvironmentId } from "@t3tools/contracts";
+import { useGT } from "gt-react-native";
 import { View } from "react-native";
 
 import { EmptyState } from "../../components/ui/EmptyState";
@@ -10,7 +11,6 @@ import { FileMarkdownPreview } from "./FileMarkdownPreview";
 import { FilePreviewLoading, FilePreviewNotice } from "./FilePreviewFeedback";
 import { SourceFileSurface } from "./SourceFileSurface";
 import { WorkspaceFileWebPreview } from "./WorkspaceFileWebPreview";
-import { useGT } from "gt-react-native";
 
 export function nativeViewerKind(kind: ReturnType<typeof useAttachmentDocument>["kind"]) {
   if (kind === "image") return "image" as const;
@@ -39,8 +39,8 @@ export function AttachmentDocumentBody(props: {
   readonly nativeError: string | null;
   readonly onOpenNative: () => void;
 }) {
-  const gt = useGT();
   const { document } = props;
+  const gt = useGT();
   if (document.error) {
     return (
       <View className="flex-1 items-center justify-center bg-sheet px-6">
@@ -103,7 +103,7 @@ export function AttachmentDocumentBody(props: {
         title={gt("No preview for this file")}
         detail={
           props.nativeError ??
-          "No app on this device can show this format. Save or share it to open it elsewhere."
+          gt("No app on this device can show this format. Save or share it to open it elsewhere.")
         }
         actionLabel={gt("Try again")}
         onAction={props.onOpenNative}

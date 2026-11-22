@@ -1,6 +1,7 @@
 import { Chip } from "../../components/ui/Chip";
 import { PullRequestSectionHeading } from "./PullRequestSectionHeading";
 import type { PullRequestListEntry, PullRequestSummary } from "@t3tools/contracts";
+import { T, useGT, useMessages } from "gt-react-native";
 import { View } from "react-native";
 import { PullRequestCardGroup, PullRequestCardRow } from "./PullRequestControls";
 import { PullRequestStackCard } from "./PullRequestStackCard";
@@ -8,7 +9,6 @@ import type { PullRequestParams } from "./usePullRequestDiff";
 import type { PullRequestStackState } from "./usePullRequestStack";
 import { pullRequestListReviewStatus } from "./pullRequestList";
 import { PullRequestGlyph } from "./pullRequestGlyphs";
-import { useGT, T } from "gt-react-native";
 
 export function PullRequestOverviewLoading({
   summary,
@@ -20,10 +20,14 @@ export function PullRequestOverviewLoading({
   readonly stack: PullRequestStackState;
 }) {
   const gt = useGT();
-  const review = pullRequestListReviewStatus({
-    reviewDecision: summary.reviewDecision ?? undefined,
-    viewerReviewRequested: "viewerReviewRequested" in summary && summary.viewerReviewRequested,
-  });
+  const m = useMessages();
+  const review = pullRequestListReviewStatus(
+    {
+      reviewDecision: summary.reviewDecision ?? undefined,
+      viewerReviewRequested: "viewerReviewRequested" in summary && summary.viewerReviewRequested,
+    },
+    m,
+  );
   const conflicting = summary.mergeability === "conflicting";
   const clean = summary.mergeability === "mergeable";
   return (
@@ -38,12 +42,12 @@ export function PullRequestOverviewLoading({
           compact
           title={
             summary.checksState === "passing"
-              ? "Checks completed"
+              ? gt("Checks completed")
               : summary.checksState === "failing"
-                ? "Checks failing"
+                ? gt("Checks failing")
                 : summary.checksState === "pending"
-                  ? "Checks running"
-                  : "Checks"
+                  ? gt("Checks running")
+                  : gt("Checks", { $context: "CI checks row" })
           }
           icon={
             summary.checksState === "passing"
@@ -64,7 +68,7 @@ export function PullRequestOverviewLoading({
         </PullRequestCardRow>
         <PullRequestCardRow
           compact
-          title={review?.accessibleLabel ?? "Reviews"}
+          title={review?.accessibleLabel ?? gt("Reviews")}
           icon={review?.icon ?? "bubble.left"}
           tint={review?.tint}
         >
@@ -74,10 +78,10 @@ export function PullRequestOverviewLoading({
           compact
           title={
             conflicting
-              ? `Conflicts with ${summary.baseBranch}`
+              ? gt("Conflicts with {branch}", { branch: summary.baseBranch })
               : clean
-                ? `No conflicts with ${summary.baseBranch}`
-                : "Branch"
+                ? gt("No conflicts with {branch}", { branch: summary.baseBranch })
+                : gt("Branch", { $context: "git branch" })
           }
           icon={
             conflicting ? PullRequestGlyph.conflicting : clean ? "checkmark.circle" : "arrow.branch"

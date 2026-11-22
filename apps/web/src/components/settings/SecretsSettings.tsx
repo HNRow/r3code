@@ -1,6 +1,7 @@
 import type { EnvironmentId, SecretProviderConfig, SecretProviderId } from "@t3tools/contracts";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
+import { T, useGT, useMessages, Var } from "gt-react";
 
 import { useEnvironmentSettings, useUpdateEnvironmentSettings } from "../../hooks/useSettings";
 import type { EnvironmentPresentation } from "../../state/environments";
@@ -25,9 +26,8 @@ import {
 } from "./ProviderSettingsPanel.logic";
 import { useSettingsScope } from "./SettingsScopeContext";
 import { RedactedSensitiveText } from "./RedactedSensitiveText";
-import { searchableSetting } from "./settingsSearch";
+import { useSearchableSetting } from "./settingsSearch";
 import { SettingsPageContainer, SettingsRow, SettingsSection } from "./settingsLayout";
-import { Var, T, useGT } from "gt-react";
 
 const SECRET_PROVIDER_KINDS: Readonly<
   Record<string, { readonly name: string; readonly icon: Icon }>
@@ -36,6 +36,7 @@ const SECRET_PROVIDER_KINDS: Readonly<
 };
 
 export function SecretsSettingsPanel() {
+  const setting = useSearchableSetting();
   const { scope, environment } = useSettingsScope();
   const connected = environment?.connection.phase === "connected";
   return (
@@ -43,7 +44,7 @@ export function SecretsSettingsPanel() {
       {connected &&
       environment.serverConfig !== null &&
       environment.serverConfig.secretProviderSettings !== true ? (
-        <SettingsSection {...searchableSetting("secret-providers")}>
+        <SettingsSection {...setting("secret-providers")}>
           <p className="px-4 py-3 text-sm text-muted-foreground">
             <T>
               Update R3 Code on <Var>{environment.label}</Var> to manage its secret providers.
@@ -57,7 +58,7 @@ export function SecretsSettingsPanel() {
           projectScoped={scope.kind === "project" || scope.kind === "checkout"}
         />
       ) : (
-        <SettingsSection {...searchableSetting("secret-providers")}>
+        <SettingsSection {...setting("secret-providers")}>
           <p className="px-4 py-3 text-sm text-muted-foreground">
             <T>
               Connect an environment to manage the secret providers its provider variables read
@@ -77,6 +78,7 @@ function EnvironmentSecretProviders({
   readonly environment: EnvironmentPresentation;
   readonly projectScoped: boolean;
 }) {
+  const setting = useSearchableSetting();
   const gt = useGT();
   const environmentId = environment.environmentId;
   const sessionState = useEnvironmentSessionState(environmentId);
@@ -105,14 +107,12 @@ function EnvironmentSecretProviders({
   return (
     <>
       <SettingsSection
-        {...searchableSetting("secret-providers")}
+        {...setting("secret-providers")}
         headerAction={
           !readOnly ? (
             <Button size="xs" variant="outline" onClick={() => setDialog({ mode: "add" })}>
-              <T>
-                <PlusIcon className="size-3" aria-hidden />
-                Add provider
-              </T>
+              <PlusIcon className="size-3" aria-hidden />
+              <T>Add provider</T>
             </Button>
           ) : null
         }
@@ -160,7 +160,7 @@ function EnvironmentSecretProviders({
                       />
                     </span>
                   ) : (
-                    `Unsupported provider (${config.kind})`
+                    gt("Unsupported provider ({kind})", { kind: config.kind })
                   )
                 }
                 control={
@@ -258,7 +258,8 @@ function SecretProviderUses({
   readonly id: SecretProviderId;
   readonly label: string;
 }) {
-  const uses = secretProviderUses(useEnvironmentSettings(environmentId), id);
+  const messages = useMessages();
+  const uses = secretProviderUses(useEnvironmentSettings(environmentId), id, messages);
   if (uses.length === 0) {
     return (
       <AlertDialogDescription>

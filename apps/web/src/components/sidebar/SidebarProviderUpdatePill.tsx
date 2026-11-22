@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "@effect/atom-react";
 import type { ServerProvider } from "@t3tools/contracts";
 import { CircleCheckIcon, DownloadIcon, TriangleAlertIcon, XIcon } from "lucide-react";
+import { T, useGT, useMessages } from "gt-react";
 import { useEffect, useEffectEvent, useState, type CSSProperties } from "react";
 
 import { primaryServerProvidersAtom } from "../../state/server";
@@ -11,7 +12,6 @@ import {
   type ProviderUpdateSidebarPillView,
 } from "../ProviderUpdateLaunchNotification.logic";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
-import { useGT, T } from "gt-react";
 
 // Matches the pill's `duration-180` class.
 const PROVIDER_UPDATE_PILL_EXIT_MS = 180;
@@ -45,6 +45,7 @@ function latestProviderCheckedAt(
 
 export function SidebarProviderUpdatePill() {
   const gt = useGT();
+  const messages = useMessages();
   const navigate = useNavigate();
   const providers = useAtomValue(primaryServerProvidersAtom);
   const [dismissedKeys, setDismissedKeys] = useState<ReadonlySet<string>>(() => new Set());
@@ -54,12 +55,16 @@ export function SidebarProviderUpdatePill() {
   const [dismissAfterExitKeys, setDismissAfterExitKeys] = useState<ReadonlyArray<string>>([]);
   const [visibleAfterIso, setVisibleAfterIso] = useState<string | undefined>();
   const effectiveVisibleAfterIso = visibleAfterIso ?? latestProviderCheckedAt(providers);
-  const view = getProviderUpdateSidebarPillView(providers, {
-    ...(effectiveVisibleAfterIso !== undefined
-      ? { visibleAfterIso: effectiveVisibleAfterIso }
-      : {}),
-    dismissedKeys,
-  });
+  const view = getProviderUpdateSidebarPillView(
+    providers,
+    {
+      ...(effectiveVisibleAfterIso !== undefined
+        ? { visibleAfterIso: effectiveVisibleAfterIso }
+        : {}),
+      dismissedKeys,
+    },
+    messages,
+  );
 
   if (visibleAfterIso === undefined && effectiveVisibleAfterIso !== undefined) {
     setVisibleAfterIso(effectiveVisibleAfterIso);
@@ -68,7 +73,7 @@ export function SidebarProviderUpdatePill() {
   const openProviderSettings = () => {
     void navigate({ to: "/settings/providers" });
   };
-  const displayedView = renderedView ?? view;
+  const displayedView = renderedView?.key === view?.key ? view : (renderedView ?? view);
   const dismissAfterVisibleMs = displayedView?.dismissAfterVisibleMs;
   const viewKey = displayedView?.key ?? null;
   const showDismissProgress =

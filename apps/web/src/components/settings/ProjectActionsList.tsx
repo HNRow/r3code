@@ -1,11 +1,11 @@
 import type { ProjectScript, ResolvedKeybindingsConfig } from "@t3tools/contracts";
+import { T, useGT } from "gt-react";
 import { SettingsIcon } from "lucide-react";
 import { shortcutLabelForCommand } from "../../keybindings";
 import { commandForProjectScript } from "../../projectScripts";
 import { ScriptIcon } from "../projectScriptEditor";
 import { Button } from "../ui/button";
 import { SettingsRow } from "./settingsLayout";
-import { T } from "gt-react";
 
 export function ProjectActionsList({
   scripts,
@@ -18,6 +18,7 @@ export function ProjectActionsList({
   disabled: boolean;
   onEdit: (script: ProjectScript) => void;
 }) {
+  const gt = useGT();
   if (scripts.length === 0)
     return (
       <p className="px-3 py-2 text-base text-muted-foreground sm:px-4 sm:text-sm">
@@ -36,7 +37,7 @@ export function ProjectActionsList({
             <span className="min-w-0 truncate">{script.name}</span>
             {script.runOnWorktreeCreate ? (
               <span className="shrink-0 rounded-sm border border-border/60 px-1.5 py-px text-2xs font-normal text-muted-foreground">
-                <T>setup</T>
+                {gt("setup", { $context: "badge, action runs when a worktree is created" })}
               </span>
             ) : null}
             {script.runOnSettle ? (
@@ -61,7 +62,7 @@ export function ProjectActionsList({
               <Button
                 size="icon-xs"
                 variant="ghost-muted"
-                aria-label={`Edit ${script.name}`}
+                aria-label={gt("Edit {name}", { name: script.name })}
                 disabled={disabled}
                 onClick={() => onEdit(script)}
               >

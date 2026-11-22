@@ -122,7 +122,7 @@ const policies = (): ReadonlyArray<Policy> => [
   {
     id: "PreviewTunnel",
     title: "Allow the preview tunnel",
-    help: "Disabled stops other devices from opening this machine's local servers through T3 Code: no in-app browser tabs loaded on the device, no Open on this device, no port forwarding. Browser tabs still stream from this machine.",
+    help: "Disabled stops other devices from opening this machine's local servers through R3 Code: no in-app browser tabs loaded on the device, no Open on this device, no port forwarding. Browser tabs still stream from this machine.",
     toggle: "PreviewTunnel",
   },
   {
@@ -224,7 +224,7 @@ const admxElement = (element: Element) => {
 export function windowsAdmx(): string {
   const body = policies().map((policy) => {
     const head = `<policy name="${policy.id}" class="Machine" displayName="$(string.${policy.id})" explainText="$(string.${policy.id}_Help)" key="${ADMX_KEY}"`;
-    const common = `<parentCategory ref="T3Code" />\n      <supportedOn ref="SUPPORTED_T3Code" />`;
+    const common = `<parentCategory ref="R3Code" />\n      <supportedOn ref="SUPPORTED_R3Code" />`;
     if (policy.toggle !== undefined) {
       return `    ${head} valueName="${policy.toggle}">
       ${common}
@@ -243,16 +243,16 @@ export function windowsAdmx(): string {
   return `<?xml version="1.0" encoding="utf-8"?>
 <policyDefinitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
   <policyNamespaces>
-    <target prefix="t3code" namespace="T3Tools.Policies.T3Code" />
+    <target prefix="t3code" namespace="T3Tools.Policies.R3Code" />
   </policyNamespaces>
   <resources minRequiredRevision="1.0" />
   <supportedOn>
     <definitions>
-      <definition name="SUPPORTED_T3Code" displayName="$(string.SUPPORTED_T3Code)" />
+      <definition name="SUPPORTED_R3Code" displayName="$(string.SUPPORTED_R3Code)" />
     </definitions>
   </supportedOn>
   <categories>
-    <category name="T3Code" displayName="$(string.T3Code)" />
+    <category name="R3Code" displayName="$(string.R3Code)" />
   </categories>
   <policies>
 ${body.join("\n")}
@@ -276,8 +276,8 @@ const presentationElement = (element: Element) => {
 /** The en-US strings and dialog layouts for `windowsAdmx`. */
 export function windowsAdml(): string {
   const strings: Array<readonly [string, string]> = [
-    ["T3Code", "R3 Code"],
-    ["SUPPORTED_T3Code", "R3 Code with managed policy support"],
+    ["R3Code", "R3 Code"],
+    ["SUPPORTED_R3Code", "R3 Code with managed policy support"],
   ];
   const presentations: Array<string> = [];
   for (const policy of policies()) {

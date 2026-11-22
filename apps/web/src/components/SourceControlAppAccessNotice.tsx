@@ -4,6 +4,7 @@ import {
   sourceControlClients,
 } from "@t3tools/client-runtime/source-control-clients";
 import { ExternalLinkIcon } from "lucide-react";
+import { T, Var } from "gt-react";
 
 import { useEnvironmentSettings } from "../hooks/useSettings";
 import { cn } from "../lib/utils";
@@ -11,7 +12,6 @@ import { useEnvironmentQuery } from "../state/query";
 import { sourceControlEnvironment } from "../state/sourceControl";
 import { T3AppIcon } from "./T3AppIcon";
 import { InlineButton } from "./ui/button";
-import { Var, T } from "gt-react";
 
 /**
  * Says when the server's forge app sign-in cannot reach `repository`, so requests there fall back
@@ -68,8 +68,8 @@ export function SourceControlAppAccessNotice(props: {
       >
         <T>
           Install on <Var>{owner}</Var>
-          <ExternalLinkIcon aria-hidden className="size-3" />
         </T>
+        <ExternalLinkIcon aria-hidden className="size-3" />
       </InlineButton>
     </div>
   );

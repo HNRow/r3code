@@ -7,6 +7,7 @@ import {
 import { AppActivityIndicator } from "../../components/ui/AppActivityIndicator";
 import { LegendList, type LegendListRef } from "@legendapp/list/react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useGT } from "gt-react-native";
 import { use, useMemo, useRef, useState, type ReactNode } from "react";
 import { useAtomValue } from "@effect/atom-react";
 import { Keyboard, Platform, Pressable, View } from "react-native";
@@ -48,8 +49,6 @@ import { useDebouncedValue } from "../../state/queries";
 import { useWorkspaceTabs } from "../layout/workspace/WorkspaceTabsContext";
 import { useSearchScrollRestoration } from "../layout/workspace/useSearchScrollRestoration";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
-import { useGT } from "gt-react-native";
-import { t } from "../../i18n/gt";
 
 function PullRequestListError(props: { readonly message: string }) {
   const [expanded, setExpanded] = useState(false);
@@ -97,8 +96,8 @@ export function PullRequestsScreen(
     readonly renderFrame?: (filters: PullRequestFilterMenu | null, list: ReactNode) => ReactNode;
   } = {},
 ) {
-  const gt = useGT();
   const navigation = useNavigation();
+  const gt = useGT();
   const primaryColumn = use(NativePrimaryColumnContext);
   const workspace = useWorkspaceTabs()!;
   const { environments } = useWorkspaceState();
@@ -330,10 +329,9 @@ export function PullRequestsScreen(
                 <SavedViewsMenu
                   read={(preferences) => preferences.pullRequestSavedViews}
                   write={(pullRequestSavedViews) => ({ pullRequestSavedViews })}
-                  noun="pull request"
-                  shortNoun="PR"
+                  list="pullRequest"
                   suggestedName={
-                    controls.involvement === "reviewing" ? "PRs Requesting My Review" : ""
+                    controls.involvement === "reviewing" ? gt("PRs Requesting My Review") : ""
                   }
                   matches={pullRequestViewMatches}
                   scope={{
@@ -367,7 +365,7 @@ export function PullRequestsScreen(
                 {result.data.errors.map((error) => (
                   <PullRequestListError
                     key={`${error.environmentId} ${error.projectTitle} ${error.message}`}
-                    message={`${error.projectTitle || environments.find((environment) => environment.environmentId === error.environmentId)?.environmentLabel || "Environment"}: ${error.message}`}
+                    message={`${error.projectTitle || environments.find((environment) => environment.environmentId === error.environmentId)?.environmentLabel || gt("Environment", { $context: "fallback name for a server" })}: ${error.message}`}
                   />
                 ))}
               </View>
@@ -412,22 +410,22 @@ export function PullRequestsScreen(
               <EmptyState
                 title={
                   result.error
-                    ? "Couldn't load pull requests"
+                    ? gt("Couldn't load pull requests")
                     : targets.length && connectedTargets.length === 0
-                      ? t("Environment offline")
+                      ? gt("Environment offline")
                       : targets.length
                         ? query
-                          ? t("No results")
-                          : t("No matching pull requests")
-                        : t("Connect an environment")
+                          ? gt("No results")
+                          : gt("No matching pull requests")
+                        : gt("Connect an environment")
                 }
                 detail={
                   result.error ??
                   (targets.length && connectedTargets.length === 0
-                    ? t("Reconnect to load pull requests that aren't saved on this device.")
+                    ? gt("Reconnect to load pull requests that aren't saved on this device.")
                     : targets.length
-                      ? t("Pull requests from the selected environments' projects appear here.")
-                      : t("Add an environment in Settings to browse its pull requests."))
+                      ? gt("Pull requests from the selected environments' projects appear here.")
+                      : gt("Add an environment in Settings to browse its pull requests."))
                 }
                 variant="plain"
               />

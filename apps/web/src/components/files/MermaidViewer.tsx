@@ -1,10 +1,11 @@
+import { T, useGT } from "gt-react";
 import { useState } from "react";
 
 import { MermaidDiagram } from "../chat/MermaidDiagram";
 import { ExpandedImageDialog } from "../chat/ExpandedImageDialog";
-import { T } from "gt-react";
 
 export default function MermaidViewer(props: { readonly text: string }) {
+  const gt = useGT();
   const [expanded, setExpanded] = useState<string | null>(null);
   // Mermaid lays out DOM before sanitizing its SVG. Refuse resource and config
   // syntax before that pass so standalone files cannot initiate requests. Node
@@ -27,7 +28,7 @@ export default function MermaidViewer(props: { readonly text: string }) {
       <MermaidDiagram source={props.text} onExpand={setExpanded} />
       {expanded ? (
         <ExpandedImageDialog
-          preview={{ images: [{ src: expanded, name: "Mermaid diagram" }], index: 0 }}
+          preview={{ images: [{ src: expanded, name: gt("Mermaid diagram") }], index: 0 }}
           onClose={() => setExpanded(null)}
         />
       ) : null}

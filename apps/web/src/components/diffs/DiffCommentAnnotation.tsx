@@ -1,4 +1,6 @@
 import type { EnvironmentId, ProjectId } from "@t3tools/contracts";
+import { T, useGT, useMessages } from "gt-react";
+import { reviewCommentRangeText } from "~/lib/composerContextRecords";
 import { MessageCircle, Trash2 } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
@@ -15,7 +17,6 @@ import {
 import { textDirection } from "~/textDirection";
 
 import { isCommentSubmitShortcut } from "./commentSubmitShortcut";
-import { useGT, T } from "gt-react";
 
 interface DiffCommentSecondaryAction {
   readonly label: string;
@@ -56,14 +57,15 @@ export function DiffCommentAnnotation({
   onCancel,
   onComment,
   onDelete,
-  placeholder = "Add a comment…",
-  submitLabel = "Comment",
+  placeholder,
+  submitLabel,
   pending = false,
   secondaryAction,
   focusOnMount = true,
   completionScope = null,
 }: DiffCommentAnnotationProps) {
   const gt = useGT();
+  const messages = useMessages();
   const [localDraftText, setLocalDraftText] = useState("");
   const displayedText = kind === "draft" && !onTextChange ? localDraftText : text;
   const trimmedText = displayedText.trim();
@@ -137,8 +139,10 @@ export function DiffCommentAnnotation({
         size="sm"
         value={displayedText}
         dir={textDirection(displayedText)}
-        placeholder={placeholder}
-        aria-label={`Comment on lines ${rangeLabel}`}
+        placeholder={placeholder ?? gt("Add a comment…")}
+        aria-label={gt("Comment on lines {rangeLabel}", {
+          rangeLabel: reviewCommentRangeText(rangeLabel, messages),
+        })}
         onValueChange={onTextChange ?? setLocalDraftText}
         onFocus={(event) => {
           const end = event.currentTarget.value.length;
@@ -184,7 +188,7 @@ export function DiffCommentAnnotation({
           disabled={speech?.preparing || pending || (!speech?.blocksSubmission && !trimmedText)}
           onClick={() => submit(speech, onComment)}
         >
-          {submitLabel}
+          {submitLabel ?? gt("Comment", { $context: "verb, submit button" })}
         </Button>
       </div>
     </div>

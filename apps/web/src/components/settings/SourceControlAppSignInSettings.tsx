@@ -1,3 +1,5 @@
+import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
+import { m } from "~/i18n/messages";
 import type { EnvironmentId, SourceControlSignInPrompt } from "@t3tools/contracts";
 import {
   readHostCredentialSettings,
@@ -6,6 +8,7 @@ import {
 } from "@t3tools/client-runtime/source-control-clients";
 import { useAtomValue } from "@effect/atom-react";
 import * as Cause from "effect/Cause";
+import { msg, T, useGT, Var } from "gt-react";
 import { CheckIcon, ExternalLinkIcon, CopyIcon } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
@@ -19,7 +22,7 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { Button, InlineButton } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import { RedactedSensitiveText } from "./RedactedSensitiveText";
-import { T, useGT, Var, t } from "gt-react";
+import { t } from "gt-react";
 
 type SignInState =
   | { readonly status: "idle" }
@@ -29,7 +32,7 @@ type SignInState =
 
 const failureMessage = (cause: Cause.Cause<unknown>) => {
   const error = Cause.squash(cause);
-  return error instanceof Error ? error.message : String(error);
+  return error instanceof Error ? (thrownErrorMessage(error, m) ?? error.message) : String(error);
 };
 
 const expiryTime = (expiresAt: number) =>
@@ -115,7 +118,11 @@ export function SourceControlAppSignInSettings({
   });
   const { copyToClipboard, isCopied } = useCopyToClipboard({
     timeout: 1500,
-    target: "sign-in code",
+    target: {
+      target: "sign-in code",
+      unavailableMessage: msg("Clipboard API is unavailable while copying sign-in code."),
+      failureMessage: msg("Failed to copy sign-in code to the clipboard."),
+    },
   });
   const [state, setState] = useState<SignInState>({ status: "idle" });
 
@@ -173,9 +180,9 @@ export function SourceControlAppSignInSettings({
           </T>
         </span>
       ) : tokenOverrides ? (
-        "Signed in, but the token saved below is used while it can be read."
+        gt("Signed in, but the token saved below is used while it can be read.")
       ) : (
-        "Signed in"
+        gt("Signed in")
       );
     action = (
       <Button size="xs" variant="outline" disabled={!canSignIn} onClick={() => void signOut()}>
@@ -183,7 +190,7 @@ export function SourceControlAppSignInSettings({
       </Button>
     );
   } else if (waiting !== null) {
-    subtitle = "Approve the app on GitHub to finish signing in.";
+    subtitle = gt("Approve the app on GitHub to finish signing in.");
     action = (
       <Button
         size="xs"
@@ -197,7 +204,7 @@ export function SourceControlAppSignInSettings({
       </Button>
     );
   } else {
-    subtitle = "A far higher GitHub API rate limit than a personal token or gh login.";
+    subtitle = gt("A far higher GitHub API rate limit than a personal token or gh login.");
     action = (
       <Button
         size="xs"
@@ -205,7 +212,7 @@ export function SourceControlAppSignInSettings({
         onClick={() => void signIn()}
       >
         {state.status === "starting" ? <Spinner /> : null}
-        {state.status === "failed" ? t("Try again") : t("Sign in with GitHub")}
+        {state.status === "failed" ? gt("Try again") : gt("Sign in with GitHub")}
       </Button>
     );
   }
@@ -247,14 +254,12 @@ export function SourceControlAppSignInSettings({
               }
               onClick={() => copyToClipboard(waiting.userCode, undefined)}
             >
-              <T>
-                Copy code & open GitHub
-                <ExternalLinkIcon aria-hidden className="size-3.5" />
-              </T>
+              <T>Copy code & open GitHub</T>
+              <ExternalLinkIcon aria-hidden className="size-3.5" />
             </Button>
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span aria-hidden className="size-1.5 rounded-full bg-warning" />
               <T>
-                <span aria-hidden className="size-1.5 rounded-full bg-warning" />
                 Waiting for approval · code expires at <Var>{expiryTime(waiting.expiresAt)}</Var>
               </T>
             </p>

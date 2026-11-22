@@ -1,3 +1,4 @@
+import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
 import type { ScopedThreadRef } from "@t3tools/contracts";
 import {
   pullRequestLinkProject,
@@ -5,7 +6,9 @@ import {
 } from "@t3tools/client-runtime/pull-request-link-input";
 import { useAtomValue } from "@effect/atom-react";
 import { settlePromise, squashAtomCommandFailure } from "@t3tools/client-runtime/state/runtime";
+import { msg, T, useGT } from "gt-react";
 import { useRef, useState } from "react";
+import { m } from "~/i18n/messages";
 
 import { useProjects, useThreadShell } from "~/state/entities";
 import { usePullRequestLinking } from "~/hooks/usePullRequestLinking";
@@ -22,7 +25,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { T, useGT, t } from "gt-react";
+import { t } from "gt-react";
 
 // Host in chat to survive command palette dismissal.
 const linkPullRequestDialogThreadAtom = Atom.make<ScopedThreadRef | null>(null).pipe(
@@ -105,7 +108,7 @@ function LinkPullRequestDialog({
     setPending(false);
     if (result._tag === "Failure") {
       const error = squashAtomCommandFailure(result);
-      setSubmitError(error instanceof Error ? error.message : "Could not link the pull request.");
+      setSubmitError(thrownErrorMessage(error, m) ?? m(msg("Could not link the pull request.")));
       return;
     }
     onOpenChange(false);
@@ -114,9 +117,9 @@ function LinkPullRequestDialog({
   const validation = !dirty
     ? null
     : reference.trim().length === 0
-      ? "Paste a pull request URL or enter 123 / #123."
+      ? gt("Paste a pull request URL or enter 123 / #123.")
       : resolved === null
-        ? "Use a pull request URL, 123, or #123."
+        ? gt("Use a pull request URL, 123, or #123.")
         : "error" in resolved
           ? resolved.error
           : null;
@@ -175,7 +178,7 @@ function LinkPullRequestDialog({
             onClick={() => void submit()}
             disabled={pending || resolved === null || "error" in resolved}
           >
-            {pending ? t("Linking...") : t("Link")}
+            {pending ? gt("Linking...") : gt("Link", { $context: "verb, button" })}
           </Button>
         </DialogFooter>
       </DialogPopup>

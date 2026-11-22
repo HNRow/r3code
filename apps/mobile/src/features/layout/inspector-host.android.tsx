@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import { View } from "react-native";
 
 import { RenderErrorBoundary, RenderFailureView } from "../../components/RenderErrorBoundary";
@@ -9,7 +10,6 @@ import {
   type InspectorContent,
   type InspectorPane,
 } from "./inspector-panes";
-import { useGT } from "gt-react-native";
 
 // AppBar draws the bar inline on Android; the slot keeps a pane's options off the thread's route.
 function PaneContent(props: {

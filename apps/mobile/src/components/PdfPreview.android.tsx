@@ -1,16 +1,18 @@
+import { errorDisplayMessage } from "@t3tools/client-runtime/errors";
 import { useAtomRefresh, useAtomValue } from "@effect/atom-react";
 import * as Effect from "effect/Effect";
 import * as Option from "effect/Option";
 import { Atom, AsyncResult } from "effect/reactivity";
+import { msg, useGT } from "gt-react-native";
 import { useState } from "react";
 import { View } from "react-native";
 import Pdf from "react-native-pdf-jsi";
 
 import { FilePreviewLoading, FilePreviewNotice } from "../features/files/FilePreviewFeedback";
 import { pdfInitialPage, pdfLinkUrl, preparePdfPreview } from "../lib/pdfPreview";
+import { m } from "../i18n/messages";
 import { tryOpenExternalUrl } from "../lib/openExternalUrl";
 import { ControlPill } from "./ui/ControlPill";
-import { useGT } from "gt-react-native";
 
 const preparedPdfAtom = Atom.family((uri: string) =>
   Atom.make(
@@ -30,7 +32,10 @@ const preparedPdfAtom = Atom.family((uri: string) =>
           });
           return prepared;
         },
-        catch: (cause) => (cause instanceof Error ? cause.message : "The PDF could not be loaded."),
+        catch: (cause) =>
+          cause instanceof Error
+            ? (errorDisplayMessage(cause, m) ?? cause.message)
+            : m(msg("The PDF could not be loaded.")),
       }).pipe(
         Effect.filterOrElse(
           (file) => file !== null,
@@ -53,9 +58,9 @@ export function PdfPreview(props: { readonly uri: string }) {
   const file = prepared._tag === "Success" && !prepared.waiting ? prepared.value : null;
   const error =
     file !== null && unrenderable === file
-      ? "The PDF could not be rendered. It may be damaged or password protected."
+      ? gt("The PDF could not be rendered. It may be damaged or password protected.")
       : prepared._tag === "Failure" && !prepared.waiting
-        ? Option.getOrElse(AsyncResult.error(prepared), () => "The PDF could not be loaded.")
+        ? Option.getOrElse(AsyncResult.error(prepared), () => gt("The PDF could not be loaded."))
         : null;
   const localUri = file?.uri ?? null;
 

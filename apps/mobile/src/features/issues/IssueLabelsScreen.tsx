@@ -9,8 +9,10 @@ import {
 } from "@t3tools/client-runtime/issue-selection";
 import { isSelected, toggleSelection } from "@t3tools/client-runtime/pull-request-selection";
 import type { IssueLabelCandidate } from "@t3tools/contracts";
+import { msg, useGT } from "gt-react-native";
 import { useEffect, useState } from "react";
 
+import { m } from "../../i18n/messages";
 import * as Dialog from "../../components/ui/Dialog";
 import { issueEnvironment, refreshIssueLists } from "../../state/issues";
 import { useEnvironmentQuery } from "../../state/query";
@@ -21,7 +23,6 @@ import { IssueCandidatesSheet } from "./IssueCandidatesSheet";
 import { issueParamsKey, issueTarget, type IssueParams } from "./issueParams";
 import { issueLabelPicksFamily } from "./issuePicks";
 import { issueCommandError, useIssueAccess } from "./issuePresentation";
-import { useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 export function IssueLabelsScreen({ route }: StaticScreenProps<IssueParams>) {
@@ -69,7 +70,7 @@ export function IssueLabelsScreen({ route }: StaticScreenProps<IssueParams>) {
           if (failure === null) return refreshIssueLists(target.environmentId);
           // Picks made after this write was sent are kept.
           setStored((latest) => issuePicksAfterFailedWrite(latest, sent));
-          Dialog.alert(t("Couldn't change labels"), failure);
+          Dialog.alert(m(msg("Couldn't change labels")), failure);
         });
       }),
     [navigation, detail, draft, current, setStored, update, target],
@@ -91,7 +92,7 @@ export function IssueLabelsScreen({ route }: StaticScreenProps<IssueParams>) {
       allowed={allowed}
       notice={
         detail && !allowed
-          ? (access?.blocked ?? "Changing labels needs triage access on this tracker.")
+          ? (access?.blocked ?? gt("Changing labels needs triage access on this tracker."))
           : null
       }
       pending={result.isPending && !result.data}

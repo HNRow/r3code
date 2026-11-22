@@ -1,245 +1,52 @@
-import { t } from "gt-react";
+import { msg } from "gt-react";
+
+import { m, type MessageResolver } from "./i18n/messages";
 export const CODE_BLOCK_LANGUAGES = [
-  {
-    id: "",
-    get label() {
-      return t("Plain text");
-    },
-  },
-  {
-    id: "asm",
-    get label() {
-      return t("Assembly");
-    },
-  },
-  {
-    id: "bash",
-    get label() {
-      return t("Bash");
-    },
-  },
-  {
-    id: "c",
-    get label() {
-      return t("C");
-    },
-  },
-  {
-    id: "cpp",
-    get label() {
-      return t("C++");
-    },
-  },
-  {
-    id: "csharp",
-    get label() {
-      return t("C#");
-    },
-  },
-  {
-    id: "css",
-    get label() {
-      return t("CSS");
-    },
-  },
-  {
-    id: "dart",
-    get label() {
-      return t("Dart");
-    },
-  },
-  {
-    id: "diff",
-    get label() {
-      return t("Diff");
-    },
-  },
-  {
-    id: "dockerfile",
-    get label() {
-      return t("Dockerfile");
-    },
-  },
-  {
-    id: "elixir",
-    get label() {
-      return t("Elixir");
-    },
-  },
-  {
-    id: "go",
-    get label() {
-      return t("Go");
-    },
-  },
-  {
-    id: "graphql",
-    get label() {
-      return t("GraphQL");
-    },
-  },
-  {
-    id: "haskell",
-    get label() {
-      return t("Haskell");
-    },
-  },
-  {
-    id: "html",
-    get label() {
-      return t("HTML");
-    },
-  },
-  {
-    id: "java",
-    get label() {
-      return t("Java");
-    },
-  },
-  {
-    id: "javascript",
-    get label() {
-      return t("JavaScript");
-    },
-  },
-  {
-    id: "json",
-    get label() {
-      return t("JSON");
-    },
-  },
-  {
-    id: "jsx",
-    get label() {
-      return t("JSX");
-    },
-  },
-  {
-    id: "kotlin",
-    get label() {
-      return t("Kotlin");
-    },
-  },
-  {
-    id: "lua",
-    get label() {
-      return t("Lua");
-    },
-  },
-  {
-    id: "markdown",
-    get label() {
-      return t("Markdown");
-    },
-  },
-  {
-    id: "php",
-    get label() {
-      return t("PHP");
-    },
-  },
-  {
-    id: "powershell",
-    get label() {
-      return t("PowerShell");
-    },
-  },
-  {
-    id: "python",
-    get label() {
-      return t("Python");
-    },
-  },
-  {
-    id: "r",
-    get label() {
-      return t("R");
-    },
-  },
-  {
-    id: "ruby",
-    get label() {
-      return t("Ruby");
-    },
-  },
-  {
-    id: "rust",
-    get label() {
-      return t("Rust");
-    },
-  },
-  {
-    id: "scala",
-    get label() {
-      return t("Scala");
-    },
-  },
-  {
-    id: "scss",
-    get label() {
-      return t("SCSS");
-    },
-  },
-  {
-    id: "sql",
-    get label() {
-      return t("SQL");
-    },
-  },
-  {
-    id: "svelte",
-    get label() {
-      return t("Svelte");
-    },
-  },
-  {
-    id: "swift",
-    get label() {
-      return t("Swift");
-    },
-  },
-  {
-    id: "toml",
-    get label() {
-      return t("TOML");
-    },
-  },
-  {
-    id: "tsx",
-    get label() {
-      return t("TSX");
-    },
-  },
-  {
-    id: "typescript",
-    get label() {
-      return t("TypeScript");
-    },
-  },
-  {
-    id: "vue",
-    get label() {
-      return t("Vue");
-    },
-  },
-  {
-    id: "xml",
-    get label() {
-      return t("XML");
-    },
-  },
-  {
-    id: "yaml",
-    get label() {
-      return t("YAML");
-    },
-  },
-  {
-    id: "zig",
-    get label() {
-      return t("Zig");
-    },
-  },
+  { id: "", label: msg("Plain text") },
+  { id: "asm", label: msg("Assembly") },
+  { id: "bash", label: "Bash" },
+  { id: "c", label: "C" },
+  { id: "cpp", label: "C++" },
+  { id: "csharp", label: "C#" },
+  { id: "css", label: "CSS" },
+  { id: "dart", label: "Dart" },
+  // oxlint-disable-next-line t3code/no-untranslated-copy -- code language name
+  { id: "diff", label: "Diff" },
+  { id: "dockerfile", label: "Dockerfile" },
+  { id: "elixir", label: "Elixir" },
+  { id: "go", label: "Go" },
+  { id: "graphql", label: "GraphQL" },
+  { id: "haskell", label: "Haskell" },
+  { id: "html", label: "HTML" },
+  { id: "java", label: "Java" },
+  { id: "javascript", label: "JavaScript" },
+  { id: "json", label: "JSON" },
+  { id: "jsx", label: "JSX" },
+  { id: "kotlin", label: "Kotlin" },
+  { id: "lua", label: "Lua" },
+  { id: "markdown", label: "Markdown" },
+  { id: "php", label: "PHP" },
+  { id: "powershell", label: "PowerShell" },
+  { id: "python", label: "Python" },
+  { id: "r", label: "R" },
+  { id: "ruby", label: "Ruby" },
+  { id: "rust", label: "Rust" },
+  { id: "scala", label: "Scala" },
+  { id: "scss", label: "SCSS" },
+  { id: "sql", label: "SQL" },
+  { id: "svelte", label: "Svelte" },
+  { id: "swift", label: "Swift" },
+  { id: "systemverilog", label: "SystemVerilog" },
+  { id: "toml", label: "TOML" },
+  { id: "tsx", label: "TSX" },
+  { id: "typescript", label: "TypeScript" },
+  // oxlint-disable-next-line t3code/no-untranslated-copy -- code language name
+  { id: "verilog", label: "Verilog" },
+  { id: "vhdl", label: "VHDL" },
+  { id: "vue", label: "Vue" },
+  { id: "xml", label: "XML" },
+  { id: "yaml", label: "YAML" },
+  { id: "zig", label: "Zig" },
 ] as const;
 
 export type CodeBlockLanguage = { readonly id: string; readonly label: string };
@@ -257,6 +64,8 @@ const LANGUAGE_ALIASES: Record<string, string> = {
   s: "asm",
   sh: "bash",
   shell: "bash",
+  sv: "systemverilog",
+  "system-verilog": "systemverilog",
   text: "",
   ts: "typescript",
   txt: "",
@@ -280,6 +89,7 @@ export function codeLanguageEntry(language: string): CodeBlockLanguage | null {
   return CODE_BLOCK_LANGUAGES.find((entry) => entry.id === id.toLowerCase()) ?? null;
 }
 
-export function codeLanguageLabel(language: string): string {
-  return codeLanguageEntry(language)?.label ?? language;
+export function codeLanguageLabel(language: string, resolve: MessageResolver = m): string {
+  const label = codeLanguageEntry(language)?.label;
+  return label === undefined ? language : resolve(label);
 }

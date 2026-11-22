@@ -1,9 +1,11 @@
 import { sourceControlClients } from "@t3tools/client-runtime/source-control-clients";
+import { changeRequestTermKind } from "../../lib/changeRequestTerm";
 import Animated from "react-native-reanimated";
 import { PR_ROW_LAYOUT } from "./pullRequestAnimations";
 import { useNavigation } from "@react-navigation/native";
 import type { PullRequestDetail } from "@t3tools/contracts";
 import type { MenuAction } from "@react-native-menu/menu";
+import { useGT } from "gt-react-native";
 import type { ReactNode } from "react";
 import { Platform, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -22,7 +24,6 @@ import { usePullRequestPermissions } from "./usePullRequestPermissions";
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
 import { usePullRequestReviewDraft } from "./usePullRequestReviewDraft";
 import { usePullRequestAgentActions } from "./usePullRequestAgentActions";
-import { useGT } from "gt-react-native";
 
 export function PullRequestCardGroup(props: { readonly children: ReactNode }) {
   return (
@@ -123,8 +124,8 @@ export function PullRequestActionToolbar(props: {
   readonly onOpenFiles?: () => void;
   readonly onHeightChange?: (height: number) => void;
 }) {
-  const gt = useGT();
   const navigation = useNavigation();
+  const gt = useGT();
   const { draft } = usePullRequestReviewDraft(props.params);
   const { themeVariables: colors } = useAppearancePreferences();
   const insets = useSafeAreaInsets();
@@ -135,11 +136,19 @@ export function PullRequestActionToolbar(props: {
   const pendingReview = canReview && draft.comments.length > 0;
   const showAgentControls = agent.canAsk || !permissions.connected;
   const canOpenThread = agent.threads.length > 0 || showAgentControls;
-  const { shortLabel } = sourceControlClients.get(
-    (props.pr ?? props.params.initialSummary)?.provider,
-  ).changeRequest;
-  const threadLabel = agent.threads.length ? "Continue thread" : `Work on ${shortLabel}`;
-  const primaryLabel = pendingReview ? `Submit review · ${draft.comments.length}` : threadLabel;
+  const term = changeRequestTermKind(
+    sourceControlClients.get((props.pr ?? props.params.initialSummary)?.provider).changeRequest,
+  );
+  const threadLabel = agent.threads.length
+    ? gt("Continue thread")
+    : gt("Work on {term, select, mr {MR} cr {change request} other {PR}}", { term });
+  const primaryLabel = pendingReview
+    ? gt("Submit review · {count}", { count: draft.comments.length })
+    : threadLabel;
+  const agentActionsLabel = gt(
+    "{term, select, mr {MR} cr {change request} other {PR}} agent actions",
+    { term },
+  );
   const chooseThread = agent.chooseThread;
   const agentActions = agent.actions.filter((action) => action.task !== "ask");
   const open = (mode: "review" | "comment") =>
@@ -181,7 +190,7 @@ export function PullRequestActionToolbar(props: {
                 <View pointerEvents="none">
                   <IconButton
                     icon="ellipsis.bubble"
-                    accessibilityLabel={`${shortLabel} agent actions`}
+                    accessibilityLabel={agentActionsLabel}
                     disabled={agent.disabled}
                   />
                 </View>
@@ -257,7 +266,7 @@ export function PullRequestActionToolbar(props: {
       identifier="pull-request-agent"
       icon="ellipsis.bubble"
       title={gt("AI helpers")}
-      accessibilityLabel={`${shortLabel} agent actions`}
+      accessibilityLabel={agentActionsLabel}
       disabled={agent.disabled}
       separateBackground
     >

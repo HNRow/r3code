@@ -7,6 +7,7 @@ import {
   type EnvironmentId,
   type ServerProvider,
 } from "@t3tools/contracts";
+import { T, useGT } from "gt-react";
 import { useState, type ReactNode } from "react";
 import { usesChatGptSharing } from "@t3tools/shared/usageLimits";
 
@@ -20,7 +21,7 @@ import { Input } from "../ui/input";
 import { WizardFooter, WizardHeader, WizardPanel, WizardPopup } from "../ui/wizard";
 import { MultipleAccountsNote } from "./MultipleAccountsNote";
 import { SettingsRow } from "./settingsLayout";
-import { useGT, T, t } from "gt-react";
+import { t } from "gt-react";
 
 const CODEX_DRIVER_KIND = ProviderDriverKind.make("codex");
 
@@ -43,7 +44,9 @@ export function AddCodexAccountDialog({
   const settings = useEnvironmentSettings(environmentId);
   const providers = useAtomValue(serverEnvironment.providersValueAtom(environmentId));
   const update = useAtomCommand(serverEnvironment.updateSettings, "Add ChatGPT account");
-  const [name, setName] = useState("Personal");
+  const [name, setName] = useState(() =>
+    gt("Personal", { $context: "default name for a ChatGPT account" }),
+  );
   const displayName = `ChatGPT - ${name.trim()}`;
   const [instanceId, setInstanceId] = useState<ProviderInstanceId | null>(null);
   const [pending, setPending] = useState(false);
@@ -92,7 +95,7 @@ export function AddCodexAccountDialog({
     >
       <WizardPopup size="wide">
         <WizardHeader
-          title={instanceId ? displayName : t("Add ChatGPT account")}
+          title={instanceId ? displayName : gt("Add ChatGPT account")}
           description={gt(
             "Each account has its own Codex instance and sign-in. Choose the other account on the sign-in page.",
           )}
@@ -148,7 +151,7 @@ export function AddCodexAccountDialog({
                 form="add-codex-account"
                 disabled={pending || !name.trim() || !canManageProviders}
               >
-                {pending ? t("Adding account…") : t("Continue")}
+                {pending ? gt("Adding account…") : gt("Continue")}
               </Button>
             </>
           )}

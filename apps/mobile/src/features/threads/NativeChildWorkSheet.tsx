@@ -4,6 +4,7 @@ import type {
   OrchestrationV2NativeChildWork,
   ThreadId,
 } from "@t3tools/contracts";
+import { T, useGT } from "gt-react-native";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -12,7 +13,6 @@ import { Button } from "../../components/ui/Button";
 import { Sheet } from "../../components/ui/Sheet";
 import { orchestrationEnvironment } from "../../state/orchestration";
 import { useEnvironmentQuery } from "../../state/query";
-import { useGT, T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 const stepLabel = (type: string) => {
@@ -78,10 +78,11 @@ export function NativeChildWorkSheet(props: {
 }
 
 function NativeChild(props: { readonly child: OrchestrationV2NativeChildWork }) {
+  const gt = useGT();
   const { child } = props;
   return (
     <View className="gap-2">
-      <Text className="font-t3-bold text-sm text-foreground">{child.role || t("Subagent")}</Text>
+      <Text className="font-t3-bold text-sm text-foreground">{child.role || gt("Subagent")}</Text>
       <Text selectable className="font-sans text-sm text-foreground-secondary">
         {child.prompt}
       </Text>

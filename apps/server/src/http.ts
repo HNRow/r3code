@@ -50,7 +50,6 @@ import {
   failEnvironmentInternal,
 } from "./auth/http.ts";
 import * as ServerEnvironment from "./environment/ServerEnvironment.ts";
-import { WEBHOOK_ROUTE_PREFIX } from "./scheduledTasks/ScheduledTaskService.ts";
 import {
   browserApiCorsAllowedHeaders,
   browserApiCorsAllowedMethods,
@@ -419,16 +418,8 @@ export const layerOtlpTracesProxyRoute = HttpRouter.add(
 
 const requestPath = (request: HttpServerRequest.HttpServerRequest) => {
   const queryIndex = request.url.indexOf("?");
-  return queryIndex === -1 ? request.url : request.url.slice(0, queryIndex);
-};
-
-// Signed URLs carry bearer tokens in the path, which URL param redaction cannot reach.
-const isSignedUrlRequest = (request: HttpServerRequest.HttpServerRequest) => {
-  const path = requestPath(request);
-  return (
-    path.startsWith(`${WEBHOOK_ROUTE_PREFIX}/`) ||
-    path.startsWith(`${ASSET_ROUTE_PREFIX}/`) ||
-    path.startsWith(`${ATTACHMENT_UPLOAD_ROUTE_PREFIX}/`)
+  return UNTRACED_REQUEST_PATHS.has(
+    queryIndex === -1 ? request.url : request.url.slice(0, queryIndex),
   );
 };
 
@@ -444,6 +435,9 @@ export const layerUnloggedSignedRequests = HttpRouter.middleware(
     ),
   { global: true },
 );
+
+// Signed URLs carry their bearer token in the path; spans and request logs record it as REDACTED.
+const SIGNED_URL_ROUTE_OPTIONS = { redactedParams: ["*"] };
 
 export const withUntracedRequests = Layer.provide(layerUntracedRequests);
 
@@ -515,6 +509,7 @@ export const layerAssetRoute = HttpRouter.add(
       Effect.orElseSucceed(() => HttpServerResponse.text("Internal Server Error", { status: 500 })),
     );
   }),
+  SIGNED_URL_ROUTE_OPTIONS,
 );
 
 export const layerAttachmentUploadRoute = HttpRouter.add(
@@ -554,6 +549,7 @@ export const layerAttachmentUploadRoute = HttpRouter.add(
       ? HttpServerResponse.empty({ status: 204 })
       : HttpServerResponse.text(stored.detail, { status: stored.status });
   }),
+  SIGNED_URL_ROUTE_OPTIONS,
 );
 
 const decodeBuildManifest = Schema.decodeUnknownEffect(

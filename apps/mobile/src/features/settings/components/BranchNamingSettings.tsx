@@ -1,3 +1,4 @@
+import { msg, T, useGT, useMessages } from "gt-react-native";
 import { BranchNamingMode, type ServerSettingsPatch } from "@t3tools/contracts";
 import { useEffect, useEffectEvent, useRef } from "react";
 import { View } from "react-native";
@@ -5,33 +6,22 @@ import { View } from "react-native";
 import { AppText as Text, AppTextInput } from "../../../components/ui/AppText";
 import { ListChoiceRow as SettingsChoiceRow } from "../../../components/ui/ListChoiceRow";
 import { SettingsSection } from "./SettingsSection";
-import { useGT, T } from "gt-react-native";
 import { t } from "../../../i18n/gt";
 
 const MODES = {
   static: {
-    get label() {
-      return t("Static prefix");
-    },
-    get description() {
-      return t("Add your prefix to the generated branch name.");
-    },
+    label: msg("Static prefix"),
+    description: msg("Add your prefix to the generated branch name."),
   },
   semantic: {
-    get label() {
-      return t("Semantic prefix");
-    },
-    get description() {
-      return t("Let the model choose feat/, fix/, refactor/, or another prefix.");
-    },
+    label: msg("Semantic prefix"),
+    description: msg("Let the model choose {examples}, or another prefix.", {
+      examples: "feat/, fix/, refactor/",
+    }),
   },
   custom: {
-    get label() {
-      return t("Custom instructions");
-    },
-    get description() {
-      return t("Generate the complete name with no added prefix or suffix.");
-    },
+    label: msg("Custom instructions"),
+    description: msg("Generate the complete name with no added prefix or suffix."),
   },
 } satisfies Record<BranchNamingMode, { label: string; description: string }>;
 
@@ -44,6 +34,7 @@ export function BranchNamingSettings(props: {
   onChange: (patch: ServerSettingsPatch) => void;
 }) {
   const gt = useGT();
+  const m = useMessages();
   // Save on exit too: Android Back hides the keyboard without ending editing.
   type Field = "branchNamePrefix" | "branchNameInstructions";
   const drafts = useRef<Partial<Record<Field, { text: string; over: string | null }>>>({});
@@ -85,8 +76,8 @@ export function BranchNamingSettings(props: {
       {BranchNamingMode.literals.map((mode, index) => (
         <SettingsChoiceRow
           key={mode}
-          label={MODES[mode].label}
-          description={MODES[mode].description}
+          label={m(MODES[mode].label)}
+          description={m(MODES[mode].description)}
           selected={props.mode === mode}
           separated={index > 0}
           disabled={props.disabled.mode}
@@ -96,14 +87,18 @@ export function BranchNamingSettings(props: {
       {props.mode === "static" ? (
         <View className="gap-2 px-4 py-3">
           <Text className="text-sm text-foreground-muted">
-            <T>Use t3 or t3/ for t3/add-search. Leave empty for no prefix.</T>
+            {gt("Use {short} or {slash} for {example}. Leave empty for no prefix.", {
+              short: "t3",
+              slash: "t3/",
+              example: "t3/add-search",
+            })}
           </Text>
           <AppTextInput
             key={props.prefix}
             accessibilityLabel={gt("Branch prefix")}
             onChangeText={(text) => edit("branchNamePrefix", text)}
             defaultValue={props.prefix ?? ""}
-            placeholder={props.prefix === null ? "Mixed" : "No prefix"}
+            placeholder={props.prefix === null ? gt("Mixed") : gt("No prefix")}
             editable={!props.disabled.prefix}
             autoCapitalize="none"
             autoCorrect={false}
@@ -124,8 +119,10 @@ export function BranchNamingSettings(props: {
             defaultValue={props.instructions ?? ""}
             placeholder={
               props.instructions === null
-                ? "Mixed. Enter instructions for all selected targets."
-                : "Use julius/ followed by the issue ID and a short description."
+                ? gt("Mixed. Enter instructions for all selected targets.")
+                : gt("Use {prefix} followed by the issue ID and a short description.", {
+                    prefix: "julius/",
+                  })
             }
             editable={!props.disabled.instructions}
             multiline

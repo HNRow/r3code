@@ -1,12 +1,12 @@
 import { Button } from "../../components/ui/Button";
 import { useAudioPlayerStatus } from "expo-audio";
+import { T, useGT } from "gt-react-native";
 import { useEffect, useState } from "react";
 import { AppState, View } from "react-native";
 import { AppText as Text } from "../../components/ui/AppText";
 import { useFullscreenVideoOpen, useMediaAudioSessionHold } from "../../lib/videoAudioSession";
 import { createAudioPlaybackSession } from "../../lib/audioSession";
 import { usePlaybackAudioPlayer } from "../voice-input/usePlaybackAudioPlayer";
-import { useGT, T } from "gt-react-native";
 
 function timestamp(seconds: number) {
   const value = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
@@ -14,8 +14,8 @@ function timestamp(seconds: number) {
 }
 
 export function AudioFilePreview(props: { uri: string; onRetry: () => void }) {
-  const gt = useGT();
   const player = usePlaybackAudioPlayer(props.uri);
+  const gt = useGT();
   const status = useAudioPlayerStatus(player);
   const [playbackRequested, setPlaybackRequested] = useState(false);
   const playback = createAudioPlaybackSession(player, false, setPlaybackRequested);
@@ -49,7 +49,7 @@ export function AudioFilePreview(props: { uri: string; onRetry: () => void }) {
       </Text>
       <View className="flex-row items-center gap-4">
         <Button
-          label={gt("−15s")}
+          label="−15s"
           tone="text"
           accessibilityLabel={gt("Back 15 seconds")}
           disabled={!status.isLoaded}
@@ -57,7 +57,11 @@ export function AudioFilePreview(props: { uri: string; onRetry: () => void }) {
         />
         <Button
           label={
-            playbackRequested || status.playing ? "Pause" : !status.isLoaded ? "Loading…" : "Play"
+            playbackRequested || status.playing
+              ? gt("Pause")
+              : !status.isLoaded
+                ? gt("Loading…")
+                : gt("Play")
           }
           tone="secondary"
           disabled={!status.isLoaded && !playbackRequested}
@@ -76,7 +80,7 @@ export function AudioFilePreview(props: { uri: string; onRetry: () => void }) {
           }}
         />
         <Button
-          label={gt("+15s")}
+          label="+15s"
           tone="text"
           accessibilityLabel={gt("Forward 15 seconds")}
           disabled={!status.isLoaded}

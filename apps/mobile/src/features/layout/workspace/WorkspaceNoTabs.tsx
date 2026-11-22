@@ -1,8 +1,8 @@
 import { useNavigation } from "@react-navigation/native";
+import { useGT } from "gt-react-native";
 import { View } from "react-native";
 import { EmptyState } from "../../../components/ui/EmptyState";
 import { openSettings } from "../../settings/settings-navigation";
-import { useGT } from "gt-react-native";
 
 export function WorkspaceNoTabs() {
   const gt = useGT();

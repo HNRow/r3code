@@ -1,4 +1,7 @@
 import type { EnvironmentId } from "@t3tools/contracts";
+import { msg } from "gt-react";
+
+import { m, type MessageResolver } from "../i18n/messages";
 
 export type ReadyAttachmentUpload = {
   readonly status: "ready";
@@ -18,10 +21,19 @@ export type AttachmentUploadState =
       readonly status: "failed";
       readonly environmentId: EnvironmentId;
       readonly reason: string;
+      /** `reason` as a `msg()`, so the composer shows it in the current language. */
+      readonly reasonMessage?: string;
       /** Retry/release deletes this id; never use a persisted draft attachment id. */
       readonly attachmentId?: string;
       readonly previous?: ReadyAttachmentUpload;
     };
+
+export function attachmentUploadFailureText(
+  upload: Extract<AttachmentUploadState, { status: "failed" }>,
+  resolve: MessageResolver,
+): string {
+  return upload.reasonMessage === undefined ? upload.reason : resolve(upload.reasonMessage);
+}
 
 export function attachmentUploadBlockReason(
   input: {
@@ -29,7 +41,7 @@ export function attachmentUploadBlockReason(
     readonly uploadsByImageId: Readonly<Record<string, AttachmentUploadState>>;
     readonly environmentId: EnvironmentId;
   },
-  _resolve?: unknown,
+  resolve: MessageResolver = m,
 ): string | null {
   let pending = 0;
 
@@ -43,7 +55,9 @@ export function attachmentUploadBlockReason(
   }
 
   if (pending > 0) {
-    return pending === 1 ? "Attachment still uploading" : "Attachments still uploading";
+    return pending === 1
+      ? resolve(msg("Attachment still uploading"))
+      : resolve(msg("Attachments still uploading"));
   }
   return null;
 }

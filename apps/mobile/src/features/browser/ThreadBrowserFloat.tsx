@@ -2,6 +2,7 @@ import { useIsFocused } from "@react-navigation/native";
 import type { EnvironmentId, PreviewSessionSnapshot, ThreadId } from "@t3tools/contracts";
 import { previewPdfAssetUrl } from "@t3tools/shared/preview";
 import * as Option from "effect/Option";
+import { useGT, useMessages } from "gt-react-native";
 import { useState } from "react";
 import { Pressable, View } from "react-native";
 import Animated, { FadeIn, FadeOut, ReduceMotion } from "react-native-reanimated";
@@ -12,7 +13,6 @@ import { useAppearancePreferences } from "../settings/appearance/AppearancePrefe
 import { browserTabTitle } from "./browserTabs";
 import { PreviewStreamWebView } from "./PreviewStreamWebView";
 import { usePreparedConnection } from "../../state/session";
-import { useGT } from "gt-react-native";
 
 const PLAYER_LONG_SIDE = 184;
 const PLAYER_ENTERING = FadeIn.duration(180).reduceMotion(ReduceMotion.System);
@@ -84,8 +84,9 @@ function FloatingBrowserPlayer(props: {
   readonly onOpen: () => void;
   readonly onClose: () => void;
 }) {
-  const gt = useGT();
   const { themeVariables } = useAppearancePreferences();
+  const gt = useGT();
+  const resolveMessage = useMessages();
   const prepared = usePreparedConnection(props.environmentId);
   const httpBaseUrl = Option.isSome(prepared) ? prepared.value.httpBaseUrl : null;
   const [viewport, setViewport] = useState<{ width: number; height: number } | null>(null);
@@ -102,7 +103,9 @@ function FloatingBrowserPlayer(props: {
     >
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Open browser, ${browserTabTitle(props.tab)}`}
+        accessibilityLabel={gt("Open browser, {title}", {
+          title: browserTabTitle(props.tab, resolveMessage),
+        })}
         accessibilityHint={gt("Opens the browser tab full screen")}
         onPress={props.onOpen}
         className="flex-1"

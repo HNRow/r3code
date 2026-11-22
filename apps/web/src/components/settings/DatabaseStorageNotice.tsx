@@ -1,3 +1,5 @@
+import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
+import { m } from "~/i18n/messages";
 import { useAtomValue } from "@effect/atom-react";
 import {
   isAtomCommandInterrupted,
@@ -9,6 +11,7 @@ import {
   type EnvironmentId,
 } from "@t3tools/contracts";
 import * as Schema from "effect/Schema";
+import { msg, T, useGT, Var } from "gt-react";
 import { type ReactNode, useState } from "react";
 
 import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
@@ -28,7 +31,7 @@ import {
 import { Button } from "../ui/button";
 import { toastManager } from "../ui/toast";
 import { SettingsRow, SettingsSection } from "./settingsLayout";
-import { useGT, T, Var, t } from "gt-react";
+import { t } from "gt-react";
 
 const DismissedEnvironmentIds = Schema.Array(Schema.String);
 const reclaimPermissionsAtom = environmentAtomList(
@@ -55,7 +58,13 @@ export function DatabaseStorageNotice({
     [],
     DismissedEnvironmentIds,
   );
-  const { copyToClipboard } = useCopyToClipboard({ target: "command" });
+  const { copyToClipboard } = useCopyToClipboard({
+    target: {
+      target: "command",
+      unavailableMessage: msg("Clipboard API is unavailable while copying command."),
+      failureMessage: msg("Failed to copy command to the clipboard."),
+    },
+  });
   const visible = recommendations
     .filter((recommendation) => !dismissed.includes(recommendation.environmentId))
     .map((recommendation) => ({
@@ -73,11 +82,13 @@ export function DatabaseStorageNotice({
     <SettingsSection id="storage-database" title={gt("Database")}>
       <SettingsRow
         title={gt("Reclaim freed database space")}
-        description={t`These databases still hold space freed by history cleanup.${
+        description={
           visible.every((recommendation) => recommendation.reclaimable)
-            ? ""
-            : " Run the command on each machine to reclaim it. It restarts the background service. Quit the desktop app first if it hosts the environment."
-        }`}
+            ? gt("These databases still hold space freed by history cleanup.")
+            : gt(
+                "These databases still hold space freed by history cleanup. Run the command on each machine to reclaim it. It restarts the background service. Quit the desktop app first if it hosts the environment.",
+              )
+        }
       />
       {visible.map(({ environmentId, status, label, reclaimable }) => {
         const dismiss = (
@@ -100,7 +111,10 @@ export function DatabaseStorageNotice({
         ) : (
           <SettingsRow
             key={environmentId}
-            title={`${formatGiB(status.reclaimableBytes)} on ${label}`}
+            title={gt("{amount} on {environment}", {
+              amount: formatGiB(status.reclaimableBytes),
+              environment: label,
+            })}
             description={<code className="select-text break-all">{status.compactCommand}</code>}
             control={
               <div className="flex flex-wrap items-center gap-1.5">
@@ -132,6 +146,7 @@ function ReclaimRow({
   readonly status: DatabaseStorageStatus;
   readonly dismiss: ReactNode;
 }) {
+  const gt = useGT();
   const reclaim = useAtomCommand(serverEnvironment.reclaimDatabaseSpace);
   const [confirming, setConfirming] = useState(false);
   const [requested, setRequested] = useState(false);
@@ -146,8 +161,10 @@ function ReclaimRow({
     if (result._tag === "Success") {
       toastManager.add({
         type: "success",
-        title: t`Reclaiming ${amount} on ${label}`,
-        description: t`R3 Code there restarts and is back in about ${minutes} min.`,
+        title: gt("Reclaiming {amount} on {environment}", { amount, environment: label }),
+        description: gt("R3 Code there restarts and is back in about {minutes} min.", {
+          minutes,
+        }),
       });
       return;
     }
@@ -156,17 +173,20 @@ function ReclaimRow({
     const error = squashAtomCommandFailure(result);
     toastManager.add({
       type: "error",
-      title: t`Could not reclaim space on ${label}`,
-      description: error instanceof Error ? error.message : "An error occurred.",
+      title: gt("Could not reclaim space on {environment}", { environment: label }),
+      description:
+        error instanceof Error
+          ? (thrownErrorMessage(error, m) ?? error.message)
+          : gt("An error occurred."),
     });
   };
   return (
     <SettingsRow
-      title={`${amount} on ${label}`}
+      title={gt("{amount} on {environment}", { amount, environment: label })}
       description={
         status.reclaimFailure === undefined
-          ? `Restarts R3 Code there. It will be offline for about ${minutes} min.`
-          : `The last attempt failed: ${status.reclaimFailure}`
+          ? gt("Restarts R3 Code there. It will be offline for about {minutes} min.", { minutes })
+          : gt("The last attempt failed: {reason}", { reason: status.reclaimFailure })
       }
       control={
         <div className="flex flex-wrap items-center gap-1.5">
@@ -176,7 +196,7 @@ function ReclaimRow({
             disabled={restarting}
             onClick={() => setConfirming(true)}
           >
-            {restarting ? t("Restarting…") : t("Reclaim")}
+            {restarting ? gt("Restarting…") : gt("Reclaim")}
           </Button>
           {dismiss}
           <AlertDialog open={confirming} onOpenChange={setConfirming}>

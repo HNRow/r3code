@@ -8,6 +8,7 @@ import {
   type TextDirection,
 } from "@t3tools/shared/textDirection";
 import { useNavigation } from "@react-navigation/native";
+import { Plural, T, useGT, Var } from "gt-react-native";
 import { useRef } from "react";
 import { Platform, Pressable, ScrollView, View, type LayoutChangeEvent } from "react-native";
 import Animated, {
@@ -36,7 +37,6 @@ import {
   type PendingUserInputDraftAnswer,
 } from "@t3tools/client-runtime/state/pending-user-input";
 import type { PendingUserInput } from "../../lib/threadActivity";
-import { useGT, T, Var } from "gt-react-native";
 
 export interface PendingUserInputCardProps {
   readonly environmentId: EnvironmentId;
@@ -50,6 +50,7 @@ export interface PendingUserInputCardProps {
   readonly onStopThread?: () => void;
   readonly cardProgress: SharedValue<number>;
   readonly cardCoverage: SharedValue<number>;
+  readonly onLayout?: (event: LayoutChangeEvent) => void;
   readonly onInputFocusChange?: (focused: boolean) => void;
   readonly drafts: Record<string, PendingUserInputDraftAnswer>;
   readonly answers: Record<string, string | ReadonlyArray<string>> | null;
@@ -174,7 +175,7 @@ export function PendingUserInputCard(props: PendingUserInputCardProps) {
 
   const stopButton = props.onStopThread ? (
     <ControlPill
-      accessibilityLabel={gt("Stop")}
+      accessibilityLabel={gt("Stop", { $context: "verb, stops the thread" })}
       icon="stop.fill"
       variant="danger"
       className="h-9 w-9"
@@ -192,9 +193,10 @@ export function PendingUserInputCard(props: PendingUserInputCardProps) {
     >
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Expand user input, ${questionCount} question${
-          questionCount === 1 ? "" : "s"
-        }`}
+        accessibilityLabel={gt(
+          "{count, plural, one {Expand user input, {count} question} other {Expand user input, {count} questions}}",
+          { count: questionCount },
+        )}
         onPress={props.onToggleCollapsed}
         className="min-h-10 flex-1 flex-row items-center gap-2 active:opacity-70"
       >
@@ -203,7 +205,19 @@ export function PendingUserInputCard(props: PendingUserInputCardProps) {
         </Text>
         <Text className="font-sans text-xs text-foreground-muted">
           <T>
-            <Var>{questionCount}</Var> question<Var>{questionCount === 1 ? "" : "s"}</Var>
+            <Plural
+              n={questionCount}
+              one={
+                <>
+                  <Var>{questionCount}</Var> question
+                </>
+              }
+              other={
+                <>
+                  <Var>{questionCount}</Var> questions
+                </>
+              }
+            />
           </T>
         </Text>
         <View className="flex-1" />
@@ -391,6 +405,7 @@ export function PendingUserInputCard(props: PendingUserInputCardProps) {
     <Animated.View
       className="relative"
       style={Platform.OS === "android" ? androidBoundsStyle : undefined}
+      onLayout={props.onLayout}
     >
       {bar}
       <Animated.View

@@ -32,7 +32,7 @@ describe("findPromptLinkProjects", () => {
         repositoryIdentity: identity("github.com/pingdotgg/t3code", "github.com/me/t3code"),
       },
       { id: "none", repositoryIdentity: null },
-      { id: "recent", repositoryIdentity: identity("github.com/PingDotGG/T3Code") },
+      { id: "recent", repositoryIdentity: identity("github.com/PingDotGG/R3Code") },
       { id: "older", repositoryIdentity: identity("github.com/pingdotgg/t3code") },
     ];
     const ids = (owner: string, name: string) =>

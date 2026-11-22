@@ -1,3 +1,4 @@
+import { useGT } from "gt-react";
 import { CheckIcon } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 
@@ -5,7 +6,6 @@ import { cn } from "../../lib/utils";
 import { AnimatedHeight } from "../AnimatedHeight";
 import { DialogPopup, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./dialog";
 import { ScrollArea } from "./scroll-area";
-import { useGT } from "gt-react";
 
 export function WizardPopup({
   children,
@@ -100,7 +100,15 @@ export function WizardSteps({
                 "bg-card text-foreground shadow-xs ring-1 ring-inset ring-black/5 hover:bg-card dark:shadow-none dark:ring-white/5",
             )}
             aria-current={index === currentStep ? "step" : undefined}
-            aria-label={`${step}, step ${index + 1}${index < currentStep && summaries?.[index] ? `, ${summaries?.[index]}` : ""}`}
+            aria-label={
+              index < currentStep && summaries?.[index]
+                ? gt("{step}, step {number}, {summary}", {
+                    step,
+                    number: index + 1,
+                    summary: summaries[index],
+                  })
+                : gt("{step}, step {number}", { step, number: index + 1 })
+            }
             onClick={onStepChange ? () => onStepChange(index) : undefined}
           >
             <span

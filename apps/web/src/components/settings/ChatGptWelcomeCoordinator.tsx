@@ -1,5 +1,6 @@
 import { useAtomValue } from "@effect/atom-react";
 import { usesChatGptSharing } from "@t3tools/shared/usageLimits";
+import { T, Var } from "gt-react";
 import { useState } from "react";
 import { environmentPresentations } from "../../state/presentation";
 import { OpenAI } from "../Icons";
@@ -13,7 +14,6 @@ import {
   DialogFooter,
 } from "../ui/dialog";
 import { ChatGptUsageButton } from "./ChatGptUsageButton";
-import { T, Var } from "gt-react";
 
 const STORAGE_KEY = "t3:chatgpt-sharing-welcome:v1";
 function readAcknowledgedProfiles(): string[] {

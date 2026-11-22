@@ -5,11 +5,12 @@ import {
   PullRequestMediaContext,
 } from "./PullRequestMedia";
 import { PullRequestSectionHeading } from "./PullRequestSectionHeading";
+import { T, useGT, useMessages } from "gt-react-native";
 import { useContext, useMemo, useState, type ComponentProps, type ReactNode } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 import { pullRequestImageSource } from "./pullRequestMediaSource";
-import { parseMarkdownDocument } from "../../lib/markdownDocument";
+import { markdownReferenceDefinitions, parseMarkdownDocument } from "../../lib/markdownDocument";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { AppText as Text } from "../../components/ui/AppText";
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
@@ -17,7 +18,6 @@ import type { FilePreviewItem } from "../../components/ui/FilePreviewModal";
 import { isBotBadgeImage } from "./botBadgeImages";
 import { PullRequestMarkdown } from "./PullRequestMarkdown";
 import { pullRequestDescriptionContent } from "./pullRequestDescriptionContent";
-import { T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 const COLLAPSED_HEIGHT = 240;
@@ -35,24 +35,30 @@ export function PullRequestDescription(props: {
 }) {
   const { collapse } = props;
   const expanded = collapse?.expanded ?? true;
+  const gt = useGT();
+  const messages = useMessages();
   const [bodyHeight, setBodyHeight] = useState(0);
   const mediaContext = useContext(PullRequestMediaContext);
   const { themeVariables: colors } = useAppearancePreferences();
   const fadeColor = colors[Platform.OS === "android" ? "--color-sheet-solid" : "--color-screen"];
   const content = useMemo(() => {
     const document = parseMarkdownDocument(props.markdown);
-    const content = pullRequestDescriptionContent(document, splitPullRequestBody(props.markdown));
+    const content = pullRequestDescriptionContent(
+      document,
+      splitPullRequestBody(props.markdown, markdownReferenceDefinitions),
+      messages,
+    );
     return {
       ...content,
       attachments: content.attachments.filter((attachment) => !isBotBadgeImage(attachment.uri)),
     };
-  }, [props.markdown]);
+  }, [props.markdown, messages]);
   const gallery: FilePreviewItem[] = content.attachments
     .filter((attachment) => attachment.kind === "image")
     .map((attachment) => {
       return {
         ...pullRequestImageSource(attachment.uri, mediaContext),
-        name: new URL(attachment.uri).pathname.split("/").pop() || "Image",
+        name: new URL(attachment.uri).pathname.split("/").pop() || gt("Image"),
       };
     });
   const canCollapse = collapse !== undefined && bodyHeight > COLLAPSED_HEIGHT;
@@ -120,7 +126,9 @@ export function PullRequestDescription(props: {
               <Pressable
                 accessibilityRole="button"
                 accessibilityState={{ expanded }}
-                accessibilityLabel={expanded ? "Collapse description" : "Expand description"}
+                accessibilityLabel={
+                  expanded ? gt("Collapse description") : gt("Expand description")
+                }
                 onPress={() => {
                   if (expanded) collapse.onCollapse();
                   collapse.onExpandedChange(!expanded);
@@ -133,7 +141,7 @@ export function PullRequestDescription(props: {
                 className="min-h-11 flex-row items-center justify-center gap-1 py-2 active:opacity-70"
               >
                 <Text className="text-xs font-t3-medium text-foreground">
-                  {expanded ? t("Show less") : t("Show more")}
+                  {expanded ? gt("Show less") : gt("Show more")}
                 </Text>
                 <SymbolView
                   name={expanded ? "chevron.up" : "chevron.down"}

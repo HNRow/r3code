@@ -1,4 +1,4 @@
-import { useGT } from "gt-react";
+import { useMessages } from "gt-react";
 
 import { WizardSteps } from "../ui/wizard";
 import {
@@ -31,24 +31,10 @@ export function AddProviderInstanceWizardSteps({
   onNavigation,
   disabled = false,
 }: AddProviderInstanceWizardStepsProps) {
-  const gt = useGT();
-  const stepLabel = (step: string) => {
-    switch (step) {
-      case "Provider":
-        return gt("Provider");
-      case "Identity":
-        return gt("Identity");
-      case "Config":
-        return gt("Config");
-      case "Sign in":
-        return gt("Sign in");
-      default:
-        return step;
-    }
-  };
+  const m = useMessages();
   return (
     <WizardSteps
-      steps={steps.map(stepLabel)}
+      steps={steps.map((step) => m(step))}
       currentStep={currentStep}
       summaries={summaries}
       isStepDisabled={() => disabled}

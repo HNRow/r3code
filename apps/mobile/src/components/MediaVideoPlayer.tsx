@@ -1,6 +1,7 @@
 import { useEvent } from "expo";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useIsFocused } from "@react-navigation/native";
+import { T, useGT } from "gt-react-native";
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { Pressable, View } from "react-native";
 
@@ -15,7 +16,6 @@ import { type MediaActionsSource } from "../lib/mediaActionsSource";
 import { useMediaVideoPlayback } from "../lib/useMediaVideoPlayback";
 import { MediaActionsMenu } from "./MediaActionsMenu";
 import { createAudioPlaybackSession } from "../lib/audioSession";
-import { T, useGT } from "gt-react-native";
 
 function LoadedMediaVideo(props: {
   readonly uri: string;
@@ -163,8 +163,8 @@ function MediaVideoPlayerContent(props: MediaVideoPlayerProps) {
   // Keep an opened player mounted while signing or reconnecting temporarily has no usable URL.
   if (playbackUri === null && props.expanded && props.uri !== null) setPlaybackUri(props.uri);
   const unavailableText = props.unavailableDetail
-    ? `Video unavailable. ${props.unavailableDetail}`
-    : "Video unavailable";
+    ? gt("Video unavailable. {detail}", { detail: props.unavailableDetail })
+    : gt("Video unavailable");
   const [videoSize, setVideoSize] = useState<{ width: number; height: number } | null>(null);
   const [bounds, setBounds] = useState<{ width: number; height: number } | null>(null);
   const sizeSource = props.fitToVideo && isFocused && videoSize === null ? props.uri : null;
@@ -213,10 +213,12 @@ function MediaVideoPlayerContent(props: MediaVideoPlayerProps) {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={
-              props.unavailable ? `${props.name}. ${unavailableText}` : `Play ${props.name}`
+              props.unavailable
+                ? `${props.name}. ${unavailableText}`
+                : gt("Play {name}", { name: props.name })
             }
             accessibilityHint={
-              mediaActions.actions.length > 0 ? "Touch and hold for media actions" : undefined
+              mediaActions.actions.length > 0 ? gt("Touch and hold for media actions") : undefined
             }
             accessibilityState={{ disabled: props.uri === null || props.unavailable === true }}
             // Stays pressable so the long-press menu still opens on a failed or unsigned tile.

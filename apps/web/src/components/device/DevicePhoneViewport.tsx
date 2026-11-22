@@ -1,3 +1,4 @@
+import { useGT } from "gt-react";
 import { useEffect, useRef } from "react";
 import type { PhoneViewer } from "@t3tools/client-runtime/device/phone-viewer";
 import type {
@@ -8,7 +9,6 @@ import type { DeviceShapeProfile } from "@t3tools/client-runtime/device/shape-pr
 import type { createPhoneInteraction } from "@t3tools/client-runtime/device/phone-interaction";
 import type { DeviceScreenSize, DeviceStreamClient } from "@t3tools/client-runtime/device/stream";
 import { mountDeviceViewer } from "./mountDeviceViewer";
-import { useGT } from "gt-react";
 
 const loadPhoneViewer = () => import("@t3tools/client-runtime/device/phone-viewer");
 

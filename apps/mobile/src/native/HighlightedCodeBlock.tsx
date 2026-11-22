@@ -1,3 +1,4 @@
+import { msg, useGT, useMessages } from "gt-react-native";
 import { useState } from "react";
 import { Pressable, ScrollView, Text } from "react-native";
 import type { MarkdownStyle } from "react-native-enriched-markdown";
@@ -9,8 +10,6 @@ import type { HighlightScheme } from "../lib/highlights";
 import { CodeBlockFrame, CodeBlockHeaderButton } from "./CodeBlockFrame";
 import { fencedCodeMarkdown } from "./codeBlockMarkdown";
 import type { NativeMarkdownTextStyle } from "./SelectableMarkdownText.types";
-import { useGT } from "gt-react-native";
-import { t } from "../i18n/gt";
 
 // Header names from enriched-markdown's CodeBlockLanguages.cpp that are not the fence capitalized.
 const FENCE_DISPLAY_NAMES: Readonly<Record<string, string>> = {
@@ -34,18 +33,10 @@ const FENCE_DISPLAY_NAMES: Readonly<Record<string, string>> = {
 const CODE_MENU_ACTIONS = [
   {
     id: "copy-code",
-    get title() {
-      return t("Copy");
-    },
+    title: msg("Copy", { $context: "verb, copies the code" }),
     image: "doc.on.doc",
   },
-  {
-    id: "copy-markdown",
-    get title() {
-      return t("Copy as Markdown");
-    },
-    image: "doc.text",
-  },
+  { id: "copy-markdown", title: msg("Copy as Markdown"), image: "doc.text" },
 ];
 
 /** A fence in a language enriched-markdown cannot colour, drawn like its native block. */
@@ -59,8 +50,9 @@ export function HighlightedCodeBlock(props: {
   readonly textStyle: NativeMarkdownTextStyle;
   readonly codeStyle: NonNullable<MarkdownStyle["codeBlock"]>;
 }) {
-  const gt = useGT();
   const { code, codeStyle, textStyle } = props;
+  const gt = useGT();
+  const resolve = useMessages();
   const [wrapped, setWrapped] = useState(false);
   const lines = useMarkdownCodeHighlight({
     code,
@@ -102,7 +94,7 @@ export function HighlightedCodeBlock(props: {
   const content = (
     <Menu
       shouldOpenOnLongPress
-      actions={CODE_MENU_ACTIONS}
+      actions={CODE_MENU_ACTIONS.map((action) => ({ ...action, title: resolve(action.title) }))}
       style={{ flexGrow: 1 }}
       onPressAction={({ nativeEvent }) => {
         copyTextWithHaptic(
@@ -121,7 +113,7 @@ export function HighlightedCodeBlock(props: {
         <>
           <CodeBlockHeaderButton
             icon="text.alignleft"
-            label={wrapped ? "Disable line wrap" : "Wrap lines"}
+            label={wrapped ? gt("Disable line wrap") : gt("Wrap lines")}
             textStyle={textStyle}
             active={wrapped}
             onPress={() => setWrapped((value) => !value)}

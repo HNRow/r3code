@@ -1,4 +1,5 @@
 import type { EnvironmentId, UnifiedSettings } from "@t3tools/contracts";
+import { T, useGT, Var } from "gt-react";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -14,9 +15,10 @@ import {
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import { AddUsageLimitSourceDialog } from "./AddUsageLimitSourceDialog";
-import { searchableSetting } from "./settingsSearch";
+import { useSearchableSetting } from "./settingsSearch";
 import { SettingsRow, SettingsSection } from "./settingsLayout";
-import { T, useGT, Var } from "gt-react";
+
+const CLI_PROXY_NAME = "CLI Proxy";
 
 export function UsageProviderSettings({
   environmentId,
@@ -30,6 +32,7 @@ export function UsageProviderSettings({
   readonly readOnly: boolean;
 }) {
   const gt = useGT();
+  const searchableSetting = useSearchableSetting();
   const updateSettings = useUpdateEnvironmentSettings(environmentId);
   const [adding, setAdding] = useState(false);
   const entries = Object.entries(sources);
@@ -41,10 +44,8 @@ export function UsageProviderSettings({
         headerAction={
           !readOnly ? (
             <Button size="xs" variant="outline" onClick={() => setAdding(true)}>
-              <T>
-                <PlusIcon className="size-3" aria-hidden />
-                Add hub
-              </T>
+              <PlusIcon className="size-3" aria-hidden />
+              <T>Add hub</T>
             </Button>
           ) : null
         }
@@ -60,10 +61,10 @@ export function UsageProviderSettings({
                 title={label}
                 description={
                   <span className="break-all">
-                    <T>
-                      CLI Proxy<Var>{source.enabled ? "" : " · Disabled"}</Var>
-                      <Var>{label !== source.url ? ` · ${source.url}` : ""}</Var>
-                    </T>
+                    {source.enabled
+                      ? CLI_PROXY_NAME
+                      : gt("{name} · Disabled", { name: CLI_PROXY_NAME })}
+                    {label !== source.url ? ` · ${source.url}` : ""}
                   </span>
                 }
                 control={

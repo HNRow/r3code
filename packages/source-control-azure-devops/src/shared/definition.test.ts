@@ -54,6 +54,18 @@ describe("Azure DevOps change request URLs", () => {
     }
   });
 
+  it("takes a pull request URL that leaves the project out as a checkout reference", () => {
+    for (const url of [
+      "https://dev.azure.com/acme/_git/web/pullrequest/17",
+      "https://acme.visualstudio.com/_git/web/pullrequest/17",
+    ]) {
+      expect(definition.isChangeRequestReference(url), url).toBe(true);
+    }
+    expect(
+      definition.isChangeRequestReference("https://dev.azure.com/_git/web/pullrequest/17"),
+    ).toBe(false);
+  });
+
   it.each([
     ["ssh.dev.azure.com", "v3/org/project/web"],
     ["org.visualstudio.com", "defaultcollection/project/_git/web"],
@@ -127,9 +139,9 @@ describe("Azure DevOps repository keys", () => {
 
   it("gives a repository the same key over SSH as over HTTPS", () => {
     for (const remote of [
-      "git@ssh.dev.azure.com:v3/T3Tools/Platform/T3Code",
-      "ssh://git@ssh.dev.azure.com:22/v3/T3Tools/Platform/T3Code",
-      "https://T3Tools@dev.azure.com/T3Tools/Platform/_git/T3Code",
+      "git@ssh.dev.azure.com:v3/T3Tools/Platform/R3Code",
+      "ssh://git@ssh.dev.azure.com:22/v3/T3Tools/Platform/R3Code",
+      "https://T3Tools@dev.azure.com/T3Tools/Platform/_git/R3Code",
     ]) {
       expect(registry.repositoryKeyFromRemote(remote), remote).toBe(
         "dev.azure.com/t3tools/platform/_git/t3code",
@@ -198,8 +210,8 @@ describe("Azure DevOps repository keys", () => {
 
   it("keeps the organization in the host for the legacy visualstudio.com remotes", () => {
     for (const remote of [
-      "T3Tools@vs-ssh.visualstudio.com:v3/T3Tools/Platform/T3Code",
-      "https://T3Tools.visualstudio.com/Platform/_git/T3Code",
+      "T3Tools@vs-ssh.visualstudio.com:v3/T3Tools/Platform/R3Code",
+      "https://T3Tools.visualstudio.com/Platform/_git/R3Code",
     ]) {
       expect(registry.repositoryKeyFromRemote(remote), remote).toBe(
         "t3tools.visualstudio.com/platform/_git/t3code",

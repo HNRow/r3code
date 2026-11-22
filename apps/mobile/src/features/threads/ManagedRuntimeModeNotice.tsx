@@ -1,9 +1,10 @@
+import { managedRuntimeModeDenial } from "@t3tools/client-runtime/contract-labels";
 import {
   clampManagedRuntimeMode,
-  managedRuntimeModeDenial,
   type ManagedPolicySummary,
   type RuntimeMode,
 } from "@t3tools/contracts";
+import { useGT, useMessages } from "gt-react-native";
 import { View } from "react-native";
 
 import { AppText } from "../../components/ui/AppText";
@@ -25,9 +26,11 @@ export function ManagedRuntimeModeNotice(props: {
   readonly supportedRuntimeModes: ReadonlyArray<RuntimeMode> | undefined;
   readonly policy: ManagedPolicySummary | undefined;
 }) {
+  const gt = useGT();
+  const messages = useMessages();
   const draftSettings = useComposerDraftSettings(props.threadKey);
   const runtimeMode = draftSettings.runtimeMode ?? props.threadRuntimeMode;
-  const denial = managedRuntimeModeDenial(props.policy, runtimeMode);
+  const denial = managedRuntimeModeDenial(props.policy, runtimeMode, messages);
   if (denial === undefined) return null;
   const choices = runtimeModeChoicesForSupportedModes(props.supportedRuntimeModes);
   const target = clampManagedRuntimeMode(
@@ -39,11 +42,11 @@ export function ManagedRuntimeModeNotice(props: {
   return (
     <View className="gap-2 px-4 pb-3">
       <AppText textRole="footnote" className="text-foreground-muted">
-        {t`${denial} Switch this thread's mode to continue.`}
+        {gt("{denial} Switch this thread's mode to continue.", { denial })}
       </AppText>
       {target === undefined || targetLabel === undefined ? null : (
         <Button
-          label={t`Switch to ${targetLabel}`}
+          label={gt("Switch to {mode}", { mode: messages(targetLabel) })}
           onPress={() => updateComposerDraftSettings(props.threadKey, { runtimeMode: target })}
         />
       )}

@@ -1,3 +1,4 @@
+import { msg, useGT, useMessages } from "gt-react";
 import { useState } from "react";
 import {
   duoFoldState,
@@ -9,7 +10,6 @@ import type { DeviceScreenSize } from "@t3tools/client-runtime/device/stream";
 import { DeviceDuoGlyph } from "./DeviceDuoGlyph";
 import { Button } from "~/components/ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "~/components/ui/tooltip";
-import { useGT, t } from "gt-react";
 
 const FOLDS = [
   { id: "closed", angle: 0 },
@@ -17,18 +17,8 @@ const FOLDS = [
   { id: "open", angle: 180 },
 ] as const;
 const STANDS = [
-  {
-    id: "laptop",
-    get label() {
-      return t("Laptop stand");
-    },
-  },
-  {
-    id: "tent",
-    get label() {
-      return t("Tent stand");
-    },
-  },
+  { id: "laptop", label: msg("Laptop stand") },
+  { id: "tent", label: msg("Tent stand") },
 ] as const;
 
 export function DeviceDuoControls(props: {
@@ -37,8 +27,9 @@ export function DeviceDuoControls(props: {
   enabled: boolean;
   onCommand: (command: DuoCommand) => void;
 }) {
-  const gt = useGT();
   const { screen } = props;
+  const gt = useGT();
+  const m = useMessages();
   const { fold, stand, phoneVertical: reportedVertical, settled } = duoFoldState(screen);
   const [settledVertical, setSettledVertical] = useState(reportedVertical);
   if (settled && settledVertical !== reportedVertical) setSettledVertical(reportedVertical);
@@ -48,9 +39,11 @@ export function DeviceDuoControls(props: {
   // correct display frame.
   const foldWaits = props.state.pending && (stand || props.state.requested?.control === "pose");
   const foldLabels = {
-    closed: "Closed",
-    half: phoneVertical ? "Book" : "Laptop",
-    open: "Open",
+    closed: gt("Closed", { $context: "iPhone Duo fold shape" }),
+    half: phoneVertical
+      ? gt("Book", { $context: "iPhone Duo fold shape" })
+      : gt("Laptop", { $context: "iPhone Duo fold shape" }),
+    open: gt("Open", { $context: "iPhone Duo fold shape" }),
   };
   const button = (
     key: string,
@@ -106,7 +99,7 @@ export function DeviceDuoControls(props: {
         {STANDS.map(({ id, label }) =>
           button(
             id,
-            label,
+            m(label),
             screen.hingePose === id,
             () => {
               if (!stand) setStandVertical(settledVertical);

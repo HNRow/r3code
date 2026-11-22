@@ -1,3 +1,4 @@
+import { T, useGT } from "gt-react-native";
 import { NavigationRouteContext } from "@react-navigation/native";
 import { Activity, useState, type ReactNode } from "react";
 import { View } from "react-native";
@@ -8,7 +9,6 @@ import { useAdaptiveWorkspaceLayout } from "../layout/adaptive-workspace-context
 import { useAndroidWorkspaceRoot } from "../layout/workspace/AndroidWorkspaceTabsProvider";
 import { SettingsListScreen } from "./SettingsRouteScreen";
 import { SettingsScreen } from "./components/SettingsScreen";
-import { useGT, T } from "gt-react-native";
 
 const SETTINGS_LIST_ROUTE = { key: "settings-sidebar", name: "Settings" };
 

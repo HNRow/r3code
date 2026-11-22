@@ -2,6 +2,7 @@ import { RefreshIcon } from "~/components/ui/refresh-icon";
 import { useAtomValue } from "@effect/atom-react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { Atom } from "effect/reactivity";
+import { useGT } from "gt-react";
 import { useEffect, useState } from "react";
 
 import {
@@ -189,16 +190,17 @@ function FirstRunRecovery({
   readonly retrying?: boolean;
 }) {
   const settingsReadFailed = reason === "settings";
+  const gt = useGT();
   return (
     <main className="flex h-dvh min-h-0 items-center justify-center bg-background px-6 text-foreground">
       <div className="flex max-w-sm flex-col items-center text-center">
         <h1 className="text-lg font-semibold">
-          {settingsReadFailed ? t("Could not read settings") : t("Still connecting")}
+          {settingsReadFailed ? gt("Could not read settings") : gt("Still connecting")}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {settingsReadFailed
-            ? t("Your saved settings could not be loaded.")
-            : t("R3 Code could not confirm this workspace.")}
+            ? gt("Your saved settings could not be loaded.")
+            : gt("R3 Code could not confirm this workspace.")}
         </p>
         <Button
           className="mt-5"
@@ -214,7 +216,7 @@ function FirstRunRecovery({
           }}
         >
           <RefreshIcon refreshing={retrying} />
-          {settingsReadFailed ? t("Retry") : t("Reload")}
+          {settingsReadFailed ? gt("Retry") : gt("Reload")}
         </Button>
       </div>
     </main>

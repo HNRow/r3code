@@ -1,3 +1,4 @@
+import { T } from "gt-react-native";
 import { Platform, ScrollView, type StyleProp, type TextStyle, View } from "react-native";
 
 import { AppText as Text } from "../../../../components/ui/AppText";
@@ -7,7 +8,6 @@ import {
 } from "../../../../lib/appearancePreferences";
 import { getMobileTerminalTheme } from "../../../terminal/terminalTheme";
 import { useAppearancePreferences } from "../AppearancePreferencesProvider";
-import { T } from "gt-react-native";
 
 const CODE_FONT_FAMILY = Platform.select({
   ios: "ui-monospace",
@@ -69,48 +69,38 @@ export function TerminalAppearancePreview(props: { readonly fontSize: number }) 
         </Text>
         <Text style={span(theme.palette[4])}>)</Text>
         <Text style={span(theme.palette[3])}> ✗</Text>
-        <Text style={span(theme.foreground)}>
-          <T> vpr dev</T>
-        </Text>
+        {/* oxlint-disable-next-line t3code/no-untranslated-copy -- sample terminal output */}
+        <Text style={span(theme.foreground)}> vpr dev</Text>
       </Text>
       <Text style={span(theme.foreground)}>
-        <Text style={span(theme.palette[2])}>
-          <T>VITE v7.1.1</T>
-        </Text>
-        <Text style={span(theme.mutedForeground)}>
-          <T> ready in</T>
-        </Text>
-        <Text style={span(theme.foreground)}>
-          <T> 1.24s</T>
-        </Text>
+        {/* oxlint-disable-next-line t3code/no-untranslated-copy -- sample terminal output */}
+        <Text style={span(theme.palette[2])}>VITE v7.1.1</Text>
+        {/* oxlint-disable-next-line t3code/no-untranslated-copy -- sample terminal output */}
+        <Text style={span(theme.mutedForeground)}> ready in</Text>
+        <Text style={span(theme.foreground)}> 1.24s</Text>
       </Text>
       <Text style={span(theme.foreground)}>
         <Text style={span(theme.palette[2])}>→ </Text>
-        <Text style={span(theme.mutedForeground)}>
-          <T>Local: </T>
-        </Text>
+        {/* oxlint-disable-next-line t3code/no-untranslated-copy -- sample terminal output */}
+        <Text style={span(theme.mutedForeground)}>Local: </Text>
         <Text style={span(theme.palette[6], { textDecorationLine: "underline" })}>
           http://127.0.0.1:5173
         </Text>
       </Text>
       <Text style={span(theme.foreground)}>
-        <Text style={span(theme.palette[2])}>
-          <T>✓ 85 passed</T>
-        </Text>
-        <Text style={span(theme.palette[3])}>
-          <T> △ 2 warnings</T>
-        </Text>
-        <Text style={span(theme.palette[1])}>
-          <T> ✗ 0 failed</T>
-        </Text>
+        {/* oxlint-disable-next-line t3code/no-untranslated-copy -- sample terminal output */}
+        <Text style={span(theme.palette[2])}>✓ 85 passed</Text>
+        {/* oxlint-disable-next-line t3code/no-untranslated-copy -- sample terminal output */}
+        <Text style={span(theme.palette[3])}> △ 2 warnings</Text>
+        {/* oxlint-disable-next-line t3code/no-untranslated-copy -- sample terminal output */}
+        <Text style={span(theme.palette[1])}> ✗ 0 failed</Text>
       </Text>
       <Text style={span(theme.foreground)}>
         <Text style={span(theme.background, { backgroundColor: theme.palette[2] })}>
           {" READY "}
         </Text>
-        <Text style={span(theme.mutedForeground)}>
-          <T> watching for changes</T>
-        </Text>{" "}
+        {/* oxlint-disable-next-line t3code/no-untranslated-copy -- sample terminal output */}
+        <Text style={span(theme.mutedForeground)}> watching for changes</Text>{" "}
         <Text style={span(theme.cursorForeground)}>▏</Text>
       </Text>
     </View>
@@ -130,6 +120,7 @@ interface CodePreviewLine {
 const CODE_PREVIEW_LINES: ReadonlyArray<CodePreviewLine> = [
   {
     id: "signature",
+    // oxlint-disable-next-line t3code/no-untranslated-copy -- sample code
     tokens: [{ text: "function", keyword: true }, { text: " formatUser(user) {" }],
   },
   {
@@ -137,6 +128,7 @@ const CODE_PREVIEW_LINES: ReadonlyArray<CodePreviewLine> = [
     tokens: [
       { text: "  " },
       { text: "return", keyword: true },
+      // oxlint-disable-next-line t3code/no-untranslated-copy -- sample code
       { text: " `${user.name} <${user.email}>` // demonstrates how long lines behave" },
     ],
   },

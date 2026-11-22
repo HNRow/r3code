@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import { useId, useState } from "react";
 import { Image, Pressable, View } from "react-native";
 
@@ -8,7 +9,6 @@ import { PresentationSource } from "../../components/ui/NativePresentation";
 import { useMediaActions } from "../../state/mediaActions";
 import { type MediaActionsSource } from "../../lib/mediaActionsSource";
 import { MediaActionsMenu } from "../../components/MediaActionsMenu";
-import { useGT } from "gt-react-native";
 
 function ResolvedWorkspaceFileImagePreview(props: {
   readonly accessibilityLabel: string;
@@ -27,9 +27,11 @@ function ResolvedWorkspaceFileImagePreview(props: {
       <MediaActionsMenu media={mediaActions} style={{ flex: 1 }}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Open full-screen preview of ${props.accessibilityLabel}`}
+          accessibilityLabel={gt("Open full-screen preview of {name}", {
+            name: props.accessibilityLabel,
+          })}
           accessibilityHint={
-            mediaActions.actions.length > 0 ? "Touch and hold for media actions" : undefined
+            mediaActions.actions.length > 0 ? gt("Touch and hold for media actions") : undefined
           }
           disabled={loadError !== null}
           className="flex-1 p-4 active:bg-subtle-strong"
@@ -51,7 +53,7 @@ function ResolvedWorkspaceFileImagePreview(props: {
               resizeMode="contain"
               onLoadStart={() => setLoadError(null)}
               onError={(event) => {
-                setLoadError(event.nativeEvent.error || "The image could not be rendered.");
+                setLoadError(event.nativeEvent.error || gt("The image could not be rendered."));
               }}
             />
           </PresentationSource>

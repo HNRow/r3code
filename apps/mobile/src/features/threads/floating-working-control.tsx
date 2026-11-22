@@ -1,5 +1,6 @@
 import type { SubagentPillSegment } from "@t3tools/client-runtime/state/thread-subagents";
 import { GlassContainer, GlassView } from "expo-glass-effect";
+import { useGT } from "gt-react-native";
 import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
 import { type LayoutChangeEvent, Pressable, useWindowDimensions, View } from "react-native";
 import Animated, {
@@ -24,7 +25,7 @@ import { BrowserPreviewButton } from "../browser/browser-preview-button";
 import { DevicePreviewButton } from "../devices/device-preview-button";
 import type { FloatingStatusAction, FloatingWorkingStatus } from "./floating-working-status";
 import { ShimmeringWorkContent } from "./thread-work-log";
-import { useGT, Var, T } from "gt-react-native";
+import { Var, T } from "gt-react-native";
 
 const CONTROL_HEIGHT = 38.5;
 const CONTROL_GAP = 8;
@@ -261,7 +262,7 @@ export function FloatingWorkingControl(props: {
       {agents !== null ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Open agents, ${agents.accessibilityLabel}`}
+          accessibilityLabel={gt("Open agents, {agents}", { agents: agents.accessibilityLabel })}
           accessibilityHint={gt("Opens this turn's subagents")}
           onPress={props.onOpenAgents}
           onLayout={(event) => setAgentsWidth(settleWidth(event.nativeEvent.layout.width))}
@@ -277,7 +278,9 @@ export function FloatingWorkingControl(props: {
       {hasQueue ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Open queue, ${props.queuedCount} messages`}
+          accessibilityLabel={gt("{count, plural, other {Open queue, {count} messages}}", {
+            count: props.queuedCount,
+          })}
           accessibilityHint={gt("Opens queued messages to send now, edit, or remove")}
           onPress={props.onOpenQueue}
           onLayout={(event) => setQueueWidth(settleWidth(event.nativeEvent.layout.width))}
@@ -289,9 +292,7 @@ export function FloatingWorkingControl(props: {
           ) : null}
           <SymbolView name="list.number" size={13} tintColorClassName="accent-foreground" />
           <Text className="shrink font-t3-medium text-xs tabular-nums" numberOfLines={1}>
-            <T>
-              <Var>{props.queuedCount}</Var> queued
-            </T>
+            {gt("{count, plural, other {{count} queued}}", { count: props.queuedCount })}
           </Text>
         </Pressable>
       ) : null}

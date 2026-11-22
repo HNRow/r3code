@@ -1,3 +1,5 @@
+import { errorDisplayMessage } from "@t3tools/client-runtime/errors";
+import { T, useGT } from "gt-react-native";
 import { ListRow } from "../../components/ui/ListRow";
 import * as Dialog from "../../components/ui/Dialog";
 import { ScreenScrollView as ScrollView } from "../../components/ui/ScreenScrollView";
@@ -28,17 +30,19 @@ import { SymbolView } from "../../components/ui/AppSymbol";
 import { hasCloudPublicConfig } from "../cloud/publicConfig";
 import { CloudEnvironmentRows } from "./CloudEnvironmentRows";
 import { autoConnectReport, devAutoConnectAttemptAtom } from "./devAutoConnect";
+import { linkedEnvironmentPrefillAtom } from "./linkedEnvironmentPrefill";
 import { splitEnvironmentSections } from "./environmentSections";
 import { leaveSettingsPage } from "../settings/settings-navigation";
 import { workspaceHasColumns } from "../layout/workspace/workspace-selection-store";
-import { useGT, T } from "gt-react-native";
-import { t } from "../../i18n/gt";
+import { m } from "../../i18n/messages";
 
 type ConnectionsNewRouteParams = {
   readonly mode?: string;
   readonly pairingUrl?: string;
   readonly autoConnect?: string;
   readonly routeFor?: EnvironmentId;
+  /** A linked machine this app chose to pair with; its details come from app state, never the link. */
+  readonly linked?: string;
 };
 
 export function ConnectionsNewRouteScreen({
@@ -47,12 +51,15 @@ export function ConnectionsNewRouteScreen({
   const params = route.params ?? {};
   // Dev-only prefill prevents production links from supplying an attacker-chosen host and token.
   const routePairingUrl = __DEV__ ? (params.pairingUrl?.trim() ?? "") : "";
+  const known = useAtomValue(linkedEnvironmentPrefillAtom);
+  const linked = known !== null && known.environmentId === params.linked ? known : null;
   // A new prefill link replaces whatever the form held.
   return (
     <PairingForm
-      key={routePairingUrl}
+      key={`${routePairingUrl}:${linked?.environmentId ?? ""}`}
       routePairingUrl={routePairingUrl}
-      routeFor={params.routeFor}
+      routeFor={params.routeFor ?? linked?.environmentId}
+      linked={linked}
     />
   );
 }
@@ -60,9 +67,11 @@ export function ConnectionsNewRouteScreen({
 function PairingForm({
   routePairingUrl,
   routeFor,
+  linked,
 }: {
   readonly routePairingUrl: string;
   readonly routeFor: EnvironmentId | undefined;
+  readonly linked: { readonly label: string; readonly host: string | null } | null;
 }) {
   const gt = useGT();
   const { connectionPairingUrl, onChangeConnectionPairingUrl, onConnectPress } =
@@ -70,7 +79,7 @@ function PairingForm({
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [initialPairing] = useState(() => parsePairingUrl(routePairingUrl || connectionPairingUrl));
-  const [hostInput, setHostInput] = useState(initialPairing.host);
+  const [hostInput, setHostInput] = useState(linked?.host ?? initialPairing.host);
   const [codeInput, setCodeInput] = useState(initialPairing.code);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -122,11 +131,11 @@ function PairingForm({
     }
     if (permission.canAskAgain) return;
     Dialog.alert(
-      t("Camera access needed"),
-      t("Camera access was denied for this app. Open Settings to enable it."),
+      gt("Camera access needed"),
+      gt("Camera access was denied for this app. Open Settings to enable it."),
       [
-        { text: t("Cancel"), style: "cancel" },
-        { text: t("Open Settings"), onPress: () => void Linking.openSettings() },
+        { text: gt("Cancel"), style: "cancel" },
+        { text: gt("Open Settings"), onPress: () => void Linking.openSettings() },
       ],
     );
   };
@@ -149,8 +158,10 @@ function PairingForm({
     } catch (error) {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Dialog.alert(
-        t("Invalid QR code"),
-        error instanceof Error ? error.message : "Scanned QR code was not recognized.",
+        gt("Invalid QR code"),
+        error instanceof Error
+          ? (errorDisplayMessage(error, m) ?? error.message)
+          : gt("Scanned QR code was not recognized."),
       );
       setTimeout(() => {
         setScannerLocked(false);
@@ -185,10 +196,16 @@ function PairingForm({
 
   return (
     <SettingsScreen
-      title={gt("Add environment")}
+      title={
+        linked
+          ? gt("Connect to {environment}", { environment: linked.label })
+          : gt("Add environment")
+      }
       actions={[
         {
-          accessibilityLabel: connecting ? "Connecting" : "Add environment",
+          accessibilityLabel: connecting
+            ? gt("Connecting", { $context: "connection status" })
+            : gt("Add environment"),
           loading: connecting,
           icon: "checkmark",
           tintColor: headerIconColor,
@@ -240,7 +257,7 @@ function PairingForm({
               />
               <View className="ml-4 border-t border-border-subtle" />
               <PairingInputRow
-                label={gt("Code")}
+                label={gt("Code", { $context: "pairing code field" })}
                 placeholder={gt("Pairing code")}
                 returnKeyType="go"
                 value={codeInput}
@@ -258,9 +275,14 @@ function PairingForm({
               )}
             >
               {pairingConnectionError ??
-                t(
-                  "For machines on your local network or tailnet. The machine keeps its own provider credentials.",
-                )}
+                (linked
+                  ? gt(
+                      "Create a pairing code on {environment}, in its Settings → Sharing & access or with `t3 auth pairing create`, and enter it here.",
+                      { environment: linked.label },
+                    )
+                  : gt(
+                      "For machines on your local network or tailnet. The machine keeps its own provider credentials.",
+                    ))}
             </Text>
           </View>
 
@@ -281,11 +303,12 @@ function PairingScanCard(props: {
   readonly onScan: (result: { readonly data: string }) => void;
   readonly onScanPress: () => void;
 }) {
+  const gt = useGT();
   const light = useAppearancePreferences().themeAppearance === "light";
   return (
     <Pressable
       accessibilityRole={props.cameraActive ? undefined : "button"}
-      accessibilityLabel={props.cameraActive ? undefined : "Scan QR code"}
+      accessibilityLabel={props.cameraActive ? undefined : gt("Scan QR code")}
       disabled={props.cameraActive}
       onPress={props.onScanPress}
       className={cn(
@@ -356,7 +379,9 @@ function PairingScanCard(props: {
           )}
         </View>
         <Text className={cn("text-center text-sm", light ? "text-black/70" : "text-white/80")}>
-          <T>Scan the code from t3 pair or desktop Connections settings</T>
+          {gt("Scan the code from {command} or desktop Connections settings", {
+            command: "t3 pair",
+          })}
         </Text>
       </View>
     </Pressable>
@@ -388,7 +413,7 @@ function T3ConnectSection() {
         />
       ) : (
         <ListRow
-          label={gt("Sign in to R3 Connect")}
+          label={gt("Sign in to {product}", { product: "T3 Connect" })}
           description={gt("Reach your machines from anywhere, no network setup.")}
           disabled={!isLoaded}
           onPress={() => navigation.navigate("SettingsAuth")}
@@ -405,7 +430,7 @@ function PairingInputRow({
   readonly label: string;
 }) {
   return (
-    <View collapsable={false} className="h-13 flex-row items-center gap-3 px-4">
+    <View collapsable={false} className="min-h-[48px] flex-row items-center gap-3 px-4">
       <Text
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
@@ -418,7 +443,8 @@ function PairingInputRow({
         accessibilityLabel={label}
         autoCapitalize="none"
         autoCorrect={false}
-        className="min-h-0 flex-1 rounded-none border-0 bg-transparent p-0 text-base leading-[23px]"
+        textAlignVertical="center"
+        className="min-h-[48px] flex-1 self-stretch rounded-none border-0 bg-transparent p-0 text-base leading-[23px]"
       />
     </View>
   );

@@ -1,10 +1,10 @@
+import { T } from "gt-react";
 import { RefreshIcon } from "~/components/ui/refresh-icon";
 
 import type { ReactNode } from "react";
 
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
-import { T } from "gt-react";
 
 export function ClerkUserProfilePage({
   action,
@@ -57,10 +57,8 @@ export function ClerkUserProfileRefreshButton({
       disabled={disabled || isPending}
       onClick={onClick}
     >
-      <T>
-        <RefreshIcon aria-hidden="true" size="sm" refreshing={isPending} />
-        Refresh
-      </T>
+      <RefreshIcon aria-hidden="true" size="sm" refreshing={isPending} />
+      <T>Refresh</T>
     </Button>
   );
 }

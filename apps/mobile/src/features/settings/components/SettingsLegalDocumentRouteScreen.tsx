@@ -1,3 +1,4 @@
+import { T, useGT } from "gt-react-native";
 import { SheetHeader } from "../../../components/ui/SheetHeader";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
@@ -12,7 +13,7 @@ import { LoadingStrip } from "../../../components/ui/LoadingStrip";
 import { SymbolView } from "../../../components/ui/AppSymbol";
 import { isLegalDocumentUrl, LEGAL_URL } from "../lib/legal-document-url";
 import { webViewDecelerationRate } from "../../../lib/webViewDecelerationRate";
-import { useGT, Var, T } from "gt-react-native";
+import { Var } from "gt-react-native";
 import { t } from "../../../i18n/gt";
 
 interface SettingsLegalDocumentRouteScreenProps {
@@ -38,7 +39,7 @@ export function SettingsLegalDocumentRouteScreen({
       onClose={() => navigation.goBack()}
       actions={[
         {
-          accessibilityLabel: t("Open legal documents in external browser"),
+          accessibilityLabel: gt("Open legal documents in external browser"),
           icon: "safari",
           onPress: () => void tryOpenExternalUrl(safeExternalUrl),
         },
@@ -63,9 +64,7 @@ export function SettingsLegalDocumentRouteScreen({
           />
           <View className="items-center gap-2">
             <Text className="text-center font-t3-bold text-lg text-foreground">
-              <T>
-                Couldn&apos;t load the <Var>{documentName.toLowerCase()}</Var>
-              </T>
+              {gt("Couldn't load the {document}", { document: documentName.toLowerCase() })}
             </Text>
             <Text selectable className="text-center text-sm leading-normal text-foreground-muted">
               {loadError}
@@ -136,12 +135,14 @@ export function SettingsLegalDocumentRouteScreen({
         }}
         onError={(event) => {
           setLoadProgress(0);
-          setLoadError(event.nativeEvent.description || "The page could not be loaded.");
+          setLoadError(event.nativeEvent.description || gt("The page could not be loaded."));
         }}
         onHttpError={(event) => {
           if (!isLegalDocumentUrl(event.nativeEvent.url)) return;
           setLoadProgress(0);
-          setLoadError(`The server returned status ${event.nativeEvent.statusCode}.`);
+          setLoadError(
+            gt("The server returned status {status}.", { status: event.nativeEvent.statusCode }),
+          );
         }}
         renderLoading={() => (
           <View className="absolute inset-0 items-center justify-center bg-sheet">

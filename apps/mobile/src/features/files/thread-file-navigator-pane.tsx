@@ -3,6 +3,7 @@ import { environmentSession } from "../../state/session";
 import type { EnvironmentId } from "@t3tools/contracts";
 import { AppBar } from "../../components/ui/AppBar";
 import { ScreenContent } from "../../components/ui/ScreenContent";
+import { useGT, useMessages } from "gt-react-native";
 import { useState } from "react";
 import { SheetPane } from "../../components/ui/SheetPane";
 
@@ -12,7 +13,6 @@ import { useAppearancePreferences } from "../settings/appearance/AppearancePrefe
 import { FileTreeBrowser } from "./FileTreeBrowser";
 import { useFileTreeEntries } from "./useFileTreeEntries";
 import { preloadWorkspaceFileContents } from "./preload-workspace-file";
-import { useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 export function ThreadFileNavigatorPane(props: {
@@ -29,16 +29,20 @@ export function ThreadFileNavigatorPane(props: {
   const searchQuery = search.workspaceKey === workspaceKey ? search.query : "";
   const setSearchQuery = (query: string) => setSearch({ workspaceKey, query });
   const { themeAppearance: highlightTheme } = useAppearancePreferences();
+  const messages = useMessages();
   const fileAccessSession = useEnvironmentQuery(
     environmentSession.sessionStateAtom(props.environmentId),
   );
   const fileEnvironment = useEnvironmentPresentation(props.environmentId);
-  const fileAccess = resolveFilesystemReadAccess({
-    isCatalogReady: fileEnvironment.isReady,
-    connection: fileEnvironment.presentation?.connection ?? null,
-    session: fileAccessSession.data,
-    sessionError: fileAccessSession.error,
-  });
+  const fileAccess = resolveFilesystemReadAccess(
+    {
+      isCatalogReady: fileEnvironment.isReady,
+      connection: fileEnvironment.presentation?.connection ?? null,
+      session: fileAccessSession.data,
+      sessionError: fileAccessSession.error,
+    },
+    messages,
+  );
   const { canReadFiles } = fileAccess;
   const entriesQuery = useFileTreeEntries({
     environmentId: props.environmentId,
@@ -67,7 +71,7 @@ export function ThreadFileNavigatorPane(props: {
           ? entriesQuery.error
           : fileAccess.isPending
             ? null
-            : (fileAccess.error ?? "This connection cannot read host files.")
+            : (fileAccess.error ?? gt("This connection cannot read host files."))
       }
       isPending={fileAccess.isPending || entriesQuery.isPending}
       isRefreshing={entriesQuery.isRefreshing}
@@ -87,14 +91,14 @@ export function ThreadFileNavigatorPane(props: {
   return (
     <SheetPane>
       <AppBar
-        title={gt("Files")}
+        title={gt("Files", { $context: "screen title, workspace files" })}
         subtitle={props.projectName}
         search={{
           value: searchQuery,
           onChangeText: setSearchQuery,
-          placeholder: t("Search files"),
+          placeholder: gt("Search files"),
         }}
-        refresh={{ accessibilityLabel: t("Refresh files"), onPress: entriesQuery.refresh }}
+        refresh={{ accessibilityLabel: gt("Refresh files"), onPress: entriesQuery.refresh }}
       />
       <ScreenContent insetHorizontal>{fileTree}</ScreenContent>
     </SheetPane>

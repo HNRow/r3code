@@ -1,3 +1,4 @@
+import { T, useGT } from "gt-react";
 import { useState } from "react";
 import * as Option from "effect/Option";
 import type { SshDeviceHostConfig } from "@t3tools/contracts";
@@ -22,7 +23,9 @@ import {
   parseDeviceHostDraft,
   type DeviceHostCheckTarget,
 } from "./deviceHostConnectionChecks";
-import { Var, T, useGT, t } from "gt-react";
+import { Var, t } from "gt-react";
+
+const EXAMPLE_HOST_NAME = "Mac mini";
 
 export function DeviceHostEditor({
   host,
@@ -90,12 +93,12 @@ function DeviceHostEditorForm({
     targets.length === 1 ||
     (expandedChecks?.key === connectionKey ? expandedChecks.open : failed > 0);
   const checkSummary = checking
-    ? "Checking environments…"
+    ? gt("Checking environments…")
     : results
       ? failed
-        ? `${failed} of ${targets.length} failed`
-        : "Connection checks passed"
-      : "Check access before saving";
+        ? gt("{failed} of {total} failed", { failed, total: targets.length })
+        : gt("Connection checks passed")
+      : gt("Check access before saving");
   return (
     <form
       className="flex min-h-0 flex-col"
@@ -105,17 +108,14 @@ function DeviceHostEditorForm({
       }}
     >
       <DialogHeader>
-        <DialogTitle>{isNew ? t("Add device host") : t("Edit device host")}</DialogTitle>
+        <DialogTitle>{isNew ? gt("Add device host") : gt("Edit device host")}</DialogTitle>
         <DialogDescription>
-          <T>
-            <Var>
-              {targets.length === 1
-                ? `Connect from ${targets[0]?.label}.`
-                : `Connect from ${targets.length} selected environments.`}
-            </Var>
-            <Var> </Var>
-            Hosts on the same machine are skipped.
-          </T>
+          {targets.length === 1
+            ? gt("Connect from {environment}.", { environment: targets[0]?.label })
+            : gt("{count, plural, other {Connect from {count} selected environments.}}", {
+                count: targets.length,
+              })}{" "}
+          <T>Hosts on the same machine are skipped.</T>
         </DialogDescription>
       </DialogHeader>
       <DialogPanel>
@@ -132,7 +132,7 @@ function DeviceHostEditorForm({
               const label = event.target.value;
               setDraft((current) => ({ ...current, label }));
             }}
-            placeholder={gt("Mac mini")}
+            placeholder={EXAMPLE_HOST_NAME}
           />
         </label>
         <label className="block space-y-1.5 text-sm">
@@ -192,7 +192,7 @@ function DeviceHostEditorForm({
                     return port ? { ...rest, port: Number(port) } : rest;
                   });
                 }}
-                placeholder={gt("Default")}
+                placeholder={gt("Default", { $context: "uses the default SSH port" })}
               />
             </label>
           </div>
@@ -214,7 +214,7 @@ function DeviceHostEditorForm({
               <div className="min-w-0 text-xs [--inline-button-white-space:normal]">
                 <CollapsibleTrigger
                   disabled={!results}
-                  aria-label={`${checkSummary}. Per-machine results`}
+                  aria-label={gt("{summary}. Per-machine results", { summary: checkSummary })}
                   render={<InlineButton tone="muted" />}
                 >
                   <span role="status" className="text-left">
@@ -237,9 +237,7 @@ function DeviceHostEditorForm({
                 if (Option.isSome(input)) void testConnection(input.value);
               }}
             >
-              <T>
-                <Var>{checking ? <Spinner size="xs" /> : null}</Var> Test connection
-              </T>
+              {checking ? <Spinner size="xs" /> : null} <T>Test connection</T>
             </Button>
           </div>
           {results ? (
@@ -258,27 +256,20 @@ function DeviceHostEditorForm({
                       >
                         {result.status === "pending" ? (
                           <>
-                            <T>
-                              <Spinner size="xs" /> Checking…
-                            </T>
+                            <Spinner size="xs" /> <T>Checking…</T>
                           </>
                         ) : result.status === "local" ? (
                           <>
-                            <T>
-                              <MonitorIcon className="size-3" /> Already available locally
-                            </T>
+                            <MonitorIcon className="size-3" /> <T>Already available locally</T>
                           </>
                         ) : result.status === "failed" ? (
                           <>
-                            <T>
-                              <XIcon className="size-3" /> Failed
-                            </T>
+                            <XIcon className="size-3" />{" "}
+                            {gt("Failed", { $context: "connection check status" })}
                           </>
                         ) : (
                           <>
-                            <T>
-                              <CheckIcon className="size-3" /> Connected
-                            </T>
+                            <CheckIcon className="size-3" /> <T>Connected</T>
                           </>
                         )}
                       </span>
@@ -310,9 +301,7 @@ function DeviceHostEditorForm({
           <T>Cancel</T>
         </Button>
         <Button type="submit" disabled={busy || checking || !valid || !draft.label.trim()}>
-          <T>
-            <Var>{busy ? <Spinner size="xs" /> : null}</Var> Save host
-          </T>
+          {busy ? <Spinner size="xs" /> : null} <T>Save host</T>
         </Button>
       </DialogFooter>
     </form>

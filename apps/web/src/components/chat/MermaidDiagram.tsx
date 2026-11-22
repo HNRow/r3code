@@ -1,10 +1,10 @@
 import DOMPurify from "dompurify";
 import type { DiagramType, MathResolver } from "pele/lazy";
+import { T, useGT, Var } from "gt-react";
 import { use, useState } from "react";
 
 import { serializeCodeBlockToMarkdown } from "../../markdown-clipboard";
 import { Button } from "../ui/button";
-import { useGT, Var, T } from "gt-react";
 
 type Pele = typeof import("pele/lazy");
 type PeleLoad = { readonly status: "loaded"; readonly pele: Pele } | { readonly status: "failed" };
@@ -249,7 +249,7 @@ export function MermaidDiagram({
       onRender: () => setRenderError(null),
       onError: (error) =>
         setRenderError(
-          error instanceof Error ? error.message : "The diagram could not be rendered.",
+          error instanceof Error ? error.message : gt("The diagram could not be rendered."),
         ),
     });
     return () => mounted.destroy();

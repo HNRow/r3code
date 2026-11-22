@@ -204,12 +204,12 @@ request, as they do on the next launch. Leave it out to count real native crashe
 ```
 
 Native crash stacks (`expo.error.source == 'nativeCrash'`) are not symbolicated. On iOS, app frames
-read like `main (T3Code + 19476)`: the offset into the app binary. The build hook uploads that
+read like `main (R3Code + 19476)`: the offset into the app binary. The build hook uploads that
 build's dSYMs to `ios/dsym/<easBuildId>.zip`; download it with an account R2 token, then:
 
 ```sh
 unzip <easBuildId>.zip
-atos -arch arm64 -o T3Code.app.dSYM/Contents/Resources/DWARF/T3Code -l 0x100000000 \
+atos -arch arm64 -o R3Code.app.dSYM/Contents/Resources/DWARF/R3Code -l 0x100000000 \
   $(printf '0x%x' $((0x100000000 + 19476)))
 ```
 
@@ -223,7 +223,7 @@ token needs **Account API Tokens: Edit** on the deploy token. Deploy output show
 it from state, where it is under `__redacted__`:
 
 ```sh
-cd infra/relay && vp exec alchemy state read T3CodeRelay/prod/output
+cd infra/relay && vp exec alchemy state read R3CodeRelay/prod/output
 ```
 
 Set it as a GitHub Actions secret, for OTA updates, and as an EAS environment variable with
@@ -234,7 +234,9 @@ PR preview builds run the PR's code in that environment. In CI only the upload s
 The `t3-code-mobile-health` dashboard is the place to look every few days: crash and handled
 error counts, top crashes with the installs and app versions they hit, crashes by version, whether
 stacks are symbolicated, and whether reports reach the relay at all. A crash counts once: the
-native abort after a JS crash (`relay.crash.js_fatal`) is left out. Startup times are metrics, so
+native abort after a JS crash (`relay.crash.js_fatal`) is left out, and so are Android `SIGKILL`
+reports, which are the OS ending the process (low memory, swiped away), not a crash. They have
+their own chart by app version. Startup times are metrics, so
 they are not on it; query `t3-code-mobile-metrics-*` with MPL. Prod and PR previews get the
 dashboard, and deployments with `RELAY_ALERT_NOTIFIER_ID` get these monitors
 ([`infra/relay/src/mobileTelemetry/monitoring.ts`](../../infra/relay/src/mobileTelemetry/monitoring.ts)):
@@ -243,6 +245,9 @@ dashboard, and deployments with `RELAY_ALERT_NOTIFIER_ID` get these monitors
   a week of data exists it has no baseline. A spike right after a release usually means a bad OTA
   update; roll it back in EAS.
 - **one crash hitting many installs** (pages): a single crash on 25 installs within an hour.
+- **Android OS kills spike** (warning): OS kills per hour well above the same time over the last 7
+  days. Reports arrive hours late, on the next launch, so it lags a release. A rise usually means a
+  memory leak or a frozen main thread in a new version.
 - **reports stopped** (warning): no startup metrics forwarded for an hour, so crashes are not
   arriving either.
 - **crash stacks not symbolicated** (warning): over half of release JS stacks stayed minified for

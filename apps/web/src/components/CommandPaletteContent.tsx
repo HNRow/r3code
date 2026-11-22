@@ -1,9 +1,9 @@
+import { T } from "gt-react";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import { type ComponentProps, type ReactNode, type RefObject } from "react";
 
 import { Command, CommandFooter, CommandInput, CommandPanel } from "./ui/command";
 import { Kbd, KbdGroup } from "./ui/kbd";
-import { T } from "gt-react";
 
 /**
  * A view replacing another inside an open dialog mounts with focus on the body,
@@ -54,7 +54,7 @@ type CommandPaletteContentProps = Omit<ComponentProps<typeof Command>, "children
 
 export function CommandPaletteContent({
   children,
-  escapeLabel = "Close",
+  escapeLabel,
   footerActionLabel,
   footerTrailing,
   inputAccessory,
@@ -114,19 +114,15 @@ export function CommandPaletteContent({
             ) : null}
             {showBackHint ? (
               <KbdGroup>
-                <Kbd>
-                  <T>Backspace</T>
-                </Kbd>
+                <Kbd>Backspace</Kbd>
                 <span>
                   <T>Back</T>
                 </span>
               </KbdGroup>
             ) : null}
             <KbdGroup>
-              <Kbd>
-                <T>Esc</T>
-              </Kbd>
-              <span>{escapeLabel}</span>
+              <Kbd>Esc</Kbd>
+              <span>{escapeLabel ?? <T>Close</T>}</span>
             </KbdGroup>
           </div>
           {footerTrailing}

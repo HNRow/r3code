@@ -1,4 +1,7 @@
 import type { RefObject } from "react";
+import { msg } from "gt-react";
+
+import { m } from "~/i18n/messages";
 import { anchoredToastManager } from "./toast";
 import { t } from "gt-react";
 
@@ -11,7 +14,7 @@ export function showAnchoredCopyErrorToast(ref: RefObject<HTMLButtonElement | nu
     positionerProps: {
       anchor: ref.current,
     },
-    title: t("Failed to copy"),
+    title: m(msg("Failed to copy")),
     description: error.message,
   });
 }

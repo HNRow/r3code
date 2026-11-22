@@ -1,4 +1,5 @@
 import { useAtomValue } from "@effect/atom-react";
+import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
 import { scopeThreadRef } from "@t3tools/client-runtime/environment";
 import {
   AuthPreviewOperateScope,
@@ -12,6 +13,8 @@ import {
   squashAtomCommandFailure,
 } from "@t3tools/client-runtime/state/runtime";
 import { isLoopbackHost } from "@t3tools/shared/preview";
+import { T, useGT, Var } from "gt-react";
+import { m } from "~/i18n/messages";
 import { CableIcon, GlobeIcon, SquareIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { type MouseEvent, useState } from "react";
 
@@ -42,7 +45,7 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { ThreadDetailsControl } from "./ThreadDetailsControl";
 import { ThreadDetailsSection } from "./ThreadDetailsSection";
 import { THREAD_DETAILS_PANEL_ICON_CLASS } from "./threadDetailsPanelStyles";
-import { useGT, Var, T, t } from "gt-react";
+import { t } from "gt-react";
 
 const SERVER_PAGE_COUNT = 4;
 
@@ -92,7 +95,7 @@ function ThreadServersList(props: ThreadServersPanelProps) {
       stackedThreadToast({
         type: "error",
         title,
-        description: error instanceof Error ? error.message : String(error),
+        description: thrownErrorMessage(error, m) ?? String(error),
       }),
     );
   };
@@ -104,19 +107,20 @@ function ThreadServersList(props: ThreadServersPanelProps) {
       event.preventDefault();
       // This machine's browser reaches another environment's loopback only through a forward.
       // Starting a forward runs the probe; only a confirmed local environment opens directly.
-      const url =
-        forwardable && locality !== "local"
-          ? await forwardPort(props.environmentId, server.port).then(
-              (forward) => forwardedUrl(forward, server.url),
-              (error: unknown) => {
-                reportFailure(gt("Could not forward port {port}", { port: server.port }), error);
-                return null;
-              },
-            )
-          : resolveExternalServerUrl(props.environmentId, server.url);
+      const forwarding = forwardable && locality !== "local";
+      const url = forwarding
+        ? await forwardPort(props.environmentId, server.port).then(
+            (forward) => forwardedUrl(forward, server.url),
+            (error: unknown) => {
+              reportFailure(gt("Could not forward port {port}", { port: server.port }), error);
+              return null;
+            },
+          )
+        : resolveExternalServerUrl(props.environmentId, server.url);
       if (url === null) return;
       // Without a forward, a remote environment's localhost would open this machine's instead.
       if (
+        !forwarding &&
         locality !== "local" &&
         tunnelsEnvironmentLoopback(environment?.entry.target) &&
         isLoopbackHost(new URL(url).hostname)
@@ -134,12 +138,12 @@ function ThreadServersList(props: ThreadServersPanelProps) {
       }
       await readLocalApi()
         ?.shell.openExternal(url)
-        .catch((error: unknown) => reportFailure("Unable to open in browser", error));
+        .catch((error: unknown) => reportFailure(gt("Unable to open in browser"), error));
       return;
     }
     const result = await openDiscoveredPort({ threadRef, port: server, openPreview });
     if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
-      reportFailure("Unable to open preview", squashAtomCommandFailure(result));
+      reportFailure(gt("Unable to open preview"), squashAtomCommandFailure(result));
     }
   };
 
@@ -152,7 +156,7 @@ function ThreadServersList(props: ThreadServersPanelProps) {
     });
     setStoppingKey(null);
     if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
-      reportFailure("Could not stop server", squashAtomCommandFailure(result));
+      reportFailure(gt("Could not stop server"), squashAtomCommandFailure(result));
     }
   };
 
@@ -170,7 +174,10 @@ function ThreadServersList(props: ThreadServersPanelProps) {
   };
 
   return (
-    <ThreadDetailsSection headingId="thread-details-servers-heading" title={gt("Servers")}>
+    <ThreadDetailsSection
+      headingId="thread-details-servers-heading"
+      title={gt("Servers", { $context: "thread details section: running dev servers" })}
+    >
       <ul className="m-0 list-none p-0">
         {servers.slice(0, visibleCount).map((server, index) => {
           const key = serverKey(server);
@@ -336,9 +343,13 @@ function ThreadServersList(props: ThreadServersPanelProps) {
           ) : (
             <ChevronUpIcon aria-hidden className="size-4 shrink-0" />
           )}
-          {hiddenCount > 0
-            ? `Show ${Math.min(hiddenCount, SERVER_PAGE_COUNT)} more`
-            : t("Show less")}
+          {hiddenCount > 0 ? (
+            <T>
+              Show <Var>{Math.min(hiddenCount, SERVER_PAGE_COUNT)}</Var> more
+            </T>
+          ) : (
+            <T>Show less</T>
+          )}
         </ThreadDetailsControl>
       ) : null}
     </ThreadDetailsSection>

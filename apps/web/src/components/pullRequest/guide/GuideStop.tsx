@@ -13,6 +13,7 @@ import {
   MessageCircleQuestionIcon,
   MessageSquareIcon,
 } from "lucide-react";
+import { msg, T, useGT, useMessages, Var } from "gt-react";
 import type { ReactNode } from "react";
 
 import { getDiffLineStat } from "~/lib/diffRendering";
@@ -29,14 +30,14 @@ import { GuideFileDiff } from "./GuideFileDiff";
 import { GuideNotes } from "./GuideNotes";
 import { GuideProse } from "./GuideProse";
 import { letterStopNotes } from "@t3tools/client-runtime/review-guide-tour";
-import { Var, T, useGT, t } from "gt-react";
+import { t } from "gt-react";
 
 const ATTENTION_LABELS = {
-  tradeoff: "A tradeoff to weigh",
-  contract: "A contract to check",
-  product: "A product call",
-  risk: "A risk to judge",
-  accessibility: "An accessibility call",
+  tradeoff: msg("A tradeoff to weigh"),
+  contract: msg("A contract to check"),
+  product: msg("A product call"),
+  risk: msg("A risk to judge"),
+  accessibility: msg("An accessibility call"),
 } as const satisfies Record<PullRequestReviewGuideAttention["kind"], string>;
 
 export function GuideStop({
@@ -73,6 +74,7 @@ export function GuideStop({
   onOpenFile: (path: string) => void;
 }) {
   const gt = useGT();
+  const resolve = useMessages();
   const { lettered, byExcerpt } = letterStopNotes(stop);
   const excerptPaths = new Set(stop.excerpts.map((excerpt) => excerpt.path));
   const otherFiles = stop.files.filter((file) => !excerptPaths.has(file.path));
@@ -152,7 +154,7 @@ export function GuideStop({
         {stop.attention !== null ? (
           <Alert controlAlignment="first-line">
             <EyeIcon />
-            <AlertTitle>{ATTENTION_LABELS[stop.attention.kind]}</AlertTitle>
+            <AlertTitle>{resolve(ATTENTION_LABELS[stop.attention.kind])}</AlertTitle>
             <AlertDescription>
               <div>
                 <GuideProse text={stop.attention.note} />
@@ -184,7 +186,7 @@ export function GuideStop({
         {otherFiles.length > 0 ? (
           <section className="flex flex-col gap-1.5">
             <h3 className="text-xs font-medium text-muted-foreground">
-              {stop.excerpts.length > 0 ? t("Also in this stop") : t("Files in this stop")}
+              {stop.excerpts.length > 0 ? gt("Also in this stop") : gt("Files in this stop")}
             </h3>
             <DiffWorkerPoolProvider>
               <ul className="flex flex-col overflow-hidden rounded-lg border border-border/60">
@@ -230,8 +232,8 @@ export function GuideStop({
                           ) : (
                             <p className="px-3 py-2 text-xs text-muted-foreground">
                               {diffLoading
-                                ? t("Loading the diff...")
-                                : t("This file is not in the loaded diff.")}
+                                ? gt("Loading the diff...")
+                                : gt("This file is not in the loaded diff.")}
                             </p>
                           )}
                         </CollapsiblePanel>
@@ -268,9 +270,7 @@ export function GuideStop({
                       aria-hidden
                       className="size-3.5 h-lh shrink-0 text-muted-foreground"
                     />
-                    <span className="sr-only">
-                      <T>Ask an agent: </T>
-                    </span>
+                    <span className="sr-only">{gt("Ask an agent: ")}</span>
                     <span>
                       <GuideProse text={question} plain />
                     </span>
@@ -279,10 +279,8 @@ export function GuideStop({
               )}
               {onAsk !== null ? (
                 <Button size="sm" variant="ghost-muted" onClick={() => onAsk("")}>
-                  <T>
-                    <MessageCircleQuestionIcon aria-hidden />
-                    Ask about this stop
-                  </T>
+                  <MessageCircleQuestionIcon aria-hidden />
+                  <T>Ask about this stop</T>
                 </Button>
               ) : null}
             </div>
@@ -301,10 +299,8 @@ export function GuideStop({
             </Button>
           ) : onFinish !== null ? (
             <Button onClick={onFinish}>
-              <T>
-                <MessageSquareIcon aria-hidden />
-                Finish review
-              </T>
+              <MessageSquareIcon aria-hidden />
+              <T>Finish review</T>
             </Button>
           ) : null}
         </footer>

@@ -1,4 +1,7 @@
+import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
+import { m as resolveMessage } from "~/i18n/messages";
 import { useAtomValue } from "@effect/atom-react";
+import { msg, T, useGT, useMessages } from "gt-react";
 import { useId, useRef, useState } from "react";
 import * as Cause from "effect/Cause";
 import * as Option from "effect/Option";
@@ -28,7 +31,7 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../
 import { Spinner } from "../ui/spinner";
 import { parseEasDeviceHostDraft } from "./easDeviceHostsSettings.logic";
 import { SecretSourceInput, useSecretSources } from "./SecretSourceInput";
-import { T, useGT, Var, t } from "gt-react";
+import { Var, t } from "gt-react";
 
 const EXPO_CREDENTIAL_MISSING =
   "No Expo credential on the server: save an access token for this host, set EXPO_TOKEN, or run `eas login`.";
@@ -43,15 +46,17 @@ function expoAccountErrorLabel(error: string): string {
 
 const FROM_THREAD_PROJECT = "thread-project";
 
-const CREDENTIAL_SOURCES: Record<DeviceEasAccount["credentialSource"], string> = {
-  settings: "the access token saved here",
-  env: "EXPO_TOKEN on the server",
-  "eas-login": "the server's eas login",
+const SIGNED_IN_MESSAGES: Record<DeviceEasAccount["credentialSource"], string> = {
+  settings: msg("Signed in as {account} with the access token saved here."),
+  env: msg("Signed in as {account} with EXPO_TOKEN on the server."),
+  "eas-login": msg("Signed in as {account} with the server's eas login."),
 };
 
 const failureMessage = (cause: Cause.Cause<unknown>) => {
   const error = Cause.squash(cause);
-  return error instanceof Error ? error.message : String(error);
+  return error instanceof Error
+    ? (thrownErrorMessage(error, resolveMessage) ?? error.message)
+    : String(error);
 };
 
 type AccountCheck =
@@ -69,6 +74,7 @@ export function EasDeviceHostEditor(props: {
   onClose: () => void;
 }) {
   const gt = useGT();
+  const m = useMessages();
   const check = useAtomCommand(deviceEnvironment.easAccount, { reportFailure: false });
   const [draft, setDraft] = useState(props.host);
   const tokenId = useId();
@@ -110,10 +116,10 @@ export function EasDeviceHostEditor(props: {
   const problem = valid
     ? null
     : !tokenValid
-      ? "Enter a valid secret reference."
+      ? gt("Enter a valid secret reference.")
       : draft.maxSessionMinutes > 0 && draft.idleMinutes >= draft.maxSessionMinutes
-        ? "Idle minutes must be smaller than session minutes."
-        : "Give the host a label and limits within the ranges shown.";
+        ? gt("Idle minutes must be smaller than session minutes.")
+        : gt("Give the host a label and limits within the ranges shown.");
   const apps = account.status === "signed-in" ? account.account.apps : [];
 
   // A check answers for the credential it was asked about: a later check or a
@@ -187,7 +193,7 @@ export function EasDeviceHostEditor(props: {
           }}
         >
           <DialogHeader>
-            <DialogTitle>{props.isNew ? t("Add Expo host") : t("Edit Expo host")}</DialogTitle>
+            <DialogTitle>{props.isNew ? gt("Add Expo host") : gt("Edit Expo host")}</DialogTitle>
             <DialogDescription>
               <T>
                 The environment's server signs in to Expo and starts the sessions. Without a token
@@ -276,12 +282,14 @@ export function EasDeviceHostEditor(props: {
             <div className="flex items-center justify-between gap-3 rounded-lg border border-border/60 px-3 py-2.5">
               <p role="status" className="min-w-0 text-xs text-muted-foreground">
                 {account.status === "signed-in"
-                  ? `Signed in as ${account.account.signedInAs} with ${CREDENTIAL_SOURCES[account.account.credentialSource]}.`
+                  ? m(SIGNED_IN_MESSAGES[account.account.credentialSource], {
+                      account: account.account.signedInAs,
+                    })
                   : account.status === "failed"
                     ? expoAccountErrorLabel(account.error)
                     : account.status === "checking"
-                      ? t("Checking the Expo account…")
-                      : t("Check the Expo account before choosing a project.")}
+                      ? gt("Checking the Expo account…")
+                      : gt("Check the Expo account before choosing a project.")}
               </p>
               <Button
                 type="button"
@@ -290,10 +298,7 @@ export function EasDeviceHostEditor(props: {
                 disabled={props.busy || !tokenValid || account.status === "checking"}
                 onClick={() => void checkAccount()}
               >
-                <T>
-                  <Var>{account.status === "checking" ? <Spinner size="xs" /> : null}</Var> Check
-                  account
-                </T>
+                {account.status === "checking" ? <Spinner size="xs" /> : null} <T>Check account</T>
               </Button>
             </div>
             <div className="space-y-1.5 text-sm">
@@ -315,7 +320,7 @@ export function EasDeviceHostEditor(props: {
                   <SelectValue>
                     {(value: string) =>
                       value === FROM_THREAD_PROJECT
-                        ? t("From the thread's project")
+                        ? gt("From the thread's project")
                         : (apps.find((app) => app.id === value)?.fullName ?? value)
                     }
                   </SelectValue>
@@ -342,21 +347,22 @@ export function EasDeviceHostEditor(props: {
               </p>
             </div>
             <div className="grid grid-cols-3 gap-3 text-sm">
-              {limit("maxConcurrentSessions", t("Sessions at once"), 20)}
-              {limit("maxSessionMinutes", t("Session minutes"), 115)}
-              {limit("idleMinutes", t("Idle minutes"), 60)}
+              {limit("maxConcurrentSessions", gt("Sessions at once"), 20)}
+              {limit("maxSessionMinutes", gt("Session minutes"), 115)}
+              {limit("idleMinutes", gt("Idle minutes"), 60)}
             </div>
             <p className="text-xs text-muted-foreground">
               <T>
                 Expo Simulators needs a paid Expo account. A session runs for up to 115 minutes and
                 stops early when it is idle for the idle minutes, so idle minutes must be less than
                 session minutes.
-                <Var>
-                  {props.isNew
-                    ? null
-                    : t(" Saving restarts this host and stops its running sessions.")}
-                </Var>
               </T>
+              {props.isNew ? null : (
+                <>
+                  {" "}
+                  <T>Saving restarts this host and stops its running sessions.</T>
+                </>
+              )}
             </p>
             {problem === null ? null : (
               <p className="text-xs text-destructive" role="alert">
@@ -369,9 +375,7 @@ export function EasDeviceHostEditor(props: {
               <T>Cancel</T>
             </Button>
             <Button type="submit" disabled={props.busy || !valid}>
-              <T>
-                <Var>{props.busy ? <Spinner size="xs" /> : null}</Var> Save host
-              </T>
+              {props.busy ? <Spinner size="xs" /> : null} <T>Save host</T>
             </Button>
           </DialogFooter>
         </form>

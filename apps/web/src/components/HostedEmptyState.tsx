@@ -1,6 +1,7 @@
 import { useAuth } from "@clerk/react";
 import type { EnvironmentId } from "@t3tools/contracts";
 import { Link } from "@tanstack/react-router";
+import { T } from "gt-react";
 import { CheckIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
@@ -17,7 +18,7 @@ import { Button } from "./ui/button";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "./ui/empty";
 import { SidebarInset } from "./ui/sidebar";
 import { WorkspacePageHeader } from "./WorkspacePageHeader";
-import { T, t } from "gt-react";
+import { t } from "gt-react";
 
 /** Home screen for the hosted app before any computer is added. */
 export function HostedEmptyState() {
@@ -38,14 +39,16 @@ export function HostedEmptyState() {
         <Empty className="flex-1">
           <EmptyHeader>
             <EmptyTitle>
-              {localEnvironmentOff ? t("This computer is off") : t("No computer connected")}
+              {localEnvironmentOff ? <T>This computer is off</T> : <T>No computer connected</T>}
             </EmptyTitle>
             <EmptyDescription>
-              {localEnvironmentOff
-                ? t("Turn it back on, or connect a different computer.")
-                : cloudEnabled
-                  ? t("Your agents run on your computer.")
-                  : t("Your agents run on your computer. Start R3 Code there first.")}
+              {localEnvironmentOff ? (
+                <T>Turn it back on, or connect a different computer.</T>
+              ) : cloudEnabled ? (
+                <T>Your agents run on your computer.</T>
+              ) : (
+                <T>Your agents run on your computer. Start R3 Code there first.</T>
+              )}
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
@@ -85,10 +88,8 @@ function T3ConnectSteps() {
           </Button>
         ) : isSignedIn ? (
           <p className="flex items-center gap-1.5 text-muted-foreground">
-            <T>
-              <CheckIcon className="size-4" />
-              Signed in
-            </T>
+            <CheckIcon className="size-4" />
+            <T>Signed in</T>
           </p>
         ) : (
           <Button size="sm" disabled={!isLoaded} onClick={openAuthPrompt}>

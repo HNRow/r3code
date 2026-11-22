@@ -1,3 +1,4 @@
+import { T, useGT } from "gt-react-native";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { Platform, Pressable, View } from "react-native";
 
@@ -7,7 +8,6 @@ import { FloatingActionButton } from "../../components/ui/FloatingActionButton";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ScreenContent } from "../../components/ui/ScreenContent";
 import type { WorkspaceTab } from "./workspace/workspace-tabs-state";
-import { useGT, T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 export function WorkspaceEmptyDetail(props: {
@@ -56,23 +56,23 @@ export function WorkspaceEmptyDetail(props: {
             />
             <Text className="text-center text-xl font-t3-bold">
               {settings
-                ? t("Select a setting")
+                ? gt("Select a setting")
                 : pullRequests
-                  ? t("Select a pull request")
+                  ? gt("Select a pull request")
                   : issues
-                    ? t("Select an issue")
-                    : t("Select a thread")}
+                    ? gt("Select an issue")
+                    : gt("Select a thread")}
             </Text>
             <Text className="text-center text-base text-foreground-muted">
               {settings
-                ? t("Choose a page from the sidebar.")
+                ? gt("Choose a page from the sidebar.")
                 : pullRequests
-                  ? t("Choose a pull request from the sidebar to review it.")
+                  ? gt("Choose a pull request from the sidebar to review it.")
                   : issues
-                    ? t("Choose an issue from the sidebar to read it.")
+                    ? gt("Choose an issue from the sidebar to read it.")
                     : Platform.OS === "android"
-                      ? t("Choose a thread from the sidebar or start a new thread.")
-                      : t("Choose a thread from the sidebar or start a new task.")}
+                      ? gt("Choose a thread from the sidebar or start a new thread.")
+                      : gt("Choose a thread from the sidebar or start a new task.")}
             </Text>
             {props.onStartNewTask && !pullRequests && !issues && !settings ? (
               Platform.OS === "android" ? (

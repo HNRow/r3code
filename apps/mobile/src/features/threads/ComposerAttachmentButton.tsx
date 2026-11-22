@@ -1,27 +1,15 @@
 import type { MenuAction } from "@react-native-menu/menu";
+import { msg, useGT, useMessages } from "gt-react-native";
 import { Pressable } from "react-native";
 
 import { useAndroidControlSizing } from "../../components/ui/useAndroidControlSizing";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { Menu } from "../../components/ui/Menu";
-import { useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 const ATTACHMENT_MENU_ACTIONS: MenuAction[] = [
-  {
-    id: "photos",
-    get title() {
-      return t("Photo Library");
-    },
-    image: "photo",
-  },
-  {
-    id: "files",
-    get title() {
-      return t("Choose Files");
-    },
-    image: "folder",
-  },
+  { id: "photos", title: msg("Photo Library"), image: "photo" },
+  { id: "files", title: msg("Choose Files"), image: "folder" },
 ];
 
 export function ComposerAttachmentButton(props: {
@@ -32,6 +20,7 @@ export function ComposerAttachmentButton(props: {
   readonly onPickFiles: () => Promise<void>;
 }) {
   const gt = useGT();
+  const m = useMessages();
   const { scale } = useAndroidControlSizing();
   const button = (
     <Pressable
@@ -61,7 +50,7 @@ export function ComposerAttachmentButton(props: {
       accessible
       accessibilityLabel={gt("Add attachment")}
       accessibilityRole="button"
-      actions={ATTACHMENT_MENU_ACTIONS}
+      actions={ATTACHMENT_MENU_ACTIONS.map((action) => ({ ...action, title: m(action.title) }))}
       onPressAction={({ nativeEvent }) => {
         if (nativeEvent.event === "photos") {
           void props.onPickMedia();

@@ -1,7 +1,10 @@
 import { useAtomCommand } from "~/state/use-atom-command";
 import type { EnvironmentId, PullRequestLabelCandidate, PullRequestRef } from "@t3tools/contracts";
 import { CheckIcon, TagIcon } from "lucide-react";
+import { msg, useGT, useMessages } from "gt-react";
 import { useState } from "react";
+
+import { m } from "~/i18n/messages";
 
 import { pullRequestEnvironment } from "~/state/pullRequests";
 import { useEnvironmentQuery } from "~/state/query";
@@ -18,7 +21,6 @@ import { toastManager } from "../ui/toast";
 import { PullRequestCandidatePicker } from "./PullRequestCandidatePicker";
 import { readableFailure } from "./pullRequestDetail.logic";
 import { pullRequestLabelColor } from "./pullRequestList.logic";
-import { useGT } from "gt-react";
 
 function matches(candidate: PullRequestLabelCandidate, query: string): boolean {
   if (query.length === 0) return true;
@@ -45,6 +47,7 @@ export function PullRequestLabelPicker({
 
   const candidatesQuery = useEnvironmentQuery(
     open ? pullRequestEnvironment.labelCandidates({ environmentId, input: reference }) : null,
+    useMessages(),
   );
   const setLabels = useAtomCommand(pullRequestEnvironment.setLabels, {
     reportFailure: false,
@@ -67,11 +70,11 @@ export function PullRequestLabelPicker({
     toastManager.add({
       type: "error",
       title: applied
-        ? `Could not put ${names.join(", ")} on`
-        : `Could not take ${names.join(", ")} off`,
+        ? m(msg("Could not put {names} on", { names: names.join(", ") }))
+        : m(msg("Could not take {names} off", { names: names.join(", ") })),
       description: readableFailure(
         squashAtomCommandFailure(result),
-        "The host refused it. Check that you have triage access on this repository.",
+        m(msg("The host refused it. Check that you have triage access on this repository.")),
       ),
     });
   };
@@ -94,7 +97,7 @@ export function PullRequestLabelPicker({
       icon={<TagIcon className="size-3.5" />}
       label={gt("Change labels")}
       allowed={allowed}
-      disabledReason="Changing labels needs triage access on this repository"
+      disabledReason={gt("Changing labels needs triage access on this repository")}
       open={open}
       onOpenChange={onOpenChange}
       query={query}
@@ -133,7 +136,10 @@ export function PullRequestLabelPicker({
               ) : null}
             </span>
             {isSelected(draft, candidate.name, candidate.isApplied) ? (
-              <CheckIcon aria-label={gt("Applied")} className="size-3.5 shrink-0" />
+              <CheckIcon
+                aria-label={gt("Applied", { $context: "label is applied" })}
+                className="size-3.5 shrink-0"
+              />
             ) : null}
           </>
         );

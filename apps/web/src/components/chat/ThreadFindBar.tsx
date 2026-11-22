@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { T, useGT } from "gt-react";
 import { ChevronDownIcon, ChevronUpIcon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "../ui/input-group";
@@ -9,7 +10,6 @@ import {
   type ThreadFindAnnouncement,
 } from "./threadFind";
 import { THREAD_DETAILS_CARD_GAP } from "./threadDetailsCardLayout";
-import { useGT, T } from "gt-react";
 
 interface ThreadFindBarProps {
   readonly open: boolean;
@@ -33,8 +33,8 @@ interface ThreadFindBarProps {
 export const THREAD_FIND_BAR_RESERVED_HEIGHT = 36 + THREAD_DETAILS_CARD_GAP;
 
 export function ThreadFindBar(props: ThreadFindBarProps) {
-  const gt = useGT();
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const gt = useGT();
 
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- focuses and selects the input DOM node when the bar opens or a find shortcut fires
   useEffect(() => {
@@ -53,8 +53,8 @@ export function ThreadFindBar(props: ThreadFindBarProps) {
   if (hasQuery) {
     label = props.counting ? "1/…" : formatThreadFindCount(props.activeIndex, props.matchCount);
   }
-  if (props.status === "loading") label = "Searching…";
-  if (props.status === "error") label = "Search failed";
+  if (props.status === "loading") label = gt("Searching…");
+  if (props.status === "error") label = gt("Search failed");
   const [storedAnnouncement, setAnnouncement] = useState<ThreadFindAnnouncement | null>(null);
   const announcement = nextThreadFindAnnouncement(storedAnnouncement, {
     navigationId: props.navigationId,

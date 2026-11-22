@@ -1,3 +1,4 @@
+import { T, useGT, useMessages } from "gt-react";
 import { CheckIcon, ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -20,7 +21,6 @@ import {
   ComboboxTrigger,
 } from "../ui/combobox";
 import { PierreEntryIcon } from "./PierreEntryIcon";
-import { useGT, T } from "gt-react";
 
 function LanguageIcon(props: { language: string; theme: "light" | "dark" }) {
   const fileName = props.language ? syntheticFileNameForLanguageId(props.language) : "file.txt";
@@ -36,11 +36,16 @@ export function ComposerCodeBlockLanguagePicker(props: {
   onChange: (language: string) => void;
 }) {
   const gt = useGT();
+  const messages = useMessages();
   const [query, setQuery] = useState("");
   const current = codeLanguageEntry(props.language)?.id ?? props.language;
-  const items: CodeBlockLanguage[] = CODE_BLOCK_LANGUAGES.some((entry) => entry.id === current)
-    ? [...CODE_BLOCK_LANGUAGES]
-    : [{ id: current, label: current }, ...CODE_BLOCK_LANGUAGES];
+  const languages = CODE_BLOCK_LANGUAGES.map((entry) => ({
+    ...entry,
+    label: messages(entry.label),
+  }));
+  const items: CodeBlockLanguage[] = languages.some((entry) => entry.id === current)
+    ? languages
+    : [{ id: current, label: current }, ...languages];
   const needle = query.trim().toLowerCase();
   const filteredItems = needle
     ? items.filter(
@@ -72,12 +77,14 @@ export function ComposerCodeBlockLanguagePicker(props: {
               variant="ghost-muted"
               size="xs"
               disabled={props.disabled}
-              aria-label={`Code language: ${codeLanguageLabel(props.language)}`}
+              aria-label={gt("Code language: {language}", {
+                language: codeLanguageLabel(props.language, messages),
+              })}
             />
           }
         >
           <LanguageIcon language={current} theme={props.theme} />
-          <span className="max-w-40 truncate">{codeLanguageLabel(props.language)}</span>
+          <span className="max-w-40 truncate">{codeLanguageLabel(props.language, messages)}</span>
           <ChevronDownIcon className="opacity-60" />
         </ComboboxTrigger>
         <ComboboxPopup align="start" className="w-56">

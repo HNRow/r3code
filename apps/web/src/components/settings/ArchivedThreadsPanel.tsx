@@ -1,3 +1,5 @@
+import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
+import { m as resolveMessage } from "~/i18n/messages";
 import { settingsScopeEnvironmentLabels } from "./settingsScopeAxis";
 import { Spinner } from "~/components/ui/spinner";
 import { ArchiveIcon, ArchiveX, Trash2Icon } from "lucide-react";
@@ -17,32 +19,35 @@ import { RelativeTime } from "../RelativeTime";
 import { Button } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { SettingsPageContainer, SettingsRow, SettingsSection } from "./settingsLayout";
-import { searchableSetting } from "./settingsSearch";
+import { useSearchableSetting } from "./settingsSearch";
 import { ProjectFavicon } from "../ProjectFavicon";
 
+import { msg, T, useGT, useMessages } from "gt-react";
 import { useRef, useState } from "react";
 import { Tooltip, TooltipTrigger, TooltipPopup } from "../ui/tooltip";
-import { Var, T, useMessages, t } from "gt-react";
+import { Var, t } from "gt-react";
 
 const ARCHIVE_ACTIONS = [
   {
     action: "unarchive",
-    get label() {
-      return t("Unarchive");
-    },
+    label: msg("Unarchive"),
+    threadLabel: msg("Unarchive {title}"),
+    failureTitle: msg("Failed to unarchive thread"),
     Icon: ArchiveX,
   },
   {
     action: "delete",
-    get label() {
-      return t("Delete");
-    },
+    label: msg("Delete", { $context: "verb, deletes a thread" }),
+    threadLabel: msg("Delete {title}"),
+    failureTitle: msg("Failed to delete thread"),
     Icon: Trash2Icon,
   },
 ] as const;
 type ArchiveAction = (typeof ARCHIVE_ACTIONS)[number]["action"];
 
 export function ArchivedThreadsPanel() {
+  const searchableSetting = useSearchableSetting();
+  const gt = useGT();
   const m = useMessages();
   const { scope, groups: projectGroups, environments } = useSettingsScope();
   const { unarchiveThread, confirmAndDeleteThread } = useThreadActions();
@@ -156,7 +161,10 @@ export function ArchivedThreadsPanel() {
       stackedThreadToast({
         type: "error",
         title,
-        description: error instanceof Error ? error.message : "An error occurred.",
+        description:
+          error instanceof Error
+            ? (thrownErrorMessage(error, resolveMessage) ?? error.message)
+            : gt("An error occurred."),
       }),
     );
   };
@@ -179,7 +187,10 @@ export function ArchivedThreadsPanel() {
       pending.delete(key);
       setPendingKeys(new Set(pending));
     });
-    reportFailure(result._tag === "Failure" ? result : result.value, `Failed to ${action} thread`);
+    reportFailure(
+      result._tag === "Failure" ? result : result.value,
+      m(ARCHIVE_ACTIONS.find((entry) => entry.action === action)!.failureTitle),
+    );
   };
 
   const handleContextMenu = async (thread: ArchivedThread, position: { x: number; y: number }) => {
@@ -189,7 +200,7 @@ export function ArchivedThreadsPanel() {
       const clicked = await readLocalApi()?.contextMenu.show(
         ARCHIVE_ACTIONS.map(({ action, label }) => ({
           id: action,
-          label,
+          label: m(label),
           destructive: action === "delete",
         })),
         position,
@@ -197,7 +208,7 @@ export function ArchivedThreadsPanel() {
       if (clicked === "unarchive" || clicked === "delete")
         await handleThreadAction(clicked, thread);
     });
-    reportFailure(result, "Archived thread action failed");
+    reportFailure(result, gt("Archived thread action failed"));
   };
 
   return (
@@ -216,16 +227,16 @@ export function ArchivedThreadsPanel() {
                   <ArchiveIcon className="size-3.5 text-muted-foreground" />
                 )}
                 {isLoadingArchive
-                  ? t("Loading archived threads")
+                  ? gt("Loading archived threads")
                   : archiveError
-                    ? t("Could not load archived threads")
-                    : t("No archived threads")}
+                    ? gt("Could not load archived threads")
+                    : gt("No archived threads")}
               </span>
             }
             description={
               isLoadingArchive
-                ? t("Checking connected environments.")
-                : (archiveError ?? "Archived threads will appear here.")
+                ? gt("Checking connected environments.")
+                : (archiveError ?? gt("Archived threads will appear here."))
             }
           />
         </SettingsSection>
@@ -249,19 +260,17 @@ export function ArchivedThreadsPanel() {
                   title={thread.title}
                   description={
                     <span className={hasMultipleEnvironments ? "block truncate" : undefined}>
+                      {hasMultipleEnvironments ? `${thread.environmentLabel} · ` : null}
                       <T>
-                        <Var>
-                          {hasMultipleEnvironments ? `${thread.environmentLabel} · ` : null}
-                        </Var>
                         Archived <RelativeTime timestamp={thread.archivedAt ?? thread.createdAt} />
-                        <Var>{" \u00b7 Created "}</Var>
+                        {" \u00b7 Created "}
                         <RelativeTime timestamp={thread.createdAt} />
                       </T>
                     </span>
                   }
                   control={
                     <div className="flex shrink-0 items-center gap-2">
-                      {ARCHIVE_ACTIONS.map(({ action, label, Icon }) => (
+                      {ARCHIVE_ACTIONS.map(({ action, label, threadLabel, Icon }) => (
                         <Tooltip key={action}>
                           <TooltipTrigger
                             render={
@@ -269,7 +278,7 @@ export function ArchivedThreadsPanel() {
                                 type="button"
                                 variant={action === "delete" ? "destructive-outline" : "outline"}
                                 size="icon-sm"
-                                aria-label={`${label} ${thread.title}`}
+                                aria-label={m(threadLabel, { title: thread.title })}
                                 disabled={pendingKeys.has(threadKey)}
                                 onClick={() => void handleThreadAction(action, thread)}
                               />
@@ -277,7 +286,7 @@ export function ArchivedThreadsPanel() {
                           >
                             <Icon className="size-3.5" />
                           </TooltipTrigger>
-                          <TooltipPopup>{label}</TooltipPopup>
+                          <TooltipPopup>{m(label)}</TooltipPopup>
                         </Tooltip>
                       ))}
                     </div>

@@ -1,3 +1,4 @@
+import { T } from "gt-react-native";
 import type { EnvironmentId } from "@t3tools/contracts";
 import type { ComponentProps } from "react";
 import { View } from "react-native";
@@ -5,7 +6,7 @@ import { View } from "react-native";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { AppText as Text } from "../../components/ui/AppText";
 import { ConnectionEnvironmentRow } from "./ConnectionEnvironmentRow";
-import { Var, T } from "gt-react-native";
+import { Var } from "gt-react-native";
 
 type EnvironmentRowProps = ComponentProps<typeof ConnectionEnvironmentRow>;
 
@@ -37,9 +38,10 @@ export function LocalEnvironmentList({
           />
         </View>
         <Text className="text-center text-sm leading-normal text-foreground-muted">
+          <T>No environments connected yet.</T>
+          {"\n"}
           <T>
-            No environments connected yet.<Var>{"\n"}</Var>Tap<Var> </Var>
-            <Text className="font-t3-bold text-foreground">+</Text> to add one.
+            Tap <Text className="font-t3-bold text-foreground">+</Text> to add one.
           </T>
         </Text>
       </View>

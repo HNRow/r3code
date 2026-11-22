@@ -1,5 +1,6 @@
 import { sanitizeFeatureBranchName } from "@t3tools/shared/git";
 import { useNavigation, type StaticScreenProps } from "@react-navigation/native";
+import { useGT } from "gt-react-native";
 import { useState } from "react";
 
 import { SheetHeader } from "../../../components/ui/SheetHeader";
@@ -13,8 +14,8 @@ import { useSelectedThreadGitActions } from "../../../state/use-selected-thread-
 import { useSelectedThreadGitState } from "../../../state/use-selected-thread-git-state";
 import { useSelectedThreadWorktree } from "../../../state/use-selected-thread-worktree";
 import { vcsEnvironment } from "../../../state/vcs";
+import { useRefreshBranchesOnFocus } from "../use-refresh-branches-on-focus";
 import { SheetActionButton } from "./gitSheetComponents";
-import { useGT } from "gt-react-native";
 
 type GitBranchesSheetProps = StaticScreenProps<{
   readonly environmentId: string;
@@ -26,6 +27,7 @@ export function GitBranchesSheet(_props: GitBranchesSheetProps) {
   const navigation = useNavigation();
   const { selectedThread } = useThreadSelection();
   const { selectedThreadCwd } = useSelectedThreadWorktree();
+  useRefreshBranchesOnFocus(selectedThread?.environmentId, selectedThreadCwd);
   const gitState = useSelectedThreadGitState();
   const gitActions = useSelectedThreadGitActions();
   const { canChangeThreadBranch } = gitActions;
@@ -39,7 +41,7 @@ export function GitBranchesSheet(_props: GitBranchesSheetProps) {
       : null,
   );
 
-  const currentBranchLabel = gitStatus.data?.refName ?? selectedThread?.branch ?? "Detached HEAD";
+  const currentBranch = gitStatus.data?.refName ?? selectedThread?.branch ?? null;
   const currentWorktreePath = selectedThreadCwd;
   const availableBranches = gitState.selectedThreadBranches;
   const branchesLoading = gitState.selectedThreadBranchesLoading;
@@ -48,8 +50,7 @@ export function GitBranchesSheet(_props: GitBranchesSheetProps) {
   const [newBranchName, setNewBranchName] = useState("");
   const [worktreeBaseBranchOverride, setWorktreeBaseBranchOverride] = useState<string | null>(null);
   const worktreeBaseBranch =
-    worktreeBaseBranchOverride ??
-    (currentBranchLabel === "Detached HEAD" ? "main" : currentBranchLabel);
+    worktreeBaseBranchOverride ?? (currentBranch === null ? "main" : currentBranch);
   const [worktreeBranchName, setWorktreeBranchName] = useState("");
 
   const disabledExistingBranchNames: Array<string> = [];
@@ -72,7 +73,7 @@ export function GitBranchesSheet(_props: GitBranchesSheetProps) {
         <FormField
           value={newBranchName}
           onChangeText={setNewBranchName}
-          placeholder={gt("feature/mobile-polish")}
+          placeholder="feature/mobile-polish"
           accessibilityLabel={gt("New branch name")}
         />
         <SheetActionButton
@@ -97,14 +98,14 @@ export function GitBranchesSheet(_props: GitBranchesSheetProps) {
           label={gt("Base branch")}
           value={worktreeBaseBranch}
           onChangeText={setWorktreeBaseBranchOverride}
-          placeholder={gt("main")}
+          placeholder="main"
           accessibilityLabel={gt("Worktree base branch")}
         />
         <FormField
           label={gt("New branch")}
           value={worktreeBranchName}
           onChangeText={setWorktreeBranchName}
-          placeholder={gt("feature/mobile-thread")}
+          placeholder="feature/mobile-thread"
           accessibilityLabel={gt("Worktree branch name")}
         />
         <SheetActionButton
@@ -136,9 +137,9 @@ export function GitBranchesSheet(_props: GitBranchesSheetProps) {
         title={gt("Existing branches")}
         footer={
           branchesLoading
-            ? "Loading branches..."
+            ? gt("Loading branches...")
             : availableBranches.length === 0
-              ? "No local branches found."
+              ? gt("No local branches found.")
               : undefined
         }
       >
@@ -146,11 +147,11 @@ export function GitBranchesSheet(_props: GitBranchesSheetProps) {
           const disabled = disabledExistingBranches.has(branch.name);
           const subtitle = branch.worktreePath
             ? branch.worktreePath === currentWorktreePath
-              ? "Checked out in this thread"
-              : "Checked out in another worktree"
+              ? gt("Checked out in this thread")
+              : gt("Checked out in another worktree")
             : branch.isDefault
-              ? "Default branch"
-              : "Local branch";
+              ? gt("Default branch")
+              : gt("Local branch");
 
           return (
             <ListChoiceRow

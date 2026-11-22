@@ -1,5 +1,6 @@
 import * as Dialog from "../../components/ui/Dialog";
 import { SymbolView } from "../../components/ui/AppSymbol";
+import { useGT } from "gt-react-native";
 import { memo, useState } from "react";
 import { Pressable, type ColorValue } from "react-native";
 
@@ -22,6 +23,7 @@ export const CopyTextButton = memo(function CopyTextButton(props: {
   readonly iconSize?: number;
   readonly buttonSize?: number;
 }) {
+  const gt = useGT();
   const [copiedAtMs, setCopiedAtMs] = useState<number | null>(null);
   const feedbackEnded = useDeadlinePassed(
     copiedAtMs === null ? null : copiedAtMs + COPY_FEEDBACK_DURATION_MS,
@@ -31,7 +33,7 @@ export const CopyTextButton = memo(function CopyTextButton(props: {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={copied ? "Copied" : props.accessibilityLabel}
+      accessibilityLabel={copied ? gt("Copied") : props.accessibilityLabel}
       disabled={props.text.length === 0}
       hitSlop={8}
       onLongPress={props.onLongPress}
@@ -39,11 +41,11 @@ export const CopyTextButton = memo(function CopyTextButton(props: {
         try {
           if (props.onCopy) await props.onCopy();
           else if (!(await tryCopyTextWithHaptic(props.text))) {
-            Dialog.alert(t("Could not copy"), t("Try again."));
+            Dialog.alert(gt("Could not copy"), gt("Try again."));
             return;
           }
         } catch {
-          Dialog.alert(t("Could not copy"), t("Try again."));
+          Dialog.alert(gt("Could not copy"), gt("Try again."));
           return;
         }
         setCopiedAtMs(Date.now());

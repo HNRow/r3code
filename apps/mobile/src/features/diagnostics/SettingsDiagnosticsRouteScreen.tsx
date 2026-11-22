@@ -7,6 +7,7 @@ import { useAtomValue } from "@effect/atom-react";
 import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
 import { AsyncResult, Atom } from "effect/reactivity";
+import { T, useGT } from "gt-react-native";
 import { useState } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -26,7 +27,6 @@ import {
   parseStartupCrashRecords,
   type StartupCrashRecord,
 } from "./crash-log-model";
-import { useGT, T } from "gt-react-native";
 
 // expo-updates retains only seven days of logs.
 const LOG_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
@@ -81,9 +81,9 @@ function appIdentity() {
 }
 
 export function SettingsDiagnosticsRouteScreen() {
-  const gt = useGT();
   const insets = useSafeAreaInsets();
   const state = useCrashLogState();
+  const gt = useGT();
   const [copied, setCopied] = useState(false);
 
   const records = state.status === "ready" ? state.records : [];
@@ -136,7 +136,7 @@ export function SettingsDiagnosticsRouteScreen() {
           <SettingsSection title={gt("Actions")}>
             <SettingsActionRow
               icon={copied ? "checkmark" : "doc.on.doc"}
-              label={copied ? "Copied" : "Copy crash report"}
+              label={copied ? gt("Copied") : gt("Copy crash report")}
               disabled={state.status !== "ready"}
               onPress={() => void copyReport()}
             />
@@ -155,11 +155,11 @@ export function SettingsDiagnosticsRouteScreen() {
 }
 
 function CrashReportsSetting() {
-  const gt = useGT();
   const preferences = useAtomValue(mobilePreferencesAtom);
   const savePreferences = useAtomCommand(saveMobilePreferences, { reportFailure: false });
   // One change at a time, so a slow save never turns sending back on after a later opt-out.
   const [saving, setSaving] = useState(false);
+  const gt = useGT();
   const ready = AsyncResult.isSuccess(preferences) && !preferences.waiting;
   const enabled = AsyncResult.isSuccess(preferences)
     ? preferences.value.crashReportsEnabled !== false
@@ -229,18 +229,14 @@ function CrashRow(props: { readonly record: StartupCrashRecord; readonly first: 
   const { record } = props;
   return (
     <View className={props.first ? "gap-1.5 p-4" : "gap-1.5 border-t border-border-subtle p-4"}>
-      <Text translate={false} className="text-xs text-foreground-muted">
+      <Text className="text-xs text-foreground-muted">
         {new Date(record.timestamp).toLocaleString()}
       </Text>
-      <Text translate={false} selectable className="text-base leading-snug text-danger-foreground">
+      <Text selectable className="text-base leading-snug text-danger-foreground">
         {record.description}
       </Text>
       {record.frames.length > 0 ? (
-        <Text
-          translate={false}
-          selectable
-          className="font-mono text-xs leading-snug text-foreground-muted"
-        >
+        <Text selectable className="font-mono text-xs leading-snug text-foreground-muted">
           {record.frames.slice(0, 4).join("\n")}
         </Text>
       ) : null}

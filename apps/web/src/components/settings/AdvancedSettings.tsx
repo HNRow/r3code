@@ -1,9 +1,9 @@
+import { T } from "gt-react";
 import { ChevronRightIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../ui/collapsible";
 import { useSettingsSearchTargetId } from "./settingsLayout";
-import { T } from "gt-react";
 
 /**
  * Folds power-user rows at the end of a section. `targetIds` names the search targets inside, so a

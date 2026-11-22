@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import { useSyncExternalStore, type ReactNode } from "react";
 import { Split, Stack } from "react-native-screens";
 
@@ -17,7 +18,6 @@ import {
   type InspectorContent,
   type InspectorPane,
 } from "./inspector-panes";
-import { useGT } from "gt-react-native";
 
 // A pane without an AppBar has no bar; one with it gets the glass the workspace's screens get.
 const PANE_HEADER_OPTIONS = { ...GLASS_HEADER_OPTIONS, headerShown: false };

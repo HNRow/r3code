@@ -9,6 +9,7 @@ import {
 import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { T, useGT } from "gt-react";
 import { ArrowDownIcon, ArrowUpIcon, GripVerticalIcon, XIcon } from "lucide-react";
 
 import { cn } from "~/lib/utils";
@@ -21,7 +22,6 @@ import {
   preferredMicrophone,
 } from "../../speech/microphoneOrder";
 import { Button } from "../ui/button";
-import { useGT, T } from "gt-react";
 
 /** The saved microphone order. Keyboard users reorder with the step buttons. */
 export function MicrophoneOrderList(props: {
@@ -68,8 +68,8 @@ export function MicrophoneOrderList(props: {
                 id={key}
                 name={
                   entry.kind === "default"
-                    ? "System default"
-                    : entry.label || device?.label || "Saved microphone"
+                    ? gt("System default")
+                    : entry.label || device?.label || gt("Saved microphone")
                 }
                 position={index + 1}
                 count={order.length}
@@ -100,6 +100,7 @@ function MicrophoneRow(props: {
   readonly onMove: (steps: number) => void;
   readonly onForget: (() => void) | undefined;
 }) {
+  const gt = useGT();
   const { name } = props;
   const { listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
     useSortable({ id: props.id });
@@ -142,7 +143,7 @@ function MicrophoneRow(props: {
           size="icon-xs"
           variant="ghost-muted"
           disabled={props.position === 1}
-          aria-label={`Move ${name} up`}
+          aria-label={gt("Move {name} up", { name })}
           onClick={() => props.onMove(-1)}
         >
           <ArrowUpIcon />
@@ -152,7 +153,7 @@ function MicrophoneRow(props: {
           size="icon-xs"
           variant="ghost-muted"
           disabled={props.position === props.count}
-          aria-label={`Move ${name} down`}
+          aria-label={gt("Move {name} down", { name })}
           onClick={() => props.onMove(1)}
         >
           <ArrowDownIcon />
@@ -162,7 +163,7 @@ function MicrophoneRow(props: {
             type="button"
             size="icon-xs"
             variant="ghost-muted"
-            aria-label={`Forget ${name}`}
+            aria-label={gt("Forget {name}", { name })}
             onClick={props.onForget}
           >
             <XIcon />

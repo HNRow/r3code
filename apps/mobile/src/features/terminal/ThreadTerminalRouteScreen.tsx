@@ -1,4 +1,5 @@
 import * as Dialog from "../../components/ui/Dialog";
+import { m } from "../../i18n/messages";
 import {
   AuthTerminalReadScope,
   AuthTerminalOperateScope,
@@ -15,6 +16,7 @@ import { useNativeColumnLayoutMetrics } from "../../native/native-layout-metrics
 import { useContentTopInset } from "../../components/ui/useBarInset";
 import { StackActions, useNavigation, type StaticScreenProps } from "@react-navigation/native";
 import { useAtomMount } from "@effect/atom-react";
+import { msg, T, useGT, useMessages } from "gt-react-native";
 import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Platform, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -91,8 +93,6 @@ import {
 import { createTerminalPasteSession } from "./terminalPaste";
 import { cacheTerminalGridSize, getCachedTerminalGridSize } from "./terminalUiState";
 import { getKeyboardShowEpoch, subscribeKeyboardShowing } from "./terminalKeyboardShowing";
-import { useGT, T } from "gt-react-native";
-import { t } from "../../i18n/gt";
 
 function TerminalHeader(props: {
   readonly subtitle: string;
@@ -103,6 +103,7 @@ function TerminalHeader(props: {
   readonly sessions: ReadonlyArray<TerminalMenuSession>;
   readonly status: Parameters<typeof getTerminalStatusLabel>[0];
   readonly workspaceRoot: string;
+  readonly onBack: () => void;
   readonly onCloseTerminal: () => void;
   readonly onDecreaseFontSize: () => void;
   readonly onIncreaseFontSize: () => void;
@@ -110,38 +111,64 @@ function TerminalHeader(props: {
   readonly onSelectTerminal: (terminalId: string) => void;
 }) {
   const gt = useGT();
+  const resolveMessage = useMessages();
   return (
     <AppBar
-      title={gt("Terminal")}
+      title={gt("Terminal", { $context: "screen title" })}
       subtitle={props.subtitle}
-      onBack={props.onCloseTerminal}
+      onBack={props.onBack}
       backInSplitView={{
-        accessibilityLabel: t("Back to chat"),
+        accessibilityLabel: gt("Back to chat"),
         icon: "chevron.left",
       }}
+      actions={
+        Platform.OS === "android" && props.isEnvironmentReady
+          ? [
+              {
+                accessibilityLabel: gt("Close terminal"),
+                icon: "trash",
+                // Tabler's trash is 18 units tall; the terminal glyph beside it is 16.
+                iconScale: 16 / 18,
+                destructive: true,
+                disabled: !props.canOperateTerminal,
+                onPress: props.onCloseTerminal,
+              },
+            ]
+          : undefined
+      }
       menus={
         props.isEnvironmentReady
           ? [
               {
-                title: t("Terminal options"),
+                title: gt("Terminal options"),
                 icon: "terminal",
-                status: getTerminalStatusLabel(props.status),
+                status: getTerminalStatusLabel(props.status, resolveMessage),
                 items: [
                   {
                     id: "text-size",
-                    title: t("Text size"),
+                    title: gt("Text size"),
                     icon: "textformat.size",
                     inline: true,
                     items: [
                       {
                         id: "font-decrease",
-                        title: t`A- ${Math.max(MIN_TERMINAL_FONT_SIZE, props.fontSize - TERMINAL_FONT_SIZE_STEP).toFixed(1)} pt`,
+                        title: gt("A- {size} pt", {
+                          size: Math.max(
+                            MIN_TERMINAL_FONT_SIZE,
+                            props.fontSize - TERMINAL_FONT_SIZE_STEP,
+                          ).toFixed(1),
+                        }),
                         disabled: props.fontSize <= MIN_TERMINAL_FONT_SIZE,
                         onPress: props.onDecreaseFontSize,
                       },
                       {
                         id: "font-increase",
-                        title: t`A+ ${Math.min(MAX_TERMINAL_FONT_SIZE, props.fontSize + TERMINAL_FONT_SIZE_STEP).toFixed(1)} pt`,
+                        title: gt("A+ {size} pt", {
+                          size: Math.min(
+                            MAX_TERMINAL_FONT_SIZE,
+                            props.fontSize + TERMINAL_FONT_SIZE_STEP,
+                          ).toFixed(1),
+                        }),
                         disabled: props.fontSize >= MAX_TERMINAL_FONT_SIZE,
                         onPress: props.onIncreaseFontSize,
                       },
@@ -152,10 +179,13 @@ function TerminalHeader(props: {
                     title: session.displayLabel,
                     icon: "terminal",
                     subtitle: [
-                      getTerminalStatusLabel({
-                        status: session.status,
-                        hasRunningSubprocess: session.hasRunningSubprocess,
-                      }),
+                      getTerminalStatusLabel(
+                        {
+                          status: session.status,
+                          hasRunningSubprocess: session.hasRunningSubprocess,
+                        },
+                        resolveMessage,
+                      ),
                       basename(session.cwd),
                     ]
                       .filter(Boolean)
@@ -166,9 +196,13 @@ function TerminalHeader(props: {
                   {
                     id: "terminal-new",
                     disabled: !props.canOperateTerminal,
-                    title: t("Open new terminal"),
+                    title: gt("Open new terminal"),
                     icon: "plus",
-                    subtitle: t`Start another shell in ${basename(props.workspaceRoot) ?? "this workspace"}`,
+                    subtitle: basename(props.workspaceRoot)
+                      ? gt("Start another shell in {folder}", {
+                          folder: basename(props.workspaceRoot),
+                        })
+                      : gt("Start another shell in this workspace"),
                     onPress: props.onOpenNewTerminal,
                   },
                 ],
@@ -182,7 +216,12 @@ function TerminalHeader(props: {
 
 const DEFAULT_TERMINAL_COLS = 80;
 const DEFAULT_TERMINAL_ROWS = 24;
-const TERMINAL_ACCESSORY_HEIGHT = 52;
+const TERMINAL_ACCESSORY_VERTICAL_PADDING = 4;
+const TERMINAL_ACCESSORY_BORDER_WIDTH = 1;
+const TERMINAL_ACCESSORY_HEIGHT =
+  (Platform.OS === "android" ? 48 : 44) +
+  TERMINAL_ACCESSORY_VERTICAL_PADDING * 2 +
+  TERMINAL_ACCESSORY_BORDER_WIDTH;
 const SHOWCASE_ENABLED = process.env.EXPO_PUBLIC_SHOWCASE === "1";
 
 class TerminalClipboardReadError extends Schema.TaggedError<TerminalClipboardReadError>()(
@@ -274,7 +313,6 @@ function useTerminalAccess(environmentId: EnvironmentId | null) {
 }
 
 export function ThreadTerminalRouteScreen(props: ThreadTerminalRouteScreenProps) {
-  const gt = useGT();
   const connectionsReady = useConnectionsReady();
   const params = props.route.params;
   const selection = useThreadSelection();
@@ -307,6 +345,7 @@ export function ThreadTerminalRouteScreen(props: ThreadTerminalRouteScreenProps)
   }
   const explicitTerminalId = requestedTerminalId ?? bootstrapTerminalId;
   const terminalId = explicitTerminalId ?? DEFAULT_TERMINAL_ID;
+  const gt = useGT();
 
   if (!selectedThread) {
     if (!connectionsReady) {
@@ -352,7 +391,7 @@ function readLiveTerminalSessions(
       cwd: summary.cwd,
       status: summary.status,
       hasRunningSubprocess: summary.hasRunningSubprocess,
-      displayLabel: resolveTerminalSessionLabel(summary.terminalId, summary),
+      displayLabel: resolveTerminalSessionLabel(summary.terminalId, summary, m),
       updatedAt: summary.updatedAt,
     }));
 }
@@ -367,8 +406,9 @@ function ThreadTerminal(props: {
   readonly access: ReturnType<typeof useTerminalAccess>;
   readonly knownSessions: ReturnType<typeof useKnownTerminalSessions>;
 }) {
-  const gt = useGT();
   const { params, routeEnvironmentId, thread: selectedThread, terminalId } = props;
+  const gt = useGT();
+  const messages = useMessages();
   const { selectedThreadProject, selectedEnvironmentConnection } = props.selection;
   const {
     session: terminalSession,
@@ -387,6 +427,7 @@ function ThreadTerminal(props: {
   const navigation = useNavigation();
   const writeTerminal = useAtomCommand(terminalEnvironment.write, "terminal write");
   const clearTerminal = useAtomCommand(terminalEnvironment.clear, "terminal clear");
+  const closeTerminal = useAtomCommand(terminalEnvironment.close, "terminal close");
   const retryEnvironment = useRetryEnvironment();
   const selectedThreadDetail = useSelectedThreadProjection();
   const selectedThreadDetailWorktreePath =
@@ -549,12 +590,12 @@ function ThreadTerminal(props: {
     const modifierActions: ReadonlyArray<TerminalToolbarAction> =
       hostPlatform === "mac"
         ? [
-            { kind: "modifier", key: "cmd", label: t("cmd"), modifier: "meta" },
-            { kind: "modifier", key: "ctrl", label: t("ctrl"), modifier: "ctrl" },
+            { kind: "modifier", key: "cmd", label: "cmd", modifier: "meta" },
+            { kind: "modifier", key: "ctrl", label: "ctrl", modifier: "ctrl" },
           ]
         : [
-            { kind: "modifier", key: "ctrl", label: t("ctrl"), modifier: "ctrl" },
-            { kind: "modifier", key: "alt", label: t("alt"), modifier: "meta" },
+            { kind: "modifier", key: "ctrl", label: "ctrl", modifier: "ctrl" },
+            { kind: "modifier", key: "alt", label: "alt", modifier: "meta" },
           ];
 
     return [
@@ -562,10 +603,10 @@ function ThreadTerminal(props: {
       { kind: "send", key: "down", label: "↓", data: "\u001b[B" },
       { kind: "send", key: "left", label: "←", data: "\u001b[D" },
       { kind: "send", key: "right", label: "→", data: "\u001b[C" },
-      { kind: "send", key: "esc", label: t("esc"), data: "\u001b" },
+      { kind: "send", key: "esc", label: "esc", data: "\u001b" },
       ...modifierActions,
-      { kind: "send", key: "tab", label: t("tab"), data: "\t" },
-      { kind: "clear", key: "clear", label: t("clear") },
+      { kind: "send", key: "tab", label: "tab", data: "\t" },
+      { kind: "clear", key: "clear", label: "clear" },
       { kind: "send", key: "tilde", label: "~", data: "~" },
       { kind: "send", key: "pipe", label: "|", data: "|" },
       { kind: "send", key: "slash", label: "/", data: "/" },
@@ -592,18 +633,21 @@ function ThreadTerminal(props: {
   const terminalBottomInset =
     (isKeyboardVisible ? keyboardHeight : 0) + (isAccessoryVisible ? TERMINAL_ACCESSORY_HEIGHT : 0);
 
-  const terminalMenuSessions: ReadonlyArray<TerminalMenuSession> = buildTerminalMenuSessions({
-    knownSessions: knownSessions ?? [],
-    workspaceRoot: selectedThreadProject?.workspaceRoot ?? null,
-    currentSession: {
-      terminalId,
-      cwd: cwd ?? null,
-      status: terminal.status,
-      hasRunningSubprocess: terminal.hasRunningSubprocess,
-      displayLabel: resolveTerminalSessionLabel(terminalId, terminal.summary),
-      updatedAt: terminal.updatedAt,
+  const terminalMenuSessions: ReadonlyArray<TerminalMenuSession> = buildTerminalMenuSessions(
+    {
+      knownSessions: knownSessions ?? [],
+      workspaceRoot: selectedThreadProject?.workspaceRoot ?? null,
+      currentSession: {
+        terminalId,
+        cwd: cwd ?? null,
+        status: terminal.status,
+        hasRunningSubprocess: terminal.hasRunningSubprocess,
+        displayLabel: resolveTerminalSessionLabel(terminalId, terminal.summary, messages),
+        updatedAt: terminal.updatedAt,
+      },
     },
-  });
+    messages,
+  );
 
   const writeInput = async (data: string): Promise<boolean> => {
     if (
@@ -695,7 +739,7 @@ function ThreadTerminal(props: {
     );
   };
 
-  const handleCloseTerminal = () => {
+  const handleBack = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
       return;
@@ -706,6 +750,26 @@ function ThreadTerminal(props: {
         threadId: params.threadId,
       }),
     );
+  };
+
+  const handleCloseTerminal = () => {
+    Dialog.confirm({
+      title: gt('Close terminal "{label}"?', {
+        label: resolveTerminalSessionLabel(terminalId, terminal.summary),
+      }),
+      message: gt("This stops the running process and clears its history."),
+      confirmText: gt("Confirm"),
+      destructive: true,
+      onConfirm: async () => {
+        if (!readEnvironmentScope(selectedThread.environmentId, AuthTerminalOperateScope)) return;
+        const result = await closeTerminal({
+          environmentId: selectedThread.environmentId,
+          input: { threadId: selectedThread.id, terminalId, deleteHistory: true },
+        });
+        if (AsyncResult.isSuccess(result)) exitNavigation.exited();
+        else Dialog.alert(gt("Couldn't close terminal"), gt("Check the connection and try again."));
+      },
+    });
   };
 
   const handleOpenNewTerminal = () => {
@@ -818,7 +882,7 @@ function ThreadTerminal(props: {
           environmentId={selectedThread.environmentId}
           threadId={selectedThread.id}
           terminalId={terminalId}
-          terminalLabel={resolveTerminalSessionLabel(terminalId, terminal.summary)}
+          terminalLabel={resolveTerminalSessionLabel(terminalId, terminal.summary, messages)}
           onClose={() => setCapturedOutput(null)}
           onAttach={() => {
             setCapturedOutput(null);
@@ -838,6 +902,7 @@ function ThreadTerminal(props: {
           hasRunningSubprocess: terminal.hasRunningSubprocess,
         }}
         workspaceRoot={selectedThreadProject.workspaceRoot}
+        onBack={handleBack}
         onCloseTerminal={handleCloseTerminal}
         onDecreaseFontSize={handleDecreaseFontSize}
         onIncreaseFontSize={handleIncreaseFontSize}
@@ -863,7 +928,7 @@ function ThreadTerminal(props: {
               environmentLabel={
                 environment.presentation?.entry.target.label ??
                 selectedEnvironmentConnection?.environmentLabel ??
-                "Environment"
+                gt("Environment", { $context: "fallback environment name" })
               }
               connection={
                 environment.presentation?.connection ?? {
@@ -872,7 +937,7 @@ function ThreadTerminal(props: {
                   traceId: null,
                 }
               }
-              resourceName="terminal"
+              resource="terminal"
               onRetry={handleRetryEnvironment}
             />
           ) : terminalSession.data === null && terminalSession.error === null ? (
@@ -884,12 +949,12 @@ function ThreadTerminal(props: {
             <EmptyState
               title={
                 terminalSession.error
-                  ? "Could not check terminal access"
-                  : "Terminal access unavailable"
+                  ? gt("Could not check terminal access")
+                  : gt("Terminal access unavailable")
               }
               detail={
                 terminalSession.error ??
-                "This connection does not have permission to view terminals."
+                gt("This connection does not have permission to view terminals.")
               }
             />
           ) : canOperateTerminal && launchLocation === null ? (
@@ -947,8 +1012,8 @@ function ThreadTerminal(props: {
                     if (text.trim()) setCapturedOutput(text);
                     else
                       Dialog.alert(
-                        t("No terminal output"),
-                        t("There is no visible output to attach."),
+                        m(msg("No terminal output")),
+                        m(msg("There is no visible output to attach.")),
                       );
                   }}
                   onInput={handleInput}
@@ -980,7 +1045,7 @@ function ThreadTerminal(props: {
                     KeyboardController.dismiss();
                     requestCapture();
                   }}
-                  className="px-4 pt-2"
+                  className="min-h-[44px] justify-center px-4 pt-2"
                   style={{
                     paddingBottom:
                       8 +
@@ -1007,7 +1072,11 @@ function ThreadTerminal(props: {
                       minHeight: TERMINAL_ACCESSORY_HEIGHT,
                     }}
                   >
-                    <ComposerToolbarRow paddingBottom={4} paddingHorizontal={8} paddingTop={4}>
+                    <ComposerToolbarRow
+                      paddingBottom={TERMINAL_ACCESSORY_VERTICAL_PADDING}
+                      paddingHorizontal={8}
+                      paddingTop={TERMINAL_ACCESSORY_VERTICAL_PADDING}
+                    >
                       <ComposerToolbarScroller
                         contentPaddingRight={2}
                         fadeOpaque={terminalTheme.background}
@@ -1036,7 +1105,7 @@ function ThreadTerminal(props: {
                         })}
                       </ComposerToolbarScroller>
                       <ComposerToolbarButton
-                        accessibilityLabel={gt("Paste")}
+                        accessibilityLabel={gt("Paste", { $context: "verb" })}
                         icon={{ ios: "doc.on.clipboard", android: "content_paste" }}
                         onPress={() => handlePaste(Clipboard.getStringAsync)}
                         showChevron={false}

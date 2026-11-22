@@ -1,18 +1,19 @@
+import { useGT } from "gt-react";
 import { useRef } from "react";
 
 import { Textarea } from "../ui/textarea";
 import { SettingsRow, SettingResetButton } from "./settingsLayout";
 import { useSettingsScope } from "./SettingsScopeContext";
-import { searchableSetting } from "./settingsSearch";
+import { useSearchableSetting } from "./settingsSearch";
 import {
   useScopedSettings,
   useScopedSettingsMixed,
   useUpdateScopedSettings,
 } from "./useScopedSettings";
-import { useGT } from "gt-react";
 
 export function ThreadTitleInstructionsSettings() {
   const gt = useGT();
+  const searchableSetting = useSearchableSetting();
   const settings = useScopedSettings();
   const { targets } = useSettingsScope();
   const scopeKey = targets.map((target) => `${target.environmentId}:${target.projectId}`).join(",");
@@ -29,7 +30,7 @@ export function ThreadTitleInstructionsSettings() {
       resetAction={
         mixed || settings.threadTitleInstructions !== "" ? (
           <SettingResetButton
-            label={gt("thread title instructions")}
+            ariaLabel={gt("Reset thread title instructions to default")}
             onClick={() => updateSettings({ threadTitleInstructions: "" })}
           />
         ) : null

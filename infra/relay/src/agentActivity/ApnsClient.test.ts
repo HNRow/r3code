@@ -32,7 +32,7 @@ const layerTest = ApnsClient.layer.pipe(
 describe("ApnsClient", () => {
   const now = DateTime.makeUnsafe(0);
   const state: RelayAgentActivityAggregateState = {
-    title: "T3 Code",
+    title: "R3 Code",
     subtitle: "Agent work in progress",
     activeCount: 1,
     updatedAt: DateTime.formatIso(now),
@@ -151,13 +151,15 @@ describe("ApnsClient", () => {
       const environmentId = "é".repeat(191);
       const threadId = "t".repeat(512);
       const notification = sanitizeApnsNotificationPayload({
-        title: "界".repeat(120),
+        title: "😀".repeat(120),
         body: "界".repeat(120),
         environmentId,
         threadId,
         deepLink: `/threads/${encodeURIComponent(environmentId)}/${threadId}`,
       });
       const request = apns.makePushNotificationRequest({ token: "push-token", notification });
+
+      expect(notification.title).toBe(`${"😀".repeat(58)}...`);
 
       expect(
         new TextEncoder().encode(JSON.stringify(request.payload)).byteLength,

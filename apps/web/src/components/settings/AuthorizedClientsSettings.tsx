@@ -840,7 +840,7 @@ export const AuthorizedClientsHeaderAction = memo(function AuthorizedClientsHead
                           {m(title)}
                         </span>
                         <span className="block text-xs leading-snug text-muted-foreground">
-                          {pairingScopeDescription(gt, description)}
+                          {m(description)}
                         </span>
                         {terminalSelected && scope === AuthTerminalOperateScope ? (
                           <span className="block text-xs text-warning">

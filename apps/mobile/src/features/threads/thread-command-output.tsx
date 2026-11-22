@@ -1,3 +1,4 @@
+import { T, useGT } from "gt-react-native";
 import type { EnvironmentId, ThreadId, TurnItemId } from "@t3tools/contracts";
 import { TERMINAL_PALETTES, terminalOutputSpans } from "@t3tools/shared/terminalOutput";
 import type React from "react";
@@ -8,7 +9,6 @@ import { AppText as Text } from "../../components/ui/AppText";
 import { useServerConfigs } from "../../state/entities";
 import { orchestrationEnvironment } from "../../state/orchestration";
 import { useEnvironmentQuery } from "../../state/query";
-import { T } from "gt-react-native";
 
 const FOLLOW_SLACK = 8;
 
@@ -25,6 +25,7 @@ export function ThreadCommandOutput(props: {
   readonly itemId: TurnItemId;
   readonly themeAppearance: "light" | "dark";
 }) {
+  const gt = useGT();
   const { data, error } = useEnvironmentQuery(
     orchestrationEnvironment.v2.commandOutput({
       environmentId: props.environmentId,
@@ -40,12 +41,12 @@ export function ThreadCommandOutput(props: {
   );
   if (text.length === 0) {
     const message = error
-      ? `Couldn't load output: ${error}`
+      ? gt("Couldn't load output: {error}", { error })
       : data === null
-        ? "Loading output…"
+        ? gt("Loading output…")
         : data.running
           ? null
-          : "No output.";
+          : gt("No output.");
     return message === null ? null : (
       <Text
         translate={false}
@@ -75,7 +76,7 @@ export function ThreadCommandOutput(props: {
         }}
       >
         {data?.output.truncated ? (
-          <Text className="pb-0.5 text-3xs text-foreground-subtle">
+          <Text className="pb-0.5 text-3xs text-foreground-muted">
             <T>Earlier output not shown</T>
           </Text>
         ) : null}

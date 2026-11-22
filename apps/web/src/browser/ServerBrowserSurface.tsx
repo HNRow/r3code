@@ -32,16 +32,18 @@ import {
   useRef,
   useState,
 } from "react";
+import { msg, T, useGT, useMessages } from "gt-react";
 
 import { AgentCursorMark } from "~/components/preview/AgentBrowserCursor";
 import { CommandBlock } from "~/components/CommandBlock";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { toastManager } from "~/components/ui/toast";
+import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
+import { m } from "~/i18n/messages";
 import { cn } from "~/lib/utils";
 import { refreshPreviewStreamAccess, usePreviewStreamAccess } from "~/state/previewStream";
 import { observeResize } from "~/lib/observeResize";
-import { useGT, Var, T, t } from "gt-react";
 
 export interface ServerBrowserHandle {
   readonly navigate: (url: string) => void;
@@ -114,9 +116,9 @@ async function copyPageText(text: string) {
   } catch {
     const id = toastManager.add({
       type: "info",
-      title: t("The page copied text"),
+      title: m(msg("The page copied text")),
       actionProps: {
-        children: "Copy",
+        children: m(msg("Copy", { $context: "verb, copies text to the clipboard" })),
         onClick: () => {
           toastManager.close(id);
           void navigator.clipboard.writeText(text).catch(() => undefined);
@@ -129,9 +131,9 @@ async function copyPageText(text: string) {
 function offerDownload(download: PreviewStreamDownload) {
   const id = toastManager.add({
     type: "info",
-    title: t`Downloaded ${download.fileName}`,
+    title: m(msg("Downloaded {fileName}", { fileName: download.fileName })),
     actionProps: {
-      children: "Save",
+      children: m(msg("Save", { $context: "verb, saves a downloaded file" })),
       onClick: () => {
         toastManager.close(id);
         const anchor = document.createElement("a");
@@ -159,7 +161,6 @@ export function ServerBrowserSurface(props: {
   readonly pdfUrl?: string | null;
   readonly ref?: Ref<ServerBrowserHandle>;
 }) {
-  const gt = useGT();
   const {
     environmentId,
     threadId,
@@ -176,6 +177,8 @@ export function ServerBrowserSurface(props: {
     pdfUrl = null,
     ref,
   } = props;
+  const gt = useGT();
+  const resolve = useMessages();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const keySentRef = useRef(false);
@@ -196,8 +199,8 @@ export function ServerBrowserSurface(props: {
     void uploadPreviewStreamFiles(chooser, files).catch((cause: unknown) =>
       toastManager.add({
         type: "error",
-        title: t("Could not send the files to the page"),
-        description: cause instanceof Error ? cause.message : undefined,
+        title: gt("Could not send the files to the page"),
+        description: thrownErrorMessage(cause, m) ?? undefined,
       }),
     );
   };
@@ -779,7 +782,7 @@ export function ServerBrowserSurface(props: {
         )}
       >
         <span role="status" className="text-xs text-muted-foreground">
-          {previewStreamControlLabel(control)}
+          {previewStreamControlLabel(control, resolve)}
         </span>
         {control?.canOperate ? (
           <Button
@@ -790,7 +793,7 @@ export function ServerBrowserSurface(props: {
               send({ type: control.controller === "you" ? "releaseControl" : "takeControl" })
             }
           >
-            {control.controller === "you" ? t("Release control") : t("Take control")}
+            {control.controller === "you" ? <T>Release control</T> : <T>Take control</T>}
           </Button>
         ) : null}
       </div>
@@ -865,9 +868,11 @@ export function ServerBrowserSurface(props: {
             aria-label={gt("Choose files for the page")}
           >
             <p className="text-sm">
-              <T>
-                The page asks for <Var>{fileChooser.multiple ? "files" : "a file"}</Var>.
-              </T>
+              {fileChooser.multiple ? (
+                <T>The page asks for files.</T>
+              ) : (
+                <T>The page asks for a file.</T>
+              )}
             </p>
             <input
               ref={fileInputRef}
@@ -886,9 +891,7 @@ export function ServerBrowserSurface(props: {
                 <T>Cancel</T>
               </Button>
               <Button size="sm" onClick={() => fileInputRef.current?.click()}>
-                <T>
-                  Choose <Var>{fileChooser.multiple ? "files" : "file"}</Var>
-                </T>
+                {fileChooser.multiple ? <T>Choose files</T> : <T>Choose file</T>}
               </Button>
             </div>
           </div>
@@ -942,7 +945,7 @@ export function ServerBrowserSurface(props: {
       {visible && hostSetup ? (
         <div className="visible absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-background p-4 text-center">
           <p role="alert" className="max-w-sm text-sm text-muted-foreground">
-            {previewStreamHostSetupMessage(hostSetup)}
+            {previewStreamHostSetupMessage(hostSetup, resolve)}
           </p>
           <CommandBlock command={hostSetup.command} className="w-full max-w-md text-left" />
           <Button variant="outline" size="sm" onClick={() => setHostSetup(null)}>

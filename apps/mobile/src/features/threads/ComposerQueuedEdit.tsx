@@ -1,13 +1,13 @@
 import { Button } from "../../components/ui/Button";
 import type { ChatAttachment, EnvironmentId } from "@t3tools/contracts";
 import { Image } from "expo-image";
+import { T, useGT } from "gt-react-native";
 import { Pressable, ScrollView, View } from "react-native";
 
 import { AppText as Text } from "../../components/ui/AppText";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { useAssetUrl } from "../../state/assets";
 import { assetImageSource } from "../../lib/assetImageSource";
-import { T, useGT } from "gt-react-native";
 
 export function ComposerQueuedEditBanner(props: {
   readonly saving: boolean;
@@ -65,6 +65,7 @@ function QueuedEditAttachmentChip(props: {
   readonly disabled: boolean;
   readonly onRemove: (attachmentId: string) => void;
 }) {
+  const gt = useGT();
   const { attachment } = props;
   const isImage = attachment.mimeType.startsWith("image/");
   const resource = {
@@ -100,7 +101,7 @@ function QueuedEditAttachmentChip(props: {
       </Text>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Remove ${attachment.name}`}
+        accessibilityLabel={gt("Remove {name}", { name: attachment.name })}
         disabled={props.disabled}
         hitSlop={8}
         onPress={() => props.onRemove(attachment.id)}

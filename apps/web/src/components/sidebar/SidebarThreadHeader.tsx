@@ -1,3 +1,4 @@
+import { useGT } from "gt-react";
 import { FolderPlusIcon, SearchIcon, SquarePenIcon, XIcon } from "lucide-react";
 import {
   type ComponentProps,
@@ -11,7 +12,7 @@ import { cn } from "~/lib/utils";
 import { Button } from "../ui/button";
 import { SidebarInput, SidebarMenuButton } from "../ui/sidebar";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
-import { useGT, Var, T } from "gt-react";
+import { Var, T } from "gt-react";
 
 export interface SidebarThreadHeaderProps {
   hasProjects: boolean;
@@ -55,7 +56,7 @@ export function SidebarThreadHeader({
   // Shrinking results can remove the active option; never leave aria-activedescendant pointing at it.
   const activeResultExists = resultsVisible && activeSearchResultIndex < searchResultCount;
   const newThreadLabel = newThreadShortcutLabel
-    ? `${gt("New thread")} (${newThreadShortcutLabel})`
+    ? gt("New thread ({shortcut})", { shortcut: newThreadShortcutLabel })
     : gt("New thread");
 
   return (
@@ -69,7 +70,7 @@ export function SidebarThreadHeader({
           value={searchQuery}
           onChange={(event) => onSearchQueryChange(event.currentTarget.value)}
           onKeyDown={onSearchKeyDown}
-          placeholder={gt("Search")}
+          placeholder={gt("Search", { $context: "search field placeholder" })}
           aria-label={gt("Search threads")}
           role="combobox"
           aria-autocomplete="list"
@@ -114,14 +115,11 @@ export function SidebarThreadHeader({
               <span className="flex flex-col gap-0.5">
                 <span>{newThreadLabel}</span>
                 <span className="text-muted-foreground">
-                  <T>
-                    New thread in current project: Shift+click
-                    <Var>
-                      {newThreadInProjectShortcutLabel
-                        ? ` (${newThreadInProjectShortcutLabel})`
-                        : ""}
-                    </Var>
-                  </T>
+                  {newThreadInProjectShortcutLabel
+                    ? gt("New thread in current project: Shift+click ({shortcut})", {
+                        shortcut: newThreadInProjectShortcutLabel,
+                      })
+                    : gt("New thread in current project: Shift+click")}
                 </span>
               </span>
             ) : (

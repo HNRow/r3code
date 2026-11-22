@@ -1,3 +1,4 @@
+import { msg, T, useGT, useMessages } from "gt-react-native";
 import { NativeScrollView } from "../../native/NativeScrollViewMarker";
 import { LegendList } from "@legendapp/list/react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -28,7 +29,6 @@ import {
   useScheduledTaskEditor,
 } from "./scheduled-task-editor";
 import { moveDraftToThread, unbindDraftFromThread } from "./scheduledTaskDraft";
-import { useGT, T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 function MissingTaskDraft() {
@@ -165,7 +165,7 @@ export function ScheduledTaskBranchPickerRouteScreen() {
       loading={
         query.trim() !== debouncedQuery.trim() || (branches.isPending && branches.data === null)
       }
-      error={project ? branches.error : "This project is no longer available."}
+      error={project ? branches.error : gt("This project is no longer available.")}
       refreshing={branches.isFetchingNextPage}
       hasMore={branches.data?.nextCursor != null}
       onRefresh={branches.refresh}
@@ -193,10 +193,11 @@ export function ScheduledTaskBranchPickerRouteScreen() {
   );
 }
 
-const THREAD_SEARCH_PLACEHOLDER = "Search threads, including older ones";
+const THREAD_SEARCH_PLACEHOLDER = msg("Search threads, including older ones");
 
 export function ScheduledTaskThreadPickerRouteScreen() {
   const gt = useGT();
+  const m = useMessages();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { editor, setEditor } = useScheduledTaskEditor();
@@ -209,9 +210,9 @@ export function ScheduledTaskThreadPickerRouteScreen() {
   const search = {
     value: query,
     onChangeText: setQuery,
-    placeholder: THREAD_SEARCH_PLACEHOLDER,
-    accessibilityLabel: t("Search threads"),
-    clearAccessibilityLabel: "Clear thread search",
+    placeholder: m(THREAD_SEARCH_PLACEHOLDER),
+    accessibilityLabel: gt("Search threads"),
+    clearAccessibilityLabel: gt("Clear thread search"),
     mode: "inline" as const,
     compactToolbar: true,
   };
@@ -227,7 +228,9 @@ export function ScheduledTaskThreadPickerRouteScreen() {
 
   const needle = query.trim().toLocaleLowerCase();
   const rows = [
-    ...(needle ? [] : [{ key: "new-thread", title: NEW_THREAD_DESTINATION_LABEL, thread: null }]),
+    ...(needle
+      ? []
+      : [{ key: "new-thread", title: m(NEW_THREAD_DESTINATION_LABEL), thread: null }]),
     ...(threadId !== null && currentLabel.toLocaleLowerCase().includes(needle)
       ? [{ key: threadId, title: currentLabel, thread: null }]
       : []),
@@ -244,7 +247,7 @@ export function ScheduledTaskThreadPickerRouteScreen() {
       .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
       .map((thread) => ({
         key: thread.id,
-        title: thread.title.trim() || "Untitled thread",
+        title: thread.title.trim() || gt("Untitled thread"),
         thread,
       })),
   ];

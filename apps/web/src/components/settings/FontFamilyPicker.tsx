@@ -1,5 +1,6 @@
 import { useLegendListRef } from "~/hooks/useLegendListRef";
 import { LegendList, type LegendListRef } from "@legendapp/list/react";
+import { T, useGT } from "gt-react";
 import { CheckIcon } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
@@ -18,7 +19,7 @@ import {
 } from "../ui/combobox";
 import { SelectButton } from "../ui/select";
 import { stackedThreadToast, toastManager } from "../ui/toast";
-import { T, useGT, t } from "gt-react";
+import { t } from "gt-react";
 
 const DEFAULT_FONT_VALUE = "__default__";
 
@@ -146,8 +147,8 @@ export function FontFamilyPicker({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: `"${value}" isn't monospace`,
-          description: t(
+          title: gt('"{font}" isn\'t monospace', { font: value }),
+          description: gt(
             "Code and terminal need a fixed-width font, so the current font was kept.",
           ),
         }),
@@ -169,7 +170,7 @@ export function FontFamilyPicker({
           <span className="flex shrink-0 items-center gap-1.5">
             {isDefault ? (
               <span className="text-3xs text-muted-foreground/60">
-                <T>default</T>
+                {gt("default", { $context: "marks the default font" })}
               </span>
             ) : null}
             {item === selectedValue ? (

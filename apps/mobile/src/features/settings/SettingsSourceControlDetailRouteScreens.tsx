@@ -1,6 +1,9 @@
 import { useAtomValue } from "@effect/atom-react";
 import type { StaticScreenProps } from "@react-navigation/native";
-import { issueTrackerSummary } from "@t3tools/client-runtime/state/issue-trackers";
+import {
+  hasIssueTrackerTeams,
+  issueTrackerSummary,
+} from "@t3tools/client-runtime/state/issue-trackers";
 import { sourceControlClients } from "@t3tools/client-runtime/source-control-clients";
 import {
   AuthSettingsWriteScope,
@@ -8,6 +11,7 @@ import {
   type SourceControlProviderKind,
 } from "@t3tools/contracts";
 import * as Option from "effect/Option";
+import { T, useGT, useMessages } from "gt-react-native";
 import type { ReactNode } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -32,7 +36,6 @@ import {
 } from "./components/SourceControlProvidersSection";
 import { AppSignInRow } from "./components/SourceControlSignInSection";
 import type { SettingsTarget } from "./settings-environment-filter";
-import { T, useGT } from "gt-react-native";
 
 /** The environment a detail page edits, once it is connected, and whether this session may. */
 function useDetailEnvironment(environmentId: EnvironmentId) {
@@ -81,6 +84,7 @@ export function SettingsSourceControlProviderRouteScreen({
   readonly kind: SourceControlProviderKind;
 }>) {
   const gt = useGT();
+  const messages = useMessages();
   const { environmentId, kind } = route.params;
   const { environment, canWrite } = useDetailEnvironment(environmentId);
   const definition = sourceControlClients.find(kind);
@@ -93,22 +97,27 @@ export function SettingsSourceControlProviderRouteScreen({
   const appSignIn = item?.appSignIn === true ? credentials?.appSignIn : undefined;
   const disabled = !canWrite || !canUpdate;
   return (
-    <DetailPage title={definition?.label ?? "Provider"}>
+    <DetailPage
+      title={
+        definition?.label ??
+        gt("Provider", { $context: "settings page of one source control provider" })
+      }
+    >
       {!environment || !definition ? (
         <Unavailable />
       ) : (
         <>
           {item ? (
-            <Text translate={false} selectable className="px-2 text-sm text-foreground-muted">
-              {[Option.getOrNull(item.version), sourceControlProviderSummary(item)]
+            <Text selectable className="px-2 text-sm text-foreground-muted">
+              {[Option.getOrNull(item.version), sourceControlProviderSummary(item, messages)]
                 .filter(Boolean)
                 .join(" · ")}
             </Text>
           ) : null}
           {appSignIn ? (
             <SettingsSection
-              title={gt("Sign in")}
-              footer="A far higher API rate limit than a personal token or CLI login."
+              title={gt("Sign in", { $context: "settings section title" })}
+              footer={gt("A far higher API rate limit than a personal token or CLI login.")}
             >
               <AppSignInRow
                 environment={environment}
@@ -131,7 +140,13 @@ export function SettingsSourceControlProviderRouteScreen({
             </SettingsSection>
           ) : null}
           {credentials ? (
-            <SettingsSection title={appSignIn ? "Or use your own credentials" : "Token"}>
+            <SettingsSection
+              title={
+                appSignIn
+                  ? gt("Or use your own credentials")
+                  : gt("Token", { $context: "access token field" })
+              }
+            >
               <SourceControlTokenForm
                 environment={environment}
                 definition={definition}
@@ -154,6 +169,7 @@ export function SettingsIssueTrackerRouteScreen({
   readonly tracker: string;
 }>) {
   const gt = useGT();
+  const messages = useMessages();
   const { environmentId } = route.params;
   const { environment, canWrite } = useDetailEnvironment(environmentId);
   const query = useEnvironmentQuery(
@@ -164,13 +180,13 @@ export function SettingsIssueTrackerRouteScreen({
   const disabled = !canWrite || !canEdit;
   const usable = tracker?.connected === true && tracker.account !== null;
   return (
-    <DetailPage title={tracker?.displayName ?? "Issue tracker"}>
+    <DetailPage title={tracker?.displayName ?? gt("Issue tracker")}>
       {!environment || !tracker ? (
         <Unavailable />
       ) : (
         <>
           <Text selectable className="px-2 text-sm text-foreground-muted">
-            {issueTrackerSummary(tracker, query.data?.bindings ?? {})}
+            {issueTrackerSummary(tracker, query.data?.bindings ?? {}, messages)}
           </Text>
           <SettingsSection title={tracker.credential.label}>
             <IssueTrackerCredentialForm
@@ -179,15 +195,20 @@ export function SettingsIssueTrackerRouteScreen({
               disabled={disabled}
             />
           </SettingsSection>
-          {usable && tracker.scopes.length > 0 ? (
+          {usable && hasIssueTrackerTeams(tracker, query.data?.bindings ?? {}) ? (
             <SettingsSection
               title={gt("Projects")}
-              footer={`Pick the ${tracker.displayName} ${tracker.scopeNoun} whose issues each project lists beside its repository's own.`}
+              footer={gt(
+                "Pick one or more {tracker} {scope}s for each project. Their issues list beside the repository's own, and agents file new issues in the first one unless asked for another.",
+                { tracker: tracker.displayName, scope: tracker.scopeNoun },
+              )}
             >
               <IssueTrackerProjectRows
                 environmentId={environmentId}
                 tracker={tracker}
                 bindings={query.data?.bindings ?? {}}
+                refreshing={query.isPending}
+                refreshFailed={query.error !== null}
                 disabled={disabled}
               />
             </SettingsSection>

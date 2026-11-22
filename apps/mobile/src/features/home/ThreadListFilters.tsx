@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import { Pressable, ScrollView } from "react-native";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { ListFilterMenu } from "../layout/workspace/ListFilterMenu";
@@ -6,7 +7,6 @@ import type {
   HomeListFilterMenuEnvironment,
   HomeListFilterMenuProject,
 } from "./home-list-filter-menu";
-import { useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 export function ThreadListFilters(props: {
@@ -34,13 +34,13 @@ export function ThreadListFilters(props: {
       contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 2, paddingBottom: 10, gap: 8 }}
     >
       <ListFilterMenu
-        label={selectedEnvironment?.label ?? "All environments"}
+        label={selectedEnvironment?.label ?? gt("All environments")}
         accessibilityLabel={gt("Filter threads by environment")}
         active={selectedEnvironment !== undefined}
         actions={[
           {
             id: "all",
-            title: t("All environments"),
+            title: gt("All environments"),
             state: props.selectedEnvironmentId === null ? "on" : "off",
           },
           ...props.environments.map((environment) => ({
@@ -63,13 +63,13 @@ export function ThreadListFilters(props: {
         }}
       />
       <ListFilterMenu
-        label={selectedProject?.label ?? "All projects"}
+        label={selectedProject?.label ?? gt("All projects")}
         accessibilityLabel={gt("Filter threads by project")}
         active={selectedProject !== undefined}
         actions={[
           {
             id: "all",
-            title: t("All projects"),
+            title: gt("All projects"),
             state: props.selectedProjectKey === null ? "on" : "off",
           },
           ...props.projects.map((project) => ({

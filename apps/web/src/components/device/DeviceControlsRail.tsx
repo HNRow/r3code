@@ -18,6 +18,7 @@ import {
   MoonIcon,
   SunIcon,
 } from "lucide-react";
+import { T, useGT, useMessages, msg } from "gt-react";
 import type { ReactNode } from "react";
 import { Button } from "~/components/ui/button";
 import {
@@ -33,7 +34,6 @@ import {
 import { Tooltip, TooltipPopup, TooltipTrigger } from "~/components/ui/tooltip";
 import type { DeviceStreamHandle, DeviceViewControls } from "./DeviceStreamView";
 import type { DeviceControls } from "./useDeviceControls";
-import { useGT, T, t } from "gt-react";
 
 export function DeviceControlsRail(props: {
   platform: DevicePlatform;
@@ -49,13 +49,14 @@ export function DeviceControlsRail(props: {
   onClose: () => void;
   onPowerOff: () => void;
 }) {
-  const gt = useGT();
   const { view, handle, controls } = props;
   const popupSide = "left";
   const settings = controls.detail?.settings;
   const inputDisabled = !handle?.inputConnected;
   const runsHostCommands = props.hostKind === "local" || props.hostKind === "ssh";
   const nextAppearance = settings?.appearance === "dark" ? "light" : "dark";
+  const gt = useGT();
+  const m = useMessages();
   return (
     <aside
       aria-label={gt("Device controls")}
@@ -65,7 +66,7 @@ export function DeviceControlsRail(props: {
       <div className="pointer-events-auto flex shrink-0 flex-col items-center gap-1 overflow-y-auto rounded-full border border-border/50 bg-background/80 p-2 shadow-sm [scrollbar-width:none]">
         <RailButton
           tooltipSide={popupSide}
-          label={gt("Home")}
+          label={gt("Home", { $context: "device home button" })}
           disabled={inputDisabled}
           onClick={() => handle?.pressButton("home")}
         >
@@ -75,7 +76,7 @@ export function DeviceControlsRail(props: {
           <>
             <RailButton
               tooltipSide={popupSide}
-              label={gt("Back")}
+              label={gt("Back", { $context: "device back button" })}
               disabled={inputDisabled}
               onClick={() => handle?.pressButton("back")}
             >
@@ -83,7 +84,7 @@ export function DeviceControlsRail(props: {
             </RailButton>
             <RailButton
               tooltipSide={popupSide}
-              label={gt("Recents")}
+              label={gt("Recents", { $context: "Android recent apps button" })}
               disabled={inputDisabled}
               onClick={() => handle?.pressButton("recents")}
             >
@@ -135,7 +136,11 @@ export function DeviceControlsRail(props: {
             <RailDivider />
             <RailButton
               tooltipSide={popupSide}
-              label={t`Switch device to ${nextAppearance} mode`}
+              label={
+                nextAppearance === "light"
+                  ? gt("Switch device to light mode")
+                  : gt("Switch device to dark mode")
+              }
               disabled={controls.disabled || !settings?.appearance}
               onClick={() => void controls.act({ type: "setAppearance", value: nextAppearance })}
             >
@@ -170,15 +175,15 @@ export function DeviceControlsRail(props: {
                 >
                   {(
                     [
-                      ["small", "Small"],
-                      ["default", "Default"],
-                      ["large", "Large"],
-                      ["extra-large", "Extra large"],
+                      ["small", msg("Small")],
+                      ["default", msg("Default")],
+                      ["large", msg("Large")],
+                      ["extra-large", msg("Extra large")],
                     ] as const
                   ).map(([value, label]) => (
                     <MenuRadioItem key={value} value={value}>
                       <span className="flex items-center gap-2">
-                        <span className="flex-1">{label}</span>
+                        <span className="flex-1">{m(label)}</span>
                         <MenuRadioItemIndicator />
                       </span>
                     </MenuRadioItem>
@@ -199,7 +204,7 @@ export function DeviceControlsRail(props: {
         {props.hostKind === "simlock" ? null : (
           <RailButton
             tooltipSide={popupSide}
-            label={props.screenshotPending ? "Capturing screenshot" : "Save screenshot"}
+            label={props.screenshotPending ? gt("Capturing screenshot") : gt("Save screenshot")}
             disabled={!view.streaming || props.screenshotPending}
             onClick={props.onScreenshot}
           >
@@ -221,23 +226,19 @@ export function DeviceControlsRail(props: {
           </MenuTrigger>
           <MenuPopup side={popupSide} align="end">
             <MenuItem onClick={props.onFloat}>
-              <T>
-                <PictureInPicture2 />
-                Float device over chat
-              </T>
+              <PictureInPicture2 />
+              <T>Float device over chat</T>
             </MenuItem>
             <MenuItem onClick={props.onClose}>
-              <T>
-                <X />
-                Close device panel
-              </T>
+              <X />
+              <T>Close device panel</T>
             </MenuItem>
             <MenuSeparator />
             <MenuItem variant="destructive" onClick={props.onPowerOff}>
               <Power />
               {props.hostKind === "simlock"
-                ? t("Return device to the pool")
-                : t("Power off device")}
+                ? gt("Return device to the pool")
+                : gt("Power off device")}
             </MenuItem>
           </MenuPopup>
         </Menu>
@@ -264,7 +265,9 @@ export function DeviceControlsRail(props: {
         {view.keyboard ? (
           <RailButton
             tooltipSide={popupSide}
-            label={view.keyboard.attached ? "Detach Magic Keyboard" : "Attach Magic Keyboard"}
+            label={
+              view.keyboard.attached ? gt("Detach Magic Keyboard") : gt("Attach Magic Keyboard")
+            }
             pressed={view.keyboard.attached}
             onClick={view.keyboard.toggle}
           >

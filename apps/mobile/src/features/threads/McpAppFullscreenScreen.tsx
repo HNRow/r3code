@@ -3,6 +3,7 @@ import { EnvironmentId, ThreadId, TurnItemId } from "@t3tools/contracts";
 import type { EnvironmentThreadShell } from "@t3tools/client-runtime/state/shell";
 import { turnItemDetailRevision } from "@t3tools/client-runtime/work-log/item-detail";
 import { mcpAppFromToolItem } from "@t3tools/shared/toolOutput";
+import { T, useGT } from "gt-react-native";
 import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -14,7 +15,6 @@ import { scopeThreadRef } from "@t3tools/client-runtime/environment";
 import { useThreadShell, useThreadShells } from "../../state/entities";
 import { useEnvironmentQuery } from "../../state/query";
 import { ThreadMcpApp } from "./McpAppWebView";
-import { useGT, T } from "gt-react-native";
 
 type McpAppFullscreenScreenProps = StaticScreenProps<{
   readonly environmentId: string;
@@ -66,7 +66,7 @@ export function McpAppFullscreenScreen({ route }: McpAppFullscreenScreenProps) {
         <AppBar
           title={gt("App")}
           onClose={() => navigation.goBack()}
-          closeAccessibilityLabel="Exit full screen"
+          closeAccessibilityLabel={gt("Exit full screen")}
         />
         <Text className="m-6 text-sm text-foreground-muted">
           <T>This app cannot be shown.</T>
@@ -95,6 +95,7 @@ function McpAppFullscreen({
   readonly threadId: ThreadId;
   readonly itemId: TurnItemId;
 }) {
+  const gt = useGT();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   // Wait for focus before goBack; an exit under another screen must not pop that screen.
@@ -145,9 +146,9 @@ function McpAppFullscreen({
   return (
     <View className="flex-1 bg-screen">
       <AppBar
-        title={app?.server ?? "App"}
+        title={app?.server ?? gt("App")}
         onClose={onClose}
-        closeAccessibilityLabel="Exit full screen"
+        closeAccessibilityLabel={gt("Exit full screen")}
       />
       <View
         className="flex-1"

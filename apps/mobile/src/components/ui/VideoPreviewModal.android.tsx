@@ -1,5 +1,6 @@
-import { MISSING_FILE_ACCESS_MESSAGE } from "@t3tools/client-runtime/state/assets";
+import { errorDisplayMessage } from "@t3tools/client-runtime/errors";
 import { videoMimeType } from "@t3tools/shared/video";
+import { T, useGT, useMessages } from "gt-react-native";
 import { Modal, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -20,7 +21,6 @@ import { usePreparedConnection } from "../../state/session";
 import { AppText } from "./AppText";
 import { MediaPreviewHeader } from "../MediaPreviewHeader";
 import { MediaVideoPlayer } from "../MediaVideoPlayer";
-import { T, useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 export type { VideoPreviewSource } from "../../lib/videoPreviewSource";
@@ -39,6 +39,7 @@ function useMediaPlayback(source: MediaVideoPreviewSource): PlaybackState {
   const resource = "resource" in source ? source.resource : null;
   const connection = usePreparedConnection(environmentId);
   const asset = useAssetUrlState(environmentId, resource);
+  const gt = useGT();
   const refreshAssetUrl = useRefreshAssetUrl(environmentId, resource);
   const uri = mediaVideoPreviewUri(source, asset._tag === "Success" ? asset.url : null);
   return {
@@ -52,7 +53,7 @@ function useMediaPlayback(source: MediaVideoPreviewSource): PlaybackState {
       (connection._tag === "None" || asset._tag === "Failure"),
     unavailableDetail:
       asset._tag === "Failure" && asset.reason === "missing-file-access"
-        ? MISSING_FILE_ACCESS_MESSAGE
+        ? gt("This connection cannot read host files. Pair again with a new link to view it.")
         : undefined,
     error: null,
     actionsSource: source.actionsSource,
@@ -60,10 +61,14 @@ function useMediaPlayback(source: MediaVideoPreviewSource): PlaybackState {
 }
 
 function useLocalPlayback(source: LocalVideoPreviewSource): PlaybackState {
+  const gt = useGT();
+  const messages = useMessages();
   const { attachment } = source;
   const preview = useLocalAttachmentPreview(attachment);
   const { uri } = preview;
-  const error = preview.error ? preview.error.message || "Could not load this video." : null;
+  const error = preview.error
+    ? errorDisplayMessage(preview.error, messages) || gt("Could not load this video.")
+    : null;
   const mimeType = videoMimeType(attachment) ?? attachment.mimeType;
   return {
     uri,
@@ -128,7 +133,7 @@ function OpenVideoPreviewModal(props: {
         <MediaPreviewHeader
           title={props.name}
           media={mediaActions}
-          closeAccessibilityLabel="Close video"
+          closeAccessibilityLabel={gt("Close video")}
           onClose={props.onRequestClose}
         />
         {playback.uri === null && !playback.unavailable ? (
@@ -164,7 +169,7 @@ function OpenVideoPreviewModal(props: {
           className="mx-4 my-3 min-h-12 items-center justify-center rounded-xl bg-white/15 px-4"
         >
           <AppText className="font-t3-medium text-base text-white">
-            {mediaActions.sharing ? t("Opening share sheet...") : t("Save or share video")}
+            {mediaActions.sharing ? gt("Opening share sheet...") : gt("Save or share video")}
           </AppText>
         </Pressable>
       </View>

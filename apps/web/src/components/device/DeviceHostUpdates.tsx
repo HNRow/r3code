@@ -1,9 +1,10 @@
 import type { DeviceServiceState, EnvironmentId } from "@t3tools/contracts";
+import { T, useGT } from "gt-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { deviceEnvironment } from "~/state/device";
 import { useAtomCommand } from "~/state/use-atom-command";
-import { T, t } from "gt-react";
+import { t } from "gt-react";
 
 export function DeviceHostUpdates({
   state,
@@ -12,6 +13,7 @@ export function DeviceHostUpdates({
   state: DeviceServiceState;
   environmentId: EnvironmentId;
 }) {
+  const gt = useGT();
   const retry = useAtomCommand(deviceEnvironment.list);
   const [pending, setPending] = useState<string | null>(null);
   if (state.hostStatus === "disabled") return null;
@@ -32,10 +34,10 @@ export function DeviceHostUpdates({
               <p className="whitespace-pre-wrap break-words text-muted-foreground">
                 {status.detail ??
                   (failed
-                    ? t("Device support could not start.")
+                    ? gt("Device support could not start.")
                     : status.status === "installing"
-                      ? t("Installing device tools…")
-                      : t("Starting device tools…"))}
+                      ? gt("Installing device tools…")
+                      : gt("Starting device tools…"))}
               </p>
               {failed ? (
                 <p className="mt-1 text-muted-foreground">
@@ -58,7 +60,7 @@ export function DeviceHostUpdates({
                   );
                 }}
               >
-                {pending === host.id ? t("Retrying…") : t("Retry")}
+                {pending === host.id ? gt("Retrying…") : gt("Retry")}
               </Button>
             ) : null}
           </div>

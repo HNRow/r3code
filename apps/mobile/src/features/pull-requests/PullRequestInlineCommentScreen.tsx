@@ -2,6 +2,7 @@ import { settlePromise } from "@t3tools/client-runtime/state/runtime";
 import { AsyncResult } from "effect/reactivity";
 import * as Dialog from "../../components/ui/Dialog";
 import { useFocusEffect, useNavigation, type StaticScreenProps } from "@react-navigation/native";
+import { T, useGT, useMessages } from "gt-react-native";
 import { useRef, useState } from "react";
 import { View } from "react-native";
 import type { PullRequestReviewPosition } from "@t3tools/contracts";
@@ -17,8 +18,6 @@ import { pullRequestTarget, type PullRequestParams } from "./usePullRequestDiff"
 import { usePullRequestPermissions } from "./usePullRequestPermissions";
 import { PullRequestCompletionSuggestions } from "./PullRequestCompletionSuggestions";
 import { usePullRequestCompletions } from "./usePullRequestCompletions";
-import { useGT, T } from "gt-react-native";
-import { t } from "../../i18n/gt";
 
 export type InlineCommentParams = PullRequestParams & {
   readonly draftId?: string;
@@ -29,9 +28,10 @@ export type InlineCommentParams = PullRequestParams & {
   readonly code: string;
 };
 export function PullRequestInlineCommentScreen({ route }: StaticScreenProps<InlineCommentParams>) {
-  const gt = useGT();
   const params = route.params;
   const navigation = useNavigation();
+  const gt = useGT();
+  const m = useMessages();
   const store = usePullRequestReviewDraft(params);
   const saved = store.draft.comments.find((draft) => draft.id === params.draftId);
   const [editedBody, setBody] = useState<string | null>(null);
@@ -87,13 +87,13 @@ export function PullRequestInlineCommentScreen({ route }: StaticScreenProps<Inli
   return (
     <PullRequestSheetContent
       busy={busy}
-      title={saved ? "Edit review comment" : "Review comment"}
-      subtitle={`#${params.number} · ${reviewPositionLabel(params.position)}`}
+      title={saved ? gt("Edit review comment") : gt("Review comment")}
+      subtitle={`#${params.number} · ${reviewPositionLabel(params.position, m)}`}
       footer={
         <Button
           fullWidth
           tone="contrast"
-          label={busy ? "Saving…" : "Save draft"}
+          label={busy ? gt("Saving…") : gt("Save draft")}
           loading={busy}
           disabled={
             !store.ready ||
@@ -145,10 +145,10 @@ export function PullRequestInlineCommentScreen({ route }: StaticScreenProps<Inli
         <Button
           label={gt("Delete draft")}
           onPress={() =>
-            Dialog.alert(t("Delete this draft?"), t("Your other review comments will be kept."), [
-              { text: t("Cancel"), style: "cancel" },
+            Dialog.alert(gt("Delete this draft?"), gt("Your other review comments will be kept."), [
+              { text: gt("Cancel"), style: "cancel" },
               {
-                text: t("Delete"),
+                text: gt("Delete"),
                 style: "destructive",
                 onPress: () => {
                   store.update((draft) => ({

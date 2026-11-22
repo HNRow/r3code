@@ -1,3 +1,4 @@
+import { T, useGT } from "gt-react";
 import { useState } from "react";
 import {
   AuthSourceControlWriteScope,
@@ -15,7 +16,7 @@ import {
   PullRequestMarkdownTextarea,
   type PullRequestCompletionScope,
 } from "./PullRequestMarkdownTextarea";
-import { useGT, T, t } from "gt-react";
+import { t } from "gt-react";
 
 export function PullRequestMarkdownEditor({
   value,
@@ -93,10 +94,10 @@ export function PullRequestMarkdownEditor({
         }}
       >
         <Toggle value="write">
-          <T>Write</T>
+          <T context="verb, markdown editor mode">Write</T>
         </Toggle>
         <Toggle value="preview">
-          <T>Preview</T>
+          <T context="markdown editor mode">Preview</T>
         </Toggle>
       </ToggleGroup>
       {preview ? (
@@ -144,7 +145,7 @@ export function PullRequestMarkdownEditor({
             onSave(draft);
           }}
         >
-          {saving ? t("Saving...") : t("Save")}
+          {saving ? gt("Saving...") : gt("Save")}
         </Button>
       </div>
     </div>

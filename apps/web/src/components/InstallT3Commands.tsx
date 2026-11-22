@@ -1,7 +1,8 @@
+import { T } from "gt-react";
 import { cn } from "~/lib/utils";
 
 import { CommandBlock } from "./CommandBlock";
-import { T, Var } from "gt-react";
+import { Var } from "gt-react";
 
 /**
  * Setup steps for another computer: install `t3`, then run `command`. Both installers are shown
@@ -30,7 +31,7 @@ export function InstallT3Commands({
       <CommandBlock command={command} />
       <p className="text-xs text-muted-foreground">
         <T>
-          Skip the install if you already have <code className="font-mono">t3</code>. If<Var> </Var>
+          Skip the install if you already have <code className="font-mono">t3</code>. If{" "}
           <code className="font-mono">t3</code> is not found after installing, add the folder the
           installer names to your PATH.
         </T>

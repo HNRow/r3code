@@ -78,6 +78,13 @@ describe("filesystem browse model", () => {
       parentPath: "~/",
       canBrowseUp: true,
     });
+    expect(getFilesystemBrowsePath("D:", "Win32")).toEqual({
+      isBrowsing: true,
+      directoryPath: "D:\\",
+      filterQuery: "",
+      parentPath: null,
+      canBrowseUp: false,
+    });
     expect(getFilesystemBrowsePath("C:\\Users\\test", "MacIntel").isBrowsing).toBe(false);
     expect(getFilesystemBrowsePath("~/projects/", "", false).isBrowsing).toBe(false);
   });
@@ -170,7 +177,7 @@ describe("browse navigation", () => {
 });
 
 describe("browse entry filtering", () => {
-  const entries = ["my-t3code", "t3code", "cotton", "T3Code-old", ".t3", "docs"].map((name) => ({
+  const entries = ["my-t3code", "t3code", "cotton", "R3Code-old", ".t3", "docs"].map((name) => ({
     name,
     fullPath: `~/code/${name}`,
   }));
@@ -178,13 +185,13 @@ describe("browse entry filtering", () => {
     filterFilesystemBrowseEntries(entries, query).visibleEntries.map((entry) => entry.name);
 
   it("keeps every visible entry in order for an empty query", () => {
-    expect(names("")).toEqual(["my-t3code", "t3code", "cotton", "T3Code-old", "docs"]);
+    expect(names("")).toEqual(["my-t3code", "t3code", "cotton", "R3Code-old", "docs"]);
   });
 
   it("matches substrings and subsequences, best match first", () => {
-    expect(names("code")).toEqual(["t3code", "T3Code-old", "my-t3code"]);
-    expect(names("t3c")).toEqual(["t3code", "T3Code-old", "my-t3code"]);
-    expect(names("tcd")).toEqual(["t3code", "T3Code-old", "my-t3code"]);
+    expect(names("code")).toEqual(["t3code", "R3Code-old", "my-t3code"]);
+    expect(names("t3c")).toEqual(["t3code", "R3Code-old", "my-t3code"]);
+    expect(names("tcd")).toEqual(["t3code", "R3Code-old", "my-t3code"]);
     expect(names("xyz")).toEqual([]);
   });
 

@@ -47,6 +47,7 @@ import {
   subscribeAgentAwarenessRegistrationStatus,
   updateAgentAwarenessRegistrationPreferences,
   type AgentAwarenessRegistrationError,
+  type AgentAwarenessRegistrationServices,
 } from "./remoteRegistration";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
@@ -290,7 +291,11 @@ const runBackgroundOperations = Effect.fn("TestRemoteRegistration.runBackgroundO
       }
       idlePasses = 0;
       const exit = yield* Effect.exit(
-        pending.operation as Effect.Effect<unknown, AgentAwarenessRegistrationError, never>,
+        pending.operation as Effect.Effect<
+          unknown,
+          AgentAwarenessRegistrationError,
+          AgentAwarenessRegistrationServices
+        >,
       );
       yield* Effect.sync(() => {
         pending.resolve(exit);

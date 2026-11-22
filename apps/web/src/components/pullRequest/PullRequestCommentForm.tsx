@@ -2,7 +2,10 @@ import { sourceControlClients } from "@t3tools/client-runtime/source-control-cli
 import { useAtomCommand } from "~/state/use-atom-command";
 import type { EnvironmentId, PullRequestDetailView, PullRequestRef } from "@t3tools/contracts";
 import { SendIcon } from "lucide-react";
+import { msg, T, useGT } from "gt-react";
 import { useEffect, useState, type RefObject } from "react";
+
+import { m } from "~/i18n/messages";
 
 import { TextFieldSpeechControls, useTextFieldSpeech } from "~/speech/useTextFieldSpeech";
 import { pullRequestEnvironment } from "~/state/pullRequests";
@@ -16,7 +19,9 @@ import {
 } from "./PullRequestMarkdownTextarea";
 import { pullRequestReviewKey } from "./pullRequestReviewStore";
 import { useInlineActionConfirm } from "./useInlineActionConfirm";
-import { useGT, T, t } from "gt-react";
+import { t } from "gt-react";
+
+import { changeRequestTermKind } from "./changeRequestTerm";
 
 export function PullRequestCommentForm({
   environmentId,
@@ -98,7 +103,7 @@ export function PullRequestCommentForm({
     });
     if (result._tag === "Failure") {
       setSubmitting(null);
-      toastManager.add({ type: "error", title: t("Could not post the comment") });
+      toastManager.add({ type: "error", title: m(msg("Could not post the comment")) });
       return;
     }
     setBody("");
@@ -122,7 +127,12 @@ export function PullRequestCommentForm({
         value={body}
         rows={3}
         placeholder={gt("Leave a comment")}
-        aria-label={`Comment on this ${sourceControlClients.get(detail.provider).changeRequest.singular}`}
+        aria-label={gt(
+          "Comment on this {term, select, mr {merge request} cr {change request} other {pull request}}",
+          {
+            term: changeRequestTermKind(sourceControlClients.get(detail.provider).changeRequest),
+          },
+        )}
         onValueChange={setBody}
         onKeyDown={(event) => {
           if (event.nativeEvent.isComposing || event.keyCode === 229) return;
@@ -162,16 +172,16 @@ export function PullRequestCommentForm({
                 </span>
                 <span className="col-start-1 row-start-1">
                   {submitting === "close"
-                    ? t("Closing...")
+                    ? gt("Closing...")
                     : inlineConfirm.isArmed("close")
-                      ? t("Confirm close?")
-                      : t("Close with comment")}
+                      ? gt("Confirm close?")
+                      : gt("Close with comment")}
                 </span>
               </span>
             ) : submitting === "reopen" ? (
-              t("Reopening...")
+              gt("Reopening...")
             ) : (
-              t("Reopen with comment")
+              gt("Reopen with comment")
             )}
           </Button>
         )}
@@ -182,7 +192,9 @@ export function PullRequestCommentForm({
           onClick={() => submitAfterDictation("comment")}
         >
           <SendIcon className="size-3.5" />
-          {submitting === "comment" ? t("Posting...") : t("Comment")}
+          {submitting === "comment"
+            ? gt("Posting...")
+            : gt("Comment", { $context: "verb, submit button" })}
         </Button>
       </div>
     </div>

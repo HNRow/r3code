@@ -2,6 +2,7 @@ import { ComposerSelectControl } from "./chat/ComposerControl";
 import { ComposerContextLabel } from "./ComposerContextLabel";
 import { FolderGit2Icon, FolderGitIcon, FolderIcon } from "lucide-react";
 import { memo, type MouseEvent as ReactMouseEvent } from "react";
+import { T, useGT, useMessages } from "gt-react";
 
 import {
   resolveCurrentWorkspaceLabel,
@@ -23,7 +24,7 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
 import { useAtomValue } from "@effect/atom-react";
 import { shortcutLabelForCommand } from "../keybindings";
 import { primaryServerKeybindingsAtom } from "../state/server";
-import { T, useGT, useMessages, t } from "gt-react";
+import { t } from "gt-react";
 
 const PREVIOUS_WORKTREE_SELECT_VALUE = "previous-worktree";
 
@@ -59,9 +60,9 @@ export const BranchToolbarEnvModeSelector = memo(function BranchToolbarEnvModeSe
   const envModeItems = [
     {
       value: "local",
-      label: m(resolveCurrentWorkspaceLabel(activeWorktreePath)),
+      label: resolveCurrentWorkspaceLabel(activeWorktreePath, m),
     },
-    { value: "worktree", label: m(resolveEnvModeLabel("worktree")) },
+    { value: "worktree", label: resolveEnvModeLabel("worktree", m) },
     ...(showPreviousWorktree && previousWorktreeLabel
       ? [{ value: PREVIOUS_WORKTREE_SELECT_VALUE, label: previousWorktreeLabel }]
       : []),
@@ -88,8 +89,8 @@ export const BranchToolbarEnvModeSelector = memo(function BranchToolbarEnvModeSe
         )}
         <ComposerContextLabel>
           {forceNewWorktree
-            ? m(resolveEnvModeLabel("worktree"))
-            : resolveLockedWorkspaceLabel(activeWorktreePath, effectiveEnvMode)}
+            ? resolveEnvModeLabel("worktree", m)
+            : resolveLockedWorkspaceLabel(activeWorktreePath, effectiveEnvMode, m)}
         </ComposerContextLabel>
       </span>
     );
@@ -99,9 +100,9 @@ export const BranchToolbarEnvModeSelector = memo(function BranchToolbarEnvModeSe
         <TooltipTrigger render={lockedRow} />
         <TooltipPopup>
           {forceNewWorktree
-            ? t("Each model starts in its own worktree.")
+            ? gt("Each model starts in its own worktree.")
             : (activeWorktreePath ??
-              resolveLockedWorkspaceLabel(activeWorktreePath, effectiveEnvMode))}
+              resolveLockedWorkspaceLabel(activeWorktreePath, effectiveEnvMode, m))}
         </TooltipPopup>
       </Tooltip>
     );
@@ -146,8 +147,8 @@ export const BranchToolbarEnvModeSelector = memo(function BranchToolbarEnvModeSe
         </TooltipTrigger>
         <TooltipPopup>
           {effectiveEnvMode === "worktree"
-            ? m(resolveEnvModeLabel("worktree"))
-            : m(resolveCurrentWorkspaceLabel(activeWorktreePath))}
+            ? resolveEnvModeLabel("worktree", m)
+            : resolveCurrentWorkspaceLabel(activeWorktreePath, m)}
           {shortcutLabel ? ` · ${shortcutLabel}` : null}
         </TooltipPopup>
       </Tooltip>
@@ -167,13 +168,13 @@ export const BranchToolbarEnvModeSelector = memo(function BranchToolbarEnvModeSe
               ) : (
                 <FolderIcon className="size-3" />
               )}
-              {m(resolveCurrentWorkspaceLabel(activeWorktreePath))}
+              {resolveCurrentWorkspaceLabel(activeWorktreePath, m)}
             </span>
           </SelectItem>
           <SelectItem value="worktree">
             <span className="inline-flex items-center gap-1.5">
               <FolderGit2Icon className="size-3" />
-              {m(resolveEnvModeLabel("worktree"))}
+              {resolveEnvModeLabel("worktree", m)}
             </span>
           </SelectItem>
           {showPreviousWorktree && previousWorktreeLabel ? (

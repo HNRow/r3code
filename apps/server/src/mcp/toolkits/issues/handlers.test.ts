@@ -65,12 +65,12 @@ const project: OrchestrationProjectShell = {
     locator: {
       source: "git-remote",
       remoteName: "origin",
-      remoteUrl: "git@github.com:T3Tools/T3Code.git",
+      remoteUrl: "git@github.com:T3Tools/R3Code.git",
     },
     provider: SourceControlProviderKind.make("github"),
-    displayName: "T3Tools/T3Code",
+    displayName: "T3Tools/R3Code",
     owner: "T3Tools",
-    name: "T3Code",
+    name: "R3Code",
   },
   createdAt: "2026-08-01T00:00:00.000Z",
   updatedAt: "2026-08-01T00:00:00.000Z",
@@ -106,7 +106,7 @@ const detail: IssueDetail = {
   key: "7",
   displayKey: "#7",
   title: "Seven",
-  url: "https://github.com/T3Tools/T3Code/issues/7",
+  url: "https://github.com/T3Tools/R3Code/issues/7",
   author: null,
   state: { category: "open", name: "open" },
   createdAt: "2026-08-01T00:00:00.000Z",
@@ -158,6 +158,7 @@ const makeHarness = Effect.fn("makeIssuesToolkitHarness")(function* (
     issueLayer ??
       Layer.mock(IssueService.IssueService)({
         detail: () => Effect.succeed(detail),
+        linkMetadata: () => Effect.succeed(detail),
         projectScope: (projectId) =>
           Effect.succeed({
             projectId,
@@ -260,7 +261,7 @@ describe("issue toolkit handlers", () => {
             projectLayer,
             Layer.mock(RepositoryIdentityResolver.RepositoryIdentityResolver)({}),
             Layer.mock(IssueTrackerBindings.IssueTrackerBindingsRepository)({
-              list: Effect.succeed(new Map([[PROJECT_ID, { tracker, scope: "ENG" }]])),
+              list: () => Effect.succeed(new Map([[PROJECT_ID, { tracker, scope: "ENG" }]])),
             }),
             Layer.succeed(
               IssueTrackerRegistry.IssueTrackerRegistry,
@@ -275,6 +276,72 @@ describe("issue toolkit handlers", () => {
         _tag: "Success",
         success: { url, displayKey: "ENG-7", title: "Seven", body: "Repro steps" },
       });
+    }),
+  );
+
+  it.effect("files an issue in the bound Linear team an agent names", () =>
+    Effect.gen(function* () {
+      const tracker = IssueTrackerKind.make("linear");
+      const host = "linear.app";
+      const filedIn = yield* Ref.make<ReadonlyArray<string>>([]);
+      const linear: StandaloneIssueTrackerApi = {
+        kind: tracker,
+        capabilities: detail.capabilities,
+        standalone: {
+          tracker,
+          displayName: "Linear",
+          host,
+          scopeNoun: "team",
+          credential: { label: "Personal API key", helpUrl: null },
+        },
+        parseIssueUrl: () => null,
+        probeCredential: () => Effect.succeed({ account: "user", scopes: [] }),
+        getViewer: () => Effect.succeed("user"),
+        listIssues: () => Effect.succeed({ items: [], nextCursor: null }),
+        getComments: () => Effect.succeed({ comments: [], nextCursor: null }),
+        getIssue: () => Effect.die("unused"),
+        create: ({ scope }) =>
+          Ref.update(filedIn, (teams) => [...teams, scope]).pipe(
+            Effect.as({
+              key: `${scope}-1`,
+              url: `https://linear.app/acme/issue/${scope}-1`,
+              displayKey: `${scope}-1`,
+            }),
+          ),
+      };
+      const issueLayer = IssueService.layer.pipe(
+        Layer.provide(
+          Layer.mergeAll(
+            projectLayer,
+            Layer.mock(RepositoryIdentityResolver.RepositoryIdentityResolver)({}),
+            Layer.mock(IssueTrackerBindings.IssueTrackerBindingsRepository)({
+              list: () =>
+                Effect.succeed(
+                  new Map([[PROJECT_ID, { tracker, scope: "ENG", additionalScopes: ["OPS"] }]]),
+                ),
+            }),
+            Layer.succeed(
+              IssueTrackerRegistry.IssueTrackerRegistry,
+              IssueTrackerRegistry.fromTrackers([linear]),
+            ),
+          ),
+        ),
+      );
+      const harness = yield* makeHarness([], issueLayer);
+
+      expect(
+        yield* harness.call("create_issue", { title: "Backup ran twice", scope: "ops" }),
+      ).toMatchObject({ tracker, scope: "OPS", key: "OPS-1" });
+      expect(yield* harness.call("create_issue", { title: "Label typo" })).toMatchObject({
+        scope: "ENG",
+        key: "ENG-1",
+      });
+      const unbound = yield* harness
+        .call("create_issue", { title: "Flaky test", scope: "QA" })
+        .pipe(Effect.flip);
+      expect(unbound).toMatchObject({ _tag: "IssueOperationError", reason: "not-found" });
+      expect(unbound.message).toContain("Use one of: ENG, OPS.");
+      expect(yield* Ref.get(filedIn)).toEqual(["OPS", "ENG"]);
     }),
   );
 
@@ -309,7 +376,7 @@ describe("issue toolkit handlers", () => {
     Effect.gen(function* () {
       const harness = yield* makeHarness();
       const result = yield* harness.call("link_issue", {
-        url: "https://github.com/T3Tools/T3Code/issues/7",
+        url: "https://github.com/T3Tools/R3Code/issues/7",
       });
       expect(result).toEqual({
         projectId: PROJECT_ID,
@@ -317,7 +384,7 @@ describe("issue toolkit handlers", () => {
         host: "github.com",
         scope: "t3tools/t3code",
         key: "7",
-        url: "https://github.com/T3Tools/T3Code/issues/7",
+        url: "https://github.com/T3Tools/R3Code/issues/7",
         alreadyLinked: false,
       });
       expect(yield* Ref.get(harness.links)).toEqual([
@@ -330,7 +397,7 @@ describe("issue toolkit handlers", () => {
             scope: "t3tools/t3code",
             key: "7",
           },
-          url: "https://github.com/T3Tools/T3Code/issues/7",
+          url: "https://github.com/T3Tools/R3Code/issues/7",
           displayKey: detail.displayKey,
           title: detail.title,
           source: "agent",

@@ -1,6 +1,6 @@
 # Source control
 
-T3 Code integrates with GitHub, GitLab, Forgejo, Gitea, Bitbucket, Azure DevOps, GitCafe, and Cursor
+R3 Code integrates with GitHub, GitLab, Forgejo, Gitea, Bitbucket, Azure DevOps, GitCafe, and Cursor
 Origin to clone and publish repositories, create pull requests, and review changes.
 
 ## Review turn changes
@@ -10,25 +10,40 @@ rebases, the files Git brought in are left out. A file stays in the list when th
 committed it, or fixed a conflict in it. Use the branch comparison to review everything that changed
 against your base branch. Restore still returns the complete saved workspace.
 
+In a [project with several repositories](multi-repo-projects.md),
+a turn's changed files are grouped by repository, and the Diff pane shows every repository the
+turn changed. Use the repository picker next to the source picker to narrow the diff to one of
+them. Paths in the diff start at the thread's folder, so the same file name in two repositories
+stays apart. This works when the project folder itself is not a Git repository; the branch
+comparison and uncommitted changes read one repository at a time, chosen from the same picker.
+
+The thread details panel lists each repository the thread has changed, most recent first, with its
+branch and uncommitted changes. Expand one to commit, push, or open a pull request in that
+repository; a pull request opened there, or already open for its branch when a turn ends, is linked
+to the thread. **Other repositories...** adds any other repository of the project to the list until you
+reload. In a worktree thread of a project with several repositories it adds a worktree of that
+repository to the thread instead; see [Worktree threads](multi-repo-projects.md#worktree-threads). A
+worktree thread of a single repository does not offer it.
+
 On web and desktop, open the Diff pane source picker and choose **Commits** to review one local
 commit at a time. The list shows the newest 100 commits in the branch comparison. A merge commit
 shows its changes against its first parent.
 
 A commit link from a supported code host opens in the Diff pane when the thread's repository has
 that commit locally, on any branch. Otherwise a pull request commit link opens the pull request. Other
-commit links follow your **Open links in** setting; on web, when that opens a new tab, T3 Code first
-shows an **Open link** button. Command/Ctrl+Click always opens the link in your browser. Commit links follow the **Open pull requests in T3 Code**
+commit links follow your **Open links in** setting; on web, when that opens a new tab, R3 Code first
+shows an **Open link** button. Command/Ctrl+Click always opens the link in your browser. Commit links follow the **Open pull requests in R3 Code**
 setting in **Settings → Diffs**.
 
 ## Connect an account
 
-Install Git and configure authentication on the machine running your T3 Code server. For a remote
+Install Git and configure authentication on the machine running your R3 Code server. For a remote
 environment, do this on the remote machine. After signing in, open **Settings → Source control & issues**
 and choose **Rescan**.
 
 ### GitHub
 
-T3 Code talks to GitHub's API directly and only needs a token. Any of these works, in this
+R3 Code talks to GitHub's API directly and only needs a token. Any of these works, in this
 order of precedence:
 
 1. A token saved in **Settings → Source control & issues → GitHub**. It is kept in the server's secret
@@ -41,17 +56,17 @@ If `gh` is signed in to several accounts or hosts, expand **GitHub** in the same
 the account each host uses or turn a host off. A saved token or `GH_TOKEN` takes precedence
 over that choice; a host turned off stays off either way.
 
-For GitHub Enterprise, sign in with `gh auth login --hostname YOUR_HOST`. T3 Code treats a
+For GitHub Enterprise, sign in with `gh auth login --hostname YOUR_HOST`. R3 Code treats a
 custom server name as GitHub once it has a credential for that host.
 
 ### Forgejo and Gitea
 
 Install [Forgejo CLI (`fj`)](https://codeberg.org/forgejo-contrib/forgejo-cli) or
-[Gitea CLI (`tea`)](https://gitea.com/gitea/tea) 0.16 or later on your T3 Code server.
+[Gitea CLI (`tea`)](https://gitea.com/gitea/tea) 0.16 or later on your R3 Code server.
 Sign in with `fj --host https://your-server auth add-token` or `tea login add`.
 Repeat for each server you use, including Codeberg.
 
-T3 Code prefers a matching `fj` login and falls back to `tea` when `fj` is unavailable
+R3 Code prefers a matching `fj` login and falls back to `tea` when `fj` is unavailable
 or has no login for that server. Once an account is selected, failed actions stay on that
 account. Settings shows the detected CLI. Forgejo and Gitea share one integration entry.
 Servers hosted under a URL subpath, such as `https://example.com/forgejo`, use `tea` because
@@ -87,7 +102,7 @@ Credentials are saved on the environment's server, so select a remote environmen
 it. Saved tokens can't be viewed again; enter a new one to replace it, or choose **Remove** to clear
 everything saved for Bitbucket.
 
-If no credentials are saved, T3 Code falls back to these variables in the server's environment.
+If no credentials are saved, R3 Code falls back to these variables in the server's environment.
 Restart the server after changing them:
 
 ```bash
@@ -129,6 +144,28 @@ sent to `git.cafe`; `CAFE_TOKEN` follows `CAFE_HOST` if you set it. Repositories
 Line comments are not available for GitCafe pull requests yet.
 Merging a stack lands it through GitCafe, and updating a branch restacks the layers above it.
 
+### TanStack Source
+
+TanStack Source is in private beta, so the server shows it only when its environment turns the flag
+on: `export T3CODE_FEATURE_FLAGS=tanstack_source` in your shell profile, then restart R3 Code. Separate
+several flags with commas. A value already set in the server's own environment, such as a service
+definition, is used instead of the profile. Install its CLI and sign in:
+
+```sh
+curl -fsSL https://source.tanstack.com/install | sh
+src auth login --web
+```
+
+Alternatively, open **Settings → Source control & issues**, expand **TanStack Source**, and enter a token
+from `https://source.tanstack.com/settings/tokens`. A saved token is used before `SRC_TOKEN`, which is
+used before the `src` login. With several `src` logins, pick the account there too.
+
+Pull requests show the runs of TanStack Source CI with their logs, and update live while open. An
+agent can open a private pull request on a public repository when you ask for one: its branch goes
+to the repository's private companion and never to the repository itself. Issues
+can be listed, filed, edited, commented on and closed. Reactions and picking reviewers or assignees
+from a list are not available yet.
+
 ### Cursor Origin
 
 Install the [Origin CLI](https://cursor.com/docs/origin/cli) and sign in. Signing in also sets up Git
@@ -146,7 +183,7 @@ from GitHub keep their pull requests on GitHub; open those from the GitHub remot
 ## Start, clone, or publish a project
 
 To start from nothing, choose **New project** in the command palette (`Cmd/Ctrl+K`), or
-**New project** under **Add Project** on any client, and type a name. T3 Code makes a Git
+**New project** under **Add Project** on any client, and type a name. R3 Code makes a Git
 repository in `~/.t3/projects` (the `projects` folder of your T3 data directory) with a README,
 an icon, and a first commit, then opens a new thread in it. Until the project has a thread, new
 threads work in its folder, even when your default is a new worktree. The folder is named after the project,
@@ -158,11 +195,11 @@ Use **Add Project** in the command palette (`Cmd/Ctrl+K`) to clone a repository.
 provider or paste a Git URL, then choose where to save it. Only GitHub is listed at first. To list
 another provider here and in **Publish Repository**, turn on its switch under
 **Settings → Source control & issues**. A branch or file page copied from GitHub,
-GitLab, GitCafe, Codeberg or Bitbucket also works: T3 Code clones that repository's default branch.
+GitLab, GitCafe, Codeberg or Bitbucket also works: R3 Code clones that repository's default branch.
 On other hosts, paste the repository's clone URL. The project opens right away while the
 clone runs in the background: you can write your first prompt, and sending waits until the files
 are in place. A toast tracks progress and lets you cancel; if the clone fails, retry it from the
-toast or from the banner above the composer. When the host refuses the machine's SSH key, T3 Code
+toast or from the banner above the composer. When the host refuses the machine's SSH key, R3 Code
 clones over HTTPS with Git's credentials for that host instead, and the project's remote uses the
 HTTPS URL.
 
@@ -177,7 +214,7 @@ make your first commit before pushing.
 
 ## Create a pull request
 
-Use a thread's Git actions to commit, push, and create a pull request. T3 Code can generate commit
+Use a thread's Git actions to commit, push, and create a pull request. R3 Code can generate commit
 messages, review titles, and descriptions from your changes. Descriptions also draw on the work in
 the thread, including the checks it ran.
 
@@ -290,10 +327,10 @@ Tick a file off in the **Code** tab once you have read it and it collapses; the 
 running count. A tick belongs to the pull request rather than to a commit, so scoping the tab to a
 single commit keeps them. A file pushed to after you cleared it comes back marked **Changed**.
 
-On GitHub these are GitHub's own viewed marks, so a review carries between T3 Code and github.com
+On GitHub these are GitHub's own viewed marks, so a review carries between R3 Code and github.com
 in either direction. Forgejo, GitLab, Bitbucket, Azure DevOps, and Cursor Origin expose no record
-T3 Code can read, so the server you are connected to keeps them instead: they follow you across the
-apps connected to that server, but the host's own site will not show them, and the count reads **viewed in T3 Code**.
+R3 Code can read, so the server you are connected to keeps them instead: they follow you across the
+apps connected to that server, but the host's own site will not show them, and the count reads **viewed in R3 Code**.
 
 On mobile, open a changed file and mark it viewed from its header. Viewed files collapse,
 and their marks follow the same rules as on web and desktop.
@@ -318,7 +355,7 @@ and so does an agent creating one with `gh pr create` or `glab mr create`. Agent
 pull requests with the `link_pull_request` tool.
 
 Agents can also read, open, update, reply on, and merge pull requests in the thread's repository
-through T3 Code's own tools, which use the same sign-in as the Pull requests page. An agent merges
+through R3 Code's own tools, which use the same sign-in as the Pull requests page. An agent merges
 only the commit it last read: if someone pushed since, the merge is refused. On github.com an
 agent can also land a GitHub stack in one merge, like **Merge stack** below.
 
@@ -375,8 +412,11 @@ The search box asks the tracker itself where it can search. Press **Load more** 
 The **Views** menu saves and restores a search, filter, and sort setup, as it does for pull
 requests.
 
-To list a Linear team's issues beside a project's, connect Linear with an API key under
-Settings → Source control & issues, then choose the team for that project there.
+To list Linear issues beside a project's, connect Linear with an API key under
+Settings → Source control & issues, then pick one or more teams for that project there. Pick
+another team at any time to add it; uncheck every team to unbind the project. Each team's
+issues appear in the Linear group of the issue list, sorted with the rest by last update, and
+each can be loaded further on its own. Agents file new issues in the first team picked unless you name another bound team.
 
 Select an issue to open it beside the list: description, comments, state changes, linked pull
 requests, labels, assignees, and reactions. Linked pull requests open in the same panel. You can

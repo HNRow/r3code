@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import { ScreenScrollView as ScrollView } from "../../components/ui/ScreenScrollView";
 import { useNavigation } from "@react-navigation/native";
 import { useAtomValue } from "@effect/atom-react";
@@ -22,7 +23,6 @@ import {
   SHOWCASE_AVAILABLE_CLOUD_ENVIRONMENTS,
   SHOWCASE_CONNECTED_CLOUD_ENVIRONMENTS,
 } from "../showcase/showcaseEnvironmentRows";
-import { useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 const SHOWCASE_ENABLED = process.env.EXPO_PUBLIC_SHOWCASE === "1";
@@ -98,7 +98,7 @@ export function SettingsEnvironmentsRouteScreen() {
       refresh={
         relaySession
           ? {
-              accessibilityLabel: t("Refresh cloud environments"),
+              accessibilityLabel: gt("Refresh cloud environments"),
               disabled: isRefreshingCloud,
               onPress: () => void refreshCloudEnvironments(),
             }
@@ -106,7 +106,7 @@ export function SettingsEnvironmentsRouteScreen() {
       }
       actions={[
         {
-          accessibilityLabel: t("Add environment"),
+          accessibilityLabel: gt("Add environment"),
           icon: "plus",
           tintColor: headerIconColor,
           onPress: () => navigation.navigate("SettingsEnvironmentNew"),

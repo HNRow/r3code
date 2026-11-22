@@ -3,6 +3,7 @@ import type {
   KeyboardEvent as ReactKeyboardEvent,
   PointerEvent as ReactPointerEvent,
 } from "react";
+import { useGT } from "gt-react";
 
 import { cn } from "~/lib/utils";
 
@@ -11,7 +12,6 @@ import {
   type BrowserViewportLayout,
   type BrowserViewportResizeDirection,
 } from "./browserViewportLayout";
-import { useGT } from "gt-react";
 
 interface Props {
   readonly layout: BrowserViewportLayout;
@@ -55,10 +55,11 @@ function ResizeHandle(props: {
     onPointerDown,
     onKeyDown,
   } = props;
+  const gt = useGT();
   return (
     <button
       type="button"
-      aria-label={`${label}. Use arrow keys to resize.`}
+      aria-label={gt("{label}. Use arrow keys to resize.", { label })}
       className={cn(EDGE_BUTTON_CLASS, kind === "corner" && "z-30", cursorClassName)}
       style={style}
       onPointerDown={(event) => onPointerDown(direction, event)}
@@ -103,13 +104,13 @@ export function BrowserViewportResizeHandles({
   onPointerDown,
   onKeyDown,
 }: Props) {
-  const gt = useGT();
   const left = layout.viewportX;
   const top = layout.viewportY;
   const right = left + layout.viewportWidth;
   const bottom = top + layout.viewportHeight;
   const railSize = BROWSER_VIEWPORT_RESIZE_RAIL_SIZE;
 
+  const gt = useGT();
   const shared = { activeDirection, onPointerDown, onKeyDown };
   return (
     <>

@@ -1,5 +1,6 @@
 import type { PullRequestAction } from "@t3tools/contracts";
 import { sourceControlClients } from "@t3tools/client-runtime/source-control-clients";
+import { T } from "gt-react";
 import { SearchIcon } from "lucide-react";
 import { PullRequestChangeBreakdownStat } from "./PullRequestChangeBreakdownStat";
 import { PullRequestStackPopover } from "./PullRequestStackPopover";
@@ -24,8 +25,8 @@ import {
   PullRequestRowGlyph,
   PullRequestRowLines,
 } from "./PullRequestListRow";
+import { PullRequestPrivateMark } from "./PullRequestDetailLayout";
 import { PullRequestLabelChip, PullRequestReviewDecisionGlyph } from "./pullRequestPresentation";
-import { T } from "gt-react";
 
 const LABEL_SLOTS = [
   { overflow: "@xl/pr-row-meta:hidden" },
@@ -161,6 +162,9 @@ function PullRequestRowImpl({
           title={entry.title}
           signals={
             <>
+              {entry.visibility === "private" ? (
+                <PullRequestPrivateMark className="size-3 text-muted-foreground" />
+              ) : null}
               {entry.checksState === undefined ? null : (
                 <PullRequestChecksPopover
                   checksState={entry.checksState}

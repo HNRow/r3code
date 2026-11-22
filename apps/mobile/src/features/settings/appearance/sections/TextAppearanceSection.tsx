@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import {
   BASE_FONT_SIZE_STEP,
   MAX_BASE_FONT_SIZE,
@@ -11,7 +12,6 @@ import {
 } from "../components/AppearancePreviews";
 import { FontSizeSliderRow } from "../components/FontSizeSliderRow";
 import { SettingsSwitchRow } from "../../components/SettingsSwitchRow";
-import { useGT } from "gt-react-native";
 
 export function TextAppearanceSection() {
   const gt = useGT();
@@ -19,7 +19,7 @@ export function TextAppearanceSection() {
     useAppearancePreferences();
 
   return (
-    <SettingsSection title={gt("Text")}>
+    <SettingsSection title={gt("Text", { $context: "settings section for text size" })}>
       <TextAppearancePreview fontSize={appearance.baseFontSize} />
       <AppearancePreviewSeparator />
       <FontSizeSliderRow
@@ -31,7 +31,7 @@ export function TextAppearanceSection() {
         onChange={setBaseFontSize}
         step={BASE_FONT_SIZE_STEP}
         value={appearance.baseFontSize}
-        valueLabel={`${appearance.baseFontSize} pt`}
+        valueLabel={gt("{size} pt", { size: appearance.baseFontSize })}
       />
       <SettingsSwitchRow
         disabled={!isReady}

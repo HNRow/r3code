@@ -1,3 +1,4 @@
+import { T, useGT } from "gt-react-native";
 import { useState } from "react";
 import { View } from "react-native";
 import { WebView } from "react-native-webview";
@@ -13,7 +14,6 @@ import { useHardwareBack } from "../../lib/backHandler";
 import { isPdfPreviewUri } from "../../lib/pdfPreview";
 import { webViewDecelerationRate } from "../../lib/webViewDecelerationRate";
 import { useContentTopInset } from "../../components/ui/useBarInset";
-import { useGT, T } from "gt-react-native";
 
 export function WorkspaceFileWebPreview(props: { readonly uri: string | null }) {
   const gt = useGT();
@@ -24,8 +24,8 @@ export function WorkspaceFileWebPreview(props: { readonly uri: string | null }) 
 }
 
 function DocumentWebPreview(props: { readonly uri: string }) {
-  const gt = useGT();
   const headerInset = useContentTopInset();
+  const gt = useGT();
   const [loadProgress, setLoadProgress] = useState(0);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [linkedPdf, setLinkedPdf] = useState<string | null>(null);
@@ -88,7 +88,7 @@ function DocumentWebPreview(props: { readonly uri: string }) {
           }}
           onError={(event) => {
             setLoadProgress(0);
-            setLoadError(event.nativeEvent.description || "The file could not be rendered.");
+            setLoadError(event.nativeEvent.description || gt("The file could not be rendered."));
           }}
           renderLoading={() => (
             <View className="absolute inset-0 items-center justify-center bg-card">

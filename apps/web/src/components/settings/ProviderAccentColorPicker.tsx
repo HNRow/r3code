@@ -1,3 +1,4 @@
+import { T, useGT } from "gt-react";
 import { PlusIcon, XIcon } from "lucide-react";
 import { useRef, useState, type PointerEvent } from "react";
 
@@ -7,7 +8,6 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Popover, PopoverClose, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import { normalizeProviderAccentColor } from "../../providerInstances";
-import { useGT, T } from "gt-react";
 
 const FALLBACK_ACCENT_COLOR = "#2563eb";
 
@@ -113,8 +113,8 @@ function ProviderCustomColorPicker(props: {
   readonly onClear: () => void;
   readonly onClose: () => void;
 }) {
+  const gt = useGT();
   const normalized = normalizeProviderAccentColor(props.value);
-
   return (
     <Popover
       onOpenChange={(open) => {
@@ -128,7 +128,11 @@ function ProviderCustomColorPicker(props: {
             size="icon-sm"
             variant="ghost-muted"
             style={normalized ? { backgroundColor: normalized } : undefined}
-            aria-label={`${normalized ? "Change" : "Add"} accent color for ${props.displayName}`}
+            aria-label={
+              normalized
+                ? gt("Change accent color for {provider}", { provider: props.displayName })
+                : gt("Add accent color for {provider}", { provider: props.displayName })
+            }
           >
             {normalized ? (
               <span className="sr-only">
@@ -158,10 +162,8 @@ function ProviderCustomColorPicker(props: {
                   className="w-full justify-start"
                   onClick={props.onClear}
                 >
-                  <T>
-                    <XIcon className="size-3.5" aria-hidden />
-                    Clear color
-                  </T>
+                  <XIcon className="size-3.5" aria-hidden />
+                  <T>Clear color</T>
                 </Button>
               }
             />

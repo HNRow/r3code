@@ -9,6 +9,7 @@ import {
   type HtmlRenderReference,
   type HtmlRenderTheme,
 } from "@t3tools/shared/htmlRender";
+import { T, useGT } from "gt-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Platform, Pressable, View, type ColorValue } from "react-native";
 import { WebView, type WebViewMessageEvent } from "react-native-webview";
@@ -20,7 +21,6 @@ import { tryOpenExternalUrl } from "../../lib/openExternalUrl";
 import { useAssetUrlState, useRefreshAssetUrl } from "../../state/assets";
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
 import { webViewDecelerationRate } from "../../lib/webViewDecelerationRate";
-import { T } from "gt-react-native";
 
 const ROW_BOTTOM_MARGIN = 8;
 const ACTION_ROW_HEIGHT = 32;
@@ -181,6 +181,7 @@ export function ThreadHtmlRender(props: {
   readonly frameWidth: number;
   readonly iconColor: ColorValue;
 }) {
+  const gt = useGT();
   const navigation = useNavigation();
   const { attachmentId, title } = props.render;
   const height = htmlRenderFrameHeight(props.render, props.frameWidth);
@@ -219,7 +220,7 @@ export function ThreadHtmlRender(props: {
         {uri !== null && !failed ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Open ${title}`}
+            accessibilityLabel={gt("Open {title}", { title })}
             hitSlop={8}
             className="h-7 w-7 items-center justify-center rounded-full border border-border/60 bg-card/80"
             onPress={() =>
@@ -255,7 +256,7 @@ export function ThreadHtmlRender(props: {
         ) : failed || asset._tag === "Failure" ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Reload ${title}`}
+            accessibilityLabel={gt("Reload {title}", { title })}
             className="flex-1 items-center justify-center"
             onPress={() => {
               retried.current = false;

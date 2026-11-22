@@ -1,4 +1,5 @@
 import type { SourceControlProviderKind } from "@t3tools/contracts";
+import { T, useMessages, Var } from "gt-react";
 import { ExternalLinkIcon, TriangleAlertIcon } from "lucide-react";
 
 import { getSourceControlPresentationForKind } from "~/sourceControlPresentation";
@@ -6,8 +7,8 @@ import { getSourceControlPresentationForKind } from "~/sourceControlPresentation
 import { Button } from "../ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "../ui/empty";
 import { RefreshIcon } from "../ui/refresh-icon";
+import { changeRequestTermKind } from "./changeRequestTerm";
 import { describePullRequestDiffError } from "./pullRequestDiffError";
-import { T, Var } from "gt-react";
 
 export function PullRequestDiffUnavailableState({
   error,
@@ -20,11 +21,13 @@ export function PullRequestDiffUnavailableState({
   url: string;
   onRetry: () => void;
 }) {
+  const m = useMessages();
   const { providerName, terminology } = getSourceControlPresentationForKind(provider);
   const { title, description } = describePullRequestDiffError(
     error,
     providerName,
-    terminology.singular,
+    changeRequestTermKind(terminology),
+    m,
   );
 
   return (
@@ -38,18 +41,16 @@ export function PullRequestDiffUnavailableState({
       </EmptyHeader>
       <div className="flex flex-wrap justify-center gap-2">
         <Button size="sm" variant="default" onClick={onRetry}>
-          <T>
-            <RefreshIcon />
-            Try again
-          </T>
+          <RefreshIcon />
+          <T>Try again</T>
         </Button>
         <Button
           size="sm"
           variant="outline"
           render={<a href={url} target="_blank" rel="noopener noreferrer" />}
         >
+          <ExternalLinkIcon aria-hidden />
           <T>
-            <ExternalLinkIcon aria-hidden />
             Open on <Var>{providerName}</Var>
           </T>
         </Button>

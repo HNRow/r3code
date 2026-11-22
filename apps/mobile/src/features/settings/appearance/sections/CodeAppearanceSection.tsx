@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import {
   CODE_FONT_SIZE_STEP,
   MAX_CODE_FONT_SIZE,
@@ -11,7 +12,6 @@ import {
   CodeAppearancePreview,
 } from "../components/AppearancePreviews";
 import { FontSizeSliderRow } from "../components/FontSizeSliderRow";
-import { useGT } from "gt-react-native";
 
 export function CodeAppearanceSection() {
   const gt = useGT();
@@ -46,7 +46,7 @@ export function CodeAppearanceSection() {
           onChange={setCodeFontSize}
           step={CODE_FONT_SIZE_STEP}
           value={appearance.codeFontSize}
-          valueLabel={`${appearance.codeFontSize} pt`}
+          valueLabel={gt("{size} pt", { size: appearance.codeFontSize })}
         />
       ) : null}
       <SettingsSwitchRow

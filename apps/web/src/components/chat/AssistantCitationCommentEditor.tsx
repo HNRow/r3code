@@ -1,4 +1,5 @@
 import { ASSISTANT_CITATION_MAX_COMMENT_LENGTH, type AssistantCitation } from "@t3tools/contracts";
+import { T, useGT, Var } from "gt-react";
 import { use, useEffect, useRef, useState, type RefObject } from "react";
 
 import { TextFieldSpeechControls, useTextFieldSpeech } from "~/speech/useTextFieldSpeech";
@@ -6,7 +7,6 @@ import { textDirection } from "~/textDirection";
 
 import { ComposerContextActionsContext } from "../composerContextActions";
 import { Button } from "../ui/button";
-import { useGT, Var, T } from "gt-react";
 
 export function AssistantCitationCommentEditor({
   citation,
@@ -114,9 +114,7 @@ export function AssistantCitationCommentEditor({
         <p role="status" className="pt-1 text-xs text-destructive">
           <T>
             Comments can contain up to{" "}
-            <Var>{ASSISTANT_CITATION_MAX_COMMENT_LENGTH.toLocaleString()}</Var>
-            <Var> </Var>
-            characters.
+            <Var>{ASSISTANT_CITATION_MAX_COMMENT_LENGTH.toLocaleString()}</Var> characters.
           </T>
         </p>
       ) : null}
@@ -132,7 +130,7 @@ export function AssistantCitationCommentEditor({
             onPointerDown={(event) => event.preventDefault()}
             onClick={onCancel}
           >
-            Cancel
+            <T>Cancel</T>
           </Button>
           <Button
             size="xs"
@@ -140,7 +138,9 @@ export function AssistantCitationCommentEditor({
             onPointerDown={(event) => event.preventDefault()}
             onClick={submit}
           >
-            {commentTooLong ? <T>Shorten comment</T> : <T>Save</T>}
+            {commentTooLong
+              ? gt("Shorten comment")
+              : gt("Save", { $context: "verb, saves the comment" })}
           </Button>
         </div>
       </div>

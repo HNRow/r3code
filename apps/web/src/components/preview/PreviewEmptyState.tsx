@@ -1,3 +1,4 @@
+import { T } from "gt-react";
 import type { EnvironmentId, ScopedThreadRef } from "@t3tools/contracts";
 import { parseUrl } from "@t3tools/shared/url";
 import { Globe, History, RadioTower } from "lucide-react";
@@ -9,7 +10,6 @@ import { DiscoveryList } from "../ui/discovery-list";
 import { PreviewLocalServerCard } from "./PreviewLocalServerCard";
 import { PreviewRecentUrlCard } from "./PreviewRecentUrlCard";
 import { useDiscoveredLocalServers } from "./useDiscoveredLocalServers";
-import { T } from "gt-react";
 
 interface Props {
   threadRef: ScopedThreadRef;

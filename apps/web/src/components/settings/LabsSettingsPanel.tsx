@@ -1,6 +1,7 @@
+import { managedCapabilityDenial } from "@t3tools/client-runtime/contract-labels";
 import { useAuth } from "@clerk/react";
 import { Link } from "@tanstack/react-router";
-import { managedCapabilityDenial } from "@t3tools/contracts";
+import { T, useGT, useMessages } from "gt-react";
 
 import { hasCloudPublicConfig } from "~/cloud/publicConfig";
 import { useT3ConnectAuthPrompt } from "../clerk/useT3ConnectAuthPrompt";
@@ -8,11 +9,11 @@ import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
 import { ScopedSwitch } from "./ScopedSwitch";
 import { SettingsPageContainer, SettingsRow, SettingsSection } from "./settingsLayout";
-import { searchableSetting } from "./settingsSearch";
+import { useSearchableSetting } from "./settingsSearch";
 import { useScopedSettings, useUpdateScopedSettings } from "./useScopedSettings";
 import { useOptionalSettingsScope, useSettingsScope } from "./SettingsScopeContext";
 import { firstManagedDenial, usePrimaryManagedPolicy } from "~/state/managedPolicy";
-import { useGT, T, Var } from "gt-react";
+import { Var } from "gt-react";
 
 /** Features still settling in. */
 export function LabsSettingsPanel() {
@@ -33,9 +34,10 @@ export function LabsSettingsPanel() {
 }
 
 function BoringSidebarRow() {
-  const gt = useGT();
+  const searchableSetting = useSearchableSetting();
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
+  const gt = useGT();
   return (
     <SettingsRow
       {...searchableSetting("boring-sidebar")}
@@ -60,9 +62,10 @@ function BoringSidebarRow() {
 }
 
 function BoringSidebarMultilineRow() {
-  const gt = useGT();
+  const searchableSetting = useSearchableSetting();
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
+  const gt = useGT();
   return (
     <SettingsRow
       {...searchableSetting("boring-sidebar-multiline")}
@@ -85,6 +88,7 @@ function BoringSidebarMultilineRow() {
 
 /** Signed out of R3 Connect, the row offers to sign in instead of its switch. */
 function GuestLinksRowWithSignIn() {
+  const searchableSetting = useSearchableSetting();
   const gt = useGT();
   const { isSignedIn } = useAuth();
   const { openAuthPrompt } = useT3ConnectAuthPrompt();
@@ -94,7 +98,7 @@ function GuestLinksRowWithSignIn() {
     <SettingsRow
       {...searchableSetting("guest-links")}
       description={gt(
-        "Share a thread with a guest who watches it live in a browser and sends messages you approve. Sign in to R3 Connect to use guest links.",
+        "Share a thread with a guest who watches it live in a browser and sends messages you approve. Sign in to T3 Connect to use guest links.",
       )}
       control={
         <Button size="sm" variant="outline" onClick={openAuthPrompt}>
@@ -106,9 +110,11 @@ function GuestLinksRowWithSignIn() {
 }
 
 function GuestLinksRow() {
-  const gt = useGT();
+  const searchableSetting = useSearchableSetting();
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
+  const gt = useGT();
+  const messages = useMessages();
   const scope = useOptionalSettingsScope();
   const primaryPolicy = usePrimaryManagedPolicy();
   // Guests arrive through R3 Connect, so a policy that turns Connect off turns this off too.
@@ -116,7 +122,7 @@ function GuestLinksRow() {
     scope
       ? scope.connectedEnvironments.map((environment) => environment.serverConfig?.managedPolicy)
       : [primaryPolicy],
-    (policy) => managedCapabilityDenial(policy, "connect"),
+    (policy) => managedCapabilityDenial(policy, "connect", messages),
   );
   return (
     <SettingsRow
@@ -126,16 +132,14 @@ function GuestLinksRow() {
       // Turning guest links off still works without R3 Connect.
       managed={settings.guestSharingEnabled ? undefined : connectDenial}
       description={
-        <>
-          <T>
-            Share a thread with a guest who watches it live in a browser and sends messages you
-            approve. Needs R3 Connect: sign in and link this machine in<Var> </Var>
-            <Link to="/settings/access" className="underline underline-offset-2">
-              Sharing & access
-            </Link>
-            . Turning it off stops every guest link.
-          </T>
-        </>
+        <T>
+          Share a thread with a guest who watches it live in a browser and sends messages you
+          approve. Needs T3 Connect: sign in and link this machine in{" "}
+          <Link to="/settings/access" className="underline underline-offset-2">
+            Sharing & access
+          </Link>
+          . Turning it off stops every guest link.
+        </T>
       }
       control={
         <ScopedSwitch
@@ -150,25 +154,24 @@ function GuestLinksRow() {
 }
 
 function LinkedEnvironmentsRow() {
-  const gt = useGT();
+  const searchableSetting = useSearchableSetting();
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
+  const gt = useGT();
   return (
     <SettingsRow
       serverScoped
       {...searchableSetting("linked-environments-beta")}
       settingKeys={["linkedEnvironmentsEnabled"]}
       description={
-        <>
-          <T>
-            Let agents here work on your other machines, and theirs here. Turn it on for each
-            machine, then link them in<Var> </Var>
-            <Link to="/settings/connections" className="underline underline-offset-2">
-              Connections
-            </Link>
-            . While off, nothing new starts over a link; running tasks finish.
-          </T>
-        </>
+        <T>
+          Let agents here work on your other machines, and theirs here. Turn it on for each machine,
+          then link them in{" "}
+          <Link to="/settings/connections" className="underline underline-offset-2">
+            Connections
+          </Link>
+          . While off, nothing new starts over a link; running tasks finish.
+        </T>
       }
       control={
         <ScopedSwitch
@@ -185,9 +188,10 @@ function LinkedEnvironmentsRow() {
 }
 
 function PromptSuggestionsRow() {
-  const gt = useGT();
+  const searchableSetting = useSearchableSetting();
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
+  const gt = useGT();
   return (
     <SettingsRow
       serverScoped
@@ -211,34 +215,32 @@ function PromptSuggestionsRow() {
 }
 
 function SimlockHostsRow() {
-  const gt = useGT();
+  const searchableSetting = useSearchableSetting();
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
+  const gt = useGT();
   return (
     <SettingsRow
       serverScoped
       {...searchableSetting("simlock-hosts")}
       settingKeys={["simlockDeviceHostsEnabled"]}
       description={
-        <>
-          <T>
-            Let the Device panel lease simulators and emulators from your own<Var> </Var>
-            <a
-              href="https://incubator.callstack.com/simlock/"
-              target="_blank"
-              rel="noreferrer"
-              className="underline underline-offset-2"
-            >
-              Simlock
-            </a>
-            <Var> </Var>
-            pool, added in<Var> </Var>
-            <Link to="/settings/devices" className="underline underline-offset-2">
-              Devices
-            </Link>
-            . An alpha that may change or break. R3 Code never installs Simlock.
-          </T>
-        </>
+        <T>
+          Let the Device panel lease simulators and emulators from your own{" "}
+          <a
+            href="https://incubator.callstack.com/simlock/"
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2"
+          >
+            Simlock
+          </a>{" "}
+          pool, added in{" "}
+          <Link to="/settings/devices" className="underline underline-offset-2">
+            Devices
+          </Link>
+          . An alpha that may change or break. R3 Code never installs Simlock.
+        </T>
       }
       control={
         <ScopedSwitch
@@ -256,10 +258,11 @@ function SimlockHostsRow() {
 
 /** Shows only when every machine in scope is a Mac, since only macOS servers honor it. */
 function FastWorktreeCheckoutRow() {
-  const gt = useGT();
+  const searchableSetting = useSearchableSetting();
   const { scope, connectedEnvironments } = useSettingsScope();
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
+  const gt = useGT();
   if (
     scope.kind === "project" ||
     scope.kind === "checkout" ||

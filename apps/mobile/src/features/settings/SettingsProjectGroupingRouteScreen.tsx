@@ -1,3 +1,4 @@
+import { msg, useGT, useMessages } from "gt-react-native";
 import { ScreenScrollView as ScrollView } from "../../components/ui/ScreenScrollView";
 import { useAtomValue } from "@effect/atom-react";
 import type { SidebarProjectGroupingMode } from "@t3tools/contracts";
@@ -15,7 +16,6 @@ import { ListChoiceRow as SettingsChoiceRow } from "../../components/ui/ListChoi
 import { SettingsSection } from "./components/SettingsSection";
 import { LanguageSettingsSection } from "./SettingsLanguageRouteScreen";
 import { NewThreadSettingsSection, WorkingSectionSettings } from "./ThreadSettingsSections";
-import { useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 const GROUPING_OPTIONS: ReadonlyArray<{
@@ -25,35 +25,24 @@ const GROUPING_OPTIONS: ReadonlyArray<{
 }> = [
   {
     mode: "repository",
-    get label() {
-      return t("Group by repository");
-    },
-    get description() {
-      return t("Matching repositories appear as one project.");
-    },
+    label: msg("Group by repository"),
+    description: msg("Matching repositories appear as one project."),
   },
   {
     mode: "repository_path",
-    get label() {
-      return t("Group by repository path");
-    },
-    get description() {
-      return t("Keep monorepo paths separate.");
-    },
+    label: msg("Group by repository path"),
+    description: msg("Keep monorepo paths separate."),
   },
   {
     mode: "separate",
-    get label() {
-      return t("Keep separate");
-    },
-    get description() {
-      return t("Show every workspace as its own project.");
-    },
+    label: msg("Keep separate"),
+    description: msg("Show every workspace as its own project."),
   },
 ];
 
 export function SettingsProjectGroupingRouteScreen() {
   const gt = useGT();
+  const m = useMessages();
   const insets = useSafeAreaInsets();
   const preferencesResult = useAtomValue(mobilePreferencesAtom);
   const savePreferences = useAtomCommand(saveMobilePreferences);
@@ -76,8 +65,8 @@ export function SettingsProjectGroupingRouteScreen() {
           {GROUPING_OPTIONS.map((option, index) => (
             <SettingsChoiceRow
               key={option.mode}
-              label={option.label}
-              description={option.description}
+              label={m(option.label)}
+              description={m(option.description)}
               selected={selectedMode === option.mode}
               separated={index > 0}
               disabled={!preferencesReady}

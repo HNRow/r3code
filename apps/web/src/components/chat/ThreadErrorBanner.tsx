@@ -4,7 +4,9 @@ import {
   CHATGPT_WORKSPACE_ADMIN_REQUEST,
   CHATGPT_WORKSPACE_USAGE_LIMIT_CODE,
 } from "@t3tools/shared/usageLimits";
+import { msg, T, useGT } from "gt-react";
 import { memo } from "react";
+import { m } from "../../i18n/messages";
 import { writeTextToClipboard } from "../../hooks/useCopyToClipboard";
 import { Alert, AlertAction, AlertDescription } from "../ui/alert";
 import { Button } from "../ui/button";
@@ -13,17 +15,21 @@ import { CircleAlertIcon, XIcon } from "lucide-react";
 import { OpenAI } from "../Icons";
 import { ChatGptUsageButton } from "../settings/ChatGptUsageButton";
 import { ExpandableText } from "../settings/ExpandableText";
-import { T, useGT, t } from "gt-react";
+import { t } from "gt-react";
 
 export function copyAdminRequest() {
-  void writeTextToClipboard(CHATGPT_WORKSPACE_ADMIN_REQUEST, "admin request").then(
+  void writeTextToClipboard(CHATGPT_WORKSPACE_ADMIN_REQUEST, {
+    target: "admin request",
+    unavailableMessage: msg("Clipboard API is unavailable while copying admin request."),
+    failureMessage: msg("Failed to copy admin request to the clipboard."),
+  }).then(
     () =>
       toastManager.add({
         type: "success",
-        title: t("Request copied"),
-        description: t("Send it to your workspace admin."),
+        title: m(msg("Request copied")),
+        description: m(msg("Send it to your workspace admin.")),
       }),
-    () => toastManager.add({ type: "error", title: t("Could not copy the request") }),
+    () => toastManager.add({ type: "error", title: m(msg("Could not copy the request")) }),
   );
 }
 
@@ -106,10 +112,9 @@ export const ThreadErrorBanner = memo(function ThreadErrorBanner({
               </p>
               {workspaceLimit ? (
                 <p>
-                  <T>
-                    You've reached your workspace's limit for using your ChatGPT plan in other apps.
-                    Copy a request to ask your workspace admin for increased usage limits.
-                  </T>
+                  {gt(
+                    "You've reached your workspace's limit for using your ChatGPT plan in other apps. Copy a request to ask your workspace admin for increased usage limits.",
+                  )}
                 </p>
               ) : null}
             </div>

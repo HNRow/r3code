@@ -9,12 +9,14 @@ import {
   WorkLogPressable,
 } from "./work-log-layout";
 import { QuestionAnswerHistory } from "./QuestionAnswerHistory";
+import { McpSignInSheet, type McpSignInTarget } from "./McpSignInSheet";
 import { ThreadCommandOutput, useCommandOutputStreaming } from "./thread-command-output";
 import {
   getQuestionAnswerPreview,
   hasQuestionAnswer,
 } from "@t3tools/client-runtime/work-log/user-input";
 import * as Haptics from "expo-haptics";
+import { T, useGT, useMessages } from "gt-react-native";
 import { Image } from "expo-image";
 import { type AppSymbolName, SymbolView } from "../../components/ui/AppSymbol";
 import { MaskedView } from "@expo/ui/community/masked-view";
@@ -45,12 +47,13 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 import {
   ORCHESTRATION_V2_WORKSPACE_PREPARATION_FAILURE_CODE,
   type EnvironmentId,
-  type OrchestrationV2RestartCancelledBackgroundWork,
   type RunId,
   type ThreadId,
   type ToolActivityIcon,
 } from "@t3tools/contracts";
 import { useAtomValue } from "@effect/atom-react";
+import { Atom } from "effect/reactivity";
+import * as DateTime from "effect/DateTime";
 import { scopeThreadRef } from "@t3tools/client-runtime/environment";
 import { environmentThreadDetails, threadEnvironment } from "../../state/threads";
 import { useAtomCommand } from "../../state/use-atom-command";
@@ -76,11 +79,9 @@ import {
 } from "../../lib/threadActivity";
 import {
   isJsonToolText,
-  restartNoticeForItem,
   toolCallLines,
   turnItemOutputImages,
   turnItemOutputText,
-  type RestartNotice,
 } from "@t3tools/client-runtime/work-log/item-detail";
 import { useTurnItemDetail } from "../../state/queries";
 import {
@@ -112,8 +113,6 @@ import { useAssetUrl } from "../../state/assets";
 import { PullRequestGlyph } from "../pull-requests/pullRequestGlyphs";
 import { useOpenLinkedThread } from "./useOpenLinkedThread";
 import { startShimmerSteps } from "./work-shimmer-steps";
-import { useGT, useMessages, msg, T, Var } from "gt-react-native";
-import { translateServerNotice } from "../../lib/timelineText";
 
 const SHIMMER_WIDTH = 72;
 const SHIMMER_ICON_AND_GAP_WIDTH = 30;
@@ -121,70 +120,6 @@ export const THREAD_DISCLOSURE_TRANSITION_MS = 180;
 const WORK_LOG_LAYOUT_TRANSITION = LinearTransition.duration(THREAD_DISCLOSURE_TRANSITION_MS);
 const WORK_LOG_DETAIL_ENTER_TRANSITION = FadeIn.duration(140);
 const WORK_LOG_DETAIL_EXIT_TRANSITION = FadeOut.duration(120);
-
-const RESTART_CANCELLED_WORK_KIND_TEXT: Record<
-  OrchestrationV2RestartCancelledBackgroundWork["kind"],
-  string
-> = {
-  subagent: msg("Subagent"),
-  shell: msg("Shell"),
-  monitor: msg("Monitor"),
-  task: msg("Task"),
-};
-
-/** The restart note's detail is the prompt sent to the agent, so the restarted server's list stands alone. */
-function RestartContinuationBody(props: {
-  readonly notice: RestartNotice;
-  readonly detail: string | undefined;
-}) {
-  const m = useMessages();
-  const [showSource, setShowSource] = useState(false);
-  const { notice } = props;
-  return (
-    <View className="gap-1">
-      <Text className="text-2xs leading-normal text-foreground-muted">
-        {notice.state === "legacy"
-          ? m("R3 Code restarted.")
-          : notice.settled
-            ? m("R3 Code restarted. Its background tasks stopped.")
-            : notice.cancelledWork.length === 0
-              ? m("R3 Code restarted and continued this turn automatically.")
-              : m(
-                  "R3 Code restarted. These background tasks were cancelled and will not report back. Run them again if you still need them:",
-                )}
-      </Text>
-      {notice.state === "structured" && notice.cancelledWork.length > 0
-        ? notice.cancelledWork.map((work, index) => (
-            <Text
-              key={`${work.kind}:${work.id ?? index}`}
-              className="ml-3 text-2xs leading-normal text-foreground-muted"
-            >
-              {`${m(RESTART_CANCELLED_WORK_KIND_TEXT[work.kind])}: ${work.label}`}
-            </Text>
-          ))
-        : null}
-      {props.detail === undefined ? null : (
-        <>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => setShowSource((current) => !current)}
-            className="mt-0.5 self-start"
-          >
-            <Text className="text-2xs font-t3-medium text-foreground-subtle">
-              {m("Original message sent to the agent")}
-            </Text>
-          </Pressable>
-          {showSource ? (
-            <Text selectable className="font-mono text-2xs leading-normal text-foreground-muted">
-              {props.detail}
-            </Text>
-          ) : null}
-        </>
-      )}
-    </View>
-  );
-}
-
 type WorkContentIcon =
   | AppSymbolName
   | "browser"
@@ -842,7 +777,6 @@ function WorkspacePreparationRetryButton(props: {
   readonly threadId: ThreadId;
   readonly runId: RunId;
 }) {
-  const gt = useGT();
   const retryable = useAtomValue(
     environmentThreadDetails.threadAtom(scopeThreadRef(props.environmentId, props.threadId)),
     (thread) => {
@@ -850,6 +784,7 @@ function WorkspacePreparationRetryButton(props: {
       return run?.status === "failed" && run.workspacePreparation !== undefined;
     },
   );
+  const gt = useGT();
   const retry = useAtomCommand(threadEnvironment.retryWorkspacePreparation, "retry setup");
   const [busy, setBusy] = useState(false);
   if (!retryable) return null;
@@ -934,6 +869,9 @@ function HighlightedCodeText({
   );
 }
 
+// Rows that aren't sign-in notices read this, so every row reads an atom.
+const NOT_SIGNED_IN = Atom.make(false);
+
 const ThreadWorkLogRow = function ThreadWorkLogRow(
   props: Omit<
     ThreadWorkLogProps,
@@ -950,11 +888,24 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
     readonly expanded: boolean;
   },
 ) {
-  const gt = useGT();
-  const m = useMessages();
   const { row, expanded } = props;
-  const restartNotice = restartNoticeForItem(row.projectedItem.item);
+  const gt = useGT();
+  const messages = useMessages();
   const openLinkedThread = useOpenLinkedThread();
+  const canSignInToMcp = useAtomValue(
+    threadEnvironment.mcpSignInStart.permissionAtom(props.environmentId),
+  );
+  const [mcpSignInOpen, setMcpSignInOpen] = useState(false);
+  const signInNotice = row.projectedItem.item;
+  const mcpSignedIn = useAtomValue(
+    signInNotice.type === "system_notice" && signInNotice.mcpSignIn !== undefined
+      ? threadEnvironment.mcpSignedInAtom(props.environmentId, {
+          threadId: signInNotice.threadId,
+          server: signInNotice.mcpSignIn.server,
+          noticeAt: DateTime.toEpochMillis(signInNotice.updatedAt),
+        })
+      : NOT_SIGNED_IN,
+  );
   const streamsOutput =
     useCommandOutputStreaming(props.environmentId) &&
     row.projectedItem.item.type === "command_execution";
@@ -978,11 +929,20 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
         })} (${new Intl.DateTimeFormat().resolvedOptions().timeZone})`
       : null;
     const label = warning
-      ? `Usage limit reached.${resetTime ? ` Retry after ${resetTime}.` : ""}`
+      ? resetTime
+        ? gt("Usage limit reached. Retry after {resetTime}.", { resetTime })
+        : gt("Usage limit reached.")
       : row.summary;
     return (
       <WorkLogPressable
-        accessibilityLabel={warning ? label : `${row.summary}: ${failureItem.failure.message}`}
+        accessibilityLabel={
+          warning
+            ? label
+            : gt("{summary}: {message}", {
+                summary: row.summary,
+                message: failureItem.failure.message,
+              })
+        }
         accessibilityHint={gt("Long press to copy.")}
         onLongPress={() => props.onCopyRow(row.id, row.getCopyText())}
       >
@@ -1011,7 +971,7 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
             ) : null}
             <Text
               accessibilityLabel={timestamp.toLocaleString()}
-              className="shrink-0 text-xs text-foreground-subtle"
+              className="shrink-0 text-xs text-foreground-muted"
             >
               {timestamp.toLocaleString(undefined, {
                 month: "short",
@@ -1022,7 +982,7 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
             </Text>
           </View>
           {!warning ? (
-            <Text translate={false} selectable className="ml-7 text-sm text-foreground">
+            <Text selectable className="ml-7 text-sm text-foreground">
               {failureItem.failure.message}
             </Text>
           ) : null}
@@ -1042,7 +1002,22 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
     row.projectedItem.item.type === "notification"
       ? notificationChildThreadId(row.projectedItem.item.source)
       : undefined;
-  const canExpand = row.canExpand && notifiedSubagentThreadId === undefined;
+  const notice = row.projectedItem.item;
+  const mcpSignInTarget: McpSignInTarget | null =
+    canSignInToMcp &&
+    notice.type === "system_notice" &&
+    notice.mcpSignIn !== undefined &&
+    notice.providerThreadId !== null
+      ? {
+          threadId: notice.threadId,
+          providerThreadId: notice.providerThreadId,
+          server: notice.mcpSignIn.server,
+        }
+      : null;
+  // Signed in, the notice is an ordinary row again.
+  const opensMcpSignIn = mcpSignInTarget !== null && !mcpSignedIn;
+  // A sign-in notice opens its sheet instead; a nested button would be out of VoiceOver's reach.
+  const canExpand = row.canExpand && notifiedSubagentThreadId === undefined && !opensMcpSignIn;
   const reasoning = row.projectedItem.item.type === "reasoning" ? row.projectedItem.item : null;
   const fetchedItem = fetchedDetail.data?.item ?? null;
   const isRead = toolGroupAction(row.workEntry) === "read";
@@ -1061,13 +1036,11 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
     call && shownItem.type === "command_execution" && shownItem.exitCode
       ? shownItem.exitCode
       : null;
-  const translateDetail = (text: string | null): string | null =>
-    text === null ? null : translateServerNotice(text, m);
   const fullDetail =
     expanded && !reasoning && !call && !row.workEntry.questionAnswer
       ? fetchedItem && !isRead
-        ? translateDetail(formatItemFullDetail(row.projectedItem, fetchedItem))
-        : translateDetail(row.getFullDetail())
+        ? formatItemFullDetail(row.projectedItem, fetchedItem)
+        : row.getFullDetail()
       : null;
   const outputImages = expanded && fetchedItem ? turnItemOutputImages(fetchedItem) : [];
   const viewedImagePath = workEntryViewedImagePath(row.workEntry);
@@ -1078,35 +1051,28 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
         ? turnItemOutputText(shownItem)
         : fetchedItem
           ? (turnItemOutputText(fetchedItem) ??
-            (outputImages.length > 0 || viewedImagePath ? null : "No output."))
+            (outputImages.length > 0 || viewedImagePath ? null : gt("No output.")))
           : fetchedDetail.error
-            ? `Couldn't load output: ${fetchedDetail.error}`
+            ? gt("Couldn't load output: {error}", { error: fetchedDetail.error })
             : row.fetchesDetail
               ? fetchedDetail.data
-                ? "Output is no longer available."
-                : "Loading output…"
+                ? gt("Output is no longer available.")
+                : gt("Loading output…")
               : null;
   const exitLine =
     failedExitCode === null ? null : (
       <Text className="mt-1.5 font-mono text-2xs leading-normal text-danger-foreground">
-        <T>
-          exit <Var>{failedExitCode}</Var>
-        </T>
+        exit {failedExitCode}
       </Text>
     );
-  const toolPresentation = resolveWorkEntryToolPresentation(row.workEntry);
-  const previewText = translateServerNotice(
-    row.groupStandIn?.label ?? workEntryRowLabel(row.workEntry),
-    m,
-  );
+  const toolPresentation = resolveWorkEntryToolPresentation(row.workEntry, undefined, messages);
+  const previewText = row.groupStandIn?.label ?? workEntryRowLabel(row.workEntry, false, messages);
   const answerPreview = row.workEntry.questionAnswer
     ? getQuestionAnswerPreview(row.workEntry.questionAnswer)
     : null;
   const accessiblePreview = [previewText, answerPreview].filter(Boolean).join(": ");
-  const displayText = translateServerNotice(
-    row.groupStandIn?.label ?? workEntryRowLabel(row.workEntry, expanded),
-    m,
-  );
+  const displayText =
+    row.groupStandIn?.label ?? workEntryRowLabel(row.workEntry, expanded, messages);
   const isSystemNotice = row.projectedItem.item.type === "system_notice";
   const isUsageLimit =
     row.projectedItem.item.type === "error" &&
@@ -1126,15 +1092,29 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
     >
       <WorkLogPressable
         accessibilityRole={
-          notifiedSubagentThreadId !== undefined ? "link" : canExpand ? "button" : undefined
+          notifiedSubagentThreadId !== undefined
+            ? "link"
+            : canExpand || opensMcpSignIn
+              ? "button"
+              : undefined
         }
-        accessibilityLabel={failed ? `${accessiblePreview}, tool call failed` : accessiblePreview}
+        accessibilityLabel={
+          failed
+            ? gt("{preview}, tool call failed", { preview: accessiblePreview })
+            : mcpSignInTarget !== null && mcpSignedIn
+              ? gt("{preview}, signed in", { preview: accessiblePreview })
+              : accessiblePreview
+        }
         accessibilityHint={
           notifiedSubagentThreadId !== undefined
-            ? "Opens this agent's thread. Long press to copy."
-            : canExpand
-              ? `Double tap to ${expanded ? "hide" : "show"} full details. Long press to copy.`
-              : "Long press to copy."
+            ? gt("Opens this agent's thread. Long press to copy.")
+            : opensMcpSignIn
+              ? gt("Opens the sign-in. Long press to copy.")
+              : canExpand
+                ? expanded
+                  ? gt("Double tap to hide full details. Long press to copy.")
+                  : gt("Double tap to show full details. Long press to copy.")
+                : gt("Long press to copy.")
         }
         accessibilityState={canExpand ? { expanded } : undefined}
         onPress={() => {
@@ -1143,6 +1123,11 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
               environmentId: String(props.environmentId),
               threadId: String(notifiedSubagentThreadId),
             });
+            return;
+          }
+          if (opensMcpSignIn) {
+            void Haptics.selectionAsync();
+            setMcpSignInOpen(true);
             return;
           }
           if (canExpand) {
@@ -1200,7 +1185,7 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
                     row.workEntry.questionAnswer &&
                     hasQuestionAnswer(row.workEntry.questionAnswer)
                       ? "text-foreground"
-                      : "text-foreground-subtle"
+                      : "text-foreground-muted"
                   }
                 >{`  ${answerPreview}`}</Text>
               ) : null}
@@ -1212,6 +1197,15 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
           {props.copied ? (
             <Text className="pr-1 font-t3-medium text-3xs text-adaptive-emerald-600-400">
               <T>Copied</T>
+            </Text>
+          ) : mcpSignInTarget !== null ? (
+            <Text
+              className={cn(
+                "pr-1 font-t3-medium text-sm",
+                mcpSignedIn ? "text-adaptive-emerald-600-400" : "text-primary",
+              )}
+            >
+              {mcpSignedIn ? <T>Signed in</T> : <T>Sign in</T>}
             </Text>
           ) : null}
           {failed && toolIcon !== undefined ? (
@@ -1240,11 +1234,17 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
           </View>
         </View>
       </WorkLogPressable>
+      {mcpSignInOpen && mcpSignInTarget !== null ? (
+        <McpSignInSheet
+          environmentId={props.environmentId}
+          target={mcpSignInTarget}
+          onClose={() => setMcpSignInOpen(false)}
+        />
+      ) : null}
 
       {expanded &&
       (reasoning ||
         fullDetail ||
-        restartNotice !== null ||
         call ||
         fetchedOutput ||
         viewedImagePath ||
@@ -1351,11 +1351,6 @@ const ThreadWorkLogRow = function ThreadWorkLogRow(
                       line
                     ) /* oxlint-enable react/no-array-index-key */,
                 )
-            ) : restartNotice !== null ? (
-              <RestartContinuationBody
-                notice={restartNotice}
-                detail={shownItem.type === "notification" ? shownItem.detail : undefined}
-              />
             ) : fullDetail ? (
               <Text selectable className="font-mono text-2xs leading-normal text-foreground-muted">
                 {isJsonToolText(fullDetail) ? (
@@ -1421,7 +1416,10 @@ export function ThreadWorkGroupToggle(props: {
   readonly trailing?: ReactNode;
   readonly onToggle: () => void;
 }) {
-  const statusLabel = props.hasFailure ? `${props.summary}, tool call failed` : props.summary;
+  const gt = useGT();
+  const statusLabel = props.hasFailure
+    ? gt("{preview}, tool call failed", { preview: props.summary })
+    : props.summary;
   const accessibilityLabel = props.thought ? `${props.thought} ${statusLabel}` : statusLabel;
   const icon =
     props.summaryToolIcon ??
@@ -1456,7 +1454,17 @@ export function ThreadWorkGroupToggle(props: {
             accessibilityRole="button"
             accessibilityState={{ expanded: props.expanded }}
             accessibilityLabel={accessibilityLabel}
-            accessibilityHint={`Double tap to ${props.expanded ? "hide" : "show"} ${props.hiddenCount} tool ${props.hiddenCount === 1 ? "call" : "calls"}.`}
+            accessibilityHint={
+              props.expanded
+                ? gt(
+                    "{count, plural, one {Double tap to hide {count} tool call.} other {Double tap to hide {count} tool calls.}}",
+                    { count: props.hiddenCount },
+                  )
+                : gt(
+                    "{count, plural, one {Double tap to show {count} tool call.} other {Double tap to show {count} tool calls.}}",
+                    { count: props.hiddenCount },
+                  )
+            }
             onPress={() => {
               void Haptics.selectionAsync();
               props.onToggle();
@@ -1508,7 +1516,8 @@ export function ThreadThinkingRow(props: {
   /** Replaces "Thinking" while the provider has not started a turn. */
   readonly providerStartingLabel?: string | undefined;
 }) {
-  const label = props.providerStartingLabel ?? props.label ?? "Thinking";
+  const gt = useGT();
+  const label = props.providerStartingLabel ?? props.label ?? gt("Thinking");
   return (
     <View
       accessible

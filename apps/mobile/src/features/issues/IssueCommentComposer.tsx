@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import { useRef, useState } from "react";
 import { Platform, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -29,7 +30,6 @@ import {
 } from "../voice-input/ComposerDictationControl";
 import { useVoiceInputController } from "../voice-input/useVoiceInputController";
 import { resolveVoiceComposerPresentation } from "../voice-input/voiceInputPresentation";
-import { useGT } from "gt-react-native";
 
 // The thread composer's editor starts after its attachment button; this keeps the same text inset.
 const EDITOR_LEADING_INSET = 14;
@@ -102,7 +102,7 @@ export function IssueCommentComposer(props: {
   const sendButton = (
     <ComposerActionButton
       size={chrome.controlSize}
-      accessibilityLabel={props.posting ? "Posting comment" : "Post comment"}
+      accessibilityLabel={props.posting ? gt("Posting comment") : gt("Post comment")}
       icon="arrow.up"
       variant="primary"
       disabled={!canSend}
@@ -170,7 +170,11 @@ export function IssueCommentComposer(props: {
                   />
                   {/* TalkBack orders siblings by position; outside this row the editor reads after Send. */}
                   <Animated.View
-                    style={[compactEditor.editorStyle, dictating ? { display: "none" } : undefined]}
+                    style={[
+                      compactEditor.editorStyle,
+                      // iOS destroys a view under display: none; the editor would lose its focus and caret.
+                      Platform.OS === "android" && dictating ? { display: "none" } : undefined,
+                    ]}
                   >
                     <ComposerEditor
                       ref={editorRef}
@@ -192,7 +196,7 @@ export function IssueCommentComposer(props: {
                         props.onFocusChange(false);
                       }}
                       onSubmit={() => void send()}
-                      submitTitle={gt("Comment")}
+                      submitTitle={gt("Comment", { $context: "verb, posts the comment" })}
                       {...compactEditor.editorProps}
                       textStyle={textStyle}
                     />

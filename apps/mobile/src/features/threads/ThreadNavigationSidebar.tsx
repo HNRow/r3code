@@ -1,3 +1,4 @@
+import { useGT, useMessages } from "gt-react-native";
 import { useActiveNewTask } from "../../state/active-new-task";
 import { ThreadUndoNotice } from "../home/ThreadUndoNotice";
 import { useAndroidControlSizing } from "../../components/ui/useAndroidControlSizing";
@@ -80,7 +81,6 @@ import {
 } from "./threadListV2";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { NativeScrollView } from "../../native/NativeScrollViewMarker";
-import { useGT } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 type SidebarListItem =
@@ -123,6 +123,7 @@ export function ThreadNavigationSidebar(props: ThreadNavigationSidebarProps) {
 
 function ThreadNavigationSidebarPane(props: ThreadNavigationSidebarProps) {
   const gt = useGT();
+  const messages = useMessages();
   const floatingTabsEnabled = useAndroidFloatingTabs();
   const { themeVariables: materialTheme } = useAppearancePreferences();
   const drawerColor = materialTheme["--color-drawer"];
@@ -178,12 +179,15 @@ function ThreadNavigationSidebarPane(props: ThreadNavigationSidebarProps) {
         : [];
   const projectScopes = useMemo(
     () =>
-      buildHomeProjectScopes({
-        projects,
-        environmentId: options.selectedEnvironmentId,
-        projectGroupingMode: options.projectGroupingMode,
-      }),
-    [projects, options.selectedEnvironmentId, options.projectGroupingMode],
+      buildHomeProjectScopes(
+        {
+          projects,
+          environmentId: options.selectedEnvironmentId,
+          projectGroupingMode: options.projectGroupingMode,
+        },
+        messages,
+      ),
+    [projects, options.selectedEnvironmentId, options.projectGroupingMode, messages],
   );
   const projectFilterOptions = pickableProjectGroups(
     sortHomeProjectScopes({
@@ -364,7 +368,7 @@ function ThreadNavigationSidebarPane(props: ThreadNavigationSidebarProps) {
     threadSearchMatchByKey,
     workingShelfEnabled,
   };
-  useThreadJumpShortcuts(listItems, handleSelectThread);
+  useThreadJumpShortcuts(listItems, handleSelectThread, props.onOpenPendingTask);
   const sidebarItemsAreEqual = (previous: SidebarListItem, item: SidebarListItem): boolean => {
     if (isThreadListV2ListItem(previous) && isThreadListV2ListItem(item)) {
       return threadListV2ListItemsAreEqual(previous, item);
@@ -533,25 +537,28 @@ function ThreadNavigationSidebarPane(props: ThreadNavigationSidebarProps) {
   };
   const header = (
     <WorkspaceListHeader
-      accessibilityLabel={gt("R3 Code, Threads")}
+      accessibilityLabel={gt("{appName}, Threads", { appName: "R3 Code" })}
       onOpenEnvironments={props.onOpenEnvironmentSettings}
       onOpenSettings={props.onOpenSettings}
       search={{
         value: props.searchQuery,
         onChangeText: props.onSearchQueryChange,
-        placeholder: t("Search"),
-        accessibilityLabel: t("Search threads"),
+        placeholder: gt("Search", { $context: "search field placeholder" }),
+        accessibilityLabel: gt("Search threads"),
       }}
       filter={{
         customized: options.selectedEnvironmentId !== null || selectedProjectKey !== null,
-        items: buildHomeListFilterMenuItems({
-          environments,
-          projects: projectFilterOptions,
-          selectedEnvironmentId: options.selectedEnvironmentId,
-          selectedProjectKey,
-          onEnvironmentChange: setSelectedEnvironmentId,
-          onProjectChange: setSelectedProjectKey,
-        }),
+        items: buildHomeListFilterMenuItems(
+          {
+            environments,
+            projects: projectFilterOptions,
+            selectedEnvironmentId: options.selectedEnvironmentId,
+            selectedProjectKey,
+            onEnvironmentChange: setSelectedEnvironmentId,
+            onProjectChange: setSelectedProjectKey,
+          },
+          messages,
+        ),
       }}
       sidebar={{
         width: props.width,
@@ -574,18 +581,18 @@ function ThreadNavigationSidebarPane(props: ThreadNavigationSidebarProps) {
         }
       >
         {catalogState.isLoadingConnections
-          ? t("Loading threads…")
+          ? gt("Loading threads…")
           : showAddEnvironment
-            ? t("No environments connected")
+            ? gt("No environments connected")
             : props.searchQuery.trim().length > 0
               ? threadSearch.isPending
-                ? t("Searching thread messages…")
+                ? gt("Searching thread messages…")
                 : threadSearch.failed
-                  ? t("Couldn't search thread messages")
-                  : t("No matching threads")
+                  ? gt("Couldn't search thread messages")
+                  : gt("No matching threads")
               : selectedProjectScope !== null
-                ? `No threads in ${selectedProjectScope.title}`
-                : t("No threads yet")}
+                ? gt("No threads in {project}", { project: selectedProjectScope.title })
+                : gt("No threads yet")}
       </Text>
       {showAddEnvironment ? (
         <View className={Platform.OS === "android" ? "self-center" : "px-2"}>

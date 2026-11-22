@@ -1,4 +1,5 @@
 import type { RelayClientDeviceRecord } from "@t3tools/contracts/relay";
+import { T, useGT, useMessages } from "gt-react";
 import { SmartphoneIcon } from "lucide-react";
 
 import { useManagedRelayDevices } from "../../cloud/managedRelayState";
@@ -16,7 +17,6 @@ import {
   ClerkUserProfileRefreshButton,
   ClerkUserProfileRow,
 } from "./ClerkUserProfilePage";
-import { useGT, T, t } from "gt-react";
 
 const MOBILE_CLIENT_SKELETON_ROWS = ["primary", "secondary"] as const;
 
@@ -27,15 +27,19 @@ function MobileClientStatusBadge({
   readonly enabled: boolean;
   readonly label: string;
 }) {
+  const gt = useGT();
   return (
     <Badge variant={enabled ? "success" : "outline"}>
-      {label}: {enabled ? t("On") : t("Off")}
+      {enabled
+        ? gt("{label}: On", { label, $context: "a setting is on" })
+        : gt("{label}: Off", { label, $context: "a setting is off" })}
     </Badge>
   );
 }
 
 function MobileClientRow({ device }: { readonly device: RelayClientDeviceRecord }) {
   const gt = useGT();
+  const m = useMessages();
   return (
     <ClerkUserProfileRow icon={<SmartphoneIcon className="size-4" />}>
       <div className="flex flex-col gap-0.5 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
@@ -48,7 +52,7 @@ function MobileClientRow({ device }: { readonly device: RelayClientDeviceRecord 
           </p>
         </div>
         <p className="shrink-0 text-2xs leading-4 text-muted-foreground/75">
-          {mobileClientUpdatedAtLabel(device.updatedAt)}
+          {mobileClientUpdatedAtLabel(device.updatedAt, m)}
         </p>
       </div>
       <div className="mt-2 flex flex-wrap gap-1.5">
@@ -62,7 +66,7 @@ function MobileClientRow({ device }: { readonly device: RelayClientDeviceRecord 
         />
       </div>
       <p className="mt-1.5 text-xs leading-4.5 text-muted-foreground/80">
-        {mobileClientNotificationDetail(device)}
+        {mobileClientNotificationDetail(device, m)}
       </p>
     </ClerkUserProfileRow>
   );
@@ -103,7 +107,7 @@ function EmptyMobileClients() {
         </EmptyTitle>
         <EmptyDescription>
           <T>
-            Install R3 Code on your phone and sign in to R3 Connect to get push notifications and
+            Install R3 Code on your phone and sign in to T3 Connect to get push notifications and
             Live Activities.
           </T>
         </EmptyDescription>
@@ -113,8 +117,8 @@ function EmptyMobileClients() {
 }
 
 export function MobileClientsUserProfilePage() {
-  const gt = useGT();
   const devicesState = useManagedRelayDevices();
+  const gt = useGT();
   const devices = devicesState.data ?? [];
   const isInitialLoad =
     !devicesState.accountId || (devicesState.data === null && !devicesState.error);

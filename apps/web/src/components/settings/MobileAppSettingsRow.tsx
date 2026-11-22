@@ -1,24 +1,21 @@
+import { msg, T, useGT, useMessages, Var } from "gt-react";
+
 import { AndroidIcon, AppleIcon } from "../Icons";
 import { Button } from "../ui/button";
 import { Popover, PopoverPopup, PopoverTitle, PopoverTrigger } from "../ui/popover";
 import { QRCodeSvg } from "../ui/qr-code";
 import { SettingsRow } from "./settingsLayout";
-import { searchableSetting } from "./settingsSearch";
-import { useGT, T, Var, t } from "gt-react";
+import { useSearchableSetting } from "./settingsSearch";
 
 const stores = [
   {
-    get label() {
-      return t("iPhone and iPad");
-    },
+    label: msg("iPhone and iPad"),
     store: "App Store",
     url: "https://apps.apple.com/us/app/t3-code-remote-claude-more/id6787819824",
     Icon: AppleIcon,
   },
   {
-    get label() {
-      return t("Android");
-    },
+    label: msg("Android"),
     store: "Google Play",
     url: "https://play.google.com/store/apps/details?id=com.t3tools.t3code",
     Icon: AndroidIcon,
@@ -26,7 +23,9 @@ const stores = [
 ];
 
 export function MobileAppSettingsRow() {
+  const searchableSetting = useSearchableSetting();
   const gt = useGT();
+  const m = useMessages();
   return (
     <SettingsRow
       {...searchableSetting("mobile-app")}
@@ -37,7 +36,7 @@ export function MobileAppSettingsRow() {
             <Popover key={store}>
               <PopoverTrigger render={<Button size="sm" variant="outline" />}>
                 <Icon />
-                {label}
+                {m(label)}
               </PopoverTrigger>
               <PopoverPopup align="end">
                 <div className="flex flex-col items-center gap-3">
@@ -51,7 +50,7 @@ export function MobileAppSettingsRow() {
                       size={128}
                       level="M"
                       marginSize={1}
-                      title={`${store} link`}
+                      title={gt("{store} link", { store })}
                     />
                   </div>
                   <Button

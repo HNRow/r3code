@@ -1,11 +1,12 @@
 import { RefreshIcon } from "~/components/ui/refresh-icon";
+import { T, useGT, Var } from "gt-react";
 import { PlusIcon, SearchIcon } from "lucide-react";
 
 import { openCommandPalette } from "../../commandPaletteBus";
 import { Button } from "../ui/button";
 import { PullRequestListGhost } from "./PullRequestGhosts";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "../ui/empty";
-import { T, Var, t } from "gt-react";
+import { t } from "gt-react";
 
 function BranchMark({ joined }: { joined: boolean }) {
   return (
@@ -69,6 +70,8 @@ export function PullRequestListEmptyState({
   onLoadMore: () => void;
   onRefresh: () => void;
 }) {
+  const gt = useGT();
+  const shownQuery = query.length > 48 ? `${query.slice(0, 48)}…` : query;
   if (!hasProjects) {
     return (
       <Empty>
@@ -83,10 +86,8 @@ export function PullRequestListEmptyState({
         </EmptyHeader>
         <EmptyContent>
           <Button size="sm" onClick={() => openCommandPalette({ open: "add-project" })}>
-            <T>
-              <PlusIcon className="size-3.5" />
-              Add project
-            </T>
+            <PlusIcon className="size-3.5" />
+            <T>Add project</T>
           </Button>
         </EmptyContent>
       </Empty>
@@ -97,7 +98,7 @@ export function PullRequestListEmptyState({
     return (
       <PullRequestListGhost
         rows={5}
-        caption={t`Searching every host for “${query.length > 48 ? `${query.slice(0, 48)}…` : query}”`}
+        caption={gt("Searching every host for “{query}”", { query: shownQuery })}
       />
     );
   }
@@ -109,7 +110,7 @@ export function PullRequestListEmptyState({
         <EmptyHeader>
           <EmptyTitle>
             <T>
-              Nothing matches “<Var>{query.length > 48 ? `${query.slice(0, 48)}…` : query}</Var>”
+              Nothing matches “<Var>{shownQuery}</Var>”
             </T>
           </EmptyTitle>
           <EmptyDescription>
@@ -121,14 +122,12 @@ export function PullRequestListEmptyState({
         </EmptyHeader>
         <div className="flex flex-wrap justify-center gap-2">
           <Button size="sm" variant="outline" onClick={onClearQuery}>
-            <T>
-              <SearchIcon className="size-3.5" />
-              Clear search
-            </T>
+            <SearchIcon className="size-3.5" />
+            <T>Clear search</T>
           </Button>
           <Button size="sm" variant="outline" disabled={refreshing} onClick={onRefresh}>
             <RefreshIcon size="sm" refreshing={refreshing} />
-            {refreshing ? <T>Checking...</T> : <T>Check again</T>}
+            {refreshing ? gt("Checking...") : gt("Check again")}
           </Button>
         </div>
       </Empty>
@@ -140,25 +139,23 @@ export function PullRequestListEmptyState({
       <BranchMark joined={false} />
       <EmptyHeader>
         <EmptyTitle>
-          {filtered ? <T>Nothing under these filters</T> : <T>No pull requests</T>}
+          {filtered ? gt("Nothing under these filters") : gt("No pull requests")}
         </EmptyTitle>
         <EmptyDescription>
-          {filtered ? (
-            <T>Widen the state, involvement or project filter to see more.</T>
-          ) : (
-            <T>Pull requests from every project in this workspace appear here.</T>
-          )}
+          {filtered
+            ? gt("Widen the state, involvement or project filter to see more.")
+            : gt("Pull requests from every project in this workspace appear here.")}
         </EmptyDescription>
       </EmptyHeader>
       <div className="flex flex-wrap justify-center gap-2">
         {canLoadMore ? (
           <Button size="sm" variant="outline" disabled={loadingMore} onClick={onLoadMore}>
-            {loadingMore ? t("Loading...") : t("Load more pull requests")}
+            {loadingMore ? gt("Loading...") : gt("Load more pull requests")}
           </Button>
         ) : null}
         <Button size="sm" variant="outline" disabled={refreshing} onClick={onRefresh}>
           <RefreshIcon size="sm" refreshing={refreshing} />
-          {refreshing ? t("Checking...") : t("Check again")}
+          {refreshing ? gt("Checking...") : gt("Check again")}
         </Button>
       </div>
     </Empty>

@@ -1,4 +1,5 @@
 import { useAtomValue } from "@effect/atom-react";
+import { useGT } from "gt-react";
 import * as Schema from "effect/Schema";
 import {
   useEffect,
@@ -66,7 +67,7 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
 import { appAtomRegistry } from "../rpc/atomRegistry";
 import { registerCommands, registerMenuAction } from "../shortcuts/dispatcher";
 import { resolveThreadRouteRef } from "../threadRoutes";
-import { useGT, Var, T } from "gt-react";
+import { Var, T } from "gt-react";
 
 const MACOS_TRAFFIC_LIGHTS_LEFT_INSET = "var(--desktop-window-controls-inset, 90px)";
 
@@ -407,9 +408,9 @@ function SidebarControl({ showSidebar }: { readonly showSidebar: boolean }) {
             }
           />
           <TooltipPopup side="bottom">
-            <T>
-              Toggle main sidebar<Var>{shortcutLabel ? ` (${shortcutLabel})` : ""}</Var>
-            </T>
+            {shortcutLabel
+              ? gt("Toggle main sidebar ({shortcut})", { shortcut: shortcutLabel })
+              : gt("Toggle main sidebar")}
           </TooltipPopup>
         </Tooltip>
       ) : null}
@@ -425,7 +426,7 @@ export function AppSidebarLayout({
   showSidebar?: boolean;
 }) {
   const gt = useGT();
-  const sidebarArea = workspaceAreaProps("sidebar", 0, "Threads");
+  const sidebarArea = workspaceAreaProps("sidebar", 0, gt("Threads"));
   const [sidebarRouteReveal] = useState<SidebarRouteReveal>(() => ({
     observedKey: null,
     pendingKey: null,

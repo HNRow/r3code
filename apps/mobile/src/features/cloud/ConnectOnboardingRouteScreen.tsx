@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import { AppBar } from "../../components/ui/AppBar";
 import { Button } from "../../components/ui/Button";
 import { ScreenScrollView as ScrollView } from "../../components/ui/ScreenScrollView";
@@ -17,7 +18,7 @@ import { splitEnvironmentSections } from "../connection/environmentSections";
 import { useConnectionController } from "../connection/useConnectionController";
 import { optOutOfConnectOnboarding } from "./connectOnboardingOptOut";
 import { hasCloudPublicConfig } from "./publicConfig";
-import { useGT, T } from "gt-react-native";
+import { T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 // Only reachable with cloud config: onboarding is requested after a R3 Connect
@@ -63,10 +64,10 @@ function ConfiguredConnectOnboardingRouteScreen() {
   return (
     <View collapsable={false} className="flex-1 bg-sheet">
       <AppBar
-        title={gt("Set up R3 Connect")}
+        title={gt("Set up {product}", { product: "T3 Connect" })}
         onClose={handleClose}
         refresh={{
-          accessibilityLabel: t("Refresh environments"),
+          accessibilityLabel: gt("Refresh environments"),
           disabled: isRefreshing,
           onPress: handleRefresh,
         }}
@@ -95,7 +96,7 @@ function ConfiguredConnectOnboardingRouteScreen() {
         ) : (
           <View collapsable={false} className="rounded-[24px] bg-grouped-card p-5">
             <Text className="text-sm leading-normal text-foreground-muted">
-              <T>Sign in to your T3 account to set up R3 Connect.</T>
+              {gt("Sign in to your T3 account to set up {product}.", { product: "T3 Connect" })}
             </Text>
           </View>
         )}

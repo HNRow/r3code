@@ -16,10 +16,6 @@ import { SettingsScreen } from "./components/SettingsScreen";
 
 /** General's row that opens the language picker, showing the current choice. */
 export function LanguageSettingsSection() {
-  return <LanguageRow />;
-}
-
-function LanguageRow() {
   const gt = useGT();
   const language = useLanguagePreference();
   return (
@@ -37,10 +33,6 @@ function LanguageRow() {
 }
 
 export function SettingsLanguageRouteScreen() {
-  return <LanguageSettings />;
-}
-
-function LanguageSettings() {
   const gt = useGT();
   const insets = useSafeAreaInsets();
   const preferencesResult = useAtomValue(mobilePreferencesAtom);

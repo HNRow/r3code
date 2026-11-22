@@ -1,4 +1,5 @@
 import type { EnvironmentId, SecretReference, UnifiedSettings } from "@t3tools/contracts";
+import { T, useGT, Var } from "gt-react";
 import { useId, useState } from "react";
 
 import { useUpdateEnvironmentSettings } from "../../hooks/useSettings";
@@ -16,7 +17,6 @@ import { Input } from "../ui/input";
 import { sourceIdFromUrl } from "./AddUsageLimitSourceDialog.logic";
 import { SecretSourceInput, useSecretSources } from "./SecretSourceInput";
 import { Label } from "../ui/label";
-import { T, Var, useGT } from "gt-react";
 
 /** Send the management key once to server secret storage; settings retain only a redaction marker. */
 export function AddUsageLimitSourceDialog({
@@ -84,7 +84,7 @@ export function AddUsageLimitSourceDialog({
           </DialogTitle>
           <DialogDescription>
             <T>
-              Show the quota of every account the hub pools, next to the providers on<Var> </Var>
+              Show the quota of every account the hub pools, next to the providers on{" "}
               <Var>{environmentLabel}</Var>. The key stays on that server.
             </T>
           </DialogDescription>

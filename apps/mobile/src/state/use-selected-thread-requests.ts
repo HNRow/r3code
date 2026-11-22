@@ -1,4 +1,6 @@
 import * as Dialog from "../components/ui/Dialog";
+import { msg } from "gt-react-native";
+import { m } from "../i18n/messages";
 import { useServerConfigs } from "./entities";
 import {
   questionAttachmentDraftKey,
@@ -393,8 +395,8 @@ export function useSelectedThreadRequests() {
         )
       ) {
         Dialog.alert(
-          t("Attachments are not ready"),
-          t("Wait for uploads to finish, or retry failed uploads."),
+          m(msg("Attachments are not ready")),
+          m(msg("Wait for uploads to finish, or retry failed uploads.")),
         );
         return;
       }

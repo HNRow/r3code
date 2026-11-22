@@ -1,35 +1,12 @@
+import { msg } from "gt-react";
 import type { UsageModelPriceOverride } from "@t3tools/contracts";
 import { t } from "gt-react";
 
 export const USAGE_PRICE_FIELDS = [
-  {
-    key: "inputCostPerMillionTokens",
-    get label() {
-      return t("Input");
-    },
-    optional: false,
-  },
-  {
-    key: "outputCostPerMillionTokens",
-    get label() {
-      return t("Output");
-    },
-    optional: false,
-  },
-  {
-    key: "cacheReadCostPerMillionTokens",
-    get label() {
-      return t("Cache read");
-    },
-    optional: true,
-  },
-  {
-    key: "cacheWriteCostPerMillionTokens",
-    get label() {
-      return t("Cache write");
-    },
-    optional: true,
-  },
+  { key: "inputCostPerMillionTokens", label: msg("Input"), optional: false },
+  { key: "outputCostPerMillionTokens", label: msg("Output"), optional: false },
+  { key: "cacheReadCostPerMillionTokens", label: msg("Cache read"), optional: true },
+  { key: "cacheWriteCostPerMillionTokens", label: msg("Cache write"), optional: true },
 ] as const;
 
 export type UsagePriceForm = { model: string } & Record<

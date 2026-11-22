@@ -1,4 +1,5 @@
 import type { SnapShotSource } from "@t3tools/contracts";
+import { T, useGT } from "gt-react";
 import { CheckIcon, CopyIcon, ImageIcon, TextIcon } from "lucide-react";
 import { Suspense, useRef, useState } from "react";
 
@@ -13,7 +14,7 @@ import {
   showAnchoredCopyErrorToast,
 } from "../ui/anchoredCopyToast";
 import { HighlightedTokens } from "./HighlightedTokens";
-import { useGT, T, t } from "gt-react";
+import { t } from "gt-react";
 
 export const SNAP_SHOT_ATTACHMENT_FRAME_CLASS =
   "relative h-28 w-52 max-w-full overflow-hidden rounded-lg border border-border/80";
@@ -138,10 +139,11 @@ export function SnapShotContentsButton({
   side?: "top" | "right" | "bottom" | "left";
   onCopySnapshot?: (() => Promise<void>) | undefined;
 }) {
+  const gt = useGT();
   const includesAccessibility = snapShotIncludesAccessibility(source);
   const ContentsIcon = includesAccessibility ? TextIcon : ImageIcon;
   const accessibilityDetails = snapShotAccessibilityDetails(source);
-  const tooltip = includesAccessibility ? "Accessibility data" : "No accessibility data";
+  const tooltip = includesAccessibility ? gt("Accessibility data") : gt("No accessibility data");
 
   return (
     <Popover>
@@ -152,7 +154,9 @@ export function SnapShotContentsButton({
               render={
                 <Button
                   aria-label={
-                    includesAccessibility ? "View accessibility data" : "No accessibility data"
+                    includesAccessibility
+                      ? gt("View accessibility data")
+                      : gt("No accessibility data")
                   }
                   className={className}
                   onClick={(event) => event.stopPropagation()}
@@ -211,6 +215,7 @@ export function SnapShotAttachmentDetails({
   onCopySnapshot?: (() => Promise<void>) | undefined;
   className?: string;
 }) {
+  const gt = useGT();
   return (
     <div
       className={cn(
@@ -235,7 +240,7 @@ export function SnapShotAttachmentDetails({
           />
         </div>
         <div className="truncate text-3xs leading-3.5 text-white/70">
-          {source.windowTitle || t("Captured window")}
+          {source.windowTitle || gt("Captured window")}
         </div>
       </div>
     </div>

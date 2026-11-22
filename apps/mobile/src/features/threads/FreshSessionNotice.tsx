@@ -1,8 +1,8 @@
+import { useGT } from "gt-react-native";
 import { View } from "react-native";
 
 import { Notice } from "../../components/ui/Notice";
 import { setFreshSessionPending, useComposerDraftSettings } from "../../state/use-composer-drafts";
-import { useGT } from "gt-react-native";
 
 /** Shown while `/clear` is armed; dismissing it keeps the current session. */
 export function FreshSessionNotice(props: { readonly threadKey: string }) {

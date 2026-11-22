@@ -1,4 +1,5 @@
 import type { IssueListEntry } from "@t3tools/contracts";
+import { T, useGT, useMessages, Var } from "gt-react";
 import { ExternalLinkIcon } from "lucide-react";
 
 import { cn } from "~/lib/utils";
@@ -13,11 +14,11 @@ import {
   PullRequestMetaLine,
 } from "../pullRequest/pullRequestPresentation";
 import { IssueStateGlyph, issueTrackerPresentation } from "./issuePresentation";
-import { useGT, Var, T } from "gt-react";
 
 /** The issue panel while its detail loads, showing what the list row already knows. */
 export function IssueDetailGhost({ seed }: { seed?: IssueListEntry | null }) {
   const gt = useGT();
+  const messages = useMessages();
   const tracker = seed ? issueTrackerPresentation(seed.tracker) : null;
   return (
     <div
@@ -42,7 +43,7 @@ export function IssueDetailGhost({ seed }: { seed?: IssueListEntry | null }) {
             <Button
               size="icon-xs"
               variant="ghost"
-              aria-label={`Open on ${tracker.providerName}`}
+              aria-label={gt("Open on {provider}", { provider: tracker.providerName })}
               render={<a href={seed.url} target="_blank" rel="noopener noreferrer" />}
             >
               <ExternalLinkIcon aria-hidden className="size-3.5" />
@@ -54,13 +55,13 @@ export function IssueDetailGhost({ seed }: { seed?: IssueListEntry | null }) {
             <PullRequestActorLabel actor={seed.author} />
             <span>
               <T>
-                opened <Var>{formatRelativeTimeLabel(seed.createdAt)}</Var>
+                opened <Var>{formatRelativeTimeLabel(seed.createdAt, undefined, messages)}</Var>
               </T>
             </span>
             {seed.closedAt ? (
               <span>
                 <T>
-                  closed <Var>{formatRelativeTimeLabel(seed.closedAt)}</Var>
+                  closed <Var>{formatRelativeTimeLabel(seed.closedAt, undefined, messages)}</Var>
                 </T>
               </span>
             ) : null}
@@ -72,7 +73,7 @@ export function IssueDetailGhost({ seed }: { seed?: IssueListEntry | null }) {
             </span>
             {seed.labels.length === 0 ? (
               <span>
-                <T>none</T>
+                <T context="no labels">none</T>
               </span>
             ) : null}
             {seed.labels.map((label) => (
@@ -85,7 +86,7 @@ export function IssueDetailGhost({ seed }: { seed?: IssueListEntry | null }) {
             </span>
             {seed.assignees.length === 0 ? (
               <span>
-                <T>none</T>
+                <T context="no assignees">none</T>
               </span>
             ) : null}
             {seed.assignees.map((actor) => (

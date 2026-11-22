@@ -36,7 +36,7 @@ const devClientPath = Effect.gen(function* () {
     yield* HostProcess.HomeDirectory,
     ".cache/t3code/native-clients/artifacts/ios/development",
     fingerprint,
-    "T3CodeDev.app",
+    "R3CodeDev.app",
   );
 });
 

@@ -1,4 +1,5 @@
 import type { DesktopPreviewColorScheme } from "@t3tools/contracts";
+import { msg, T, useGT, useMessages, Var } from "gt-react";
 import { Minus, MoreVertical, Plus as PlusIcon, RotateCcw } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
@@ -18,30 +19,15 @@ import {
   MenuTrigger,
 } from "~/components/ui/menu";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "~/components/ui/tooltip";
-import { useGT, T, Var, t } from "gt-react";
+import { t } from "gt-react";
 
 const COLOR_SCHEME_OPTIONS: ReadonlyArray<{
   value: DesktopPreviewColorScheme;
   label: string;
 }> = [
-  {
-    value: "system",
-    get label() {
-      return t("System");
-    },
-  },
-  {
-    value: "light",
-    get label() {
-      return t("Light");
-    },
-  },
-  {
-    value: "dark",
-    get label() {
-      return t("Dark");
-    },
-  },
+  { value: "system", label: msg("System", { $context: "color scheme" }) },
+  { value: "light", label: msg("Light", { $context: "color scheme" }) },
+  { value: "dark", label: msg("Dark", { $context: "color scheme" }) },
 ];
 
 export interface PreviewMoreMenuActions {
@@ -91,7 +77,7 @@ const MenuTriggerButton = () => {
         <MoreVertical />
       </TooltipTrigger>
       <TooltipPopup>
-        <T>More</T>
+        <T context="more actions menu">More</T>
       </TooltipPopup>
     </Tooltip>
   );
@@ -110,6 +96,7 @@ export function PreviewMoreMenu({
   move,
 }: Props) {
   const gt = useGT();
+  const m = useMessages();
   const zoomLabel = `${Math.round(zoomFactor * 100)}%`;
   const disabled = !enabled;
   return (
@@ -118,12 +105,8 @@ export function PreviewMoreMenu({
       <MenuPopup align="end" sideOffset={6}>
         {actions.find ? (
           <MenuItem onClick={actions.find} disabled={disabled}>
-            <T>
-              Find on page
-              <Var>
-                {findShortcutLabel ? <MenuShortcut>{findShortcutLabel}</MenuShortcut> : null}
-              </Var>
-            </T>
+            <T>Find on page</T>
+            {findShortcutLabel ? <MenuShortcut>{findShortcutLabel}</MenuShortcut> : null}
           </MenuItem>
         ) : null}
         <MenuItem onClick={actions.hardReload} disabled={disabled}>
@@ -137,13 +120,13 @@ export function PreviewMoreMenu({
         {actions.toggleNativePictureInPicture ? (
           <MenuItem onClick={actions.toggleNativePictureInPicture} disabled={disabled}>
             {nativePictureInPicture
-              ? t("Close separate preview window")
-              : t("Open separate preview window")}
+              ? gt("Close separate preview window")
+              : gt("Open separate preview window")}
           </MenuItem>
         ) : null}
         {move ? <MenuItem onClick={move.onMove}>{move.label}</MenuItem> : null}
         <MenuItem onClick={onToggleDeviceToolbar} disabled={disabled}>
-          {deviceToolbarVisible ? t("Hide device toolbar") : t("Show device toolbar")}
+          {deviceToolbarVisible ? gt("Hide device toolbar") : gt("Show device toolbar")}
         </MenuItem>
         <MenuSub>
           <MenuSubTrigger disabled={disabled}>
@@ -156,7 +139,7 @@ export function PreviewMoreMenu({
             >
               {COLOR_SCHEME_OPTIONS.map((option) => (
                 <MenuRadioItem key={option.value} value={option.value}>
-                  {option.label}
+                  {m(option.label)}
                 </MenuRadioItem>
               ))}
             </MenuRadioGroup>

@@ -1,3 +1,4 @@
+import { msg, T, useGT, useMessages } from "gt-react-native";
 import { ScreenScrollView as ScrollView } from "../../components/ui/ScreenScrollView";
 import { useAtomValue } from "@effect/atom-react";
 import { AsyncResult } from "effect/reactivity";
@@ -14,7 +15,6 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { ListChoiceRow as SettingsChoiceRow } from "../../components/ui/ListChoiceRow";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { SettingsSection } from "./components/SettingsSection";
-import { useGT, T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 const SEND_MODIFIER = Platform.OS === "android" ? "Ctrl" : "Command";
@@ -26,29 +26,25 @@ const ENTER_BEHAVIOR_OPTIONS: ReadonlyArray<{
 }> = [
   {
     behavior: "send",
-    get label() {
-      return t("Send message");
-    },
-    get description() {
-      return t("Return sends the message. Shift-Return inserts a new line.");
-    },
+    label: msg("Send message"),
+    description: msg("{returnKey} sends the message. {shiftReturn} inserts a new line.", {
+      returnKey: "Return",
+      shiftReturn: "Shift-Return",
+    }),
   },
   {
     behavior: "newline",
-    get label() {
-      return t("Insert new line");
-    },
-    // The modifier is part of the sentence, so each platform gets its own catalog entry.
-    get description() {
-      return SEND_MODIFIER === "Ctrl"
-        ? t("Return inserts a new line. Ctrl-Return sends the message.")
-        : t("Return inserts a new line. Command-Return sends the message.");
-    },
+    label: msg("Insert new line"),
+    description: msg("{returnKey} inserts a new line. {sendKeys} sends the message.", {
+      returnKey: "Return",
+      sendKeys: `${SEND_MODIFIER}-Return`,
+    }),
   },
 ];
 
 export function SettingsKeyboardRouteScreen() {
   const gt = useGT();
+  const m = useMessages();
   const insets = useSafeAreaInsets();
   const preferencesResult = useAtomValue(mobilePreferencesAtom);
   const savePreferences = useAtomCommand(saveMobilePreferences);
@@ -70,8 +66,8 @@ export function SettingsKeyboardRouteScreen() {
           {ENTER_BEHAVIOR_OPTIONS.map((option, index) => (
             <SettingsChoiceRow
               key={option.behavior}
-              label={option.label}
-              description={option.description}
+              label={m(option.label)}
+              description={m(option.description)}
               selected={selectedBehavior === option.behavior}
               separated={index > 0}
               disabled={!preferencesReady}

@@ -2,6 +2,7 @@ import { sourceControlClients } from "@t3tools/client-runtime/source-control-cli
 import { parsePatchFiles } from "@pierre/diffs/utils/parsePatchFiles";
 import type { FileDiffMetadata } from "@pierre/diffs";
 import { StackActions, useNavigation, type StaticScreenProps } from "@react-navigation/native";
+import { msg, T, useGT, useMessages } from "gt-react-native";
 import { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import { AppBar } from "../../../components/ui/AppBar";
@@ -29,7 +30,6 @@ import { composerPullRequests } from "../../../state/pull-requests";
 import { usePullRequestPermissions } from "../usePullRequestPermissions";
 import { pullRequestTarget } from "../usePullRequestDiff";
 import { useReviewGuide } from "./useReviewGuide";
-import { T } from "gt-react-native";
 import { t } from "../../../i18n/gt";
 
 export type GuideStopParams = PullRequestParams & {
@@ -39,11 +39,11 @@ export type GuideStopParams = PullRequestParams & {
 };
 
 const attentionLabels = {
-  tradeoff: "A tradeoff to weigh",
-  contract: "A contract to check",
-  product: "A product call",
-  risk: "A risk to judge",
-  accessibility: "An accessibility call",
+  tradeoff: msg("A tradeoff to weigh"),
+  contract: msg("A contract to check"),
+  product: msg("A product call"),
+  risk: msg("A risk to judge"),
+  accessibility: msg("An accessibility call"),
 };
 
 export function PullRequestGuideContent({
@@ -100,6 +100,8 @@ export function PullRequestGuideContent({
 
 export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideStopParams>) {
   const navigation = useNavigation();
+  const gt = useGT();
+  const m = useMessages();
   const state = useReviewGuide(route.params);
   const detail = useEnvironmentQuery(composerPullRequests.detail(pullRequestTarget(route.params)));
   const permissions = usePullRequestPermissions(route.params, detail.data);
@@ -133,16 +135,19 @@ export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideSto
   return (
     <View className="flex-1 bg-screen">
       <AppBar
-        title={t`Stop ${route.params.position + 1} of ${guide?.stops.length ?? "…"}`}
+        title={gt("Stop {position} of {total}", {
+          position: route.params.position + 1,
+          total: guide?.stops.length ?? "…",
+        })}
         onBack={() => navigation.goBack()}
         menus={[
           {
-            title: t("Guide options"),
+            title: gt("Guide options"),
             icon: "ellipsis",
             items: [
               {
                 id: "word-wrap",
-                title: t("Word wrap"),
+                title: gt("Word wrap"),
                 icon: "text.alignleft",
                 selected: appearance.codeWordBreak,
                 onPress: () => setCodeWordBreak(!appearance.codeWordBreak),
@@ -166,7 +171,7 @@ export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideSto
                 <T>This guide was rewritten. Go back to start the new tour.</T>
               </Text>
             ) : !stop ? (
-              <Text>{state.error ?? t("Loading stop…")}</Text>
+              <Text>{state.error ?? gt("Loading stop…")}</Text>
             ) : (
               <>
                 <GuideNotice state={state} />
@@ -177,7 +182,7 @@ export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideSto
                     <View className="flex-row items-center gap-2">
                       <SymbolView name="eye" size={17} tintColorClassName="accent-icon-muted" />
                       <Text className="text-sm font-t3-semibold">
-                        {attentionLabels[stop.attention.kind]}
+                        {m(attentionLabels[stop.attention.kind])}
                       </Text>
                     </View>
                     <PullRequestMarkdown lineBreaks={false} markdown={stop.attention.note} />
@@ -261,10 +266,10 @@ export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideSto
                   accessibilityRole="button"
                   accessibilityLabel={
                     guide && position < guide.stops.length - 1
-                      ? "Next stop"
+                      ? gt("Next stop")
                       : canReview
-                        ? "Finish review"
-                        : "Finish tour"
+                        ? gt("Finish review")
+                        : gt("Finish tour")
                   }
                   className="mt-2 flex-row items-center gap-4 border-t border-border-subtle pt-5 pb-2 active:opacity-60"
                   onPress={() =>
@@ -286,15 +291,18 @@ export function PullRequestGuideStopScreen({ route }: StaticScreenProps<GuideSto
                   <View className="min-w-0 flex-1 gap-1">
                     <Text className="text-xs text-foreground-muted">
                       {guide && position < guide.stops.length - 1
-                        ? `Next · ${position + 2} of ${guide.stops.length}`
-                        : t("End of guide")}
+                        ? gt("Next · {position} of {total}", {
+                            position: position + 2,
+                            total: guide.stops.length,
+                          })
+                        : gt("End of guide")}
                     </Text>
                     <Text className="text-base font-t3-semibold">
                       {guide && position < guide.stops.length - 1
                         ? guide.stops[position + 1]?.title
                         : canReview
-                          ? t("Finish review")
-                          : t("Finish tour")}
+                          ? gt("Finish review")
+                          : gt("Finish tour")}
                     </Text>
                   </View>
                   <View className="h-11 w-11 items-center justify-center rounded-full bg-foreground">

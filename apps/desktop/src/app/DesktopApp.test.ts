@@ -74,6 +74,7 @@ import * as ElectronWindow from "../electron/ElectronWindow.ts";
 import * as MacPermissions from "../permissions/MacPermissions.ts";
 import * as LoopbackTunnel from "../preview/LoopbackTunnel.ts";
 import * as PreviewManager from "../preview/Manager.ts";
+import * as AppleSpeech from "../speech/AppleSpeech.ts";
 
 interface StubbedDesktop {
   readonly localEnvironmentEnabled: boolean;
@@ -233,6 +234,7 @@ const runStubbedDesktop = (stub: StubbedDesktop) =>
           Layer.mock(ElectronTheme.ElectronTheme, {}),
           Layer.mock(ElectronWindow.ElectronWindow, {}),
           Layer.mock(MacPermissions.MacPermissions, {}),
+          Layer.mock(AppleSpeech.AppleSpeech, {}),
           Layer.mock(LoopbackTunnel.LoopbackTunnel, {}),
           Layer.mock(PreviewManager.PreviewManager, {
             isBrowserPartition: () => {
@@ -340,8 +342,8 @@ it.effect(
         baseDir,
         platform: "linux",
       } as DesktopEnvironment.DesktopEnvironment["Service"]);
-      const removedAppImage = path.join(baseDir, "T3-Code-0.1.6-x86_64.AppImage");
-      const updatedAppImage = path.join(baseDir, "T3-Code-0.1.7-x86_64.AppImage");
+      const removedAppImage = path.join(baseDir, "R3-Code-0.1.6-x86_64.AppImage");
+      const updatedAppImage = path.join(baseDir, "R3-Code-0.1.7-x86_64.AppImage");
       yield* fs.makeDirectory(path.dirname(launcher), { recursive: true });
       yield* fs.writeFileString(
         launcher,

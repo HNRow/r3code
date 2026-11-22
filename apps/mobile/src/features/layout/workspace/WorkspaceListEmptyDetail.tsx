@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import { Platform } from "react-native";
 
 import { AppBar } from "../../../components/ui/AppBar";
@@ -5,7 +6,6 @@ import { Toolbar } from "../../../components/ui/Toolbar";
 import { NativeStackScreenOptions } from "../../../native/StackHeader";
 import { useWorkspacePaneState } from "../adaptive-workspace-context";
 import { WorkspaceEmptyDetail } from "../WorkspaceEmptyDetail";
-import { useGT } from "gt-react-native";
 
 /**
  * The thread list's route in split view, where the list is the sidebar beside it: an empty
@@ -37,7 +37,7 @@ export function WorkspaceListEmptyDetail(props: {
           onPress={props.onStartNewTask}
         />
       </Toolbar>
-      <AppBar embedded title={gt("Threads")} />
+      <AppBar embedded title={gt("Threads", { $context: "screen title, list of chat threads" })} />
       <WorkspaceEmptyDetail
         onAddConnection={
           Platform.OS === "android" && !props.hasConnections ? props.onAddConnection : undefined

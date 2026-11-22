@@ -1,4 +1,5 @@
 import { LegendList, type LegendListRef } from "@legendapp/list/react-native";
+import { T, useGT } from "gt-react-native";
 import { settlePromise } from "@t3tools/client-runtime/state/runtime";
 import { useAtomValue } from "@effect/atom-react";
 import { AsyncResult } from "effect/reactivity";
@@ -44,7 +45,6 @@ import {
   selectableSourceHtml,
 } from "./source-file-document";
 import { sourceHighlightAtom } from "./sourceHighlightingState";
-import { T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 interface SourceFileSurfaceProps {
@@ -69,6 +69,7 @@ const HighlightedSourceLine = function HighlightedSourceLine(props: {
   readonly wordBreak: boolean;
   readonly onLongPress?: () => void;
 }) {
+  const gt = useGT();
   const selectable = props.onLongPress === undefined;
   const row = (
     <View
@@ -141,7 +142,7 @@ const HighlightedSourceLine = function HighlightedSourceLine(props: {
   return onLongPress ? (
     <Pressable
       onLongPress={onLongPress}
-      accessibilityActions={[{ name: "longpress", label: t("Select text") }]}
+      accessibilityActions={[{ name: "longpress", label: gt("Select text") }]}
       onAccessibilityAction={(event) => {
         if (event.nativeEvent.actionName === "longpress") onLongPress();
       }}

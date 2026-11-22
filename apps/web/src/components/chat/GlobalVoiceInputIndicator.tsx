@@ -1,3 +1,4 @@
+import { useGT } from "gt-react";
 import { useVoiceTranscriptionDestination } from "../../speech/useEnvironmentSpeechInput";
 import {
   useRetainedVoiceInputSession,
@@ -14,8 +15,8 @@ import { t } from "gt-react";
  * records into is off screen, shows it so it can be finished, cancelled, or returned to.
  */
 export function GlobalVoiceInputIndicator({ hidden = false }: { hidden?: boolean }) {
-  const { prepared, grantId, cloudProvider, cloudModel } = useVoiceTranscriptionDestination();
-  const session = useRetainedVoiceInputSession({ prepared, grantId, cloudProvider, cloudModel });
+  const gt = useGT();
+  const session = useRetainedVoiceInputSession(useVoiceTranscriptionDestination());
   const { state, target, recordingStartedAt } = useVoiceInputSessionSnapshot(session);
   const presented = useVoiceOwnerPresented(target?.ownerKey ?? null);
   const { level } = useVoiceInputSessionActivity(
@@ -35,7 +36,7 @@ export function GlobalVoiceInputIndicator({ hidden = false }: { hidden?: boolean
           onClick={() => target.open?.()}
           className="min-w-0 shrink"
         >
-          <span className="truncate">{target.label ?? t("Untitled thread")}</span>
+          <span className="truncate">{target.label ?? gt("Untitled thread")}</span>
         </Button>
         <ComposerSpeechRecordingPill
           state={state}

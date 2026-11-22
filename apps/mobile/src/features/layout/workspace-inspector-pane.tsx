@@ -1,3 +1,4 @@
+import { useGT } from "gt-react-native";
 import { useEffect, useRef, useState } from "react";
 import Animated, {
   cubicBezier,
@@ -14,7 +15,6 @@ import { WORKSPACE_PANE_TIMING } from "./workspace-pane-animation";
 import { WorkspacePaneDivider } from "./workspace-pane-divider";
 import { InspectorPanes } from "./inspector-host";
 import type { InspectorContent } from "./inspector-panes";
-import { useGT } from "gt-react-native";
 
 // CSS form of WORKSPACE_PANE_TIMING's Easing.inOut(Easing.cubic).
 const PANE_EASING = cubicBezier(0.65, 0, 0.35, 1);
