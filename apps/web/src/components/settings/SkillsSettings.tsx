@@ -241,7 +241,9 @@ function InstallSkillDialog(props: {
                 }}
               >
                 <SelectTrigger aria-label={gt("Scope")}>
-                  <SelectValue />
+                  <SelectValue>
+                    {(value: string) => (value === "project" ? gt("Project") : gt("User"))}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectPopup>
                   <SelectItem value="user">{gt("User")}</SelectItem>

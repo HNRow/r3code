@@ -89,7 +89,7 @@ export function WorktreesDirectoryRow() {
           aria-label={gt("Worktree location")}
           autoCapitalize="none"
           spellCheck={false}
-          placeholder={mixed ? "Mixed" : "Default"}
+          placeholder={mixed ? gt("Mixed") : gt("Default")}
           defaultValue={mixed ? "" : settings.worktreesDirectory}
           onFocus={(event) => {
             draft.current = event.target.value;
@@ -269,6 +269,23 @@ const KEEP_WHEN_LABELS = {
   "tracked-changes": "Edited tracked files",
 } as const;
 
+function cleanupCountsLabel(report: StorageCleanupReport): string {
+  const { removed, kept, failed } = report.counts;
+  if (failed > 0) {
+    return t("{removed} removed, {kept} kept, {failed} failed", { removed, kept, failed });
+  }
+  return t("{removed} removed, {kept} kept", { removed, kept });
+}
+
+function cleanupRunDescription(report: StorageCleanupReport, nowMs: number): string {
+  const summary = t("Last run {when}. {size} recovered.", {
+    when: formatRelativeTimeLabel(report.finishedAt, nowMs),
+    size: formatBytes(report.bytesFreed),
+  });
+  if (report.counts.failed === 0) return summary;
+  return `${summary} ${t("{count} items couldn't be removed.", { count: report.counts.failed })}`;
+}
+
 function lastRunSummary(
   entries: readonly { readonly label: string; readonly counts: string }[],
   machineCount: number,
@@ -277,7 +294,7 @@ function lastRunSummary(
   if (!first) return "";
   if (machineCount <= 1) return first.counts;
   if (entries.length === machineCount && entries.every((entry) => entry.counts === first.counts)) {
-    return `${first.counts} on every machine`;
+    return t("{counts} on every machine", { counts: first.counts });
   }
   return entries.map((entry) => `${entry.label}: ${entry.counts}`).join(" · ");
 }
@@ -437,16 +454,14 @@ function CleanupSection() {
       environment,
       report,
       label: settingsScopeEnvironmentLabel(environment, connectedEnvironments),
-      counts: report
-        ? `${report.counts.removed} removed, ${report.counts.kept} kept${report.counts.failed > 0 ? `, ${report.counts.failed} failed` : ""}`
-        : "",
+      counts: report ? cleanupCountsLabel(report) : "",
       description: report
-        ? `Last run ${formatRelativeTimeLabel(report.finishedAt, nowMs)}. ${formatBytes(report.bytesFreed)} recovered.${report.counts.failed > 0 ? ` ${report.counts.failed} ${report.counts.failed === 1 ? "item" : "items"} couldn't be removed.` : ""}`
+        ? cleanupRunDescription(report, nowMs)
         : query?.failed
-          ? "Could not load the last run."
+          ? t("Could not load the last run.")
           : query?.loading
-            ? "Loading last run…"
-            : "Cleanup hasn't run yet.",
+            ? t("Loading last run…")
+            : t("Cleanup hasn't run yet."),
     };
   });
   const deleteNow = async () => {

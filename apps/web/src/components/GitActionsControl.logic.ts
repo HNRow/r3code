@@ -486,10 +486,20 @@ export function resolveFeatureBranchUnavailableReason(input: {
   hasWorkingTreeChanges: boolean;
 }): string | null {
   if (!input.hasWorkingTreeChanges) {
-    return `There are no changes to commit, so a feature branch can't be named. Create a branch yourself or continue on ${input.branchName}.`;
+    return fill(
+      t(
+        "There are no changes to commit, so a feature branch can't be named. Create a branch yourself or continue on {1}.",
+      ),
+      { 1: input.branchName },
+    );
   }
   if (input.action === "push" || input.action === "create_pr") {
-    return `This action doesn't commit your changes, so a feature branch can't be named. Create a branch yourself or continue on ${input.branchName}.`;
+    return fill(
+      t(
+        "This action doesn't commit your changes, so a feature branch can't be named. Create a branch yourself or continue on {1}.",
+      ),
+      { 1: input.branchName },
+    );
   }
   return null;
 }

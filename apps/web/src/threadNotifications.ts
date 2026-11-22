@@ -1,16 +1,30 @@
 import type { EnvironmentId, ThreadId } from "@t3tools/contracts";
 import type { ClientSettings } from "@t3tools/contracts/settings";
+import { t } from "gt-react";
 
 import completionUrl from "./assets/notification-completion.mp3";
 import inputUrl from "./assets/notification-input.mp3";
 
 type NotificationMode = ClientSettings["notificationMode"];
-export const NOTIFICATION_MODE_LABELS = {
-  off: "Off",
-  notifications: "Notifications only",
-  sound: "Sound only",
-  "notifications-and-sound": "Notifications with sound",
-} satisfies Record<NotificationMode, string>;
+export const NOTIFICATION_MODES = [
+  "off",
+  "notifications",
+  "sound",
+  "notifications-and-sound",
+] as const satisfies ReadonlyArray<NotificationMode>;
+
+export function notificationModeLabel(mode: NotificationMode): string {
+  switch (mode) {
+    case "off":
+      return t("Off");
+    case "notifications":
+      return t("Notifications only");
+    case "sound":
+      return t("Sound only");
+    case "notifications-and-sound":
+      return t("Notifications with sound");
+  }
+}
 
 export function hasNotificationSound(mode: NotificationMode) {
   return mode === "sound" || mode === "notifications-and-sound";

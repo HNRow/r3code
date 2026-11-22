@@ -151,7 +151,7 @@ export interface ChannelSwitchRelease {
 }
 
 export const channelSwitchLabel = (channel: DesktopUpdateChannel, _resolve?: unknown) =>
-  channel === "nightly" ? "Nightly" : "Stable";
+  channel === "nightly" ? t("Nightly") : t("Stable");
 
 /** Stable and Nightly each build their own commits, so either can hold migrations the other lacks.
  * Crossing tracks needs proof that the target release knows every migration the database holds. */

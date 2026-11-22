@@ -1,7 +1,7 @@
 import { useId, useState, type KeyboardEvent } from "react";
 
 import { Button } from "../ui/button";
-import { useGT, T, Var, t } from "gt-react";
+import { useGT, T, Var } from "gt-react";
 
 export function ThemeCssEditor({
   value,
@@ -110,8 +110,8 @@ export function ThemeCssEditor({
       <div className="flex items-start justify-between gap-2">
         <p id={hintId} className="text-xs text-muted-foreground">
           {tabIndents
-            ? t("Tab indents. Shift+Tab unindents. Press Escape, then Tab to leave.")
-            : t("Tab moves to the next control.")}
+            ? gt("Tab indents. Shift+Tab unindents. Press Escape, then Tab to leave.")
+            : gt("Tab moves to the next control.")}
         </p>
         <Button
           size="xs"

@@ -1,5 +1,4 @@
 import { useAtomRefresh, useAtomValue } from "@effect/atom-react";
-import { cloudSpeechDisclosure } from "@t3tools/shared/speech";
 import type { PreparedConnection } from "@t3tools/client-runtime/connection";
 import {
   configuredSecretSources,
@@ -315,7 +314,9 @@ export function CloudVoiceConfiguration({
             ? t("Updating the key keeps dictation enabled.")
             : routed && saved
               ? t("Leave blank to keep the saved key.")
-              : `Anyone with dictation access to ${environment.label} can bill this key.`}
+              : gt("Anyone with dictation access to {environment} can bill this key.", {
+                  environment: environment.label,
+                })}
       </p>
     </>
   );
@@ -331,19 +332,30 @@ export function CloudVoiceConfiguration({
         <DialogHeader>
           <DialogTitle>
             {remove
-              ? `Remove the ${company} key?`
+              ? gt("Remove the {company} key?", { company })
               : active
                 ? routed
                   ? t("Manage OpenRouter dictation")
-                  : `Manage ${company} key`
-                : `Use ${name} for dictation?`}
+                  : gt("Manage {company} key", { company })
+                : gt("Use {name} for dictation?", { name })}
           </DialogTitle>
           <DialogDescription>
             {remove
               ? `Everyone using ${name} for dictation on ${environment.label} will lose access.`
               : active && !routed
                 ? `Anyone with dictation access to ${environment.label} can use this API key.`
-                : cloudSpeechDisclosure(provider, environment.label)}
+                : provider === "openrouter"
+                  ? gt(
+                      "After you stop, {environment} sends the recording to OpenRouter. OpenRouter chooses who runs your model. T3 requests zero data retention; your OpenRouter account may allow safety retention.",
+                      { environment: environment.label },
+                    )
+                  : gt(
+                      "After you stop, {environment} sends your recording and vocabulary hints, including project names, to {provider}.",
+                      {
+                        environment: environment.label,
+                        provider: name,
+                      },
+                    )}
           </DialogDescription>
         </DialogHeader>
         {!remove && (

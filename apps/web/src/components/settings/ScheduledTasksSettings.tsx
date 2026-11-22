@@ -161,10 +161,16 @@ const WEEKDAY_SHORT = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] as const;
 // Thread ids are trimmed, so the leading space keeps this from matching one.
 const NEW_THREAD_DESTINATION = " new-thread";
 
-const WORKSPACE_MODE_LABELS: Record<WorkspaceMode, string> = {
-  worktree: "Create a new worktree",
-  root: "Use the project checkout",
-  existing_worktree: "Use a specific checkout",
+const WORKSPACE_MODE_LABELS = {
+  get worktree() {
+    return t("Create a new worktree");
+  },
+  get root() {
+    return t("Use the project checkout");
+  },
+  get existing_worktree() {
+    return t("Use a specific checkout");
+  },
 };
 
 const EMPTY_DRAFT: DraftState = {
@@ -1237,10 +1243,16 @@ function ScheduledTaskEditorDialog({
   );
 }
 
-const THREAD_MODE_LABELS: Record<ScheduledTaskThreadMode, string> = {
-  new_thread: "New thread each run",
-  continue: "One thread, continuing the conversation",
-  fresh_session: "One thread, fresh session each run",
+const THREAD_MODE_LABELS = {
+  get new_thread() {
+    return t("New thread each run");
+  },
+  get continue() {
+    return t("One thread, continuing the conversation");
+  },
+  get fresh_session() {
+    return t("One thread, fresh session each run");
+  },
 };
 
 function useScheduledTaskThread(environmentId: EnvironmentId, threadId: ThreadId | null) {
@@ -1280,8 +1292,8 @@ function ScheduledTaskDestination({
     ref !== null
       ? thread?.title.trim() || `Thread ${ref.threadId}`
       : threadMode === "new_thread"
-        ? "New thread each run"
-        : "Started by the first run";
+        ? t("New thread each run")
+        : t("Started by the first run");
   const shells = useVisibleThreadShells(open);
   // Mounts older settled threads matching the query, which shells may leave out.
   useThreadSearch(open && projectId ? [environmentId] : [], query, {
@@ -1306,14 +1318,18 @@ function ScheduledTaskDestination({
   };
   const detail =
     threadMode === "new_thread"
-      ? "Each run starts a new thread with the workspace and model below."
+      ? t("Each run starts a new thread with the workspace and model below.")
       : ref === null
         ? threadMode === "continue"
-          ? "The first run starts a thread with the workspace and model below. Later runs continue that conversation."
-          : "The first run starts a thread with the workspace and model below. Later runs post there, each in a fresh session without earlier runs' context."
+          ? t(
+              "The first run starts a thread with the workspace and model below. Later runs continue that conversation.",
+            )
+          : t(
+              "The first run starts a thread with the workspace and model below. Later runs post there, each in a fresh session without earlier runs' context.",
+            )
         : threadMode === "continue"
-          ? "Each run continues this conversation, in its workspace and with its current model."
-          : "Each run starts a fresh session in this thread, without earlier runs' context.";
+          ? t("Each run continues this conversation, in its workspace and with its current model.")
+          : t("Each run starts a fresh session in this thread, without earlier runs' context.");
   return (
     <Field label={gt("Destination")} htmlFor="scheduled-task-destination">
       {onThreadModeChange ? (
@@ -1359,7 +1375,7 @@ function ScheduledTaskDestination({
                 ? "scheduled-task-destination-thread"
                 : "scheduled-task-destination"
             }
-            aria-label={onThreadModeChange ? "Destination thread" : undefined}
+            aria-label={onThreadModeChange ? gt("Destination thread") : undefined}
             disabled={disabled}
             render={<Button variant="outline" size="sm" />}
             className="w-full justify-between"
@@ -2196,7 +2212,7 @@ function ScheduledTaskEditorForm({
                     </span>
                   )}
                   <span className="text-xs text-muted-foreground">
-                    <T>on</T>
+                    <T context="task runs on these days">on</T>
                   </span>
                 </div>
                 <ToggleGroup

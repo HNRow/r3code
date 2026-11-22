@@ -310,6 +310,74 @@ const THEME_EDITOR_COLOR_FAMILY_BY_ROLE = new Map(
   ),
 );
 
+function themeEditorGroupTitle(gt: (message: string) => string, id: string): string {
+  switch (id) {
+    case "foundation":
+      return gt("Foundation");
+    case "brand-content":
+      return gt("Brand & content");
+    case "search":
+      return gt("Search");
+    case "context":
+      return gt("Context");
+    case "status":
+      return gt("Status");
+    default:
+      return id;
+  }
+}
+
+function themeEditorFamilyLabel(gt: (message: string) => string, id: string): string {
+  switch (id) {
+    case "background":
+      return gt("Background");
+    case "surface":
+      return gt("Surface");
+    case "raised-surface":
+      return gt("Raised surface");
+    case "overlay":
+      return gt("Overlay");
+    case "text":
+      return gt("Text");
+    case "muted-text":
+      return gt("Muted text");
+    case "border":
+      return gt("Border");
+    case "input":
+      return gt("Input");
+    case "subtle-surface":
+      return gt("Subtle surface");
+    case "highlight-surface":
+      return gt("Highlight surface");
+    case "accent":
+      return gt("Accent");
+    case "action":
+      return gt("Action");
+    case "message-surface":
+      return gt("Message surface");
+    case "code-surface":
+      return gt("Code surface");
+    case "search-matches":
+      return gt("Search matches");
+    case "current-match":
+      return gt("Current match");
+    case "sidebar-background":
+      return gt("Sidebar background");
+    case "sidebar-controls":
+      return gt("Sidebar controls");
+    case "sidebar-selection":
+      return gt("Sidebar selection");
+    case "terminal-background":
+      return gt("Terminal background");
+    case "error":
+      return gt("Error");
+    case "warning":
+      return gt("Warning");
+    default:
+      return id;
+  }
+}
+
 function getThemeEditorColorFamily(role: ThemeColorRole): ThemeEditorColorFamily | null {
   return THEME_EDITOR_COLOR_FAMILY_BY_ROLE.get(role) ?? null;
 }
@@ -978,7 +1046,7 @@ export function ThemeEditorPanel({
           setName(event.currentTarget.value);
           setError(null);
         }}
-        placeholder={isEditing ? "Theme name" : "e.g. Aurora"}
+        placeholder={isEditing ? gt("Theme name") : gt("e.g. Aurora")}
         value={name}
       />
     </label>
@@ -989,7 +1057,7 @@ export function ThemeEditorPanel({
     // Use aria-disabled so locked modes remain hoverable for explanatory tooltips.
     const button = (
       <Toggle aria-disabled={lockReason !== null} value={appearance}>
-        {appearance === "light" ? t("Light") : t("Dark")}
+        {appearance === "light" ? gt("Light") : gt("Dark")}
       </Toggle>
     );
     if (lockReason === null) return button;
@@ -1071,7 +1139,7 @@ export function ThemeEditorPanel({
       {families.map((family) => (
         <ThemeColorField
           key={family.id}
-          label={family.label}
+          label={themeEditorFamilyLabel(gt, family.id)}
           onChange={updateColor}
           onEditCancel={cancelColorEdit}
           onEditStart={startColorEdit}
@@ -1092,7 +1160,11 @@ export function ThemeEditorPanel({
       families: group.families.filter(
         (family) =>
           !query ||
-          [family.label, ...family.roles.map((role) => getThemeRoleLabel(role))]
+          [
+            family.label,
+            themeEditorFamilyLabel(gt, family.id),
+            ...family.roles.map((role) => getThemeRoleLabel(role)),
+          ]
             .join(" ")
             .toLowerCase()
             .includes(query),
@@ -1102,7 +1174,9 @@ export function ThemeEditorPanel({
       <div className="space-y-5">
         {groups.map((group) => (
           <section className="space-y-2" key={group.id}>
-            <h4 className="text-sm font-medium text-foreground">{group.title}</h4>
+            <h4 className="text-sm font-medium text-foreground">
+              {themeEditorGroupTitle(gt, group.id)}
+            </h4>
             {renderRoleFields(group.families, "grid gap-1")}
           </section>
         ))}
@@ -1123,7 +1197,7 @@ export function ThemeEditorPanel({
             onSelect={selectThemeRole}
             onToggleSelected={toggleThemeRole}
             role={role}
-            label={role === "canvas" ? "Background" : "Accent"}
+            label={role === "canvas" ? gt("Background") : gt("Accent")}
             selected={selectedRole === role}
             value={colorsByAppearance[activeAppearance][role]}
           />
@@ -1213,7 +1287,7 @@ export function ThemeEditorPanel({
 
   return (
     <div
-      aria-label={isEditing ? "Edit theme" : "Create theme"}
+      aria-label={isEditing ? gt("Edit theme") : gt("Create theme")}
       className={cn(
         "dialog-glass fixed z-[110] flex max-h-[min(42rem,calc(100dvh-6rem))] w-[min(26rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border text-popover-foreground",
         position === null && "bottom-4 right-4",
@@ -1246,15 +1320,26 @@ export function ThemeEditorPanel({
       >
         <div className="flex min-w-0 flex-1 items-baseline gap-2">
           <h2 className="shrink-0 truncate text-sm font-medium">
-            {isEditing ? t("Edit theme") : t("Create theme")}
+            {isEditing ? gt("Edit theme") : gt("Create theme")}
           </h2>
           {isMinimized ? null : (
             <p className="truncate text-xs text-muted-foreground">
               {isInspecting
-                ? t("Select an element · Esc to cancel")
+                ? gt("Select an element · Esc to cancel")
                 : selectedRole
-                  ? `${isAdvanced ? (getThemeEditorColorFamily(selectedRole)?.label ?? getThemeRoleLabel(selectedRole)) : getThemeRoleLabel(selectedRole)} · ${usageCount ?? 0} ${usageCount === 1 ? "use" : "uses"}`
-                  : t("Select a color below")}
+                  ? `${
+                      isAdvanced
+                        ? (() => {
+                            const family = getThemeEditorColorFamily(selectedRole);
+                            return family
+                              ? themeEditorFamilyLabel(gt, family.id)
+                              : getThemeRoleLabel(selectedRole);
+                          })()
+                        : selectedRole === "canvas"
+                          ? gt("Background")
+                          : gt("Accent")
+                    } · ${usageCount ?? 0} ${usageCount === 1 ? "use" : "uses"}`
+                  : gt("Select a color below")}
             </p>
           )}
         </div>
@@ -1262,7 +1347,9 @@ export function ThemeEditorPanel({
           <TooltipTrigger
             render={
               <Button
-                aria-label={isInspecting ? "Cancel inspecting app colors" : "Inspect app colors"}
+                aria-label={
+                  isInspecting ? gt("Cancel inspecting app colors") : gt("Inspect app colors")
+                }
                 aria-pressed={isInspecting}
                 size="xs"
                 variant={isInspecting ? "secondary" : "ghost"}
@@ -1275,16 +1362,16 @@ export function ThemeEditorPanel({
                 }}
               >
                 <MousePointer2Icon />
-                {isInspecting ? t("Cancel") : t("Inspect")}
+                {isInspecting ? gt("Cancel") : gt("Inspect")}
               </Button>
             }
           />
           <TooltipPopup data-theme-editor-panel="">
-            {isInspecting ? t("Cancel and clear the selection") : t("Pick a color from the app")}
+            {isInspecting ? gt("Cancel and clear the selection") : gt("Pick a color from the app")}
           </TooltipPopup>
         </Tooltip>
         <Button
-          aria-label={isMinimized ? "Expand the theme editor" : "Minimize the theme editor"}
+          aria-label={isMinimized ? gt("Expand the theme editor") : gt("Minimize the theme editor")}
           size="icon-xs"
           variant="ghost"
           onClick={() => setIsMinimized(!isMinimized)}

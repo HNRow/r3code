@@ -30,6 +30,17 @@ import { parseEasDeviceHostDraft } from "./easDeviceHostsSettings.logic";
 import { SecretSourceInput, useSecretSources } from "./SecretSourceInput";
 import { T, useGT, Var, t } from "gt-react";
 
+const EXPO_CREDENTIAL_MISSING =
+  "No Expo credential on the server: save an access token for this host, set EXPO_TOKEN, or run `eas login`.";
+
+function expoAccountErrorLabel(error: string): string {
+  return error === EXPO_CREDENTIAL_MISSING
+    ? t(
+        "No Expo credential on the server: save an access token for this host, set EXPO_TOKEN, or run `eas login`.",
+      )
+    : error;
+}
+
 const FROM_THREAD_PROJECT = "thread-project";
 
 const CREDENTIAL_SOURCES: Record<DeviceEasAccount["credentialSource"], string> = {
@@ -267,7 +278,7 @@ export function EasDeviceHostEditor(props: {
                 {account.status === "signed-in"
                   ? `Signed in as ${account.account.signedInAs} with ${CREDENTIAL_SOURCES[account.account.credentialSource]}.`
                   : account.status === "failed"
-                    ? account.error
+                    ? expoAccountErrorLabel(account.error)
                     : account.status === "checking"
                       ? t("Checking the Expo account…")
                       : t("Check the Expo account before choosing a project.")}
@@ -304,7 +315,7 @@ export function EasDeviceHostEditor(props: {
                   <SelectValue>
                     {(value: string) =>
                       value === FROM_THREAD_PROJECT
-                        ? "From the thread's project"
+                        ? t("From the thread's project")
                         : (apps.find((app) => app.id === value)?.fullName ?? value)
                     }
                   </SelectValue>
@@ -331,9 +342,9 @@ export function EasDeviceHostEditor(props: {
               </p>
             </div>
             <div className="grid grid-cols-3 gap-3 text-sm">
-              {limit("maxConcurrentSessions", "Sessions at once", 20)}
-              {limit("maxSessionMinutes", "Session minutes", 115)}
-              {limit("idleMinutes", "Idle minutes", 60)}
+              {limit("maxConcurrentSessions", t("Sessions at once"), 20)}
+              {limit("maxSessionMinutes", t("Session minutes"), 115)}
+              {limit("idleMinutes", t("Idle minutes"), 60)}
             </div>
             <p className="text-xs text-muted-foreground">
               <T>

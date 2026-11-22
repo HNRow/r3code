@@ -453,7 +453,7 @@ export function BackgroundActivitySettingsRow() {
             >
               <SelectValue>
                 {(value: BackgroundActivityProfileOption | null) =>
-                  value === null ? "Mixed" : BACKGROUND_ACTIVITY_PROFILE_OPTION_LABELS[value]
+                  value === null ? "Mixed" : m(BACKGROUND_ACTIVITY_PROFILE_OPTION_LABELS[value])
                 }
               </SelectValue>
             </SelectTrigger>
@@ -469,8 +469,8 @@ export function BackgroundActivitySettingsRow() {
               </SelectItem>
               <SelectItem hideIndicator value="advanced" disabled={!isEnvironmentScope}>
                 {isEnvironmentScope
-                  ? BACKGROUND_ACTIVITY_PROFILE_OPTION_LABELS.advanced
-                  : `${BACKGROUND_ACTIVITY_PROFILE_OPTION_LABELS.advanced} (one environment)`}
+                  ? m(BACKGROUND_ACTIVITY_PROFILE_OPTION_LABELS.advanced)
+                  : `${m(BACKGROUND_ACTIVITY_PROFILE_OPTION_LABELS.advanced)} (one environment)`}
               </SelectItem>
             </SelectPopup>
           </Select>

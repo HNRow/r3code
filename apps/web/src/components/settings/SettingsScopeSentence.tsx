@@ -90,7 +90,11 @@ export function SettingsScopeSentence() {
       </span>
       <span className="flex min-w-0 items-center gap-1.5">
         <span className="shrink-0">
-          {scope.search.machine || scope.scope.kind === "checkout" ? <T>on</T> : <T>across</T>}
+          {scope.search.machine || scope.scope.kind === "checkout" ? (
+            <T context="settings apply on this machine">on</T>
+          ) : (
+            <T context="settings apply across environments">across</T>
+          )}
         </span>
         <EnvironmentScopeMenu {...props} />
       </span>

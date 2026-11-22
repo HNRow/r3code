@@ -217,7 +217,11 @@ export function MicrophoneTest({
     );
   const panel = error ? (
     <p role="alert" className="min-w-0 flex-1 text-xs text-destructive">
-      {error}
+      {error === MICROPHONE_PERMISSION_ERROR
+        ? gt(
+            "Microphone access is required for voice input. Allow access in your browser or system settings and try again.",
+          )
+        : error}
     </p>
   ) : phase === "starting" ? (
     <span role="status" className="min-w-0 flex-1 truncate text-xs text-muted-foreground">

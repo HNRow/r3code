@@ -490,7 +490,11 @@ export function AddEnvironmentDialog({
         onClick={() => void handleAddSavedBackend()}
       >
         <PlusIcon className="size-3.5" />
-        {isAddingSavedBackend ? t("Adding…") : routeTarget ? t("Add route") : t("Add environment")}
+        {isAddingSavedBackend
+          ? gt("Adding…")
+          : routeTarget
+            ? gt("Add route")
+            : gt("Add environment")}
       </Button>
     </div>
   );
@@ -622,10 +626,10 @@ export function AddEnvironmentDialog({
         >
           <PlusIcon className="size-3.5" />
           {isAddingSavedBackend
-            ? t("Adding…")
+            ? gt("Adding…")
             : routeTarget
-              ? t("Add route")
-              : t("Add environment")}
+              ? gt("Add route")
+              : gt("Add environment")}
         </Button>
       </div>
     </div>

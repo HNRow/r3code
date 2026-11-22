@@ -25,6 +25,9 @@ import {
   type ServerAuthPolicy,
   type ServerDirectEndpoint,
 } from "@t3tools/contracts";
+import { msg } from "gt-react";
+
+import { m, type MessageResolver } from "../../i18n/messages";
 import {
   getDesktopUpdateDownloadedVersion,
   resolveDesktopUpdateButtonAction,
@@ -100,12 +103,15 @@ export function isWslSettingsRowVisible(input: {
  * Once client/server versions match, this passive Version label follows the sidebar update action,
  * including retryable failures. Rechecks retain downloaded-update labels; `state` is null outside desktop.
  */
-export function resolveLocalVersionStatusLabel(state: DesktopUpdateState | null): string {
-  if (!state) return "Up to date";
+export function resolveLocalVersionStatusLabel(
+  state: DesktopUpdateState | null,
+  resolve: MessageResolver = m,
+): string {
+  if (!state) return resolve(msg("Up to date"));
   if (state.status === "downloading") {
     return state.availableVersion
-      ? `Downloading update ${state.availableVersion}`
-      : "Downloading update";
+      ? resolve(msg("Downloading update {version}", { version: state.availableVersion }))
+      : resolve(msg("Downloading update"));
   }
   const action = resolveDesktopUpdateButtonAction(state);
   if (
@@ -114,14 +120,16 @@ export function resolveLocalVersionStatusLabel(state: DesktopUpdateState | null)
     (state.status === "checking" && state.downloadedVersion !== null)
   ) {
     const version = getDesktopUpdateDownloadedVersion(state);
-    return version ? `Update ${version} downloaded` : "Update downloaded";
+    return version
+      ? resolve(msg("Update {version} downloaded", { version }))
+      : resolve(msg("Update downloaded"));
   }
   if (action === "download") {
     return state.availableVersion
-      ? `Update ${state.availableVersion} available`
-      : "Update available";
+      ? resolve(msg("Update {version} available", { version: state.availableVersion }))
+      : resolve(msg("Update available"));
   }
-  return "Up to date";
+  return resolve(msg("Up to date"));
 }
 
 export type QrEndpointOption = {

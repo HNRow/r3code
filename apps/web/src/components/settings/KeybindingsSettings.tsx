@@ -863,6 +863,7 @@ function KeybindingKeyControl({
     captureKeybinding,
     pillRef,
   } = editor;
+  const gt = useGT();
   const showPill = !isRecording && keyDraft === row.key && row.key.length > 0 && !isDirty;
 
   return (
@@ -901,7 +902,7 @@ function KeybindingKeyControl({
           autoFocus={isRecording}
           aria-label={`Keybinding for ${commandLabel(row.command)}`}
           value={isRecording ? "" : keyDraft}
-          placeholder={isRecording ? "Press shortcut" : "Unassigned"}
+          placeholder={isRecording ? gt("Press shortcut") : gt("Unassigned")}
           size="sm"
           font="mono"
           className="w-44"
@@ -1231,13 +1232,14 @@ function NewKeybindingKeyInput({
   autoFocus?: boolean;
   className?: string | undefined;
 }) {
+  const gt = useGT();
   return (
     <Input
       data-keybinding-capture=""
       autoFocus={autoFocus}
       aria-label={`Keybinding for ${draft.commandLabelText}`}
       value={draft.isRecording ? "" : draft.keyDraft}
-      placeholder={draft.isRecording ? "Press shortcut" : "Unassigned"}
+      placeholder={draft.isRecording ? gt("Press shortcut") : gt("Unassigned")}
       size="sm"
       font="mono"
       className={className}

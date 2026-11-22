@@ -55,6 +55,9 @@ const SCOPE_TITLES: Readonly<Record<string, string>> = {
   get "Manage relay"() {
     return t("Manage relay");
   },
+  get "Configure relay (admin)"() {
+    return t("Configure relay (admin)");
+  },
 };
 
 export function SessionPermissions({

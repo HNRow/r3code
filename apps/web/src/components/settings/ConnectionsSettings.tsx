@@ -162,9 +162,10 @@ const BACKEND_VALUE_WSL_OFF = "backend:wsl-off";
 // Subscribes on its own so desktop download progress does not re-render the page.
 function LocalVersionStatusLabel() {
   const updateState = useDesktopUpdateState();
+  const m = useMessages();
   return (
     <span className="text-xs text-muted-foreground">
-      {resolveLocalVersionStatusLabel(updateState)}
+      {resolveLocalVersionStatusLabel(updateState, m)}
     </span>
   );
 }

@@ -8,6 +8,7 @@ import { useRef, useState } from "react";
 import {
   type DesktopUpdateChannel,
   IDLE_COMPACTION_MODES,
+  type IdleCompactionMode,
   globalIdleCompaction,
   managedUpdatesDenial,
   managedUpdatesMessage,
@@ -17,7 +18,6 @@ import {
 } from "@t3tools/contracts";
 import {
   DEFAULT_UNIFIED_SETTINGS,
-  type DiffLayout,
   MAX_SIDEBAR_AUTO_SETTLE_AFTER_DAYS,
   MIN_SIDEBAR_AUTO_SETTLE_AFTER_DAYS,
   type ResponseStreamingMode,
@@ -26,6 +26,7 @@ import {
   ScreenReaderAnnouncements,
   ToolCallVisibility,
 } from "@t3tools/contracts/settings";
+import { idleCompactionModeLabel } from "@t3tools/client-runtime/contract-labels";
 import { desktopUpdateChannelOf } from "@t3tools/shared/cliRelease";
 import { createModelSelection, pickModelSelection } from "@t3tools/shared/model";
 import { resolvePastedPath } from "@t3tools/shared/path";
@@ -168,11 +169,6 @@ const TIMESTAMP_FORMAT_LABELS = {
   get "24-hour"() {
     return t("24-hour");
   },
-};
-
-const DIFF_LAYOUT_LABELS: Record<DiffLayout, string> = {
-  stacked: "Stacked",
-  split: "Split",
 };
 
 const QUIT_CONFIRMATION_MODE_LABELS: Record<QuitConfirmationMode, string> = {
@@ -320,20 +316,23 @@ function AboutVersionSection() {
       ? !canCheckForUpdate(updateState)
       : isDesktopUpdateButtonDisabled(updateState);
 
-  const actionLabel: Record<string, string> = { download: "Download", install: "Install" };
+  const actionLabel: Record<string, string> = {
+    download: gt("Download"),
+    install: gt("Install"),
+  };
   const statusLabel: Record<string, string> = {
-    checking: "Checking…",
-    downloading: "Downloading…",
+    checking: gt("Checking…"),
+    downloading: gt("Downloading…"),
     // Off its track, "up to date" only means no switch is pending; Review moves it.
-    ...(appOffTrack ? {} : { "up-to-date": "Up to Date" }),
+    ...(appOffTrack ? {} : { "up-to-date": gt("Up to date") }),
   };
   const buttonLabel =
-    actionLabel[action] ?? statusLabel[updateState?.status ?? ""] ?? "Check for Updates";
+    actionLabel[action] ?? statusLabel[updateState?.status ?? ""] ?? gt("Check for Updates");
   const description =
     action === "download" || action === "install"
-      ? "Update available."
+      ? gt("Update available.")
       : (getDesktopUpdateDisabledReason(updateState, updatesDenial) ??
-        "Current version of the application.");
+        gt("Current version of the application."));
 
   return (
     <>
@@ -1222,9 +1221,12 @@ export function ChatSettingsPanel() {
   const gt = useGT();
   const modifierLabel = isMacPlatform(navigator.platform) ? "⌘" : "Ctrl";
   const sendShortcutOptions = [
-    { value: "enter", label: t("Enter") },
-    { value: "mod-enter-multiline", label: t`${modifierLabel} + Enter for multiline prompts` },
-    { value: "mod-enter", label: t`${modifierLabel} + Enter always` },
+    { value: "enter", label: gt("Enter") },
+    {
+      value: "mod-enter-multiline",
+      label: gt("{0} + Enter for multiline prompts", { 0: modifierLabel }),
+    },
+    { value: "mod-enter", label: gt("{0} + Enter always", { 0: modifierLabel }) },
   ] as const;
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
@@ -1378,7 +1380,7 @@ export function ChatSettingsPanel() {
                 aria-label={gt("Follow-up behavior")}
               >
                 <SelectValue>
-                  {settings.followUpBehavior === "queue" ? t("Queue") : t("Steer")}
+                  {settings.followUpBehavior === "queue" ? gt("Queue") : gt("Steer")}
                 </SelectValue>
               </SelectTrigger>
               <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -1406,17 +1408,16 @@ export function ChatSettingsPanel() {
   );
 }
 
-const TOOL_CALL_VISIBILITY_LABELS: Record<ToolCallVisibility, string> = {
-  showAll: "Show all",
-  hideSuccessful: "Hide successful",
-  hideAll: "Hide all",
-  zen: "Zen",
-};
-
 const isToolCallVisibility = Schema.is(ToolCallVisibility);
 
 function ToolCallVisibilityRow() {
   const gt = useGT();
+  const toolCallVisibilityLabels = {
+    showAll: gt("Show all"),
+    hideSuccessful: gt("Hide successful"),
+    hideAll: gt("Hide all"),
+    zen: gt("Zen"),
+  } as const;
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
   return (
@@ -1443,12 +1444,12 @@ function ToolCallVisibilityRow() {
           }}
         >
           <SelectTrigger size="sm" className="w-full sm:w-40" aria-label={gt("Tool calls in chat")}>
-            <SelectValue>{TOOL_CALL_VISIBILITY_LABELS[settings.toolCallVisibility]}</SelectValue>
+            <SelectValue>{toolCallVisibilityLabels[settings.toolCallVisibility]}</SelectValue>
           </SelectTrigger>
           <SelectPopup align="end" alignItemWithTrigger={false}>
             {ToolCallVisibility.literals.map((value) => (
               <SelectItem key={value} value={value}>
-                {TOOL_CALL_VISIBILITY_LABELS[value]}
+                {toolCallVisibilityLabels[value]}
               </SelectItem>
             ))}
           </SelectPopup>
@@ -1600,7 +1601,9 @@ function DiffColorsSettingsRow() {
                 <span className="size-2 rounded-full bg-diff-addition" />
               </span>
               <SelectValue>
-                {settings.diffColorScheme === "blue-orange" ? t("Blue & orange") : t("Red & green")}
+                {settings.diffColorScheme === "blue-orange"
+                  ? gt("Blue & orange")
+                  : gt("Red & green")}
               </SelectValue>
             </SelectTrigger>
             <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -1649,14 +1652,16 @@ export function DiffsSettingsPanel() {
               }}
             >
               <SelectTrigger size="sm" className="w-full sm:w-40" aria-label={gt("Diff layout")}>
-                <SelectValue>{DIFF_LAYOUT_LABELS[settings.diffLayout]}</SelectValue>
+                <SelectValue>
+                  {settings.diffLayout === "split" ? gt("Split") : gt("Stacked")}
+                </SelectValue>
               </SelectTrigger>
               <SelectPopup align="end" alignItemWithTrigger={false}>
                 <SelectItem hideIndicator value="stacked">
-                  {DIFF_LAYOUT_LABELS.stacked}
+                  {gt("Stacked")}
                 </SelectItem>
                 <SelectItem hideIndicator value="split">
-                  {DIFF_LAYOUT_LABELS.split}
+                  {gt("Split")}
                 </SelectItem>
               </SelectPopup>
             </Select>
@@ -1719,7 +1724,7 @@ export function DiffsSettingsPanel() {
                 aria-label={gt("Default diff file state")}
               >
                 <SelectValue>
-                  {settings.diffFilesCollapsed ? t("Collapsed") : t("Expanded")}
+                  {settings.diffFilesCollapsed ? gt("Collapsed") : gt("Expanded")}
                 </SelectValue>
               </SelectTrigger>
               <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -1777,6 +1782,7 @@ export function CompactIdleThreadsRow() {
 
 function ScopedCompactIdleThreadsRow() {
   const gt = useGT();
+  const m = useMessages();
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
   const { targets } = useSettingsScope();
@@ -1816,9 +1822,7 @@ function ScopedCompactIdleThreadsRow() {
           >
             <SelectValue>
               {(value: string | null) =>
-                value === null
-                  ? "Mixed"
-                  : IDLE_COMPACTION_MODES.find((mode) => mode.value === value)?.label
+                value === null ? "Mixed" : idleCompactionModeLabel(value as IdleCompactionMode, m)
               }
             </SelectValue>
           </SelectTrigger>
@@ -1831,7 +1835,7 @@ function ScopedCompactIdleThreadsRow() {
                 // A server from before modes has only the on/off switch, so it cannot store "Never".
                 disabled={mode.value === "off" && !idleCompaction.neverAvailable}
               >
-                {mode.label}
+                {idleCompactionModeLabel(mode.value, m)}
               </SelectItem>
             ))}
           </SelectPopup>

@@ -76,8 +76,11 @@ export function UseInAnotherAppDialogHost() {
 }
 
 function UseInAnotherAppDialog({ requested }: { readonly requested: EnvironmentId | null }) {
+  const gt = useGT();
   const { environment, label } = useAccessEnvironment(requested);
-  const title = `Use R3 Code in another app (MCP) · ${label ?? "R3 Code"}`;
+  const title = gt("Use R3 Code in another app (MCP) · {device}", {
+    device: label ?? "R3 Code",
+  });
   return (
     <Dialog open onOpenChange={(open) => (open ? undefined : close())}>
       <WizardPopup>
@@ -90,8 +93,8 @@ function UseInAnotherAppDialog({ requested }: { readonly requested: EnvironmentI
               <GateMessage
                 title={
                   environment === null
-                    ? "Connect to an environment first."
-                    : "R3 Connect is not available in this build."
+                    ? gt("Connect to an environment first.")
+                    : gt("R3 Connect is not available in this build.")
                 }
               />
             </WizardPanel>

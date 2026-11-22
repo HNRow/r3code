@@ -12,6 +12,8 @@ import {
   type ProviderSettingsFormSchemaAnnotation,
   type SecretReference,
 } from "@t3tools/contracts";
+import type { IdleCompactionMode } from "@t3tools/contracts/settings";
+import { idleCompactionModeLabel } from "@t3tools/client-runtime/contract-labels";
 import { PlusIcon, XIcon } from "lucide-react";
 
 import { cn } from "../../lib/utils";
@@ -410,6 +412,13 @@ function SecretSettingsControl({
   );
 }
 
+const IDLE_COMPACTION_OPTION_LABELS: Record<string, IdleCompactionMode | "default"> = {
+  "Use default": "default",
+  "When you return": "onReturn",
+  "Before the cache expires (beta)": "beforeCacheExpires",
+  Never: "off",
+};
+
 function ProviderSettingsSelect({
   field,
   value,
@@ -430,6 +439,10 @@ function ProviderSettingsSelect({
   const fallback = options[0]?.value ?? "";
   const current = readProviderConfigString(value, field.key) || fallback;
   const label = options.find((option) => option.value === current)?.label ?? current;
+  const optionLabel = (text: string) => {
+    const mode = IDLE_COMPACTION_OPTION_LABELS[text];
+    return mode ? idleCompactionModeLabel(mode, m) : m(text);
+  };
   return (
     <Select
       value={current}
@@ -439,12 +452,12 @@ function ProviderSettingsSelect({
       }}
     >
       <SelectTrigger id={inputId} size={size} className={className} aria-label={field.label}>
-        <SelectValue>{label}</SelectValue>
+        <SelectValue>{optionLabel(label)}</SelectValue>
       </SelectTrigger>
       <SelectPopup align="start" alignItemWithTrigger={false}>
         {options.map((option) => (
           <SelectItem key={option.value} value={option.value}>
-            {m(option.label)}
+            {optionLabel(option.label)}
           </SelectItem>
         ))}
       </SelectPopup>
