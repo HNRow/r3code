@@ -22,6 +22,9 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "~/components/ui/tooltip";
 import { useComposerHandleContext } from "~/composerHandleContext";
 import { writeTextToClipboard } from "~/hooks/useCopyToClipboard";
 import { useStableCallback } from "~/hooks/useStableCallback";
+import { useAtomCommand } from "~/state/use-atom-command";
+import { projectEnvironment } from "~/state/projects";
+import { requestConfirmDialog } from "~/confirmDialog";
 import { useTheme } from "~/hooks/useTheme";
 import { useWorkspaceMutationRefresh } from "~/hooks/useWorkspaceMutationRefresh";
 import { useFileContextMenu, type FileContextMenuAction } from "~/fileContextMenu";
@@ -174,6 +177,7 @@ export default function FileBrowserPanel({
   const { resolvedTheme } = useTheme();
   const composerRef = useComposerHandleContext();
   const fileContextMenu = useFileContextMenu(environmentId);
+  const deleteEntry = useAtomCommand(projectEnvironment.deleteEntry, { reportFailure: false });
   const {
     entries: directoryEntries,
     load,
@@ -230,6 +234,12 @@ export default function FileBrowserPanel({
             ...fileMenuItems,
             { id: "copy-mention", label: gt("Copy mention") },
             { id: "add-to-chat", label: gt("Add to chat") },
+            {
+              id: "delete-entry",
+              label: gt("Delete"),
+              destructive: true,
+              separatorBefore: true,
+            },
           ],
           position,
         );
@@ -239,6 +249,29 @@ export default function FileBrowserPanel({
           fileMenuItems.some((entry) => entry.id === clicked) || clicked.startsWith("editor:");
         if (isFileMenuAction) {
           await fileContextMenu.activate(clicked as FileContextMenuAction, fileTarget);
+          return;
+        }
+        if (clicked === "delete-entry") {
+          const name = relativePath.split("/").at(-1) || relativePath;
+          const confirmed =
+            (await requestConfirmDialog(gt('Delete "{name}"? This cannot be undone.', { name }), {
+              variant: "destructive",
+            })) ?? true;
+          if (!confirmed) return;
+          const result = await deleteEntry({
+            environmentId,
+            input: { cwd, relativePath },
+          });
+          if (!AsyncResult.isSuccess(result)) {
+            toastManager.add({
+              type: "error",
+              title: gt("Could not delete {name}", { name }),
+              description: thrownErrorMessage(Cause.squash(result.cause), m) ?? gt("Try again."),
+            });
+            return;
+          }
+          refresh();
+          if (query.trim()) pathSearch.refresh();
           return;
         }
         if (clicked === "copy-mention") {

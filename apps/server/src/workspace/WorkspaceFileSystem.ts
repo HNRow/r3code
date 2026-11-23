@@ -6,6 +6,8 @@ import type {
   FilesystemEntryMetadata,
   FilesystemGetMetadataInput,
   FilesystemGetMetadataResult,
+  ProjectDeleteEntryInput,
+  ProjectDeleteEntryResult,
   ProjectReadFileInput,
   ProjectReadFileResult,
   ProjectWriteFileInput,
@@ -53,6 +55,7 @@ export class WorkspaceFileSystemOperationError extends Schema.TaggedError<Worksp
       "close",
       "make-directory",
       "write-file",
+      "remove",
     ]),
     cause: Schema.Defect(),
   },
@@ -128,6 +131,14 @@ export class WorkspaceFileSystem extends Context.Service<
       input: ProjectWriteFileInput,
     ) => Effect.Effect<
       ProjectWriteFileResult,
+      | WorkspaceFileSystemError
+      | WorkspacePaths.WorkspacePathOutsideRootError
+      | KnownWorkspaces.UnknownWorkspaceError
+    >;
+    readonly deleteEntry: (
+      input: ProjectDeleteEntryInput,
+    ) => Effect.Effect<
+      ProjectDeleteEntryResult,
       | WorkspaceFileSystemError
       | WorkspacePaths.WorkspacePathOutsideRootError
       | KnownWorkspaces.UnknownWorkspaceError
@@ -642,7 +653,41 @@ export const make = Effect.gen(function* () {
     return { relativePath: target.relativePath };
   });
 
-  return WorkspaceFileSystem.of({ getMetadata, readFile, writeFile });
+  const deleteEntry: WorkspaceFileSystem["Service"]["deleteEntry"] = Effect.fn(
+    "WorkspaceFileSystem.deleteEntry",
+  )(function* (input) {
+    yield* knownWorkspaces.assertContains(input.cwd);
+    const target = yield* resolveWriteTarget(input);
+    const realWorkspaceRoot = yield* Effect.promise(() =>
+      NodeFSP.realpath(path.resolve(input.cwd)),
+    );
+    if (path.resolve(target.realTargetPath) === path.resolve(realWorkspaceRoot)) {
+      return yield* new WorkspaceFilePathEscapeError({
+        workspaceRoot: input.cwd,
+        relativePath: input.relativePath,
+        resolvedWorkspaceRoot: realWorkspaceRoot,
+        resolvedPath: target.realTargetPath,
+      });
+    }
+    yield* fileSystem.remove(target.realTargetPath, { recursive: true, force: true }).pipe(
+      Effect.mapError(
+        (cause) =>
+          new WorkspaceFileSystemOperationError({
+            workspaceRoot: input.cwd,
+            relativePath: input.relativePath,
+            resolvedPath: target.realTargetPath,
+            operationPath: target.realTargetPath,
+            operation: "remove",
+            cause,
+          }),
+      ),
+    );
+    // The tree and path search both read this scan; drop their stale entry.
+    yield* workspaceEntries.refresh(input.cwd);
+    return { relativePath: target.relativePath };
+  });
+
+  return WorkspaceFileSystem.of({ getMetadata, readFile, writeFile, deleteEntry });
 });
 
 export const layer = Layer.effect(WorkspaceFileSystem, make);

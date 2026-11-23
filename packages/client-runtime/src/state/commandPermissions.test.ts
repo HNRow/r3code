@@ -264,6 +264,23 @@ describe("command permissions", () => {
       expect(registry.get(saving.permissionAtom(env))).toBe(true);
     }),
   );
+  it.effect("deleting a workspace entry needs the filesystem write grant", () =>
+    Effect.gen(function* () {
+      const registry = yield* setup;
+      const deleting = createCommandPermissions(runtime, WS_METHODS.projectsDeleteEntry);
+      registry.set(sessions(env), AsyncResult.success(grant(true)));
+      expect(registry.get(deleting.permissionAtom(env))).toBe(false);
+      registry.set(
+        sessions(env),
+        AsyncResult.success({
+          ...grant(true),
+          scopes: [AuthFilesystemWriteScope],
+          permissions: [AuthFilesystemWriteScope],
+        }),
+      );
+      expect(registry.get(deleting.permissionAtom(env))).toBe(true);
+    }),
+  );
   it.effect("waits for an initial grant", () =>
     Effect.gen(function* () {
       const registry = yield* setup;

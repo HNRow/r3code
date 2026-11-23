@@ -60,6 +60,17 @@ function optimisticProjectFileKey(target: OptimisticProjectFileTarget): string {
   return JSON.stringify([target.environmentId, target.cwd, target.relativePath]);
 }
 
+function deletedEntryPaths(
+  input: EnvironmentRpcInput<typeof WS_METHODS.projectsDeleteEntry>,
+  result: EnvironmentRpcSuccess<typeof WS_METHODS.projectsDeleteEntry>,
+) {
+  return new Set(
+    [result.relativePath, input.relativePath].map((path) =>
+      resolveWorkspaceFilePath(path, input.cwd),
+    ),
+  );
+}
+
 function writtenFilePaths(
   input: EnvironmentRpcInput<typeof WS_METHODS.projectsWriteFile>,
   result: EnvironmentRpcSuccess<typeof WS_METHODS.projectsWriteFile>,
@@ -249,6 +260,27 @@ export function createProjectEnvironmentAtoms<R, E>(
       onSuccess: ({ environmentId, input }, registry, result) =>
         Effect.sync(() => {
           for (const path of writtenFilePaths(input, result))
+            fileMetadata.refreshPath(environmentId, path, registry);
+        }),
+    }),
+    deleteEntry: createEnvironmentRpcCommand(runtime, {
+      label: "environment-data:projects:delete-entry",
+      tag: WS_METHODS.projectsDeleteEntry,
+      scheduler: fileScheduler,
+      concurrency: {
+        mode: "serial",
+        key: ({ environmentId, input }) =>
+          JSON.stringify([environmentId, input.cwd, input.relativePath]),
+      },
+      execute: (input) =>
+        requestGuarded(WS_METHODS.projectsDeleteEntry, input).pipe(
+          Effect.tap((result) =>
+            Effect.forEach(deletedEntryPaths(input, result), fileMetadata.invalidate),
+          ),
+        ),
+      onSuccess: ({ environmentId, input }, registry, result) =>
+        Effect.sync(() => {
+          for (const path of deletedEntryPaths(input, result))
             fileMetadata.refreshPath(environmentId, path, registry);
         }),
     }),

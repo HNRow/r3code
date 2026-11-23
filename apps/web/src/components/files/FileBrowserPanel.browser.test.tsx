@@ -47,6 +47,14 @@ vi.mock("~/fileContextMenu", () => ({
 }));
 vi.mock("~/hooks/useWorkspaceMutationRefresh", () => ({ useWorkspaceMutationRefresh: () => {} }));
 
+const deleteEntry = vi.fn(async () => ({ _tag: "Success", value: { relativePath: "README.md" } }));
+const confirmDelete = vi.fn(async () => true);
+vi.mock("~/state/use-atom-command", () => ({ useAtomCommand: () => deleteEntry }));
+vi.mock("~/state/projects", () => ({ projectEnvironment: { deleteEntry: {} } }));
+vi.mock("~/confirmDialog", () => ({
+  requestConfirmDialog: (...args: unknown[]) => confirmDelete(...(args as [])),
+}));
+
 function findTreeRow(path: string): HTMLElement | null {
   for (const host of document.querySelectorAll("*")) {
     const row = host.shadowRoot?.querySelector<HTMLElement>(`[data-item-path="${path}"]`);
@@ -128,6 +136,49 @@ describe("FileBrowserPanel", () => {
     await expect.element(action).toHaveFocus();
     await userEvent.keyboard("{Escape}");
     await vi.waitFor(() => expect((row.getRootNode() as ShadowRoot).activeElement).toBe(row));
+  });
+
+  it("deletes the entry after confirmation and refreshes the listing", async () => {
+    const refresh = vi.fn();
+    const originalRefresh = directory.refresh;
+    directory.refresh = refresh;
+    deleteEntry.mockClear();
+    confirmDelete.mockClear();
+    try {
+      await using _screen = await render(
+        <FileBrowserPanel
+          environmentId={EnvironmentId.make("env-files")}
+          cwd="/repo"
+          projectName="repo"
+          selectedPath={null}
+          selectedPathRevealId={0}
+          onOpenFile={() => {}}
+          workspaceMutationId={null}
+        />,
+      );
+      using _menu = { [Symbol.dispose]: () => dismissContextMenu() };
+      await vi.waitFor(() => expect(findTreeRow("README.md")).not.toBeNull());
+      findTreeRow("README.md")!.dispatchEvent(
+        new MouseEvent("contextmenu", {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          button: 2,
+        }),
+      );
+      await userEvent.click(page.getByRole("menuitem", { name: "Delete", exact: true }));
+
+      await vi.waitFor(() => expect(confirmDelete).toHaveBeenCalledOnce());
+      await vi.waitFor(() =>
+        expect(deleteEntry).toHaveBeenCalledWith({
+          environmentId: "env-files",
+          input: { cwd: "/repo", relativePath: "README.md" },
+        }),
+      );
+      await vi.waitFor(() => expect(refresh).toHaveBeenCalled());
+    } finally {
+      directory.refresh = originalRefresh;
+    }
   });
 
   it("dragging a file row carries a composer mention without opening it, and dragend releases it", async () => {

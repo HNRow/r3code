@@ -512,6 +512,7 @@ export const ProjectFileOperation = Schema.Literals([
   "close",
   "make-directory",
   "write-file",
+  "remove",
 ]);
 export type ProjectFileOperation = typeof ProjectFileOperation.Type;
 
@@ -563,6 +564,17 @@ export const ProjectWriteFileResult = Schema.Struct({
 });
 export type ProjectWriteFileResult = typeof ProjectWriteFileResult.Type;
 
+export const ProjectDeleteEntryInput = Schema.Struct({
+  cwd: TrimmedNonEmptyString,
+  relativePath: Schema.NonEmptyString.check(Schema.isMaxLength(PROJECT_WRITE_FILE_PATH_MAX_LENGTH)),
+});
+export type ProjectDeleteEntryInput = typeof ProjectDeleteEntryInput.Type;
+
+export const ProjectDeleteEntryResult = Schema.Struct({
+  relativePath: Schema.NonEmptyString,
+});
+export type ProjectDeleteEntryResult = typeof ProjectDeleteEntryResult.Type;
+
 export const ProjectEnsureScratchResult = Schema.Struct({
   projectId: ProjectId,
 });
@@ -612,6 +624,31 @@ export class ProjectWriteFileError extends Schema.TaggedError<ProjectWriteFileEr
       message:
         decodedProjectErrorMessage(props) ??
         `Failed to write workspace file '${props.relativePath}' in '${props.cwd}'.`,
+    } as any);
+  }
+}
+
+export class ProjectDeleteEntryError extends Schema.TaggedError<ProjectDeleteEntryError>()(
+  "ProjectDeleteEntryError",
+  {
+    cwd: Schema.optional(TrimmedNonEmptyString),
+    relativePath: Schema.optional(Schema.NonEmptyString),
+    failure: Schema.optional(ProjectFileFailure),
+    resolvedPath: Schema.optional(Schema.NonEmptyString),
+    resolvedWorkspaceRoot: Schema.optional(TrimmedNonEmptyString),
+    operation: Schema.optional(ProjectFileOperation),
+    operationPath: Schema.optional(Schema.NonEmptyString),
+    message: TrimmedNonEmptyString,
+    cause: Schema.optional(Schema.Defect()),
+  },
+) {
+  // @effect-diagnostics-next-line overriddenSchemaConstructor:off
+  constructor(props: ProjectFileFailureContext) {
+    super({
+      ...props,
+      message:
+        decodedProjectErrorMessage(props) ??
+        `Failed to delete workspace entry '${props.relativePath}' in '${props.cwd}'.`,
     } as any);
   }
 }

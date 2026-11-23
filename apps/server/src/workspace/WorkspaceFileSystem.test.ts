@@ -962,4 +962,56 @@ it.layer(layerTest, { excludeTestServices: true })("WorkspaceFileSystemLive", (i
       }),
     );
   });
+
+  describe("deleteEntry", () => {
+    it.effect("deletes a file and drops it from the workspace entry list", () =>
+      Effect.gen(function* () {
+        const workspaceEntries = yield* WorkspaceEntries.WorkspaceEntries;
+        const workspaceFileSystem = yield* WorkspaceFileSystem.WorkspaceFileSystem;
+        const fileSystem = yield* FileSystem.FileSystem;
+        const path = yield* Path.Path;
+        const cwd = yield* makeTempDir;
+        yield* writeTextFile(cwd, "notes/todo.md", "done\n");
+
+        yield* workspaceFileSystem.deleteEntry({ cwd, relativePath: "notes/todo.md" });
+
+        expect(yield* fileSystem.exists(path.join(cwd, "notes/todo.md"))).toBe(false);
+        const entries = yield* workspaceEntries.list({ cwd });
+        expect(entries.entries.some((entry) => entry.path === "notes/todo.md")).toBe(false);
+      }),
+    );
+
+    it.effect("deletes a directory with its contents", () =>
+      Effect.gen(function* () {
+        const workspaceFileSystem = yield* WorkspaceFileSystem.WorkspaceFileSystem;
+        const fileSystem = yield* FileSystem.FileSystem;
+        const path = yield* Path.Path;
+        const cwd = yield* makeTempDir;
+        yield* writeTextFile(cwd, "dist/keep.txt", "x\n");
+        yield* writeTextFile(cwd, "dist/nested/deep.txt", "y\n");
+
+        yield* workspaceFileSystem.deleteEntry({ cwd, relativePath: "dist" });
+
+        expect(yield* fileSystem.exists(path.join(cwd, "dist"))).toBe(false);
+      }),
+    );
+
+    it.effect("refuses a path inside git's folder", () =>
+      Effect.gen(function* () {
+        const workspaceFileSystem = yield* WorkspaceFileSystem.WorkspaceFileSystem;
+        const path = yield* Path.Path;
+        const cwd = yield* makeTempDir;
+        yield* writeTextFile(cwd, ".git/config", "[core]\n");
+
+        const error = yield* workspaceFileSystem
+          .deleteEntry({ cwd, relativePath: ".git/config" })
+          .pipe(Effect.flip);
+
+        expect(error).toBeInstanceOf(WorkspaceFileSystem.WorkspaceFilePathEscapeError);
+        expect(
+          yield* Effect.promise(() => NodeFSP.readFile(path.join(cwd, ".git/config"), "utf8")),
+        ).toContain("[core]");
+      }),
+    );
+  });
 });
