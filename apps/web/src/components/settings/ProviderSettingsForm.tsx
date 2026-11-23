@@ -6,6 +6,7 @@ import {
   isSecretReference,
   isSecretSetting,
   type EnvironmentId,
+  type IdleCompactionMode,
   type ProviderSettingsFormAnnotation,
   type ProviderSettingsFormControl,
   type ProviderSettingsFormOption,
@@ -14,6 +15,7 @@ import {
 } from "@t3tools/contracts";
 import { msg, T, useGT, useMessages } from "gt-react";
 import { PlusIcon, XIcon } from "lucide-react";
+import { idleCompactionModeLabel } from "@t3tools/client-runtime/contract-labels";
 
 import { m, type MessageResolver } from "../../i18n/messages";
 import { cn } from "../../lib/utils";
@@ -32,7 +34,6 @@ export type SettingsFormDefinition = Pick<ProviderClientDefinition, "settingsSch
 };
 import { SettingsRow } from "./settingsLayout";
 import "./providerFieldMessages";
-import { t } from "gt-react";
 
 export interface ProviderSettingsFieldModel {
   readonly key: string;

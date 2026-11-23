@@ -13,6 +13,7 @@ import { jsx } from "react/jsx-runtime";
 import "react-native-gesture-handler";
 import { LogBox } from "react-native";
 import { featureFlags } from "react-native-screens";
+import { GTProvider } from "gt-react-native";
 
 import App from "./src/App";
 

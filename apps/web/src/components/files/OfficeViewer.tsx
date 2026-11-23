@@ -53,12 +53,6 @@ async function readOfficeFile(src: string, signal: AbortSignal) {
   return new Blob(chunks).arrayBuffer();
 }
 
-// 文档分页标题由 worker 生成（"Page 3"），在渲染时按当前语言重排。
-function pageTitle(title: string | undefined): string | undefined {
-  const match = title === undefined ? null : /^Page (\d+)$/.exec(title);
-  return match ? t`Page ${match[1]}` : title;
-}
-
 export default function OfficeViewer(props: {
   readonly src: string;
   readonly name: string;

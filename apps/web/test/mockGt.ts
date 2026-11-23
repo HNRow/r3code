@@ -112,6 +112,7 @@ vi.mock("gt-react", () => ({
   initializeGTSPA: async () => {},
   getTranslationsSnapshot: () => ({}),
   msg: identity,
+  decodeMsg: identity,
   t: identity,
   T: (props: { readonly children?: unknown }) => props.children,
   Branch: (props: { readonly children?: unknown }) => props.children,

@@ -24,7 +24,6 @@ import {
   type HeaderBarButtonItemWithMenu,
   type HeaderBarButtonSearchBarPlacementItem,
 } from "react-native-screens";
-import { t } from "../i18n/gt";
 
 // UIKit's bar margins, and the width of a glass bar button.
 const BAR_MARGINS = 32;
@@ -164,6 +163,7 @@ export function V5StackHeader(props: {
 }) {
   const { options } = props;
   const gt = useGT();
+  const m = useMessages();
   const theme = useMobileNavigationTheme();
   const nativeMetrics = useNativeLayoutMetrics();
   const deviceType = useDeviceType();

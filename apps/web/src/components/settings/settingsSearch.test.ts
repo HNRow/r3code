@@ -112,7 +112,7 @@ describe("searchSettings", () => {
       id: "skills",
       to: "/settings/skills",
     });
-    expect(SETTINGS_NAV_GROUPS.flatMap((group) => group.paths)).toContain("/settings/skills");
+    expect(settingsNavGroups(true).flatMap((group) => group.paths)).toContain("/settings/skills");
   });
 
   it("matches normalized title substrings", () => {

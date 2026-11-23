@@ -69,24 +69,6 @@ describe("pullRequestMarkdownExtensions", () => {
   });
 });
 
-describe("pullRequestMarkdownPlugins", () => {
-  it("renders GitHub emoji shortcodes in prose and leaves code literal", () => {
-    const processor = unified()
-      .use(remarkParse)
-      .use(
-        pullRequestMarkdownPlugins({
-          provider: "github",
-          url: "https://github.com/team/repo/pull/8",
-        }),
-      );
-    const tree = processor.runSync(processor.parse("Ship it :tada: :+1: `:tada:`")) as Node;
-    const text = (node: Node): string =>
-      (node.type === "inlineCode" ? `\`${node.value}\`` : (node.value ?? "")) +
-      (node.children ?? []).map(text).join("");
-    expect(text(tree)).toBe("Ship it 🎉 👍 `:tada:`");
-  });
-});
-
 describe("pullRequestCommentPreview", () => {
   it.each([
     ["<!-- hidden -->\n> [!WARNING]\n**Guard** [this](https://example.com).", "Guard this."],

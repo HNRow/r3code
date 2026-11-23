@@ -45,8 +45,6 @@ import {
   deviceMicrophoneOrder,
   localVoiceTranscriberAtom,
 } from "../voice-input/VoiceInputProvider";
-import { Var, T } from "gt-react-native";
-import { t } from "../../i18n/gt";
 
 type MicrophonePermission = "checking" | "granted" | "ask" | "denied";
 
@@ -344,7 +342,7 @@ export function SettingsVoiceRouteScreen() {
           />
         ) : null}
         {!grant && transcriber === null ? (
-          <Text className="px-2 text-sm text-foreground-muted">{m(UNAVAILABLE_EXPLANATION)}</Text>
+          <Text className="px-2 text-sm text-foreground-muted">{m(unavailableExplanation())}</Text>
         ) : null}
         {permission === "ask" || permission === "denied" ? (
           <>

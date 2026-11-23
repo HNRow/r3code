@@ -17,6 +17,7 @@ import type { SheetProps } from "./Sheet.types";
 /** Native presentation. Scrollable children use automatic insets beneath the iOS header. */
 export function Sheet(props: SheetProps) {
   const gt = useGT();
+  const m = useMessages();
   const containerStyle = useResolveClassNames("bg-sheet");
   const screenId = useId();
   const [isOpen, setIsOpen] = useState(true);

@@ -8,7 +8,6 @@ import {
   showAnchoredCopyErrorToast,
 } from "../ui/anchoredCopyToast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
-import { t } from "gt-react";
 
 export const MessageCopyButton = memo(function MessageCopyButton({
   text,
@@ -41,7 +40,7 @@ export const MessageCopyButton = memo(function MessageCopyButton({
       <TooltipTrigger
         render={
           <Button
-            aria-label={copyLabel}
+            aria-label={label}
             disabled={isCopied}
             onClick={() => copyToClipboard(text)}
             ref={ref}
@@ -55,7 +54,7 @@ export const MessageCopyButton = memo(function MessageCopyButton({
         {isCopied ? <CheckIcon className="size-3 text-primary" /> : <Icon className="size-3" />}
       </TooltipTrigger>
       <TooltipPopup>
-        <p>{copyLabel}</p>
+        <p>{label}</p>
       </TooltipPopup>
     </Tooltip>
   );

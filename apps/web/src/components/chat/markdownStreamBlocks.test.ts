@@ -3,9 +3,6 @@ import { describe, expect, it } from "vite-plus/test";
 
 import { wordsHast } from "~/markdown/wordsHast";
 import { splitMarkdownBlocks } from "./markdownStreamBlocks";
-import { rehypeHeadingIds } from "./markdownFragments";
-
-const MATH_PLUGINS: PluggableList = [[remarkMath, { singleDollarTextMath: true }]];
 
 // Whitespace between top-level blocks collapses in the rendered message.
 const renderMarkdown = (source: string, math = false) =>
