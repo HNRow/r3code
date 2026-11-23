@@ -113,6 +113,9 @@ const T3_MCP_SERVER_ALIASES = new Set([
   "t3code",
   "t3-code-direct",
   "t3_code_direct",
+  "r3-code",
+  "r3_code",
+  "r3code",
 ]);
 
 const T3_MCP_TOOLS: Readonly<Record<string, T3McpToolDefinition>> = {
@@ -359,6 +362,7 @@ const T3_MCP_TOOLS: Readonly<Record<string, T3McpToolDefinition>> = {
     ["Handle", "Handling", "Handled", "pending questions"],
     "question-respond",
   ),
+  t3_workflow: tool(["Use", "Using", "Used", "workflow runs"], "thread-send"),
   t3_submit_output: tool(["Submit", "Submitting", "Submitted", "the result"], "thread-send"),
   t3_queue_list: tool(["List", "Listing", "Listed", "queued messages"], "queue-list"),
   t3_queue_read: tool(["Read", "Reading", "Read", "a queued message"], "queue-read"),
@@ -485,7 +489,7 @@ function parseT3McpToolName(value: string): string | null {
     return namespaceMatch.groups.tool ?? null;
   }
 
-  const prefixed = /^(?:mcp[-_]{1,2})?t3[-_ ]?code(?:__|[-_.:/ ])(?<tool>.+)$/i.exec(label);
+  const prefixed = /^(?:mcp[-_]{1,2})?[rt]3[-_ ]?code(?:__|[-_.:/ ])(?<tool>.+)$/i.exec(label);
   const candidate = prefixed?.groups?.tool ?? label;
   if (Object.hasOwn(T3_MCP_TOOLS, candidate)) return candidate;
   // OpenCode 2 thread prefixes can contain underscores; choose the longest known tool-name suffix.

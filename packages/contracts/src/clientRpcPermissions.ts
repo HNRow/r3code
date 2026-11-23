@@ -85,6 +85,13 @@ export const CLIENT_GUARDED_RPC_SCOPES = {
   [WS_METHODS.scheduledTasksRunNow]: AuthOrchestrationOperateScope,
   [WS_METHODS.scheduledTasksRotateWebhookToken]: AuthOrchestrationOperateScope,
   [ORCHESTRATION_V2_WS_METHODS.stopWorkflow]: AuthOrchestrationOperateScope,
+  // An answer, a resume and a cancel each decide what a run's agents do next.
+  [WS_METHODS.workflowsAnswer]: AuthOrchestrationOperateScope,
+  [WS_METHODS.workflowsResume]: AuthOrchestrationOperateScope,
+  [WS_METHODS.workflowsCancel]: AuthOrchestrationOperateScope,
+  // The server runs this file: saving it is running code there, as a terminal does.
+  [WS_METHODS.workflowsSaveDefinition]: AuthTerminalOperateScope,
+  [WS_METHODS.workflowsDeleteDefinition]: AuthTerminalOperateScope,
   // Force stop kills agent processes, as Stop on a terminal does.
   [ORCHESTRATION_V2_WS_METHODS.forceStopThread]: AuthOrchestrationOperateScope,
   // A guest link hands thread access to someone outside, like a pairing link.
@@ -95,6 +102,8 @@ export const CLIENT_GUARDED_RPC_SCOPES = {
   [WS_METHODS.peerLinksAnswerRequest]: AuthAccessWriteScope,
   [WS_METHODS.peerLinksPairClient]: AuthAccessWriteScope,
   [WS_METHODS.peerLinksPairLink]: AuthAccessWriteScope,
+  // Send stores and sends a report from a thread's turn: the bar of running that thread.
+  [WS_METHODS.agentFeedbackAnswerRequest]: AuthOrchestrationOperateScope,
 } as const;
 export type ClientGuardedRpcTag = keyof typeof CLIENT_GUARDED_RPC_SCOPES;
 
@@ -122,10 +131,11 @@ export function clientRpcRequiredScopes(
         : method === WS_METHODS.skillsSetEnabled
           ? decodeSkillSetEnabled(input)
           : decodeSkillUninstall(input);
-    if (payload.nativeId.startsWith("project:")) {
-      return [AuthProvidersManageScope, AuthFilesystemWriteScope];
-    }
+    return payload.nativeId.startsWith("project:")
+      ? [AuthProvidersManageScope, AuthFilesystemWriteScope]
+      : [AuthProvidersManageScope];
   }
+  if (method === WS_METHODS.skillsSync) return [AuthProvidersManageScope];
   if (
     input !== undefined &&
     (method === WS_METHODS.pluginsSetEnabled || method === WS_METHODS.pluginsUninstall)
@@ -135,9 +145,9 @@ export function clientRpcRequiredScopes(
         ? decodePluginSetEnabled(input)
         : decodePluginUninstall(input);
     // 项目级安装记录写在项目的设置里，和 project 技能一样需要可写文件系统。
-    if (payload.scope === "project" || payload.scope === "local") {
-      return [AuthProvidersManageScope, AuthFilesystemWriteScope];
-    }
+    return payload.scope === "project" || payload.scope === "local"
+      ? [AuthProvidersManageScope, AuthFilesystemWriteScope]
+      : [AuthProvidersManageScope];
   }
   if (method === WS_METHODS.gitPreparePullRequestThread && input !== undefined) {
     const payload = decodePrepareThread(input);

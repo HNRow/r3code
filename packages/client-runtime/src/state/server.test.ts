@@ -2000,17 +2000,11 @@ describe("provider setup commands", () => {
         }),
       );
 
-      expect(result).toMatchObject({ _tag: "Success", value: inventory });
-      expect(installed).toMatchObject({
-        _tag: "Success",
-        value: { requiresSessionRestart: true },
-      });
+      expect(result).toMatchObject(inventory);
+      expect(installed).toMatchObject({ requiresSessionRestart: true });
       expect(synced).toMatchObject({
-        _tag: "Success",
-        value: {
-          requiresSessionRestart: true,
-          backups: [{ nativeId: "review", path: "/backup/review" }],
-        },
+        requiresSessionRestart: true,
+        backups: [{ nativeId: "review", path: "/backup/review" }],
       });
       expect(yield* Queue.take(requested)).toEqual({ instanceId: "claude", cwd: "/repo" });
       expect(mutations).toEqual([

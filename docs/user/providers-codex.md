@@ -146,6 +146,7 @@ address, paste it into R3 Code, and choose **Finish sign-in**. Codex reconnects 
 thread and keeps the sign-in for other threads on the same Codex instance; an instance with its own
 home, such as a second account, may need to sign in separately. Signing in needs permission to
 manage providers.
+
 ## Use the OpenAI Chrome extension
 
 Connecting ChatGPT in **Settings → Providers** signs in the Codex provider.
