@@ -31,7 +31,6 @@ import { PullRequestStackHeader } from "./PullRequestStackHeader";
 import { PullRequestStackLayerContent } from "./PullRequestStackLayerContent";
 import { PullRequestGlyph } from "./pullRequestIcons";
 import { readableFailure } from "./pullRequestDetail.logic";
-import { t } from "gt-react";
 
 import { changeRequestTermKind } from "./changeRequestTerm";
 

@@ -61,7 +61,6 @@ import {
   movedPreparingImageThread,
   removePreparingComposerImages,
 } from "./preparingComposerImages";
-import { t } from "gt-react";
 
 /**
  * Takes files into the draft: validates and reserves slots, compresses images, inserts

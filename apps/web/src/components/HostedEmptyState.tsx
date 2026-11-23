@@ -18,7 +18,6 @@ import { Button } from "./ui/button";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "./ui/empty";
 import { SidebarInset } from "./ui/sidebar";
 import { WorkspacePageHeader } from "./WorkspacePageHeader";
-import { t } from "gt-react";
 
 /** Home screen for the hosted app before any computer is added. */
 export function HostedEmptyState() {

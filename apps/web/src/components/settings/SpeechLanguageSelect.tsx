@@ -3,7 +3,6 @@ import { effectiveSpeechLanguage } from "@t3tools/shared/speech";
 import { useGT, useLocale } from "gt-react";
 import { updateClientSettings, useClientSettings } from "../../hooks/useSettings";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
-import { T } from "gt-react";
 
 const languageNamesByLocale = new Map<string, Intl.DisplayNames>();
 export function languageLabel(code: string, locale = "en"): string {

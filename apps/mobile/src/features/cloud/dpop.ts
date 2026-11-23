@@ -13,7 +13,6 @@ import * as SecureStore from "expo-secure-store";
 import { DpopProof } from "@t3tools/client-runtime/relay";
 import { DpopPublicJwk } from "@t3tools/shared/dpopCommon";
 import * as Layer from "effect/Layer";
-import { t } from "../../i18n/gt";
 
 export class CloudDpopError extends Schema.TaggedError<CloudDpopError>()("CloudDpopError", {
   message: Schema.String,

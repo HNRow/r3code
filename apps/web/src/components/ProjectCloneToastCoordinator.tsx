@@ -30,7 +30,6 @@ import { useAtomCommand } from "../state/use-atom-command";
 import { type DraftId, useComposerDraftStore } from "../composerDraftStore";
 import { toastManager } from "./ui/toast";
 import { stackedThreadToast } from "./ui/toastHelpers";
-import { t } from "gt-react";
 
 export function ProjectCloneToastCoordinator() {
   const { environments } = useEnvironments();

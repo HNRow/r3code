@@ -61,10 +61,6 @@ interface UpdateEverythingDialogProps {
   readonly checking?: boolean;
 }
 
-function fill(template: string, vars: Readonly<Record<number, string>>): string {
-  return template.replace(/\{(\d+)\}/g, (match, index: string) => vars[Number(index)] ?? match);
-}
-
 type UpdateEverythingDialogContentProps = Omit<
   UpdateEverythingDialogProps,
   "open" | "onOpenChange"

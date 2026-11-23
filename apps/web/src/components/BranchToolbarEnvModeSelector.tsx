@@ -24,7 +24,6 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
 import { useAtomValue } from "@effect/atom-react";
 import { shortcutLabelForCommand } from "../keybindings";
 import { primaryServerKeybindingsAtom } from "../state/server";
-import { t } from "gt-react";
 
 const PREVIOUS_WORKTREE_SELECT_VALUE = "previous-worktree";
 

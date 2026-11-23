@@ -30,7 +30,6 @@ import { Input } from "../ui/input";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
 import { toastManager } from "../ui/toast";
 import { SettingsRow } from "./settingsLayout";
-import { t } from "gt-react";
 
 interface AcpSessionProject {
   readonly id: ProjectId;

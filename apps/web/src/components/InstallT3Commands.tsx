@@ -2,7 +2,6 @@ import { T } from "gt-react";
 import { cn } from "~/lib/utils";
 
 import { CommandBlock } from "./CommandBlock";
-import { Var } from "gt-react";
 
 /**
  * Setup steps for another computer: install `t3`, then run `command`. Both installers are shown

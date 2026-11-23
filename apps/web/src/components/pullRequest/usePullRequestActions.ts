@@ -47,7 +47,6 @@ import {
   readableFailure,
 } from "./pullRequestDetail.logic";
 import { pullRequestEntryKey, type EnvironmentPullRequestEntry } from "./pullRequestList.logic";
-import { t } from "gt-react";
 
 import { changeRequestTermKind, type ChangeRequestTermKind } from "./changeRequestTerm";
 

@@ -7,7 +7,6 @@ import { m } from "../i18n/messages";
 import { appAtomRegistry } from "../rpc/atomRegistry";
 import { sourceControlEnvironment } from "../state/sourceControl";
 import { toastManager } from "./ui/toast";
-import { t } from "gt-react";
 
 /**
  * After a clone, suggests installing the forge app on the repository's owner when the server is

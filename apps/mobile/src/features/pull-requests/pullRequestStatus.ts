@@ -12,8 +12,6 @@ import type { AppSymbolName } from "../../components/ui/AppSymbol";
 import { m, type MessageResolver } from "../../i18n/messages";
 import { PullRequestGlyph } from "./pullRequestGlyphs";
 
-import { t } from "../../i18n/gt";
-
 const STATES = {
   open: {
     label: msg("Open", { $context: "pull request state" }),

@@ -70,7 +70,6 @@ import {
 import { BackgroundThreadContext } from "./backgroundThread";
 import { isInSideChatPane } from "../../lib/sideChatPane";
 import { useStableCallback } from "../../hooks/useStableCallback";
-import { t } from "gt-react";
 
 /**
  * The prompt stash: saving the draft aside, restoring or deleting an entry, the badge pulse,

@@ -13,7 +13,6 @@ import { type ComposerThreadTarget, useComposerDraftStore } from "../../composer
 import { environmentThreadShells, threadEnvironment } from "../../state/threads";
 import { useOrchestrationCommand } from "../../state/use-orchestration-command";
 import { stackedThreadToast, toastManager } from "../ui/toast";
-import { t } from "gt-react";
 
 /** Sets an existing thread's composer pick on the thread, so any next turn runs on it. */
 export function useApplyThreadModelPick() {

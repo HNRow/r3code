@@ -11,7 +11,6 @@ import { m, type MessageResolver } from "~/i18n/messages";
 import { readLocalApi } from "~/localApi";
 
 import { toastManager } from "../ui/toast";
-import { t } from "gt-react";
 
 export type PullRequestLinkContextMenuAction = "copy-link" | "open-external";
 

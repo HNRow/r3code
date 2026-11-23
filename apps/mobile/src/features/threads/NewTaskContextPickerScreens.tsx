@@ -53,7 +53,6 @@ import {
   useConnectionDiagnosis,
 } from "../connection/ConnectionDiagnosisDetails";
 import { environmentStatusText } from "../connection/environmentStatusText";
-import { t } from "../../i18n/gt";
 
 const BRANCH_SEARCH_DEBOUNCE_MS = 150;
 

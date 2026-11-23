@@ -5,7 +5,6 @@ import { RefreshIcon } from "~/components/ui/refresh-icon";
 import { cn } from "~/lib/utils";
 
 import { Button } from "../ui/button";
-import { Var } from "gt-react";
 
 import type { ChangeRequestTermKind } from "./changeRequestTerm";
 

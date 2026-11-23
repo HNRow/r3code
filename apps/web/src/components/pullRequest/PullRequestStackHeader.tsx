@@ -2,7 +2,6 @@ import { T, useGT, Var } from "gt-react";
 
 import { MenuGroupLabel } from "../ui/menu";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
-import { t } from "gt-react";
 
 export function PullRequestStackHeader({
   number,

@@ -18,7 +18,6 @@ import {
   usePullRequestActionRunner,
   usePullRequestDefaultMergeMethodResolver,
 } from "./usePullRequestActions";
-import { t } from "gt-react";
 
 import { changeRequestTermKind } from "./changeRequestTerm";
 

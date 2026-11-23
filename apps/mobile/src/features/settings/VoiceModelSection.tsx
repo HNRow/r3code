@@ -32,7 +32,6 @@ import {
   voiceSpeechModelsAtom,
   voiceSpeechStatusAtom,
 } from "../voice-input/voiceDestination";
-import { t } from "../../i18n/gt";
 
 const isDownloading = (model: EnvironmentSpeechModel) =>
   model.state === "downloading" || model.state === "verifying";

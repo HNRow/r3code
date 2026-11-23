@@ -9,7 +9,6 @@ import {
   resolveThreadPrBadgeAction,
   type ThreadPrPresentation,
 } from "../../state/thread-pr-presentation";
-import { t } from "../../i18n/gt";
 
 /** Called once per thread list so virtualized rows share one stable handler. */
 export function useOpenThreadPullRequests() {

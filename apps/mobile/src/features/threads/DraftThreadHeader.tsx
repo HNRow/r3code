@@ -16,7 +16,6 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { vcsActionManager, vcsEnvironment } from "../../state/vcs";
 import { useVcsActionState } from "../../state/use-vcs-action-state";
 import { ThreadHeader } from "./ThreadHeader";
-import { t } from "../../i18n/gt";
 
 export function DraftThreadHeader(props: {
   readonly thread: EnvironmentThreadShell;

@@ -17,7 +17,6 @@ import {
   useLinkedPullRequestLines,
 } from "./LinkedPullRequestList";
 import { useLinkedPullRequestActions } from "./useLinkedPullRequestActions";
-import { Var, T } from "gt-react-native";
 
 export function ThreadPullRequestsSheet(
   _props: StaticScreenProps<{ readonly environmentId: string; readonly threadId: string }>,

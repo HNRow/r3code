@@ -7,7 +7,6 @@ import type {
 } from "../../sidebarProjectGrouping";
 import { m, type MessageResolver } from "../../i18n/messages";
 import type { EnvironmentPresentation } from "../../state/environments";
-import { t } from "gt-react";
 
 export interface SettingsScopeSearch {
   project?: string | undefined;

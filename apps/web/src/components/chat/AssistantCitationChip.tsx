@@ -32,7 +32,6 @@ import { resolveAssistantCitationCommentDismissal } from "./assistantCitationCom
 import { observeAssistantCitationCommentSource } from "./AssistantCitationSource";
 import { composerFloatingLayerProps } from "./composerEventScope";
 import { textDirection } from "~/textDirection";
-import { t } from "gt-react";
 
 function useCitationSourceLinkProps(citation: AssistantCitation) {
   const navigate = useNavigate();

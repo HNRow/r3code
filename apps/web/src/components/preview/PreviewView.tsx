@@ -113,7 +113,6 @@ import {
 import { stackedThreadToast, toastManager } from "~/components/ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "~/components/ui/tooltip";
 import { observeResize } from "~/lib/observeResize";
-import { t } from "gt-react";
 
 interface Props {
   threadRef: ScopedThreadRef;

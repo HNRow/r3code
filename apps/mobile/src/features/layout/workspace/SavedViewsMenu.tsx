@@ -16,8 +16,6 @@ import { mobilePreferencesAtom, saveMobilePreferences } from "../../../state/pre
 import { useAtomCommand } from "../../../state/use-atom-command";
 import { ListFilterMenu } from "./ListFilterMenu";
 
-import { t } from "../../../i18n/gt";
-
 type SavedViewIdentity = typeof SavedViewIdentitySchema.Type;
 const EMPTY_SAVED_VIEWS: ReadonlyArray<never> = [];
 

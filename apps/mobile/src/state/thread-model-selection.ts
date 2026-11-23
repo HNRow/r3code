@@ -18,7 +18,6 @@ import {
   releaseComposerDraftModelSelection,
   updateComposerDraftSettings,
 } from "./use-composer-drafts";
-import { t } from "../i18n/gt";
 
 /** Sets an existing thread's pick on the thread, so any next turn runs on it. */
 export function selectThreadModel(

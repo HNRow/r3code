@@ -31,7 +31,7 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../
 import { Spinner } from "../ui/spinner";
 import { parseEasDeviceHostDraft } from "./easDeviceHostsSettings.logic";
 import { SecretSourceInput, useSecretSources } from "./SecretSourceInput";
-import { Var, t } from "gt-react";
+import { t } from "gt-react";
 
 const EXPO_CREDENTIAL_MISSING =
   "No Expo credential on the server: save an access token for this host, set EXPO_TOKEN, or run `eas login`.";

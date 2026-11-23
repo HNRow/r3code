@@ -19,7 +19,6 @@ import {
   usePullRequestReviewStore,
 } from "./pullRequestReviewStore";
 import type { PullRequestCompletionScope } from "./PullRequestMarkdownTextarea";
-import { t } from "gt-react";
 
 export function PullRequestGuideTab({
   environmentId,

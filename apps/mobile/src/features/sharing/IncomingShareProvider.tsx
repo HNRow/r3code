@@ -51,7 +51,6 @@ import {
   removeIncomingShareDraft,
   writeIncomingShareDraft,
 } from "./incoming-share-storage";
-import { t } from "../../i18n/gt";
 
 function receiveSharingEnabled(): boolean {
   if (Platform.OS === "android") {

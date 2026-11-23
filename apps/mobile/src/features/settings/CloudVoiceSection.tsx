@@ -42,7 +42,6 @@ import {
   cloudVoiceModelsAtom,
   runSpeech,
 } from "../voice-input/voiceDestination";
-import { t } from "../../i18n/gt";
 
 type CloudDestination = Extract<VoiceTranscriptionDestination, { kind: "cloud" }>;
 type Props = { environment: EnvironmentPresentation; active: CloudDestination | null };

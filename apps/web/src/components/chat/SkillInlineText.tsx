@@ -11,7 +11,6 @@ import { ContextChipPopover } from "../contextChipParts";
 import { Button } from "../ui/button";
 import { PopoverClose } from "../ui/popover";
 import { ModelMentionChip } from "./ModelMentionChip";
-import { t } from "gt-react";
 
 function SkillInlineText(props: {
   text: string;

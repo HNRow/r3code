@@ -8,7 +8,6 @@ import {
   IssueListPreferencesSchema,
   type IssueListPreferences,
 } from "./issueListPreferences";
-import { t } from "gt-react";
 
 export function issueViewMatches(
   view: SavedView<typeof IssueListPreferencesSchema.Type>,

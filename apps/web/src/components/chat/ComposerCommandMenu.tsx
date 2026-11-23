@@ -37,7 +37,6 @@ import { PierreEntryIcon } from "./PierreEntryIcon";
 import { ProviderInstanceIcon } from "./ProviderInstanceIcon";
 import { ComposerBanner } from "./ComposerBanner";
 import { resolvePullRequestState } from "../pullRequest/pullRequestPresentation";
-import { t } from "gt-react";
 
 export type ComposerCommandItem =
   | {

@@ -21,7 +21,6 @@ import { usePreparedConnection } from "../../state/session";
 import { AppText } from "./AppText";
 import { MediaPreviewHeader } from "../MediaPreviewHeader";
 import { MediaVideoPlayer } from "../MediaVideoPlayer";
-import { t } from "../../i18n/gt";
 
 export type { VideoPreviewSource } from "../../lib/videoPreviewSource";
 

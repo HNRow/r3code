@@ -31,7 +31,6 @@ import { environmentServerConfigsAtom, serverEnvironment } from "../state/server
 import { usePrimaryEnvironmentId } from "../state/environments";
 import { reviewEnvironment } from "../state/review";
 import { useAtomQueryRunner } from "../state/use-atom-query-runner";
-import { t } from "gt-react";
 
 export function usePullRequestPreviewTarget(environmentId: EnvironmentId | null, url: string) {
   const projects = useProjects();

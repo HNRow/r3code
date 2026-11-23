@@ -20,7 +20,6 @@ import { getMobileUniwindThemeName } from "../../../../lib/mobileThemeRuntime";
 import type { MessageResolver } from "../../../../i18n/messages";
 import { cn } from "../../../../lib/cn";
 import { useAppearancePreferences } from "../AppearancePreferencesProvider";
-import { t } from "../../../../i18n/gt";
 
 const THEME_NAMES: Readonly<Record<string, string>> = {
   grove: msg("Grove", { $context: "color theme name" }),

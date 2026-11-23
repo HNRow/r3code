@@ -29,7 +29,6 @@ import {
   resolveMarkdownImageDisplaySize,
   resolveSvgImageSize,
 } from "./markdownImageSize";
-import { t } from "../../i18n/gt";
 
 /** Use known feed width immediately; later image measurement would move already-positioned rows. */
 export const MarkdownImageAvailableWidthContext = createContext(0);

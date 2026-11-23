@@ -13,7 +13,6 @@ import {
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Spinner } from "../ui/spinner";
-import { Var } from "gt-react";
 
 export interface ConnectDeviceRevokeRequest {
   readonly title: string;

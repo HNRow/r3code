@@ -44,7 +44,6 @@ import { cn } from "~/lib/utils";
 import { textDirection } from "~/textDirection";
 import { useClientSettings } from "../../hooks/useSettings";
 import { GuestShareIndicator } from "./GuestShareControls";
-import { t } from "gt-react";
 
 interface ChatHeaderProps {
   activeThreadEnvironmentId: EnvironmentId;

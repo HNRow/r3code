@@ -16,7 +16,6 @@ import {
   type SourceControlHostCredentials,
 } from "@t3tools/client-runtime/source-control-clients";
 import { redactedPlaceholder } from "./RedactedSensitiveText";
-import { t } from "gt-react";
 
 /** Sentinel select value for "follow the CLI's active login"; logins never contain spaces. */
 const ACTIVE_ACCOUNT = "active cli account";

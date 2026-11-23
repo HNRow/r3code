@@ -17,7 +17,6 @@ import { SnapShotShortcutKeys } from "../desktop/SnapShotShortcutKeys";
 import { Button } from "../ui/button";
 import { keybindingFromKeyboardEvent } from "./KeybindingsSettings.logic";
 import { createRecordingRequestTracker } from "./SnapShotSettings.logic";
-import { t } from "gt-react";
 
 const MODIFIER_FROM_KEY: Readonly<Record<string, SnapShotModifier>> = {
   Shift: "shift",

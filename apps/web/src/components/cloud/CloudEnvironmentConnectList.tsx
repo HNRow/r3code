@@ -45,7 +45,6 @@ import { Skeleton } from "../ui/skeleton";
 import { toastManager } from "../ui/toast";
 import { Tooltip, TooltipTrigger, TooltipPopup } from "../ui/tooltip";
 import { presentSavedCloudEnvironmentConnection } from "./cloudEnvironmentConnectionPresentation";
-import { t } from "gt-react";
 
 const EMPTY_DISCOVERY_REFRESH_INTERVAL_MS = 5_000;
 

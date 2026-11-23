@@ -10,7 +10,6 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { PullRequestSheetContent } from "../pull-requests/PullRequestSheetContent";
 import { issueTarget, type IssueParams } from "./issueParams";
 import { issueCommandError, useIssueAccess } from "./issuePresentation";
-import { t } from "../../i18n/gt";
 
 type IssueEditParams = IssueParams & { readonly field: "title" | "body" };
 

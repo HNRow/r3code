@@ -24,7 +24,6 @@ import { createRemoteEnvironmentProjectionAtoms } from "./remote-environment-pro
 import { serverEnvironment } from "./server";
 import { relayEnvironmentDiscovery } from "./relay";
 import { connectPairingUrl as connectPairingUrlCommand } from "../connection/onboarding";
-import { t } from "../i18n/gt";
 
 const RELAY_REMOVAL_ACCOUNT_NOTE: Record<Discovery.RelayEnvironmentRegistration, string> = {
   registered: msg(

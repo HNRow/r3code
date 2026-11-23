@@ -11,7 +11,6 @@ import type {
   AgentActivityProps,
   AgentActivityRowProps,
 } from "../../widgets/AgentActivity";
-import { t } from "../../i18n/gt";
 
 const SHOWCASE_AGENT_ACTIVITY_ROWS = [
   { threadId: "pocket-command-center", phase: "waiting_for_approval", minutesAgo: 1 },

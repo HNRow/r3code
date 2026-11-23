@@ -104,7 +104,6 @@ import {
 } from "./use-thread-outbox";
 import { clearThreadComposerError, setThreadComposerError } from "./thread-composer-error";
 import { workspaceConnections } from "./workspace";
-import { t } from "../i18n/gt";
 
 const threadOutboxDebug = createDebugLogger("thread-outbox");
 

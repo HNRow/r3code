@@ -25,7 +25,6 @@ import { ProjectFavicon } from "../ProjectFavicon";
 import { msg, T, useGT, useMessages } from "gt-react";
 import { useRef, useState } from "react";
 import { Tooltip, TooltipTrigger, TooltipPopup } from "../ui/tooltip";
-import { Var, t } from "gt-react";
 
 const ARCHIVE_ACTIONS = [
   {

@@ -53,7 +53,6 @@ import { msg } from "gt-react";
 
 import { m, type MessageResolver } from "~/i18n/messages";
 import { inferReviewCommentFenceLanguage, type ReviewCommentContext } from "~/reviewCommentContext";
-import { t } from "gt-react";
 
 import { changeRequestTermKind } from "./changeRequestTerm";
 

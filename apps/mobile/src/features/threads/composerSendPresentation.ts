@@ -7,7 +7,6 @@ import { msg } from "gt-react-native";
 import { m, type MessageResolver } from "../../i18n/messages";
 
 import type { FollowUpBehavior } from "../../lib/followUpBehavior";
-import { t } from "../../i18n/gt";
 
 export interface ComposerSendPresentation {
   readonly label: string;

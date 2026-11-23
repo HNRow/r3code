@@ -29,7 +29,6 @@ import {
   type ClaudeAccountDraft,
 } from "./claude-accounts";
 import type { SettingsTarget } from "./settings-environment-filter";
-import { t } from "../../i18n/gt";
 
 function useProviderInstanceMutation(environment: SettingsTarget) {
   const gt = useGT();

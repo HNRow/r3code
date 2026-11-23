@@ -6,7 +6,6 @@ import * as NodeChildProcess from "node:child_process";
 import * as NodeFS from "node:fs";
 import * as NodeOS from "node:os";
 import * as NodePath from "node:path";
-import * as NodeUtil from "node:util";
 
 // Desktop only depends on gt-i18n, so the gt CLI hides `generate` there; its script adds it back.
 const GENERATE: Record<string, readonly [string, ...string[]]> = {

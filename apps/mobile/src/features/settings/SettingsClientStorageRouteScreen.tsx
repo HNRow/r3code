@@ -23,7 +23,6 @@ import { ListActionRow as SettingsActionRow } from "../../components/ui/ListActi
 import { SettingsSection } from "./components/SettingsSection";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { formatBytes } from "../../lib/formatBytes";
-import { t } from "../../i18n/gt";
 
 export function SettingsClientStorageRouteScreen() {
   const gt = useGT();

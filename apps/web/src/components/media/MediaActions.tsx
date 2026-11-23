@@ -32,7 +32,6 @@ import { useAtomQueryRunner } from "../../state/use-atom-query-runner";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { downloadMedia, readMediaPng } from "./mediaContent";
-import { t } from "gt-react";
 
 export interface MediaActionSource {
   readonly kind: "image" | "video";

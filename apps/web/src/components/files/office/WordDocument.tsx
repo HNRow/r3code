@@ -16,7 +16,6 @@ import {
   type WordSpan,
   type WordLink,
 } from "./word-protocol";
-import { useGT } from "gt-react";
 
 type Opened = {
   pages: readonly WordPageSize[];
@@ -29,7 +28,6 @@ export default function WordDocument(props: {
   onDetails: (text: string) => void;
   onError: (cause: unknown) => void;
 }) {
-  const gt = useGT();
   const { onError, bytes, onDetails } = props;
   const [opened, setOpened] = useState<Opened>();
   const scroll = useRef<((index: number, y?: number) => void) | null>(null);

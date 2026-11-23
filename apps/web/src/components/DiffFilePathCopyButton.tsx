@@ -6,7 +6,6 @@ import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
 import { ANCHORED_COPY_TOAST_TIMEOUT_MS, showAnchoredCopyErrorToast } from "./ui/anchoredCopyToast";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
-import { t } from "gt-react";
 
 export function DiffFilePathCopyButton({
   filePath,

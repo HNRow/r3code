@@ -23,7 +23,6 @@ import {
   SHOWCASE_AVAILABLE_CLOUD_ENVIRONMENTS,
   SHOWCASE_CONNECTED_CLOUD_ENVIRONMENTS,
 } from "../showcase/showcaseEnvironmentRows";
-import { t } from "../../i18n/gt";
 
 const SHOWCASE_ENABLED = process.env.EXPO_PUBLIC_SHOWCASE === "1";
 

@@ -21,7 +21,6 @@ import {
 } from "./ConnectionsSettings.logic";
 import { ITEM_ROW_CLASSNAME, ITEM_ROW_INNER_CLASSNAME } from "./itemRows";
 import { SettingsSection } from "./settingsLayout";
-import { t } from "gt-react";
 
 function reportFailure(title: string, result: Parameters<typeof isAtomCommandInterrupted>[0]) {
   if (result._tag !== "Failure" || isAtomCommandInterrupted(result)) return;

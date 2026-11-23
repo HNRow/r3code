@@ -17,8 +17,6 @@ import { linkedThreadRouteParams } from "./linkedThreadRoute";
 import { LinkedThreadView } from "./LinkedThreadSheet";
 import type { ThreadInspectorPresentation } from "./thread-inspector-header";
 import { ThreadPreviewRoute } from "./thread-preview-route";
-import { useGT } from "gt-react-native";
-import { t } from "../../i18n/gt";
 
 /** A thread shown beside or over the workspace does not take the workspace's content width. */
 export function InspectorContentScope({ children }: { readonly children: ReactNode }) {

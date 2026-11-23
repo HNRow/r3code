@@ -8,7 +8,6 @@ import { msg } from "gt-react-native";
 
 import { m } from "../../i18n/messages";
 import { findEnvironmentUpdate } from "./environment-maintenance";
-import { t } from "../../i18n/gt";
 
 export interface EnvironmentReleaseCheck {
   readonly fromVersion: string;

@@ -44,7 +44,6 @@ import {
   enrichedModelReference,
   enrichedLinkVariantPattern,
 } from "../lib/enrichedLinkPresentation";
-import { gt, t } from "../i18n/gt";
 
 function enrichedStyle(
   style: SelectableMarkdownTextProps["textStyle"],

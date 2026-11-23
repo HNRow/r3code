@@ -7,7 +7,6 @@ import { msg } from "gt-react-native";
 import type { AppBarMenuItem } from "../../../components/ui/AppBar.types";
 import { m, type MessageResolver } from "../../../i18n/messages";
 import { withNativeGlassHeaderItem } from "../native-glass-header-items";
-import { t } from "../../../i18n/gt";
 
 type NativeHeaderMenuItems = NativeStackHeaderItemMenu["menu"]["items"];
 type NativeHeaderIcon = NonNullable<Extract<NativeStackHeaderItem, { type: "button" }>["icon"]>;

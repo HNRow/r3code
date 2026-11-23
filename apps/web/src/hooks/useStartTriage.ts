@@ -18,7 +18,6 @@ import { useAtomCommand } from "~/state/use-atom-command";
 import { writeTextToClipboard } from "./useCopyToClipboard";
 import { useNewThreadHandler } from "./useHandleNewThread";
 import { useScratchProject } from "./useScratchProject";
-import { t } from "gt-react";
 
 export const TRIAGE_CLI_COMMAND = "npx t3 triage";
 

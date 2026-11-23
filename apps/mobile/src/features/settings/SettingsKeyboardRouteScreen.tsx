@@ -15,7 +15,6 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { ListChoiceRow as SettingsChoiceRow } from "../../components/ui/ListChoiceRow";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { SettingsSection } from "./components/SettingsSection";
-import { t } from "../../i18n/gt";
 
 const SEND_MODIFIER = Platform.OS === "android" ? "Ctrl" : "Command";
 

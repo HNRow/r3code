@@ -6,7 +6,6 @@ import { openCommandPalette } from "../../commandPaletteBus";
 import { Button } from "../ui/button";
 import { PullRequestListGhost } from "./PullRequestGhosts";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "../ui/empty";
-import { t } from "gt-react";
 
 function BranchMark({ joined }: { joined: boolean }) {
   return (

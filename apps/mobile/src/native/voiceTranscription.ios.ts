@@ -11,7 +11,6 @@ import {
   type VoiceTranscriber,
   type VoiceTranscriptionOptions,
 } from "@t3tools/client-runtime/voice-input";
-import { t } from "../i18n/gt";
 
 interface AppleSpeechModule {
   isAppleSpeechAvailable?: () => boolean;

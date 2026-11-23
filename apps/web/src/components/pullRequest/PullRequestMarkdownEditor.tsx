@@ -16,7 +16,6 @@ import {
   PullRequestMarkdownTextarea,
   type PullRequestCompletionScope,
 } from "./PullRequestMarkdownTextarea";
-import { t } from "gt-react";
 
 export function PullRequestMarkdownEditor({
   value,

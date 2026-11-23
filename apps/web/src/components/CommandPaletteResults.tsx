@@ -27,7 +27,6 @@ import {
 import { getVirtualizedScrollFadeClassName } from "./ui/scroll-area";
 import { ProjectPinButton } from "./ProjectPinButton";
 import { SearchMatchHintLine, ThreadSearchMatchExcerpt } from "./ThreadSearchMatch";
-import { t } from "gt-react";
 
 interface CommandPaletteResultsProps {
   emptyStateMessage?: string;

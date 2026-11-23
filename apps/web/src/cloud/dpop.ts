@@ -8,7 +8,6 @@ import * as Signature from "effect/crypto/Signature";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 import * as Schema from "effect/Schema";
-import { t } from "gt-react";
 
 export interface BrowserDpopKey {
   readonly privateKey: CryptoKey;

@@ -10,7 +10,6 @@ import { EnvironmentMachineIcon } from "../EnvironmentMachineIcon";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Badge } from "../ui/badge";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
-import { Var, t } from "gt-react";
 
 const T3_CONNECT_NAME = "T3 Connect";
 

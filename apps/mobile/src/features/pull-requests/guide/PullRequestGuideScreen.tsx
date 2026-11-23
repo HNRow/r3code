@@ -30,7 +30,6 @@ import { composerPullRequests } from "../../../state/pull-requests";
 import { usePullRequestPermissions } from "../usePullRequestPermissions";
 import { pullRequestTarget } from "../usePullRequestDiff";
 import { useReviewGuide } from "./useReviewGuide";
-import { t } from "../../../i18n/gt";
 
 export type GuideStopParams = PullRequestParams & {
   readonly position: number;

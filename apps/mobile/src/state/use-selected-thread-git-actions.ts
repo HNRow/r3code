@@ -39,7 +39,6 @@ import type { GitRepositoryTarget } from "./thread-git-target";
 import { noteRepositoryGitAction, showGitActionResult } from "./use-vcs-action-state";
 import { useThreadSelection } from "./use-thread-selection";
 import { useSelectedThreadWorktree } from "./use-selected-thread-worktree";
-import { t } from "../i18n/gt";
 
 function refreshFailureMessage(cause: Cause.Cause<unknown>): string {
   const error = Cause.squash(cause);

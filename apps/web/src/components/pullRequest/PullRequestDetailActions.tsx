@@ -28,7 +28,6 @@ import { PullRequestGlyph } from "./pullRequestIcons";
 import type { resolvePullRequestState } from "./pullRequestPresentation";
 import type { PickableEnvironment } from "./pullRequestProjectAssignment.logic";
 import { useInlineActionConfirm } from "./useInlineActionConfirm";
-import { Var, t } from "gt-react";
 
 import type { ChangeRequestTermKind } from "./changeRequestTerm";
 

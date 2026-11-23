@@ -30,7 +30,6 @@ import type { EnvironmentRuntimeState } from "../../state/remote-runtime-types";
 import { useEnvironmentScope } from "../../state/session";
 import { threadEnvironment } from "../../state/threads";
 import { useAtomCommand } from "../../state/use-atom-command";
-import { t } from "../../i18n/gt";
 
 type MenuAction = MenuProps["actions"][number];
 

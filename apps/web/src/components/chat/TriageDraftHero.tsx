@@ -4,7 +4,6 @@ import { TRIAGE_CLI_COMMAND } from "~/hooks/useStartTriage";
 
 import { InlineButton } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
-import { t } from "gt-react";
 
 /**
  * The empty-draft hero for a triage session, in place of "What should we work on?".

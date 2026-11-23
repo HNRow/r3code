@@ -25,7 +25,6 @@ import { BrowserPreviewButton } from "../browser/browser-preview-button";
 import { DevicePreviewButton } from "../devices/device-preview-button";
 import type { FloatingStatusAction, FloatingWorkingStatus } from "./floating-working-status";
 import { ShimmeringWorkContent } from "./thread-work-log";
-import { Var, T } from "gt-react-native";
 
 const CONTROL_HEIGHT = 38.5;
 const CONTROL_GAP = 8;

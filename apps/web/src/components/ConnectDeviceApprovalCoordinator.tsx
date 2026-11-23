@@ -19,7 +19,6 @@ import { useAtomCommand } from "../state/use-atom-command";
 import { describeConnectDeviceClient } from "./settings/ConnectionsSettings.logic";
 import { toastManager } from "./ui/toast";
 import { stackedThreadToast } from "./ui/toastHelpers";
-import { t } from "gt-react";
 
 /** Asks whoever can approve to look at R3 Connect devices waiting on an environment. */
 export function ConnectDeviceApprovalCoordinator() {

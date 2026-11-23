@@ -10,7 +10,6 @@ import {
 import type { PullRequestParams } from "./usePullRequestDiff";
 import { usePullRequestConnected } from "./usePullRequestConnected";
 import { usePullRequestThreads } from "./usePullRequestThreads";
-import { t } from "../../i18n/gt";
 
 export function usePullRequestAgentActions(
   params: PullRequestParams,

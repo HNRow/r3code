@@ -8,7 +8,6 @@ import {
 } from "../../lib/windowControlsOverlay";
 
 import { AttachmentImage } from "../media/AttachmentImage";
-import { Var, T } from "gt-react";
 
 const MAX_ZOOM = 8;
 

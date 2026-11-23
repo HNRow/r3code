@@ -104,7 +104,6 @@ import { holdLaunchSplashForHomeRows, settleLaunchSplashHomeRows } from "./home-
 import { useWorkspaceTabs } from "../layout/workspace/WorkspaceTabsContext";
 import { ThreadListFilters } from "./ThreadListFilters";
 import { deriveHomeEmptyState } from "./home-empty-state";
-import { t } from "../../i18n/gt";
 
 interface HomeScreenProps {
   /** Whether this list is the one on screen; see `useHomeRouteVisible`. */
@@ -721,12 +720,6 @@ export function HomeScreen(props: HomeScreenProps) {
         detail={gt('Couldn\'t search messages for "{query}". Change the search to try again.', {
           query: props.searchQuery,
         })}
-        variant={Platform.OS === "android" ? "plain" : undefined}
-      />
-    ) : hasSearchQuery && threadSearch.failed ? (
-      <EmptyState
-        title="Search failed"
-        detail={`Couldn't search messages for "${props.searchQuery}". Change the search to try again.`}
         variant={Platform.OS === "android" ? "plain" : undefined}
       />
     ) : hasSearchQuery ? (

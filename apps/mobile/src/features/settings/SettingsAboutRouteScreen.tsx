@@ -20,7 +20,6 @@ import {
 import { SettingsRow } from "./components/SettingsRow";
 import { SettingsSection } from "./components/SettingsSection";
 import { SettingsScreen } from "./components/SettingsScreen";
-import { t } from "../../i18n/gt";
 
 export function SettingsAboutRouteScreen() {
   const gt = useGT();

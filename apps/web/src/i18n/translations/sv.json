@@ -1556,7 +1556,7 @@
   "d483dc58ae9695bf": "Kunde inte uppdatera miljöns molninställningar: {detail}",
   "74dcbea91099bd6f": "Kunde inte ta bort miljöns länk till molnet.",
   "d87e1ac843ebe37f": "Kunde inte ta bort miljöns länk till molnet: {detail}",
-  "2ac809c51fe3e984": "Frånkopplad lokalt, men T3 Connect bekräftade inte att miljön togs bort",
+  "bfcfbe319fefff57": "Disconnected locally, but R3 Connect did not confirm it removed this environment",
   "413f1a76e506153c": "{name} är inte konfigurerad.",
   "805bc9a909bbb382": "{url} misslyckades",
   "01da8c5b0a52e84a": "Kunde inte hämta bevis för miljölänken.",
@@ -3189,10 +3189,7 @@
     {
       "t": "span",
       "i": 2,
-      "c": [
-        " ",
-        "på datorn som öppnade den här sidan"
-      ]
+      "c": [" ", "på datorn som öppnade den här sidan"]
     }
   ],
   "b2d53b4d1d48fbef": [
@@ -3204,10 +3201,7 @@
     {
       "t": "span",
       "i": 2,
-      "c": [
-        " ",
-        "· den som kör den får den här åtkomsten"
-      ]
+      "c": [" ", "· den som kör den får den här åtkomsten"]
     }
   ],
   "c54cc9c75db9dc58": "Godkänn bara en inloggning som du själv precis har startat.",
@@ -5723,7 +5717,6 @@
   "17809eca3ed84183": "Endast cellvärden. Diagram, bilder och formatering visas inte. Begränsat till 500 rader och 50 kolumner.",
   "f1a5dfc750ab1824": "Endast cellvärden. Diagram, bilder och formatering visas inte. Förhandsvisningen är begränsad till 250 000 rader, 1 024 kolumner och begränsad celltext.",
   "823f8ed5323b3992": "Endast cellvärden. Diagram, bilder och formatering visas inte.",
-  "858554f8b919bc4f": "Page {0}",
   "9fd5e1a67eef8abb": "Text och bilder. Layout och inbäddade objekt kan skilja sig från originalet.",
   "4e847c438e6e8535": "Det här bladet är tomt.",
   "5f1a7ef49d949dd7": "The Office engine was closed",
@@ -10157,6 +10150,27 @@
   "57ad6be8af4aa3a0": "Tangenttryckningar i inspelning",
   "18e31eb8cc642148": "Musklick i inspelning",
   "46dce590ce68842a": "Flytande förhandsvisning",
+  "b676742d5c9783f1": "Wait for the full response",
+  "47cae2671170e30a": "Show finished paragraphs",
+  "995c40e36789a516": "Text appears once the agent finishes its turn.",
+  "99ed1c4d021ae372": "Each paragraph or code block appears as soon as it is complete.",
+  "c0b0406e0cafa1d1": "Senaste meddelande",
+  "cb0775162a9b6419": "Skapad",
+  "62570d4bfe4ab517": "Manuell",
+  "7fa9414ef5e9dd6c": "12-hour",
+  "2f42917064c97f09": "24-hour",
+  "dcc08eacff8bd0bc": "Stacked",
+  "62d8f823deedf316": "Split",
+  "7e8c995646a967d3": "Direkt",
+  "51497bd401292062": "Håll ned",
+  "9d6cc6ac23312071": "Dubbeltryck",
+  "f001fa7b329c8fbf": "Hide successful",
+  "ad208e3e32c85029": "Hide all",
+  "c80e4bb3201efd71": "Zen",
+  "0cb9ffcd1fb46b0c": "Status only",
+  "cf0f7fc3df26fa75": "Status and messages",
+  "3bf40445a706e4c9": "Everything",
+  "840497a2b41e60a3": "Never",
   "91f76d566351a1ed": "Kunde inte bekräfta uppdateringen",
   "51afa46ca07c002e": "Bekräftelsen av uppdateringen misslyckades.",
   "9cedd1912bb1ce88": "Kunde inte installera uppdateringen",
@@ -10330,12 +10344,6 @@
   "7207af3bea6c9bf8": "Hur vi hanterar dina data, inklusive de anonyma användningsdata som R3 Code samlar in.",
   "e741b1ab9396053a": "Hur vi hanterar dina data. {telemetryOff}",
   "17e62d3d0ca86e5e": "Meddelanden för beroenden, resurser och valfria verktyg som R3 Code använder.",
-  "c0b0406e0cafa1d1": "Senaste meddelande",
-  "cb0775162a9b6419": "Skapad",
-  "62570d4bfe4ab517": "Manuell",
-  "7e8c995646a967d3": "Direkt",
-  "51497bd401292062": "Håll ned",
-  "9d6cc6ac23312071": "Dubbeltryck",
   "e39a57514be028e9": "Granska",
   "7c0512387c3a42ea": "Stable",
   "3476687eaa175b32": "Nightly",
@@ -10613,6 +10621,7 @@
     },
     " är den här gatewayen."
   ],
+  "9478ebbf30d744db": "Shadowed",
   "55273815a762e145": "Install a skill",
   "f83a0b7a2147bf6b": "The source folder is read from the selected environment. The destination is derived from the name and scope, not an absolute target path.",
   "5bf6efee457c1b5b": "Provider instance",
@@ -10667,7 +10676,6 @@
   "63739f23d55fa6a9": "Moving…",
   "1ab22cdbf60056e4": "Move to quarantine",
   "1327c966ab857e25": "Manage in Plugins",
-  "9478ebbf30d744db": "Shadowed",
   "d6152c288ef31ce7": "Kontrollerar ögonblicksbilder…",
   "03ba037132fb5daa": "Stöds inte på den här plattformen.",
   "1029a97ff56a15ed": "Slå på detta för att konfigurera ögonblicksbilder.",
@@ -11271,8 +11279,6 @@
   "b0d0aebadc521ed1": "Ta bort sparade webbläsarfångster efter så här många dagar. Äldre länkar till fångster öppnas inte längre.",
   "fe4208562792c313": "Ta bort gamla roterade loggar",
   "8debac9c8e9cff47": "Ta bort inaktiva roterade loggfiler efter så här många dagar. Aktuella loggar behålls.",
-  "10077a4872dfe8d0": "Last run {when}. {size} recovered.",
-  "666535dff3b86c64": "{count} items couldn't be removed.",
   "cdc5fc4d2cdf859b": "days",
   "8e73b883d41d4102": "Av",
   "80d58a3fd4e4212a": "Projekt",

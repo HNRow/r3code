@@ -28,7 +28,6 @@ import {
   alternateComposerDispatchAction,
   resolveComposerDispatchMode,
 } from "@t3tools/client-runtime/state/composer-dispatch";
-import { T, t } from "gt-react";
 
 interface PendingActionState {
   questionIndex: number;

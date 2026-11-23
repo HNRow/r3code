@@ -11,7 +11,6 @@ import {
   waitForComposerDraftsLoaded,
 } from "../../state/use-composer-drafts";
 import { linkedThreadDraftAction } from "./prompt-link-model";
-import { t } from "../../i18n/gt";
 
 export function showPromptLinkNotice(notice: string): void {
   Dialog.alert(m(msg("Prompt from a link")), notice);

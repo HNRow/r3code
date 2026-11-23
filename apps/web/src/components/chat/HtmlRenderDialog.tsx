@@ -13,7 +13,6 @@ import { observeResize } from "~/lib/observeResize";
 import { HtmlRenderDocument } from "../files/BrowserDocumentFrame";
 import { Button } from "../ui/button";
 import { Dialog, DialogPopup, DialogTitle } from "../ui/dialog";
-import { Var, T } from "gt-react";
 
 export function HtmlRenderDialog(props: {
   readonly src: string;

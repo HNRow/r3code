@@ -24,8 +24,6 @@ import { useAppearancePreferences } from "../settings/appearance/AppearancePrefe
 import { isZipFile, ZipArchiveView } from "./ZipArchiveView";
 import { AttachmentDocumentBody, nativeViewerKind } from "./AttachmentDocumentBody";
 
-import { t } from "../../i18n/gt";
-
 export type AttachmentFileRouteParams = {
   readonly environmentId?: string;
   readonly threadId?: string;

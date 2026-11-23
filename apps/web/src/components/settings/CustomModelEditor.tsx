@@ -23,7 +23,6 @@ import {
   emptyEditorDescriptor,
   validateDraft,
 } from "./customModelEditor.logic";
-import { Var, t } from "gt-react";
 
 const CUSTOM_ID_VALUE = "__custom__";
 const START_FROM_NONE = "__none__";

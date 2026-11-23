@@ -20,7 +20,6 @@ import {
 } from "~/lib/selectionActions";
 import { Button } from "../ui/button";
 import { BackgroundThreadContext } from "./backgroundThread";
-import { t } from "gt-react";
 
 export function AssistantSelectionToolbar({
   viewport,

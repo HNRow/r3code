@@ -43,7 +43,6 @@ import {
 import { useThreadListNow } from "./use-thread-list-now";
 import { useThreadListV2ShelfPreferences } from "./use-thread-list-v2-shelf-preferences";
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
-import { t } from "../../i18n/gt";
 
 const keyOf = (thread: EnvironmentThreadShell) => scopedThreadKey(thread.environmentId, thread.id);
 type Section = "pinned" | "active" | "snoozed" | "settled";

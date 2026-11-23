@@ -1556,7 +1556,7 @@
   "d483dc58ae9695bf": "Could not update environment cloud preferences: {detail}",
   "74dcbea91099bd6f": "Could not unlink the environment from cloud.",
   "d87e1ac843ebe37f": "Could not unlink the environment from cloud: {detail}",
-  "2ac809c51fe3e984": "Disconnected locally, but T3 Connect did not confirm it removed this environment",
+  "bfcfbe319fefff57": "Disconnected locally, but R3 Connect did not confirm it removed this environment",
   "413f1a76e506153c": "{name} is not configured.",
   "805bc9a909bbb382": "{url} failed",
   "01da8c5b0a52e84a": "Could not obtain environment link proof.",
@@ -3189,10 +3189,7 @@
     {
       "t": "span",
       "i": 2,
-      "c": [
-        " ",
-        "on the computer that opened this page"
-      ]
+      "c": [" ", "on the computer that opened this page"]
     }
   ],
   "b2d53b4d1d48fbef": [
@@ -3204,10 +3201,7 @@
     {
       "t": "span",
       "i": 2,
-      "c": [
-        " ",
-        "· whoever runs it gets this access"
-      ]
+      "c": [" ", "· whoever runs it gets this access"]
     }
   ],
   "c54cc9c75db9dc58": "Only approve a sign-in you just started.",
@@ -5724,7 +5718,6 @@
   "17809eca3ed84183": "Cell values only. Charts, images, and formatting are not shown. Limited to 500 rows and 50 columns.",
   "f1a5dfc750ab1824": "Cell values only. Charts, images, and formatting are not shown. Preview limited to 250,000 rows, 1,024 columns, and bounded cell text.",
   "823f8ed5323b3992": "Cell values only. Charts, images, and formatting are not shown.",
-  "858554f8b919bc4f": "Page {0}",
   "9fd5e1a67eef8abb": "Text and images. Layout and embedded objects may differ from the original.",
   "4e847c438e6e8535": "This sheet is empty.",
   "5f1a7ef49d949dd7": "The Office engine was closed",
@@ -10158,6 +10151,27 @@
   "57ad6be8af4aa3a0": "Recording key presses",
   "18e31eb8cc642148": "Recording mouse presses",
   "46dce590ce68842a": "Floating preview",
+  "b676742d5c9783f1": "Wait for the full response",
+  "47cae2671170e30a": "Show finished paragraphs",
+  "995c40e36789a516": "Text appears once the agent finishes its turn.",
+  "99ed1c4d021ae372": "Each paragraph or code block appears as soon as it is complete.",
+  "c0b0406e0cafa1d1": "Last user message",
+  "cb0775162a9b6419": "Created at",
+  "62570d4bfe4ab517": "Manual",
+  "7fa9414ef5e9dd6c": "12-hour",
+  "2f42917064c97f09": "24-hour",
+  "dcc08eacff8bd0bc": "Stacked",
+  "62d8f823deedf316": "Split",
+  "7e8c995646a967d3": "Direct",
+  "51497bd401292062": "Hold",
+  "9d6cc6ac23312071": "Double press",
+  "f001fa7b329c8fbf": "Hide successful",
+  "ad208e3e32c85029": "Hide all",
+  "c80e4bb3201efd71": "Zen",
+  "0cb9ffcd1fb46b0c": "Status only",
+  "cf0f7fc3df26fa75": "Status and messages",
+  "3bf40445a706e4c9": "Everything",
+  "840497a2b41e60a3": "Never",
   "91f76d566351a1ed": "Could not confirm update",
   "51afa46ca07c002e": "Update confirmation failed.",
   "9cedd1912bb1ce88": "Could not install update",
@@ -10331,12 +10345,6 @@
   "7207af3bea6c9bf8": "How we handle your data, including the anonymous usage data R3 Code collects.",
   "e741b1ab9396053a": "How we handle your data. {telemetryOff}",
   "17e62d3d0ca86e5e": "Notices for dependencies, assets, and optional tools used by R3 Code.",
-  "c0b0406e0cafa1d1": "Last user message",
-  "cb0775162a9b6419": "Created at",
-  "62570d4bfe4ab517": "Manual",
-  "7e8c995646a967d3": "Direct",
-  "51497bd401292062": "Hold",
-  "9d6cc6ac23312071": "Double press",
   "e39a57514be028e9": "Review",
   "7c0512387c3a42ea": "Stable",
   "3476687eaa175b32": "Nightly",
@@ -10614,6 +10622,7 @@
     },
     " is this gateway."
   ],
+  "9478ebbf30d744db": "Shadowed",
   "55273815a762e145": "Install a skill",
   "f83a0b7a2147bf6b": "The source folder is read from the selected environment. The destination is derived from the name and scope, not an absolute target path.",
   "5bf6efee457c1b5b": "Provider instance",
@@ -10668,7 +10677,6 @@
   "63739f23d55fa6a9": "Moving…",
   "1ab22cdbf60056e4": "Move to quarantine",
   "1327c966ab857e25": "Manage in Plugins",
-  "9478ebbf30d744db": "Shadowed",
   "d6152c288ef31ce7": "Checking snapshots…",
   "03ba037132fb5daa": "Not supported on this platform.",
   "1029a97ff56a15ed": "Turn this on to set up snapshots.",
@@ -11272,8 +11280,6 @@
   "b0d0aebadc521ed1": "Delete saved browser captures after this many days. Older capture links will no longer open.",
   "fe4208562792c313": "Delete old rotated logs",
   "8debac9c8e9cff47": "Delete inactive rotated log files after this many days. Current logs are kept.",
-  "10077a4872dfe8d0": "Last run {when}. {size} recovered.",
-  "666535dff3b86c64": "{count} items couldn't be removed.",
   "cdc5fc4d2cdf859b": "days",
   "8e73b883d41d4102": "Off",
   "80d58a3fd4e4212a": "Project",

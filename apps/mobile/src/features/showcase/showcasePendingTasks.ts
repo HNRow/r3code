@@ -9,7 +9,6 @@ import {
 } from "@t3tools/contracts";
 
 import type { QueuedThreadMessage } from "../../state/thread-outbox-model";
-import { t } from "../../i18n/gt";
 
 export const SHOWCASE_PENDING_TASK_DEFINITIONS = [
   {

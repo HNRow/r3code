@@ -23,7 +23,6 @@ import {
   parseDeviceHostDraft,
   type DeviceHostCheckTarget,
 } from "./deviceHostConnectionChecks";
-import { Var, t } from "gt-react";
 
 const EXAMPLE_HOST_NAME = "Mac mini";
 

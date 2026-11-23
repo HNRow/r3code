@@ -23,7 +23,6 @@ import { IssueCandidatesSheet } from "./IssueCandidatesSheet";
 import { issueParamsKey, issueTarget, type IssueParams } from "./issueParams";
 import { issueAssigneePicksFamily } from "./issuePicks";
 import { issueCommandError, useIssueAccess } from "./issuePresentation";
-import { t } from "../../i18n/gt";
 
 export function IssueAssigneesScreen({ route }: StaticScreenProps<IssueParams>) {
   const gt = useGT();

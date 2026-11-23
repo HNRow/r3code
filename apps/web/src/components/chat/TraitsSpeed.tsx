@@ -6,7 +6,6 @@ import { m, type MessageResolver } from "~/i18n/messages";
 import { UltrafastIcon } from "../Icons";
 import { cn } from "~/lib/utils";
 import { ComposerControlIcon, type ComposerControlSize } from "./ComposerControl";
-import { t } from "gt-react";
 
 export function getTraitsSpeedDisplay(
   descriptor: ProviderOptionDescriptor,

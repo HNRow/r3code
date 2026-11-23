@@ -54,7 +54,6 @@ import {
   useLinkedPullRequestLines,
 } from "../LinkedPullRequestList";
 import { useLinkedPullRequestActions } from "../useLinkedPullRequestActions";
-import { t } from "../../../i18n/gt";
 
 type GitOverviewSheetProps = StaticScreenProps<
   {

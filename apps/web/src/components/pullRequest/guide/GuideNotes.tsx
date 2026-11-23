@@ -4,7 +4,6 @@ import type { PullRequestReviewGuideNote } from "@t3tools/contracts";
 import { cn } from "~/lib/utils";
 
 import { GuideProse } from "./GuideProse";
-import { Var, t } from "gt-react";
 
 export function GuideNoteMarker({ marker }: { marker: string }) {
   return (

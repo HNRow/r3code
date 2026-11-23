@@ -4,7 +4,6 @@ import { EraserIcon } from "lucide-react";
 import { m, type MessageResolver } from "../../i18n/messages";
 
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
-import { t } from "gt-react";
 
 /** Shown while `/clear` is armed; dismissing it keeps the current conversation. */
 export function freshSessionBannerItem(

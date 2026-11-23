@@ -115,7 +115,6 @@ import { resolvePullRequestState } from "./pullRequest/pullRequestPresentation";
 import { PullRequestGlyph } from "~/components/pullRequest/pullRequestIcons";
 import { observeResize } from "~/lib/observeResize";
 import { surfaceShortcutKey } from "~/lib/surfaceShortcutKey";
-import { t } from "gt-react";
 
 export interface RightPanelTabsProps {
   mode: PreviewPanelMode;

@@ -19,7 +19,6 @@ import {
 } from "./PullRequestMarkdownTextarea";
 import { pullRequestReviewKey } from "./pullRequestReviewStore";
 import { useInlineActionConfirm } from "./useInlineActionConfirm";
-import { t } from "gt-react";
 
 import { changeRequestTermKind } from "./changeRequestTerm";
 

@@ -12,7 +12,6 @@ import { ComposerPendingApprovalActions } from "./ComposerPendingApprovalActions
 import { ToolActivityIconView, type WorkEntryIconName } from "./TimelineToolActivityIcon";
 import { TimelineRowCtx } from "./timelineRowContext";
 import { WorkLogRow } from "./WorkLog";
-import { t } from "gt-react";
 
 const APPROVAL_PRESENTATION = {
   command: {

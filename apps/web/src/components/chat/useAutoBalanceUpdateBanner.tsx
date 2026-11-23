@@ -25,7 +25,6 @@ import { InlineButton } from "../ui/button";
 import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
 import { ComposerServerUpdateIcon } from "./ComposerServerUpdateStatus";
-import { t } from "gt-react";
 
 export function useAutoBalanceUpdateBanner(
   environments: readonly EnvironmentPresentation[],

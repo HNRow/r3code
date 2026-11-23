@@ -26,7 +26,6 @@ import { Spinner } from "../ui/spinner";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { SecretInput } from "./SecretInput";
 import { classifySecretProvider } from "./SecretProviderDialog.logic";
-import { t } from "gt-react";
 
 export interface SecretSource {
   readonly id: SecretProviderId;

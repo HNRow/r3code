@@ -155,7 +155,6 @@ import {
   usePullRequestReviewStore,
   type PendingReviewComment,
 } from "./pullRequestReviewStore";
-import { t } from "gt-react";
 
 import { changeRequestTermKind } from "./changeRequestTerm";
 

@@ -16,7 +16,6 @@ import { SymbolView } from "../../components/ui/AppSymbol";
 import { environmentCatalog } from "../../connection/catalog";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { SettingsSection } from "../settings/components/SettingsSection";
-import { T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 const options: ReadonlyArray<{

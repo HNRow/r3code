@@ -22,7 +22,6 @@ import {
 import { createWidget, type WidgetEnvironment } from "expo-widgets";
 
 import {
-  DEFAULT_SUBSCRIPTION_USAGE_LABELS,
   type SubscriptionUsageSnapshot as SubscriptionUsageProps,
   type WidgetLimitAccount,
 } from "./subscriptionUsageSnapshot";
@@ -30,7 +29,6 @@ import {
 export function SubscriptionUsage(props: SubscriptionUsageProps, environment: WidgetEnvironment) {
   "widget";
   // The widget runtime evaluates this function without the app's module scope.
-  const labels = props.labels ?? DEFAULT_SUBSCRIPTION_USAGE_LABELS;
   const now = Date.now();
   const mode = props.theme?.mode;
   const appearance =

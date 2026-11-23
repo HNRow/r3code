@@ -14,7 +14,6 @@ import {
   resolveWorkspaceFilePath,
   resolveWorkspaceRelativeFilePath,
 } from "../files/filePath";
-import { t } from "../../i18n/gt";
 
 export interface FileChipTarget {
   readonly fullPath?: string;

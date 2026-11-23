@@ -9,7 +9,6 @@ import ReadOnlySourcePreview from "./ReadOnlySourcePreview";
 import DocumentPages from "./DocumentPages";
 import { FileSurfaceNotice } from "./fileSurfaceChrome";
 import type { OfficeWorkerResult } from "./officePreviewProtocol";
-import { Var } from "gt-react";
 
 // Saved notebooks must not load URLs or turn authored links into app actions.
 const NOTEBOOK_MARKDOWN: MarkdownExtensions = { inert: true };

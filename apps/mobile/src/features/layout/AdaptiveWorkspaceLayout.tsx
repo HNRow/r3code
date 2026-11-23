@@ -120,7 +120,6 @@ import { workspaceTabOf, type WorkspaceTab } from "./workspace/workspace-tabs-st
 import { workspaceRoutesOf } from "./workspace-overlay-routes";
 import { SettingsWorkspaceLayout } from "../settings/SettingsWorkspaceLayout";
 import { WorkspaceThreadSidebar } from "./workspace/WorkspaceThreadSidebar";
-import { t } from "../../i18n/gt";
 
 export { useAdaptiveWorkspaceLayout, useWorkspacePaneState };
 

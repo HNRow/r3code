@@ -6,7 +6,6 @@ import { View } from "react-native";
 import { AppText as Text, AppTextInput } from "../../../components/ui/AppText";
 import { ListChoiceRow as SettingsChoiceRow } from "../../../components/ui/ListChoiceRow";
 import { SettingsSection } from "./SettingsSection";
-import { t } from "../../../i18n/gt";
 
 const MODES = {
   static: {

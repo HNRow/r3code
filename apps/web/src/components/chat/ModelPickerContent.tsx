@@ -75,7 +75,6 @@ import {
 } from "../../providerInstances";
 import { providerModelKey, sortProviderModelItems } from "../../modelOrdering";
 import { hasRuntimeModelCatalog } from "../../providerModels";
-import { t } from "gt-react";
 
 type ModelPickerItem = {
   slug: string;

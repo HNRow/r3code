@@ -10,7 +10,6 @@ import { m, type MessageResolver } from "../../i18n/messages";
 import { Button } from "../ui/button";
 import { toastManager } from "../ui/toast";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
-import { T, t } from "gt-react";
 
 export function feedbackBannerItem(
   submission: CodexFeedbackSubmission,

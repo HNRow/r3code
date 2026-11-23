@@ -7,8 +7,6 @@ import { PullRequestAvatar } from "./PullRequestPresentation";
 import type { PullRequestCompletion } from "@t3tools/shared/pullRequestComposerTrigger";
 import type { usePullRequestCompletions } from "./usePullRequestCompletions";
 
-import { t } from "../../i18n/gt";
-
 const COPY = {
   mention: {
     label: msg("Mention a user"),

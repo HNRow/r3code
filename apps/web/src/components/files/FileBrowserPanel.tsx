@@ -48,7 +48,6 @@ import { useDirectoryEntries } from "./useDirectoryEntries";
 import { useProjectPathSearch } from "~/state/queries";
 import { isMacPlatform } from "~/lib/utils";
 import { type PreviewAction, subscribePreviewAction } from "../preview/previewActionBus";
-import { Var, t } from "gt-react";
 
 interface FileBrowserPanelProps {
   environmentId: EnvironmentId;

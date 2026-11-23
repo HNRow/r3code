@@ -15,7 +15,6 @@ import {
   connectDeviceApprovalPrompts,
   createApprovalPromptQueue,
 } from "./connectDeviceApproval";
-import { t } from "../../i18n/gt";
 
 /** Asks to approve R3 Connect devices waiting on hosts that require it and this phone manages. */
 export function ConnectDeviceApprovalCoordinator() {

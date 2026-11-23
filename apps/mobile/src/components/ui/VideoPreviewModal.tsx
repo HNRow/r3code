@@ -19,7 +19,6 @@ import {
   isAudioSessionOwner,
   releaseAudioSession,
 } from "../../lib/audioSession";
-import { t } from "../../i18n/gt";
 
 export type { VideoPreviewSource } from "../../lib/videoPreviewSource";
 

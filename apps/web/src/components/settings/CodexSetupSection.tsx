@@ -57,7 +57,6 @@ import {
   settleHandoffAuthorizationPage,
   settleProviderInstall,
 } from "./CodexSetupSection.logic";
-import { Var, t } from "gt-react";
 
 const noop = () => undefined;
 

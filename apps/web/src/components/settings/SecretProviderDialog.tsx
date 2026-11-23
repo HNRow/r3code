@@ -21,7 +21,6 @@ import {
   secretProviderFromDraft,
   type SecretProviderDraft,
 } from "./SecretProviderDialog.logic";
-import { t } from "gt-react";
 
 /** Mounted per open, so each open starts from a fresh draft. */
 export function SecretProviderDialog({

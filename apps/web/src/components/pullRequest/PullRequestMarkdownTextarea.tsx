@@ -28,7 +28,6 @@ import { Popover, PopoverPopup } from "../ui/popover";
 import { Textarea, type TextareaProps } from "../ui/textarea";
 import { PULL_REQUEST_STATE_PRESENTATION } from "./pullRequestIcons";
 import { PullRequestActorAvatar, resolvePullRequestState } from "./pullRequestPresentation";
-import { t } from "gt-react";
 
 /** The repository whose users `@` completes and whose issues and change requests `#` does. */
 export interface PullRequestCompletionScope {

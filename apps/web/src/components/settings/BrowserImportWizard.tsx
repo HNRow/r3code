@@ -39,7 +39,6 @@ import {
   type WizardTargetSelection,
   type WizardStep,
 } from "./browserImportWizard.logic";
-import { t } from "gt-react";
 
 export type { WizardTarget } from "./browserImportWizard.logic";
 

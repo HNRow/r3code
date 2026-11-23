@@ -49,7 +49,6 @@ import {
   reconcilePendingThreadOrder,
   type PendingThreadOrder,
 } from "./threadOrder";
-import { t } from "../../i18n/gt";
 
 export const threadListInboxReturns = createInboxReturnTracker();
 

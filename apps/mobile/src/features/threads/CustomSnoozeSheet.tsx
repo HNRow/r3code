@@ -34,7 +34,6 @@ import { StandaloneStack } from "../layout/nested-stacks";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
-import { t } from "../../i18n/gt";
 
 const durationAmounts = Array.from({ length: 99 }, (_, index) => index + 1);
 const modes = [

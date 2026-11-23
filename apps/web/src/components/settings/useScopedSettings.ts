@@ -36,7 +36,6 @@ import {
   type ProjectOverrideEntry,
   type ScopedSettingsPatch,
 } from "./scopedSettings";
-import { t } from "gt-react";
 
 const readSettings = (environmentId: EnvironmentId) =>
   readEnvironment(environmentId)?.serverConfig?.settings ?? null;

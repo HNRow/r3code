@@ -33,7 +33,6 @@ import {
   reportRelayClientInstallProgress,
   requestRelayClientInstallConfirmation,
 } from "./relayClientInstallDialog";
-import { t } from "gt-react";
 
 function relayUrl(): string | null {
   return resolveCloudPublicConfig().relayUrl;
@@ -370,7 +369,7 @@ export const unlinkEnvironmentFromCloud: (input: {
           decodedRelayClientError(
             m(
               msg(
-                "Disconnected locally, but T3 Connect did not confirm it removed this environment",
+                "Disconnected locally, but R3 Connect did not confirm it removed this environment",
               ),
             ),
           ),

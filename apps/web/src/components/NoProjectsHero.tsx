@@ -10,7 +10,6 @@ import { Button } from "./ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "./ui/empty";
 import { SidebarInset } from "./ui/sidebar";
 import { WorkspacePageHeader } from "./WorkspacePageHeader";
-import { t } from "gt-react";
 
 export function NoProjectsHero() {
   const gt = useGT();

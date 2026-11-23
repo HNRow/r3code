@@ -1,7 +1,6 @@
 import { T, useGT } from "gt-react";
 
 import type { PullRequestReplyAvailability } from "./pullRequestDetail.logic";
-import { t } from "gt-react";
 
 export function PullRequestMoreReplies({
   moreReplies,

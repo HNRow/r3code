@@ -6,7 +6,6 @@ import { CircleAlertIcon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { VoiceInputPill } from "./VoiceInputPill";
-import { Var, T, t } from "gt-react";
 
 const VOICE_ERROR_LABELS: Readonly<Record<VoiceInputErrorCode, string>> = {
   "microphone-blocked": msg("Mic blocked"),

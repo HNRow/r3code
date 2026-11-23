@@ -17,7 +17,6 @@ import * as Dialog from "../../components/ui/Dialog";
 import { projectEnvironment } from "../../state/projects";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { CopyTextButton } from "./CopyTextButton";
-import { t } from "../../i18n/gt";
 
 export function ProposedPlanCard(props: {
   readonly environmentId: EnvironmentId;

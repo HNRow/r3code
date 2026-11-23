@@ -13,7 +13,6 @@ import { useAtomCommand } from "~/state/use-atom-command";
 import { toastManager } from "../../ui/toast";
 import { readableFailure } from "../pullRequestDetail.logic";
 import { guideRunKey, useGuideRunStore } from "./guideRunStore";
-import { t } from "gt-react";
 
 export function useReviewGuideWriter({
   environmentId,

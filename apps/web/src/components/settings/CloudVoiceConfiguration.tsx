@@ -66,7 +66,6 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { SecretInput } from "./SecretInput";
 import { SecretSourceSelect } from "./SecretSourceInput";
-import { t } from "gt-react";
 
 // Per dialog instance, not an Atom.family: key presence must be read fresh each time it opens.
 function useCloudRead<A, E>(

@@ -10,7 +10,6 @@ import type {
   FilePreviewViewerProps,
 } from "./FilePreviewModal.types";
 import { FilePreviewSession } from "./FilePreviewSession";
-import { t } from "../../i18n/gt";
 
 export type {
   FilePreviewItem,

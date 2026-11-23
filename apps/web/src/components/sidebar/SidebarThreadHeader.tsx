@@ -12,7 +12,6 @@ import { cn } from "~/lib/utils";
 import { Button } from "../ui/button";
 import { SidebarInput, SidebarMenuButton } from "../ui/sidebar";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
-import { Var, T } from "gt-react";
 
 export interface SidebarThreadHeaderProps {
   hasProjects: boolean;

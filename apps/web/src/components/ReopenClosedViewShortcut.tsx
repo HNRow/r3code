@@ -48,7 +48,6 @@ import {
 } from "../threadRoutes";
 import { toastManager } from "./ui/toast";
 import { readIssueListPreferences } from "./issue/issueListPreferences";
-import { t } from "gt-react";
 
 declare module "@tanstack/react-router" {
   interface HistoryState {

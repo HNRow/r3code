@@ -13,7 +13,6 @@ import { ComposerSurface } from "../chat/ComposerSurface";
 import { readableFailure } from "../pullRequest/pullRequestDetail.logic";
 import { Spinner } from "../ui/spinner";
 import { toastManager } from "../ui/toast";
-import { t } from "gt-react";
 
 /** The thread composer's card, floating over the issue's timeline, with a comment as its message. */
 export function IssueCommentComposer({

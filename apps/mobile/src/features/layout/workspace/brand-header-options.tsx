@@ -6,7 +6,6 @@ import { brandTitleOffset, CompactBrandTitle } from "../../../components/Compact
 import { WorkspaceConnectionTitle } from "../../home/WorkspaceConnectionTitle";
 import { m, type MessageResolver } from "../../../i18n/messages";
 
-
 function renderCompactBrandTitle() {
   return <CompactBrandTitle allowFontScaling={Platform.OS === "ios"} />;
 }

@@ -34,7 +34,6 @@ import { Input } from "../ui/input";
 import { RadioGroup } from "../ui/radio-group";
 import { Spinner } from "../ui/spinner";
 import { StandalonePage, StandalonePageHeader } from "../ui/standalone-page";
-import { t } from "gt-react";
 
 export const accessConfig: Record<
   AuthMcpClientAccess,

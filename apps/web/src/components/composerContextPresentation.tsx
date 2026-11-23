@@ -59,7 +59,6 @@ import {
   PullRequestChip,
   UnresolvedChip,
 } from "./contextChipParts";
-import { t } from "gt-react";
 
 export type ComposerDraftContextRecord =
   | { kind: "terminal"; record: TerminalContextDraft }

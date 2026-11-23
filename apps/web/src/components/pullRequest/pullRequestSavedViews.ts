@@ -9,7 +9,6 @@ import {
   type PullRequestListPreferencePatch,
   type PullRequestListPreferences,
 } from "./pullRequestListPreferences";
-import { t } from "gt-react";
 
 export function pullRequestViewMatches(
   view: SavedView<typeof PullRequestListPreferencesSchema.Type>,

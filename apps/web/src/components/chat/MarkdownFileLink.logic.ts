@@ -6,7 +6,6 @@ import { m } from "../../i18n/messages";
 
 import type { MarkdownFileLinkMeta } from "../../markdown-links";
 import type { RemoteOpenMode } from "../../remoteOpen";
-import { t } from "gt-react";
 
 export function canUseMarkdownFileShellActions(
   environmentId: EnvironmentId | null,

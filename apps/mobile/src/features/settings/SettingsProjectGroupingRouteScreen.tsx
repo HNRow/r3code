@@ -16,7 +16,6 @@ import { ListChoiceRow as SettingsChoiceRow } from "../../components/ui/ListChoi
 import { SettingsSection } from "./components/SettingsSection";
 import { LanguageSettingsSection } from "./SettingsLanguageRouteScreen";
 import { NewThreadSettingsSection, WorkingSectionSettings } from "./ThreadSettingsSections";
-import { t } from "../../i18n/gt";
 
 const GROUPING_OPTIONS: ReadonlyArray<{
   readonly mode: SidebarProjectGroupingMode;

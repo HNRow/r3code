@@ -36,7 +36,6 @@ import {
   type SimlockHostEnvironment,
   type SimlockTokenEntry,
 } from "./simlockDeviceHostsSettings.logic";
-import { Var, t } from "gt-react";
 
 const failureMessage = (cause: Cause.Cause<unknown>) => {
   const error = Cause.squash(cause);

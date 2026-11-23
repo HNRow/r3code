@@ -38,7 +38,6 @@ import { projectEnvironment } from "~/state/projects";
 import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
 import { useAtomCommand } from "~/state/use-atom-command";
 import { readEnvironmentScope, useEnvironmentScope } from "~/state/session";
-import { t } from "gt-react";
 
 export const ProposedPlanCard = memo(function ProposedPlanCard({
   planMarkdown,

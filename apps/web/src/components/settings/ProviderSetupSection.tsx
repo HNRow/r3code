@@ -25,7 +25,6 @@ import { Button } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { SettingsRow } from "./settingsLayout";
 import { ProviderAuthenticationSection } from "./ProviderAuthenticationSection";
-import { t } from "gt-react";
 
 interface ProviderSetupSectionProps {
   readonly environmentId: EnvironmentId;

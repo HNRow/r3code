@@ -5,8 +5,6 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import { SymbolView } from "../../../components/ui/AppSymbol";
 
-import { t } from "../../../i18n/gt";
-
 export function SettingsDragHandle(props: {
   readonly title: string;
   readonly canMoveUp: boolean;

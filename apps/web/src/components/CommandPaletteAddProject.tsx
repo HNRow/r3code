@@ -15,7 +15,6 @@ import { Button } from "./ui/button";
 import { Kbd, KbdGroup } from "./ui/kbd";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "./ui/select";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
-import { t } from "gt-react";
 
 export function remoteProjectSourceIcon(
   source: AddProjectRemoteSource,

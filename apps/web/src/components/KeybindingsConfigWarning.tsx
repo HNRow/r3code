@@ -12,7 +12,6 @@ import { useOpenInPreferredEditor } from "../editorPreferences";
 import { useEnvironmentScope } from "../state/session";
 import { Button } from "./ui/button";
 import { stackedThreadToast, toastManager } from "./ui/toast";
-import { t } from "gt-react";
 
 export function KeybindingsConfigWarning({
   message,

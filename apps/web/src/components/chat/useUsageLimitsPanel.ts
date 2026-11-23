@@ -11,7 +11,6 @@ import { useState } from "react";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { toastManager } from "../ui/toast";
 import { usageLimitsBannerItem } from "./ComposerUsageLimits";
-import { t } from "gt-react";
 
 /** Keep opened data live. Retain hidden panels during reconnect; clear when quota-spending work resumes. */
 export function useUsageLimitsPanel(input: {

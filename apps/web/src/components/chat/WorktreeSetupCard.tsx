@@ -23,7 +23,6 @@ import { observeVisibleAnimation } from "~/lib/visibleAnimation";
 import { cn } from "~/lib/utils";
 import { useNowSecond } from "~/hooks/useNowSecond";
 import { WorkLogRow } from "./WorkLog";
-import { Var } from "gt-react";
 
 interface WorktreeSetupCardProps {
   snapshot: WorktreeSetupSnapshot;

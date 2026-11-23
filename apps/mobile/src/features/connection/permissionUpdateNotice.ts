@@ -10,7 +10,6 @@ import { appAtomRegistry } from "../../state/atom-registry";
 import { projectEnvironmentPresentation } from "../../state/environments";
 import { environmentPresentations } from "../../state/presentation";
 import { environmentSession } from "../../state/session";
-import { t } from "../../i18n/gt";
 
 const storageKey = "t3code.permission-update.v1";
 

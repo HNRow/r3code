@@ -74,7 +74,6 @@ import {
   recoverQueuedMessageEdit,
 } from "./queuedMessageEdit";
 import type { EditQueuedRunRequest } from "./QueuedRunsControl";
-import { t } from "gt-react";
 
 interface EditingQueuedRun {
   readonly threadId: ThreadId;

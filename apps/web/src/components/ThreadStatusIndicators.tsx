@@ -60,7 +60,6 @@ import {
   type PullRequestGlyphIcon,
 } from "./pullRequest/pullRequestIcons";
 import { resolvePullRequestState } from "./pullRequest/pullRequestPresentation";
-import { t } from "gt-react";
 
 export interface PrStatusIndicator {
   label: string;

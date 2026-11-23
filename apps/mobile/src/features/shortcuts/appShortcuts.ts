@@ -5,7 +5,6 @@ import { EnvironmentId, ThreadId, type ScopedThreadRef } from "@t3tools/contract
 
 import { m } from "../../i18n/messages";
 import type { RecentThreadShortcut } from "../../persistence/imperative";
-import { t } from "../../i18n/gt";
 
 const MAX_RECENT_THREAD_SHORTCUTS = 3;
 

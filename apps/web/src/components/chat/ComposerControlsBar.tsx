@@ -31,7 +31,6 @@ import {
 } from "./ComposerModelEffort";
 import type { useComposerProviderModel } from "./useComposerProviderModel";
 import { resolveComposerControlsOwnership } from "./composerControlsOwnership";
-import { t } from "gt-react";
 
 /**
  * The composer footer controls: the model picker (which also holds effort, speed and

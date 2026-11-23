@@ -20,8 +20,6 @@ import {
   releaseAudioSession,
 } from "../../lib/audioSession";
 import { usePlaybackAudioPlayer } from "../voice-input/usePlaybackAudioPlayer";
-import { Var, T } from "gt-react-native";
-import { t } from "../../i18n/gt";
 
 type PreviewProps = {
   readonly source: FilePreviewSource;

@@ -19,7 +19,6 @@ import {
 } from "../ui/combobox";
 import { SelectButton } from "../ui/select";
 import { stackedThreadToast, toastManager } from "../ui/toast";
-import { t } from "gt-react";
 
 const DEFAULT_FONT_VALUE = "__default__";
 

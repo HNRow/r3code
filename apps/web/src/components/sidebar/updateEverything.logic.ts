@@ -20,7 +20,6 @@ import {
   supportsDesktopAppUpdate,
 } from "~/versionSkew";
 import type { ServerUpdateOutcome, ServerUpdateTarget } from "../ServerUpdateAction";
-import { t } from "gt-react";
 
 export interface UpdateEverythingMachine {
   readonly environmentId: EnvironmentId;

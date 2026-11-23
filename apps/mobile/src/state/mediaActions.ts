@@ -32,7 +32,6 @@ import {
 import { copyTextWithHaptic } from "../lib/copyTextWithHaptic";
 import { loadLocalAttachmentPreview } from "../lib/localAttachmentPreview";
 import { canSaveImageToLibrary, saveImageToLibrary } from "../lib/saveImageToLibrary";
-import { t } from "../i18n/gt";
 
 function allowsHostMedia(session: SessionGrantInput | null) {
   return session === null || sessionGrantsScope(session, AuthFilesystemReadScope);

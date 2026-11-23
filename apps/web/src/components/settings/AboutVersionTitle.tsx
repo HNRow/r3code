@@ -5,7 +5,6 @@ import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
 import { InlineButton } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
-import { t } from "gt-react";
 
 export function AboutVersionTitle() {
   const gt = useGT();

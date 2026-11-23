@@ -47,7 +47,6 @@ import {
 } from "../../questionAttachments";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { readComposerImageBytes } from "../chat/composerAttachmentFiles";
-import { t } from "gt-react";
 
 type CaptureTarget = DraftId | ScopedThreadRef;
 type CaptureFailure = "missing-project" | "delivery";

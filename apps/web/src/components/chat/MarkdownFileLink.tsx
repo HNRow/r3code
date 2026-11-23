@@ -29,7 +29,6 @@ import {
 } from "./MarkdownFileLink.logic";
 import { reportMarkdownActionFailure } from "./markdownActionFailure";
 import { WorkspaceEntryTooltip } from "./WorkspaceEntryIcon";
-import { t } from "gt-react";
 
 interface MarkdownFileLinkProps {
   environmentId: EnvironmentId | null;

@@ -4,7 +4,6 @@ import { THREAD_FIND_BLOCK_TAGS } from "@t3tools/shared/threadFindBlockTags";
 
 import { observeResize } from "~/lib/observeResize";
 
-
 const THREAD_FIND_HIGHLIGHT_NAME = "t3-thread-find";
 const THREAD_FIND_ACTIVE_HIGHLIGHT_NAME = "t3-thread-find-active";
 

@@ -18,7 +18,6 @@ import { sourceControlEnvironment } from "~/state/sourceControl";
 import { useAtomCommand } from "~/state/use-atom-command";
 import { useNewThreadHandler } from "./useHandleNewThread";
 import { suggestAppAccessForRemote } from "../components/sourceControlAppAccessToast";
-import { t } from "gt-react";
 
 function errorMessage(error: unknown): string {
   return error instanceof Error && error.message.trim().length > 0

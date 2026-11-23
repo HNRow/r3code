@@ -11,7 +11,6 @@ import {
   workspaceListFilterIcon,
   type WorkspaceListHeaderProps,
 } from "./WorkspaceListHeader.types";
-import { t } from "../../../i18n/gt";
 
 export function WorkspaceListHeader(props: WorkspaceListHeaderProps) {
   return props.sidebar ? <SidebarColumnHeader {...props} sidebar={props.sidebar} /> : null;

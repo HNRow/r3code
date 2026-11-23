@@ -19,7 +19,6 @@ import {
   promptLinkSearchFromParams,
   stepPendingPromptLink,
 } from "./prompt-link-model";
-import { t } from "../../i18n/gt";
 
 const THREAD_LINK_KEYS = ["prompt"];
 

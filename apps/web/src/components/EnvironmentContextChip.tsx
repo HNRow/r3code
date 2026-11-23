@@ -6,7 +6,6 @@ import { useEnvironment } from "~/state/environments";
 import { ContextChip, ContextChipLabel } from "./ContextChip";
 import { EnvironmentMachineIcon } from "./EnvironmentMachineIcon";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
-import { t } from "gt-react";
 
 /**
  * Inline chip for a mentioned machine, in the composer and in sent messages. Prefers the

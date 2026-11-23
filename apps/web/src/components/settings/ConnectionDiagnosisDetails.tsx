@@ -21,7 +21,6 @@ import { useNowSecond } from "../../hooks/useNowSecond";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
-import { t } from "gt-react";
 
 /**
  * What failed on the way to an environment, or null while it is connected, off,

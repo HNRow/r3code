@@ -50,7 +50,6 @@ import {
   useUpdateScopedSettings,
 } from "./useScopedSettings";
 import { settingsScopeEnvironmentLabel } from "./settingsScopeAxis";
-import { t } from "gt-react";
 
 export function WorktreesDirectoryRow() {
   const setting = useSearchableSetting();
@@ -272,23 +271,6 @@ const KEEP_WHEN_LABELS = {
   "uncommitted-changes": msg("Uncommitted changes"),
   "tracked-changes": msg("Edited tracked files"),
 } as const;
-
-function cleanupCountsLabel(report: StorageCleanupReport): string {
-  const { removed, kept, failed } = report.counts;
-  if (failed > 0) {
-    return t("{removed} removed, {kept} kept, {failed} failed", { removed, kept, failed });
-  }
-  return t("{removed} removed, {kept} kept", { removed, kept });
-}
-
-function cleanupRunDescription(report: StorageCleanupReport, nowMs: number): string {
-  const summary = t("Last run {when}. {size} recovered.", {
-    when: formatRelativeTimeLabel(report.finishedAt, nowMs),
-    size: formatBytes(report.bytesFreed),
-  });
-  if (report.counts.failed === 0) return summary;
-  return `${summary} ${t("{count} items couldn't be removed.", { count: report.counts.failed })}`;
-}
 
 function lastRunSummary(
   entries: readonly { readonly label: string; readonly counts: string }[],

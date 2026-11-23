@@ -4,7 +4,6 @@ import { useGT } from "gt-react";
 
 import { ProviderSettingsPanel } from "../components/settings/ProviderSettingsPanel";
 import { useSettingsScope } from "../components/settings/SettingsScopeContext";
-import { t } from "gt-react";
 
 function SettingsProvidersRoute() {
   const target = Route.useSearch();

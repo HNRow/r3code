@@ -18,7 +18,6 @@ import { dismissProjectFileCopy, useProjectFileCopy } from "../../lib/addProject
 import { type ComposerBannerStackItem } from "./ComposerBannerStack";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { Button } from "../ui/button";
-import { t } from "gt-react";
 /**
  * A project still being cloned or copied into place: the composer banner with its cancel,
  * retry, and remove actions, and the reason sending waits until it is done.

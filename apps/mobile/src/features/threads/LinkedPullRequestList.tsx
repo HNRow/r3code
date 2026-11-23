@@ -32,7 +32,6 @@ import {
   pullRequestConflict,
   pullRequestStatus,
 } from "../pull-requests/pullRequestStatus";
-import { t } from "../../i18n/gt";
 
 export function useLinkedPullRequestLines(
   thread: EnvironmentThreadShell | null,

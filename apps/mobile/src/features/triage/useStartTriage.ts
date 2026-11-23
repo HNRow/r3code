@@ -20,7 +20,6 @@ import {
 } from "../../state/use-composer-drafts";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { usePrepareTriage } from "./usePrepareTriage";
-import { t } from "../../i18n/gt";
 
 const CLI_COMMAND = "npx t3 triage";
 

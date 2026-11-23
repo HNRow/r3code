@@ -37,7 +37,6 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import type { NewProjectScriptInput } from "../projectScriptEditor";
 import { m } from "../../i18n/messages";
 import { toastManager } from "../ui/toast";
-import { t } from "gt-react";
 
 function reportScriptFailure(result: AtomCommandResult<unknown, unknown>) {
   if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {

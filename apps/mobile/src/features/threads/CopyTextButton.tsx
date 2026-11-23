@@ -6,7 +6,6 @@ import { Pressable, type ColorValue } from "react-native";
 
 import { useDeadlinePassed } from "../../lib/clock";
 import { tryCopyTextWithHaptic } from "../../lib/copyTextWithHaptic";
-import { t } from "../../i18n/gt";
 
 const COPY_FEEDBACK_DURATION_MS = 1200;
 

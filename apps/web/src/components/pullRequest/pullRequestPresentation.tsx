@@ -38,7 +38,6 @@ import {
   type PullRequestStatePresentation,
   type PullRequestGlyphIcon,
 } from "./pullRequestIcons";
-import { t } from "gt-react";
 
 export function PullRequestLabelChip({
   label,

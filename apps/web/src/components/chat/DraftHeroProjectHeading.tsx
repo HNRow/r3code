@@ -2,7 +2,6 @@ import { useGT } from "gt-react";
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 import { observeResize } from "~/lib/observeResize";
-import { T } from "gt-react";
 
 const PROJECT_SLOT = "\uE000";
 

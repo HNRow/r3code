@@ -29,7 +29,6 @@ import {
   useScheduledTaskEditor,
 } from "./scheduled-task-editor";
 import { moveDraftToThread, unbindDraftFromThread } from "./scheduledTaskDraft";
-import { t } from "../../i18n/gt";
 
 function MissingTaskDraft() {
   const gt = useGT();

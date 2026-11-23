@@ -30,7 +30,6 @@ import { GuideFileDiff } from "./GuideFileDiff";
 import { GuideNotes } from "./GuideNotes";
 import { GuideProse } from "./GuideProse";
 import { letterStopNotes } from "@t3tools/client-runtime/review-guide-tour";
-import { t } from "gt-react";
 
 const ATTENTION_LABELS = {
   tradeoff: msg("A tradeoff to weigh"),

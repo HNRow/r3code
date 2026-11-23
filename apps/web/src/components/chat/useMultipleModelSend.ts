@@ -44,7 +44,6 @@ import {
   startFanoutThread,
 } from "./chatViewSend";
 import type { useLocalDispatchState } from "./useLocalDispatchState";
-import { t } from "gt-react";
 
 interface MultipleModelSendInput {
   readonly environmentId: EnvironmentId;

@@ -30,7 +30,6 @@ import {
   retryComposerAttachmentUpload,
   useComposerAttachmentUploadState,
 } from "../state/composer-attachment-uploads";
-import { t } from "../i18n/gt";
 
 export interface ComposerAttachmentStripProps {
   readonly environmentId?: EnvironmentId;

@@ -5,7 +5,6 @@ import { Pressable } from "react-native";
 import { useAndroidControlSizing } from "../../components/ui/useAndroidControlSizing";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { Menu } from "../../components/ui/Menu";
-import { t } from "../../i18n/gt";
 
 const ATTACHMENT_MENU_ACTIONS: MenuAction[] = [
   { id: "photos", title: msg("Photo Library"), image: "photo" },

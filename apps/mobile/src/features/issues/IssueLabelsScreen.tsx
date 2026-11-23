@@ -23,7 +23,6 @@ import { IssueCandidatesSheet } from "./IssueCandidatesSheet";
 import { issueParamsKey, issueTarget, type IssueParams } from "./issueParams";
 import { issueLabelPicksFamily } from "./issuePicks";
 import { issueCommandError, useIssueAccess } from "./issuePresentation";
-import { t } from "../../i18n/gt";
 
 export function IssueLabelsScreen({ route }: StaticScreenProps<IssueParams>) {
   const gt = useGT();

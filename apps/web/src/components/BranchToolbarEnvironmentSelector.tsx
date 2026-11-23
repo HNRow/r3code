@@ -20,7 +20,6 @@ import {
   SelectPopup,
   SelectValue,
 } from "./ui/select";
-import { t } from "gt-react";
 
 interface BranchToolbarEnvironmentSelectorProps {
   autoEnvironmentLabel?: string | undefined;

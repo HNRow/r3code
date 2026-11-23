@@ -26,7 +26,6 @@ import { cn } from "~/lib/utils";
 import { BROWSER_DEVICE_TOOLBAR_HEIGHT, resizeFreeformViewport } from "./browserViewportLayout";
 import { commitViewportAndAspectRatio } from "./browserDeviceToolbarState";
 import { ScreenRotationIcon } from "./ScreenRotationIcon";
-import { t } from "gt-react";
 
 const RESPONSIVE_VALUE = "responsive";
 const SELECT_ITEMS = [

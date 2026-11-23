@@ -11,7 +11,6 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "~/lib/utils";
 import { modelPickerModelKey } from "./modelPickerKeys";
 import { ProviderInstanceIcon } from "./ProviderInstanceIcon";
-import { t } from "gt-react";
 
 export const ModelListRow = memo(function ModelListRow(props: {
   index: number;

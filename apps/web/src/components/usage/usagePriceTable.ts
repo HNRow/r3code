@@ -8,7 +8,6 @@ import {
   type UsagePriceForm,
 } from "./usagePriceForm";
 import type { UsagePriceChange, UsagePriceTarget } from "./usagePriceTargets";
-import { t } from "gt-react";
 
 export type UsagePriceField = (typeof USAGE_PRICE_FIELDS)[number]["key"];
 

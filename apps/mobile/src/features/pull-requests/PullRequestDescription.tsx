@@ -18,7 +18,6 @@ import type { FilePreviewItem } from "../../components/ui/FilePreviewModal";
 import { isBotBadgeImage } from "./botBadgeImages";
 import { PullRequestMarkdown } from "./PullRequestMarkdown";
 import { pullRequestDescriptionContent } from "./pullRequestDescriptionContent";
-import { t } from "../../i18n/gt";
 
 const COLLAPSED_HEIGHT = 240;
 

@@ -42,7 +42,6 @@ import { Badge } from "../ui/badge";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { ComposerControl, ComposerControlIcon, type ComposerControlSize } from "./ComposerControl";
 import { useComposerMenuState } from "./useComposerMenuState";
-import { t } from "gt-react";
 
 type ProviderOptions = ReadonlyArray<ProviderOptionSelection>;
 

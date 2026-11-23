@@ -24,7 +24,6 @@ import {
   tokenTypeSegments,
 } from "./usageBreakdown";
 import { PROVIDER_PRESENTATION } from "./usageProviders";
-import { t } from "gt-react";
 
 export interface UsageChartWindow {
   readonly days: readonly string[];

@@ -5,7 +5,6 @@ import { AppText as Text } from "../../components/ui/AppText";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { cn } from "../../lib/cn";
 import type { ModelOption } from "../../lib/modelOptions";
-import { T } from "gt-react-native";
 
 export type ModelRowProps = {
   readonly option: ModelOption;

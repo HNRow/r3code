@@ -19,7 +19,6 @@ import {
   readThreadUndoNotice,
   useThreadUndoNotice,
 } from "./thread-undo-notice";
-import { t } from "../../i18n/gt";
 
 export function ThreadUndoNotice(props: { readonly visible: boolean }) {
   const gt = useGT();

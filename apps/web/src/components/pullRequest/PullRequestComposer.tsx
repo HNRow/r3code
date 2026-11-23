@@ -15,7 +15,6 @@ import {
   usePullRequestReviewStore,
 } from "./pullRequestReviewStore";
 import { pullRequestCompletionScope } from "./PullRequestMarkdownTextarea";
-import { t } from "gt-react";
 
 import { changeRequestTermKind } from "./changeRequestTerm";
 

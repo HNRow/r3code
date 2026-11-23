@@ -5,7 +5,6 @@ import { ExpandedImageDialog } from "~/components/chat/ExpandedImageDialog";
 import { observeResize } from "~/lib/observeResize";
 import { AttachmentImage } from "../media/AttachmentImage";
 import { FileSurfaceAction, FileSurfaceFailure } from "./fileSurfaceChrome";
-import { t } from "gt-react";
 
 export default function PreviewImageContent(props: {
   readonly src: string;

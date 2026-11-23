@@ -5,7 +5,6 @@ import { useGT } from "gt-react-native";
 
 import { AppText as Text } from "../../components/ui/AppText";
 import { cn } from "../../lib/cn";
-import { t } from "../../i18n/gt";
 
 export function ThreadSearchMatchExcerpt(props: {
   readonly match: EnvironmentThreadSearchMatch;

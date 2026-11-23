@@ -11,7 +11,6 @@ import { SharedSlotTitle } from "./SharedSlotTitle";
 import { useWorkspaceTabs } from "./WorkspaceTabsContext";
 import type { PullRequestFilterMenu } from "../../pull-requests/PullRequestListFilters";
 import { openSettings } from "../../settings/settings-navigation";
-import { t } from "../../../i18n/gt";
 
 /** Pull request and issue search share the thread list's Android header. */
 export function ListSearchToolbar(props: {

@@ -5,8 +5,6 @@ import type { AppBarMenu } from "../../../components/ui/AppBar.types";
 import { ENVIRONMENT_MACHINE_SYMBOLS } from "../../../components/EnvironmentMachineSymbol";
 import { useSettingsEnvironmentFilter } from "../settings-environment-filter";
 
-import { t } from "../../../i18n/gt";
-
 /** The settings scope filter, as an `AppBar` menu. */
 export function useSettingsEnvironmentMenu(): AppBarMenu {
   const gt = useGT();

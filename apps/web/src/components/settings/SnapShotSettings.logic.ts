@@ -1,4 +1,3 @@
-import { t } from "gt-react";
 import type { ClientSettingsPatch, DesktopSnapShotState, SnapShotSound } from "@t3tools/contracts";
 import { msg } from "gt-react";
 

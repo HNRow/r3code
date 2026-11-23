@@ -40,7 +40,6 @@ import { ThreadScreenFallback } from "./ThreadScreenHost";
 import { NewTaskDraftScreen } from "./NewTaskDraftScreen";
 
 import type { NewTaskDraftRouteParams } from "./thread-route-state";
-import { t } from "../../i18n/gt";
 export type { NewTaskDraftRouteParams } from "./thread-route-state";
 
 const branchCheckouts = makeNewTaskBranchCheckouts({

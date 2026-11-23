@@ -49,7 +49,6 @@ import {
 } from "../ChatView.logic";
 import { readPreparedConnection } from "../../state/session";
 import { recallComposerMessage } from "./composerPromptHistory";
-import { t } from "gt-react";
 
 // Kept per route so a send in flight, and the multiple-model selections, survive
 // ChatView remounting while the user navigates.

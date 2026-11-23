@@ -9,7 +9,6 @@ import * as Dialog from "../../components/ui/Dialog";
 import { serverEnvironment } from "../../state/server";
 import { useAtomCommand } from "../../state/use-atom-command";
 import type { ScopedMobileSettingsTarget } from "./settings-scoped-server";
-import { t } from "../../i18n/gt";
 
 export function useSettingsWriter() {
   const gt = useGT();

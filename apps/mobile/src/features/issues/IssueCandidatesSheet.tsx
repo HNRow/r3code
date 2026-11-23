@@ -10,8 +10,6 @@ import { EmptyState } from "../../components/ui/EmptyState";
 import { SelectionRow } from "../../components/ui/SelectionRow";
 import { NativeScrollView } from "../../native/NativeScrollViewMarker";
 import { PullRequestSearchSheet } from "../pull-requests/PullRequestSearchSheet";
-import { Var, T } from "gt-react-native";
-import { t } from "../../i18n/gt";
 
 interface Candidate {
   readonly key: string;

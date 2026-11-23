@@ -9,7 +9,6 @@ import {
 import type { MessageResolver } from "../../i18n/messages";
 import { formatRelativeTimeLabel } from "../../timestampFormat";
 import { openDesktopUpdateReleaseNotes } from "../desktopUpdate.toast";
-import { t } from "gt-react";
 
 type DesktopUpdateShell = Pick<DesktopBridge, "openExternal">;
 

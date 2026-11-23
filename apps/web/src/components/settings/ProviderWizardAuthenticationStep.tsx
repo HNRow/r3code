@@ -9,7 +9,6 @@ import { WizardFooter, WizardPanel } from "../ui/wizard";
 import { ProviderAuthenticationSection } from "./ProviderAuthenticationSection";
 import { SettingsGroup } from "./SettingsGroup";
 import { SettingsRow } from "./settingsLayout";
-import { t } from "gt-react";
 
 export function ProviderWizardAuthenticationStep({
   environmentId,

@@ -5,7 +5,6 @@ import { cn } from "~/lib/utils";
 import { Button } from "../ui/button";
 import { PullRequestMarkdown } from "./PullRequestMarkdown";
 import { observeResize } from "~/lib/observeResize";
-import { t } from "gt-react";
 
 export function PullRequestCommentBody({
   className,

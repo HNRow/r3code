@@ -6,7 +6,6 @@ import { useStableCallback } from "~/hooks/useStableCallback";
 import { ContextChip, ContextChipAction, ContextChipLabel } from "../ContextChip";
 import { middleTruncateAttachmentName } from "../composerInlineChip";
 import { Spinner } from "../ui/spinner";
-import { t } from "gt-react";
 
 export const AudioPreviewUnmountContext = createContext<((audio: HTMLAudioElement) => void) | null>(
   null,

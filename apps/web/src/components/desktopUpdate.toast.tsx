@@ -8,7 +8,6 @@ import {
 } from "./desktopUpdate.logic";
 import { m } from "../i18n/messages";
 import { toastManager } from "./ui/toast";
-import { Var, t } from "gt-react";
 
 type DesktopUpdateShell = Pick<DesktopBridge, "openExternal">;
 

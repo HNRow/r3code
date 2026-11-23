@@ -18,7 +18,6 @@ import { buildThreadRouteParams, resolveThreadRouteTarget } from "../threadRoute
 import { Button } from "./ui/button";
 import { Dialog, DialogHeader, DialogPanel, DialogPopup, DialogTitle } from "./ui/dialog";
 import { toastManager } from "./ui/toast";
-import { t } from "gt-react";
 
 // Dev servers register this free ACP agent; see ProviderInstanceRegistryHydration.ts.
 const DEV_REPLAY_INSTANCE_ID = ProviderInstanceId.make("devReplay");

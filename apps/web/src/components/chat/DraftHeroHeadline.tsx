@@ -48,7 +48,6 @@ import { InlineButton } from "../ui/button";
 import { DraftProjectName } from "./DraftProjectName";
 import { DraftHeroProjectHeading } from "./DraftHeroProjectHeading";
 import { TriageDraftHero } from "./TriageDraftHero";
-import { t } from "gt-react";
 
 const ADD_PROJECT_VALUE = "add-project";
 

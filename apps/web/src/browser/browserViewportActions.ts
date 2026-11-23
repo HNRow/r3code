@@ -9,7 +9,6 @@ import { m } from "~/i18n/messages";
 import { updatePreviewServerSnapshot } from "~/previewStateStore";
 import { appAtomRegistry } from "~/rpc/atomRegistry";
 import { previewEnvironment } from "~/state/preview";
-import { t } from "gt-react";
 
 /** One browser tab as both the server (thread + tab id) and this window's runtime know it. */
 export interface BrowserViewportTarget {

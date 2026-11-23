@@ -25,7 +25,6 @@ import {
 } from "./deviceStreamSession";
 import type { DeviceHardwareButton, DeviceScreenSize } from "@t3tools/client-runtime/device/stream";
 import { observeResize } from "~/lib/observeResize";
-import { Var } from "gt-react";
 
 const NO_SESSION_ATOM = Atom.make<DeviceStreamSession | null>(null).pipe(
   Atom.withLabel("device-stream:none"),

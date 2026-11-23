@@ -4,8 +4,6 @@ import { AppText as Text } from "../../components/ui/AppText";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { Menu } from "../../components/ui/Menu";
 import type { ActivityFilter } from "./pullRequestActivityFilter";
-import { Var, T } from "gt-react-native";
-import { t } from "../../i18n/gt";
 
 export function PullRequestActivityFilters({
   value,

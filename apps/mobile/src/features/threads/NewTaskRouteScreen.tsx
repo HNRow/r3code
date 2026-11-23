@@ -47,7 +47,6 @@ import {
   resolveNewTaskScratchOption,
 } from "./new-task-project-selection";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
-import { t } from "../../i18n/gt";
 
 type NewTaskRouteParams = {
   readonly incomingShareId?: string | string[];

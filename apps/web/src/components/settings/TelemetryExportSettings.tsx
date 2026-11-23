@@ -14,7 +14,6 @@ import { useSettingsScope } from "./SettingsScopeContext";
 import { useScopedSettings } from "./useScopedSettings";
 import { SettingsSection } from "./settingsLayout";
 import { SettingsScopeNotice } from "./SettingsScopeNotice";
-import { t } from "gt-react";
 
 const SIGNALS = [
   {

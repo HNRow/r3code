@@ -20,7 +20,6 @@ import {
   ThemePreviewCircle,
 } from "./settings/ThemePreviewCircles";
 import { stackedThreadToast, toastManager } from "./ui/toast";
-import { t } from "gt-react";
 
 export const APPEARANCE_OPTIONS = [
   { mode: "system", label: msg("System"), icon: MonitorIcon },

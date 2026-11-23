@@ -10,7 +10,6 @@ import { cn } from "~/lib/utils";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
-import { T } from "gt-react";
 
 type DownloadProgress = { downloaded: number; total: number } | null;
 

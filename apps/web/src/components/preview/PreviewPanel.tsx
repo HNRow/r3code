@@ -11,7 +11,6 @@ import { useEnvironmentScope } from "~/state/session";
 
 import { PreviewPanelShell, type PreviewPanelMode } from "./PreviewPanelShell";
 import { PreviewView } from "./PreviewView";
-import { t } from "gt-react";
 
 interface Props {
   mode: PreviewPanelMode;

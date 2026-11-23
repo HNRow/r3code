@@ -1556,7 +1556,7 @@
   "d483dc58ae9695bf": "Impossible de mettre à jour les préférences cloud de l’environnement : {detail}",
   "74dcbea91099bd6f": "Impossible de dissocier l’environnement du cloud.",
   "d87e1ac843ebe37f": "Impossible de dissocier l’environnement du cloud : {detail}",
-  "2ac809c51fe3e984": "Déconnecté localement, mais T3 Connect n’a pas confirmé la suppression de cet environnement",
+  "bfcfbe319fefff57": "Disconnected locally, but R3 Connect did not confirm it removed this environment",
   "413f1a76e506153c": "{name} n’est pas configuré.",
   "805bc9a909bbb382": "Échec de {url}",
   "01da8c5b0a52e84a": "Impossible d’obtenir la preuve d’association de l’environnement.",
@@ -3189,10 +3189,7 @@
     {
       "t": "span",
       "i": 2,
-      "c": [
-        " ",
-        "sur l’ordinateur qui a ouvert cette page"
-      ]
+      "c": [" ", "sur l’ordinateur qui a ouvert cette page"]
     }
   ],
   "b2d53b4d1d48fbef": [
@@ -3204,10 +3201,7 @@
     {
       "t": "span",
       "i": 2,
-      "c": [
-        " ",
-        "· quiconque l’exécute obtient cet accès"
-      ]
+      "c": [" ", "· quiconque l’exécute obtient cet accès"]
     }
   ],
   "c54cc9c75db9dc58": "N’approuvez qu’une connexion que vous venez de lancer.",
@@ -5723,7 +5717,6 @@
   "17809eca3ed84183": "Valeurs des cellules uniquement. Les graphiques, les images et la mise en forme ne sont pas affichés. Limité à 500 lignes et 50 colonnes.",
   "f1a5dfc750ab1824": "Valeurs des cellules uniquement. Les graphiques, les images et la mise en forme ne sont pas affichés. Aperçu limité à 250 000 lignes, 1 024 colonnes et un texte de cellule borné.",
   "823f8ed5323b3992": "Valeurs des cellules uniquement. Les graphiques, les images et la mise en forme ne sont pas affichés.",
-  "858554f8b919bc4f": "Page {0}",
   "9fd5e1a67eef8abb": "Texte et images. La mise en page et les objets incorporés peuvent différer de l’original.",
   "4e847c438e6e8535": "Cette feuille est vide.",
   "5f1a7ef49d949dd7": "The Office engine was closed",
@@ -10148,6 +10141,27 @@
   "57ad6be8af4aa3a0": "Touches pressées dans les enregistrements",
   "18e31eb8cc642148": "Clics dans les enregistrements",
   "46dce590ce68842a": "Aperçu flottant",
+  "b676742d5c9783f1": "Wait for the full response",
+  "47cae2671170e30a": "Show finished paragraphs",
+  "995c40e36789a516": "Text appears once the agent finishes its turn.",
+  "99ed1c4d021ae372": "Each paragraph or code block appears as soon as it is complete.",
+  "c0b0406e0cafa1d1": "Dernier message envoyé",
+  "cb0775162a9b6419": "Date de création",
+  "62570d4bfe4ab517": "Manuel",
+  "7fa9414ef5e9dd6c": "12-hour",
+  "2f42917064c97f09": "24-hour",
+  "dcc08eacff8bd0bc": "Stacked",
+  "62d8f823deedf316": "Split",
+  "7e8c995646a967d3": "Immédiat",
+  "51497bd401292062": "Appui long",
+  "9d6cc6ac23312071": "Double appui",
+  "f001fa7b329c8fbf": "Hide successful",
+  "ad208e3e32c85029": "Hide all",
+  "c80e4bb3201efd71": "Zen",
+  "0cb9ffcd1fb46b0c": "Status only",
+  "cf0f7fc3df26fa75": "Status and messages",
+  "3bf40445a706e4c9": "Everything",
+  "840497a2b41e60a3": "Never",
   "91f76d566351a1ed": "Impossible de confirmer la mise à jour",
   "51afa46ca07c002e": "La confirmation de la mise à jour a échoué.",
   "9cedd1912bb1ce88": "Impossible d’installer la mise à jour",
@@ -10321,12 +10335,6 @@
   "7207af3bea6c9bf8": "Comment nous traitons vos données, y compris les données d'utilisation anonymes collectées par R3 Code.",
   "e741b1ab9396053a": "Comment nous traitons vos données. {telemetryOff}",
   "17e62d3d0ca86e5e": "Mentions des dépendances, ressources et outils facultatifs utilisés par R3 Code.",
-  "c0b0406e0cafa1d1": "Dernier message envoyé",
-  "cb0775162a9b6419": "Date de création",
-  "62570d4bfe4ab517": "Manuel",
-  "7e8c995646a967d3": "Immédiat",
-  "51497bd401292062": "Appui long",
-  "9d6cc6ac23312071": "Double appui",
   "e39a57514be028e9": "Consulter",
   "7c0512387c3a42ea": "Stable",
   "3476687eaa175b32": "Nightly",
@@ -10604,6 +10612,7 @@
     },
     " pointe vers cette passerelle."
   ],
+  "9478ebbf30d744db": "Shadowed",
   "55273815a762e145": "Installer un skill",
   "f83a0b7a2147bf6b": "Le dossier source est lu depuis l’environnement sélectionné. La destination est déduite du nom et de la portée, pas d’un chemin absolu.",
   "5bf6efee457c1b5b": "Instance du fournisseur",
@@ -10658,7 +10667,6 @@
   "63739f23d55fa6a9": "Moving…",
   "1ab22cdbf60056e4": "Move to quarantine",
   "1327c966ab857e25": "Gérer dans Plugins",
-  "9478ebbf30d744db": "Shadowed",
   "d6152c288ef31ce7": "Vérification des captures…",
   "03ba037132fb5daa": "Non pris en charge sur cette plateforme.",
   "1029a97ff56a15ed": "Activez cette option pour configurer les captures.",
@@ -11262,8 +11270,6 @@
   "b0d0aebadc521ed1": "Supprime les captures du navigateur enregistrées après ce nombre de jours. Les liens vers les anciennes captures ne s’ouvriront plus.",
   "fe4208562792c313": "Supprimer les anciens journaux archivés",
   "8debac9c8e9cff47": "Supprime les fichiers journaux archivés inactifs après ce nombre de jours. Les journaux actuels sont conservés.",
-  "10077a4872dfe8d0": "Dernière exécution {when}. {size} récupérés.",
-  "666535dff3b86c64": "{count} éléments n'ont pas pu être supprimés.",
   "cdc5fc4d2cdf859b": "days",
   "8e73b883d41d4102": "Désactivé",
   "80d58a3fd4e4212a": "Projet",

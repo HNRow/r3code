@@ -3,7 +3,6 @@ import { msg } from "gt-react-native";
 import type { StatusTone } from "../../components/StatusPill";
 import { m, type MessageResolver } from "../../i18n/messages";
 import type { RemoteClientConnectionState } from "../../lib/connection";
-import { t } from "../../i18n/gt";
 
 export function connectionTone(
   state: RemoteClientConnectionState,

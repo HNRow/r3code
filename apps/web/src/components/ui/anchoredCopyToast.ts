@@ -3,7 +3,6 @@ import { msg } from "gt-react";
 
 import { m } from "~/i18n/messages";
 import { anchoredToastManager } from "./toast";
-import { t } from "gt-react";
 
 export const ANCHORED_COPY_TOAST_TIMEOUT_MS = 1000;
 

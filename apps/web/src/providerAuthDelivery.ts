@@ -7,7 +7,6 @@ import { m } from "./i18n/messages";
 import { appAtomRegistry } from "./rpc/atomRegistry";
 import { environmentPresentations } from "./state/presentation";
 import { serverEnvironment } from "./state/server";
-import { t } from "gt-react";
 
 type ProviderAuthDelivery = NonNullable<ReturnType<typeof readCodexAuthDelivery>>;
 

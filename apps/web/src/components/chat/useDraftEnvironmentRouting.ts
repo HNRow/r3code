@@ -40,7 +40,6 @@ import { loadBalancingSendWarning } from "./composerSend.logic";
 import { appAtomRegistry } from "../../rpc/atomRegistry";
 import { seedDraftModelSelection } from "../../lib/seedDraftModelSelection";
 import { draftFanoutSelectionsAtom } from "./chatViewSend";
-import { t } from "gt-react";
 
 interface DraftEnvironmentRoutingInput {
   readonly draftId: DraftId | null;

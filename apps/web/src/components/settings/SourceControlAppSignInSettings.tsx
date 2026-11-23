@@ -22,7 +22,6 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { Button, InlineButton } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import { RedactedSensitiveText } from "./RedactedSensitiveText";
-import { t } from "gt-react";
 
 type SignInState =
   | { readonly status: "idle" }

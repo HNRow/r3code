@@ -14,7 +14,6 @@ import {
 import { EnvironmentMachineIcon } from "./EnvironmentMachineIcon";
 import { ProjectFavicon } from "./ProjectFavicon";
 import { COMMAND_PALETTE_META_ICON_CLASS, CommandPaletteMetaDot } from "./ThreadCommandSubtitle";
-import { t } from "gt-react";
 
 export interface CommandPaletteProjectLocation {
   readonly kind: "local" | "remote";

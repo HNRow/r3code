@@ -54,7 +54,6 @@ import { issueListFiltersAtom } from "./issueListFilters";
 import { issueViewMatches } from "./issueSavedViews";
 import { SavedViewsMenu } from "../layout/workspace/SavedViewsMenu";
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
-import { t } from "../../i18n/gt";
 
 const DEFAULT_ISSUE_LIST_INPUT = { state: "open", involvement: "all", limit: 50 } as const;
 const STATES = {

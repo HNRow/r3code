@@ -9,7 +9,6 @@ import { msg } from "gt-react";
 
 import { m } from "../i18n/messages";
 import { stackedThreadToast } from "./ui/toast";
-import { t } from "gt-react";
 
 type TitleRegenerationResult = AtomCommandResult<ThreadTitleRegenerationOutcome | null, unknown>;
 

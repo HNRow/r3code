@@ -45,7 +45,6 @@ import {
   useVoiceInputSessionSnapshot,
   type VoiceInputTarget,
 } from "./voiceInputSession";
-import { t } from "gt-react";
 
 /** A product name, shown untranslated. */
 export const APPLE_SPEECH_LABEL = "Apple Speech";

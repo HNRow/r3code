@@ -9,8 +9,6 @@ import { PullRequestMarkdown } from "../PullRequestMarkdown";
 import { Menu } from "../../../components/ui/Menu";
 
 import { useAppearancePreferences } from "../../settings/appearance/AppearancePreferencesProvider";
-import { Var, T } from "gt-react-native";
-import { t } from "../../../i18n/gt";
 
 export function GuideOutline({
   guide,

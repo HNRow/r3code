@@ -24,7 +24,6 @@ import {
   PullRequestMarkdownTextarea,
   type PullRequestCompletionScope,
 } from "./PullRequestMarkdownTextarea";
-import { t } from "gt-react";
 
 import type { ChangeRequestTermKind } from "./changeRequestTerm";
 

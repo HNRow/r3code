@@ -13,7 +13,6 @@ import { RedactedSensitiveText } from "../settings/RedactedSensitiveText";
 import { LimitWindows, ResetCredits } from "../usage/UsageLimits";
 import { ComposerBanner } from "./ComposerBanner";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
-import { Var, t } from "gt-react";
 import "../usage/usageNoticeMessages";
 
 function accountLabel(account: UsageLimitsReport["accounts"][number]): string {

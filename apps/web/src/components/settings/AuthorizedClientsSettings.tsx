@@ -586,48 +586,6 @@ const ConnectedClientListRow = memo(function ConnectedClientListRow({
   );
 });
 
-/** 权限说明在 shared 里是 msg() 原文，目录抽不到。这里用字面量 gt()，才能进 web 词条。 */
-function pairingScopeDescription(gt: (message: string) => string, description: string): string {
-  switch (description) {
-    case "Read threads, status, checkpoints, and configuration.":
-      return gt("Read threads, status, checkpoints, and configuration.");
-    case "Start, update, and stop tasks.":
-      return gt("Start, update, and stop tasks.");
-    case "Edit environment preferences and keybindings.":
-      return gt("Edit environment preferences and keybindings.");
-    case "Configure, install, sign in to, and update providers and usage sources.":
-      return gt("Configure, install, sign in to, and update providers and usage sources.");
-    case "Update the server and control environment processes.":
-      return gt("Update the server and control environment processes.");
-    case "Open browser previews and host browser automation.":
-      return gt("Open browser previews and host browser automation.");
-    case "Read process diagnostics, resource history, and usage totals.":
-      return gt("Read process diagnostics, resource history, and usage totals.");
-    case "Read existing terminal output and status.":
-      return gt("Read existing terminal output and status.");
-    case "Create terminals and send input to running shells.":
-      return gt("Create terminals and send input to running shells.");
-    case "Commit, push, manage branches and repositories, and change pull requests.":
-      return gt("Commit, push, manage branches and repositories, and change pull requests.");
-    case "Browse host files, search workspaces, and inspect local changes.":
-      return gt("Browse host files, search workspaces, and inspect local changes.");
-    case "Edit workspace files and save plans to disk.":
-      return gt("Edit workspace files and save plans to disk.");
-    case "Inspect pairing links and authorized clients.":
-      return gt("Inspect pairing links and authorized clients.");
-    case "Issue and revoke credentials for other clients.":
-      return gt("Issue and revoke credentials for other clients.");
-    case "Inspect managed relay connectivity.":
-      return gt("Inspect managed relay connectivity.");
-    case "Update relay preferences or unlink T3 Connect.":
-      return gt("Update relay preferences or unlink T3 Connect.");
-    case "Set up or replace T3 Connect, including its trusted pairing credential issuer.":
-      return gt("Set up or replace T3 Connect, including its trusted pairing credential issuer.");
-    default:
-      return description;
-  }
-}
-
 type AuthorizedClientsHeaderActionProps = {
   environmentId: EnvironmentId;
   onPairingLinkCreated: (result: AuthPairingCredentialResult) => void;

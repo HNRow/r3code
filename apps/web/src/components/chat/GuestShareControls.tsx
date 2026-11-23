@@ -41,7 +41,6 @@ import { buildExpandedImagePreview, type ExpandedImagePreview } from "./Expanded
 import { GuestMessageAttachments } from "./GuestMessageAttachments";
 import { GuestMessageName, guestBubbleClassName } from "./guestMessageStyle";
 import { guestShareDialogThreadAtom } from "./guestShareDialogState";
-import { t } from "gt-react";
 
 function useThreadGuestShare(threadRef: ScopedThreadRef | null): ThreadGuestShare | null {
   return useQuietThreadProjection(threadRef)?.projection.thread.guestShare ?? null;

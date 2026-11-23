@@ -22,8 +22,6 @@ import { themeColorWithContrast } from "../../lib/mobileTheme";
 import type { Alert, AlertButton } from "react-native";
 import type { ConfirmDialogRequest, TextInputDialogRequest } from "./Dialog.types";
 
-import { t } from "../../i18n/gt";
-
 export type { ConfirmDialogRequest, TextInputDialogRequest } from "./Dialog.types";
 
 type AlertRequest = {

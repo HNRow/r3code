@@ -2,7 +2,6 @@ import { T } from "gt-react";
 import { ChevronDownIcon, PaperclipIcon } from "lucide-react";
 
 import { Button } from "../ui/button";
-import { Var } from "gt-react";
 
 export function WorkspaceFileDropOverlay() {
   return (

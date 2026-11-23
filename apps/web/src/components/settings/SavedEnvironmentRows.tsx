@@ -71,7 +71,6 @@ import {
 } from "../ServerUpdateAction";
 import { CloudEnvironmentConnectRows } from "../cloud/CloudEnvironmentConnectList";
 import { useT3ConnectAuthPrompt } from "../clerk/useT3ConnectAuthPrompt";
-import { t } from "gt-react";
 
 type SavedBackendListRowProps = {
   environment: EnvironmentPresentation;

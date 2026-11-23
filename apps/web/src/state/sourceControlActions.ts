@@ -33,7 +33,6 @@ import { sourceControlEnvironment } from "./sourceControl";
 import { useAtomCommand } from "./use-atom-command";
 import { vcsActionManager, vcsEnvironment } from "./vcs";
 import { suggestAppAccessForRemote } from "../components/sourceControlAppAccessToast";
-import { t } from "gt-react";
 
 export type SourceControlActionKind =
   | "init"

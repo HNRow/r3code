@@ -43,7 +43,6 @@ import { crossesReleaseTrack } from "@t3tools/shared/cliRelease";
 import { Button } from "./ui/button";
 import { toastManager } from "./ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
-import { t } from "gt-react";
 
 const UPDATE_STAGE_LABELS: Record<ServerUpdateStage, string> = {
   downloading: msg("Downloading…"),

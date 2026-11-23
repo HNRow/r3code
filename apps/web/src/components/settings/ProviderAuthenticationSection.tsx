@@ -28,7 +28,6 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { SettingsRow } from "./settingsLayout";
 import { RedactedSensitiveText } from "./RedactedSensitiveText";
-import { t } from "gt-react";
 
 const ProviderAuthTerminal = lazy(() => import("./ProviderAuthTerminal"));
 

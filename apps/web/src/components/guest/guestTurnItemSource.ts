@@ -21,7 +21,6 @@ import { msg } from "gt-react";
 import { m } from "~/i18n/messages";
 
 import type { TurnItemSource } from "../chat/timelineRowContext";
-import { t } from "gt-react";
 
 /** What an expanded guest row says when it cannot read the item. */
 class GuestItemReadError extends Schema.TaggedError<GuestItemReadError>()("GuestItemReadError", {

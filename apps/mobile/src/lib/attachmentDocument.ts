@@ -21,7 +21,6 @@ import { localAttachmentPreviewAtom, localAttachmentPreviewState } from "./local
 import { downloadAndShareAttachment, shareLocalAttachment } from "./attachmentDownload";
 import { refreshAssetUrl, useFreshAssetUrl, useRefreshAssetUrl } from "../state/assets";
 import { attachmentDocumentPresentation } from "./attachmentDocumentPresentation";
-import { t } from "../i18n/gt";
 
 const isLocalUri = (uri: string) => /^(file|content):/.test(uri);
 

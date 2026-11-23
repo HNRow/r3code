@@ -7,7 +7,6 @@ import { msg } from "gt-react-native";
 import type { AppBarMenuItem } from "../../components/ui/AppBar.types";
 import { m, type MessageResolver } from "../../i18n/messages";
 import type { WorkspaceEnvironment } from "../../state/workspaceModel";
-import { t } from "../../i18n/gt";
 
 export interface HomeListFilterMenuEnvironment {
   readonly environmentId: EnvironmentId;

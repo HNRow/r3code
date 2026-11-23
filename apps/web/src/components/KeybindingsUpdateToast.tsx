@@ -7,7 +7,6 @@ import { primaryServerConfigAtom, primaryServerConfigEventAtom } from "../state/
 import { KeybindingsConfigWarning } from "./KeybindingsConfigWarning";
 import { createKeybindingsUpdateToastController } from "./KeybindingsUpdateToast.logic";
 import { stackedThreadToast, toastManager } from "./ui/toast";
-import { t } from "gt-react";
 
 export function startKeybindingsUpdateToasts(): () => void {
   const controller = createKeybindingsUpdateToastController({});

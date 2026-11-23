@@ -6,7 +6,7 @@ import {
   settlePromise,
   squashAtomCommandFailure,
 } from "@t3tools/client-runtime/state/runtime";
-import { T, t } from "gt-react";
+import { T } from "gt-react";
 import { useRef, useState } from "react";
 import { useGT } from "gt-react";
 

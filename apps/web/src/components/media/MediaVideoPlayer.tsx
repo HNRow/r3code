@@ -10,7 +10,6 @@ import { prepareVideoFirstFrame } from "../../lib/videoFirstFrame";
 import { Button } from "../ui/button";
 import { OpenMediaLink } from "./OpenMediaLink";
 import { MediaActions, type MediaActionSource } from "./MediaActions";
-import { t } from "gt-react";
 
 interface MediaVideoPlayerProps {
   readonly src: string | null;

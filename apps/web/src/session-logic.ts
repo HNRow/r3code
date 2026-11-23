@@ -54,7 +54,6 @@ import { m, type MessageResolver } from "./i18n/messages";
 import * as DateTime from "effect/DateTime";
 import * as Equal from "effect/Equal";
 import { shallow } from "zustand/vanilla/shallow";
-import { t } from "gt-react";
 
 export {
   workEntryDisplayIndicatesToolFailure,

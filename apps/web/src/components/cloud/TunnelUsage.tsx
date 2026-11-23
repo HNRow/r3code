@@ -8,7 +8,6 @@ import { m, type MessageResolver } from "../../i18n/messages";
 import { cn } from "../../lib/utils";
 import { Alert, AlertAction, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
-import { Var, t } from "gt-react";
 
 // Above this, one slot per tunnel is too thin to read, so the bar fills instead.
 const MAX_SEGMENTS = 10;

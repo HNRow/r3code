@@ -22,7 +22,6 @@ import {
   releaseCheckError,
   releaseCheckValue,
 } from "./environmentUpdateCheck";
-import { t } from "../../i18n/gt";
 
 export function OutdatedServerUpdateSection({
   environmentId,

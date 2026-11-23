@@ -13,7 +13,6 @@ import { useSearchableSetting } from "./settingsSearch";
 import { useScopedSettings, useUpdateScopedSettings } from "./useScopedSettings";
 import { useOptionalSettingsScope, useSettingsScope } from "./SettingsScopeContext";
 import { firstManagedDenial, usePrimaryManagedPolicy } from "~/state/managedPolicy";
-import { Var } from "gt-react";
 
 /** Features still settling in. */
 export function LabsSettingsPanel() {

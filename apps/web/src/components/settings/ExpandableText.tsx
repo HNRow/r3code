@@ -4,7 +4,6 @@ import { InlineButton } from "../ui/button";
 import { useId, useState } from "react";
 
 import { cn } from "../../lib/utils";
-import { t } from "gt-react";
 
 export function ExpandableText({
   text,

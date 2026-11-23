@@ -21,7 +21,6 @@ import { m } from "./i18n/messages";
 import { shellEnvironment } from "./state/shell";
 import { useAtomCommand } from "./state/use-atom-command";
 import { readEnvironmentScope } from "./state/session";
-import { t } from "gt-react";
 
 const LAST_EDITOR_KEY = "t3code:last-editor";
 

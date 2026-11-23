@@ -22,7 +22,6 @@ import {
   settingsScopeEnvironmentLabels,
   settingsScopeProjectMachines,
 } from "./settingsScopeAxis";
-import { t } from "gt-react";
 
 interface ScopeChoice {
   label: string;

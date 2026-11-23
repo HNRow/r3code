@@ -51,7 +51,6 @@ import {
   SnapShotAttachmentDetails,
 } from "./SnapShotAttachmentDetails";
 import { prepareVideoFirstFrame } from "../../lib/videoFirstFrame";
-import { t } from "gt-react";
 
 function ComposerAttachmentUploadProgress({
   id,

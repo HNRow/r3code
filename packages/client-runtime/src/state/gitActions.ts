@@ -302,7 +302,7 @@ export function resolveQuickAction(
 
   if (hasDefaultBranchDelta && !isDefaultBranch) {
     return {
-      label: `Create ${terminology.shortLabel}`,
+      label: resolve(msg("Create {shortLabel}", { shortLabel: terminology.shortLabel })),
       disabled: false,
       kind: "run_action",
       action: "create_pr",

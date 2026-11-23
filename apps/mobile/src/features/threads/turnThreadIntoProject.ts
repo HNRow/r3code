@@ -15,7 +15,6 @@ import { appAtomRegistry } from "../../state/atom-registry";
 import { environmentProjects, projectEnvironment } from "../../state/projects";
 import { environmentServerConfigsAtom } from "../../state/server";
 import { readEnvironmentScope } from "../../state/session";
-import { t } from "../../i18n/gt";
 
 /** A No project thread that already has its own folder, on a server that can promote it. */
 export function canTurnThreadIntoProject(thread: EnvironmentThreadShell): boolean {

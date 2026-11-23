@@ -1,7 +1,6 @@
 import { useGT } from "gt-react-native";
 
 import type { useReviewHeaderPresentation as useIosReviewHeaderPresentation } from "./useReviewHeaderPresentation";
-import { t } from "../../i18n/gt";
 
 export function useReviewHeaderPresentation(
   props: Parameters<typeof useIosReviewHeaderPresentation>[0],

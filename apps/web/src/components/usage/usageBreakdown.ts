@@ -9,7 +9,6 @@ import {
 import { msg } from "gt-react";
 
 import type { ShareSegment } from "./UsageShareBar";
-import { t } from "gt-react";
 
 export function sortModelsByTokens(models: readonly ModelTotals[]) {
   return models.toSorted(

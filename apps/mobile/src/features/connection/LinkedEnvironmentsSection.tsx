@@ -14,7 +14,6 @@ import { peerLinkEnvironment } from "../../state/peerLinks";
 import { useEnvironmentQuery } from "../../state/query";
 import { useEnvironmentScope } from "../../state/session";
 import { SettingsSection } from "../settings/components/SettingsSection";
-import { t } from "../../i18n/gt";
 
 export function LinkedEnvironmentsSection(props: {
   readonly environmentId: EnvironmentId;

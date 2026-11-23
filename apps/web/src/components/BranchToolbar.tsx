@@ -79,7 +79,6 @@ import { useComposerMenuProps } from "./chat/composerEventScope";
 import { cn } from "~/lib/utils";
 
 import { observeResize } from "~/lib/observeResize";
-import { t } from "gt-react";
 
 const isClipboardApiUnavailableError = Schema.is(ClipboardApiUnavailableError);
 const isClipboardWriteError = Schema.is(ClipboardWriteError);

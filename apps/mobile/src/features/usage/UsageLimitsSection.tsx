@@ -40,7 +40,6 @@ import {
   refreshEnvironmentLimits,
 } from "./usageLimitsRefresh";
 import { usageProviderKind, useProviderColors } from "./usageProviders";
-import { t } from "../../i18n/gt";
 
 const PACE_LABEL = {
   ahead: msg("ahead of pace"),

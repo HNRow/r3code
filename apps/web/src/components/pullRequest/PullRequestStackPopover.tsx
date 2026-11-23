@@ -7,7 +7,6 @@ import { Menu, MenuTrigger, MenuPopup, MenuGroup, MenuGroupLabel, MenuItem } fro
 import { PullRequestStackLayers } from "./PullRequestStackLayers";
 import { PullRequestStackHeader } from "./PullRequestStackHeader";
 import { PullRequestGlyph } from "./pullRequestIcons";
-import { t } from "gt-react";
 
 // Mount only on open to avoid per-row stack fetches.
 function StackBody({

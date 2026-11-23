@@ -7,7 +7,6 @@ import { m } from "~/i18n/messages";
 import { useTheme } from "~/hooks/useTheme";
 
 import { FileSurfaceLoading } from "./fileSurfaceChrome";
-import { Var } from "gt-react";
 
 const MAX_FONT_BYTES = 10 * 1024 * 1024;
 

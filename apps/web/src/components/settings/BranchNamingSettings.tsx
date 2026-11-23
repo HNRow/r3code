@@ -13,7 +13,6 @@ import {
   useScopedSettingsMixed,
   useUpdateScopedSettings,
 } from "./useScopedSettings";
-import { t } from "gt-react";
 
 const MODES = {
   static: msg("Static prefix"),

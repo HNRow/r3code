@@ -1556,7 +1556,7 @@
   "d483dc58ae9695bf": "Cloud-Einstellungen der Umgebung konnten nicht aktualisiert werden: {detail}",
   "74dcbea91099bd6f": "Die Verknüpfung der Umgebung mit der Cloud konnte nicht gelöst werden.",
   "d87e1ac843ebe37f": "Die Cloud-Verknüpfung der Umgebung konnte nicht aufgehoben werden: {detail}",
-  "2ac809c51fe3e984": "Lokal getrennt, aber T3 Connect hat nicht bestätigt, dass diese Umgebung entfernt wurde",
+  "bfcfbe319fefff57": "Disconnected locally, but R3 Connect did not confirm it removed this environment",
   "413f1a76e506153c": "{name} ist nicht konfiguriert.",
   "805bc9a909bbb382": "{url} fehlgeschlagen",
   "01da8c5b0a52e84a": "Der Nachweis für die Umgebungsverknüpfung konnte nicht abgerufen werden.",
@@ -3190,10 +3190,7 @@
     {
       "t": "span",
       "i": 2,
-      "c": [
-        " ",
-        "auf dem Computer, der diese Seite geöffnet hat"
-      ]
+      "c": [" ", "auf dem Computer, der diese Seite geöffnet hat"]
     }
   ],
   "b2d53b4d1d48fbef": [
@@ -3205,10 +3202,7 @@
     {
       "t": "span",
       "i": 2,
-      "c": [
-        " ",
-        "· wer es ausführt, erhält diesen Zugriff"
-      ]
+      "c": [" ", "· wer es ausführt, erhält diesen Zugriff"]
     }
   ],
   "c54cc9c75db9dc58": "Genehmige nur eine Anmeldung, die du gerade selbst gestartet hast.",
@@ -5723,7 +5717,6 @@
   "17809eca3ed84183": "Nur Zellwerte. Diagramme, Bilder und Formatierung werden nicht angezeigt. Begrenzt auf 500 Zeilen und 50 Spalten.",
   "f1a5dfc750ab1824": "Nur Zellwerte. Diagramme, Bilder und Formatierung werden nicht angezeigt. Vorschau begrenzt auf 250.000 Zeilen, 1.024 Spalten und begrenzten Zelltext.",
   "823f8ed5323b3992": "Nur Zellwerte. Diagramme, Bilder und Formatierung werden nicht angezeigt.",
-  "858554f8b919bc4f": "Page {0}",
   "9fd5e1a67eef8abb": "Text und Bilder. Layout und eingebettete Objekte können vom Original abweichen.",
   "4e847c438e6e8535": "Dieses Tabellenblatt ist leer.",
   "5f1a7ef49d949dd7": "The Office engine was closed",
@@ -10149,6 +10142,27 @@
   "57ad6be8af4aa3a0": "Tastendrücke aufnehmen",
   "18e31eb8cc642148": "Mausklicks aufnehmen",
   "46dce590ce68842a": "Schwebende Vorschau",
+  "b676742d5c9783f1": "Wait for the full response",
+  "47cae2671170e30a": "Show finished paragraphs",
+  "995c40e36789a516": "Text appears once the agent finishes its turn.",
+  "99ed1c4d021ae372": "Each paragraph or code block appears as soon as it is complete.",
+  "c0b0406e0cafa1d1": "Letzte eigene Nachricht",
+  "cb0775162a9b6419": "Erstellungsdatum",
+  "62570d4bfe4ab517": "Manuell",
+  "7fa9414ef5e9dd6c": "12-hour",
+  "2f42917064c97f09": "24-hour",
+  "dcc08eacff8bd0bc": "Stacked",
+  "62d8f823deedf316": "Split",
+  "7e8c995646a967d3": "Direkt",
+  "51497bd401292062": "Gedrückt halten",
+  "9d6cc6ac23312071": "Doppelt drücken",
+  "f001fa7b329c8fbf": "Hide successful",
+  "ad208e3e32c85029": "Hide all",
+  "c80e4bb3201efd71": "Zen",
+  "0cb9ffcd1fb46b0c": "Status only",
+  "cf0f7fc3df26fa75": "Status and messages",
+  "3bf40445a706e4c9": "Everything",
+  "840497a2b41e60a3": "Never",
   "91f76d566351a1ed": "Update konnte nicht bestätigt werden",
   "51afa46ca07c002e": "Bestätigung des Updates fehlgeschlagen.",
   "9cedd1912bb1ce88": "Update konnte nicht installiert werden",
@@ -10322,12 +10336,6 @@
   "7207af3bea6c9bf8": "Wie wir Ihre Daten behandeln, einschließlich der anonymen Nutzungsdaten, die R3 Code erhebt.",
   "e741b1ab9396053a": "Wie wir mit deinen Daten umgehen. {telemetryOff}",
   "17e62d3d0ca86e5e": "Hinweise zu Abhängigkeiten, Medien und optionalen Werkzeugen, die R3 Code verwendet.",
-  "c0b0406e0cafa1d1": "Letzte eigene Nachricht",
-  "cb0775162a9b6419": "Erstellungsdatum",
-  "62570d4bfe4ab517": "Manuell",
-  "7e8c995646a967d3": "Direkt",
-  "51497bd401292062": "Gedrückt halten",
-  "9d6cc6ac23312071": "Doppelt drücken",
   "e39a57514be028e9": "Review",
   "7c0512387c3a42ea": "Stabil",
   "3476687eaa175b32": "Nightly",
@@ -10605,6 +10613,7 @@
     },
     " dieses Gateway ist."
   ],
+  "9478ebbf30d744db": "Shadowed",
   "55273815a762e145": "Skill installieren",
   "f83a0b7a2147bf6b": "Der Quellordner wird aus der ausgewählten Umgebung gelesen. Das Ziel ergibt sich aus Name und Bereich, nicht aus einem absoluten Pfad.",
   "5bf6efee457c1b5b": "Anbieterinstanz",
@@ -10659,7 +10668,6 @@
   "63739f23d55fa6a9": "Moving…",
   "1ab22cdbf60056e4": "Move to quarantine",
   "1327c966ab857e25": "In Plugins verwalten",
-  "9478ebbf30d744db": "Shadowed",
   "d6152c288ef31ce7": "Snapshots werden geprüft…",
   "03ba037132fb5daa": "Auf dieser Plattform nicht unterstützt.",
   "1029a97ff56a15ed": "Schalte das ein, um Snapshots einzurichten.",
@@ -11263,8 +11271,6 @@
   "b0d0aebadc521ed1": "Gespeicherte Browser-Aufnahmen nach so vielen Tagen löschen. Ältere Aufnahme-Links öffnen sich dann nicht mehr.",
   "fe4208562792c313": "Alte rotierte Logs löschen",
   "8debac9c8e9cff47": "Inaktive rotierte Log-Dateien nach so vielen Tagen löschen. Aktuelle Logs bleiben erhalten.",
-  "10077a4872dfe8d0": "Letzter Lauf {when}. {size} freigegeben.",
-  "666535dff3b86c64": "{count} Elemente konnten nicht entfernt werden.",
   "cdc5fc4d2cdf859b": "days",
   "8e73b883d41d4102": "Aus",
   "80d58a3fd4e4212a": "Projekt",

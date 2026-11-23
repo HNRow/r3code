@@ -15,7 +15,6 @@ import {
   releaseEditingQueuedMessage,
 } from "../../state/use-thread-outbox";
 import { withThreadDismissal } from "./thread-dismissal";
-import { t } from "../../i18n/gt";
 
 export function usePendingTaskListActions(
   selectThreadRoute: (params: ReactNavigation.RootParamList["Thread"]) => void,

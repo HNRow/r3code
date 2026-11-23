@@ -10,7 +10,6 @@ import { environmentThreadDetails, threadEnvironment } from "../../state/threads
 import { toastManager } from "../ui/toast";
 import type { AssistantCitationRequest } from "./AssistantCitationSource";
 import type { MessagesTimelineRow } from "./MessagesTimeline.logic";
-import { t } from "gt-react";
 
 /** Whether the cited response is in the loaded history, after paging toward it. */
 export type CitedHistory =

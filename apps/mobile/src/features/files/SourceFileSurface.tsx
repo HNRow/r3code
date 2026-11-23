@@ -45,7 +45,6 @@ import {
   selectableSourceHtml,
 } from "./source-file-document";
 import { sourceHighlightAtom } from "./sourceHighlightingState";
-import { t } from "../../i18n/gt";
 
 interface SourceFileSurfaceProps {
   readonly contents: string;

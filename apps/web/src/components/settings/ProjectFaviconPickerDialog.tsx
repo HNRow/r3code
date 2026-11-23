@@ -22,7 +22,6 @@ import { useProjectFilePickerQuery } from "../files/projectFilesQueryState";
 import { CommandDialog, CommandDialogPopup, CommandFooterAction } from "../ui/command";
 import { toastManager } from "../ui/toast";
 import { ProjectFaviconThumbnail } from "./ProjectFaviconThumbnail";
-import { t } from "gt-react";
 
 function emptyMessage(
   query: string,

@@ -18,7 +18,6 @@ import { splitEnvironmentSections } from "../connection/environmentSections";
 import { useConnectionController } from "../connection/useConnectionController";
 import { optOutOfConnectOnboarding } from "./connectOnboardingOptOut";
 import { hasCloudPublicConfig } from "./publicConfig";
-import { T } from "gt-react-native";
 import { t } from "../../i18n/gt";
 
 // Only reachable with cloud config: onboarding is requested after a R3 Connect

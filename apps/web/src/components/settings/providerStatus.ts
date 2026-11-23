@@ -1,4 +1,3 @@
-import { t } from "gt-react";
 import type {
   ServerProvider,
   ServerProviderVersionAdvisory,

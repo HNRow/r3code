@@ -5,8 +5,6 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-reanimated";
 import { cn } from "../../lib/cn";
 
-import { t } from "../../i18n/gt";
-
 const ACCESSIBILITY_RESIZE_STEP = 24;
 
 interface WorkspacePaneDividerProps {

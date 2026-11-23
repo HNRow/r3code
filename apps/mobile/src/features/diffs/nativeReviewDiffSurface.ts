@@ -14,7 +14,6 @@ import { msg, useMessages } from "gt-react-native";
 
 import { EmptyState } from "../../components/ui/EmptyState";
 import { NativeViewResolutionError } from "../../native/nativeViewResolutionError";
-import { t } from "../../i18n/gt";
 
 const NATIVE_REVIEW_DIFF_MODULE_NAME = "T3ReviewDiffSurface";
 const NATIVE_REVIEW_DIFF_PAYLOAD_RETRY_FRAMES = 60;

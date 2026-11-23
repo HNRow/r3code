@@ -51,7 +51,6 @@ import { useCopyToClipboard } from "./useCopyToClipboard";
 import { useNewThreadHandler } from "./useHandleNewThread";
 import { useClientSettings } from "./useSettings";
 import { canTurnThreadIntoProject, useThreadActions } from "./useThreadActions";
-import { t } from "gt-react";
 
 function failureToast(title: string, error: unknown) {
   toastManager.add(

@@ -23,7 +23,6 @@ import { formatUpcomingTimestamp } from "../../timestampFormat";
 import { toastManager } from "../ui/toast";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
 import { copyAdminRequest } from "./ThreadErrorBanner";
-import { t } from "gt-react";
 
 type RecoveryProps = {
   runId: RunId;

@@ -1,4 +1,5 @@
 import { vi } from "vite-plus/test";
+import { initializeI18nConfig as initializeGtConfig } from "gt-i18n/internal";
 
 // 单元测试里没有启动 GT 的翻译管线，且移动端单测通常只 mock 了 react-native 的一小部分。
 // 这里用等价的轻量实现替换 GT 包，返回英文原文，并支持 msg("...") 与 t`...` 两种写法。
@@ -136,6 +137,16 @@ vi.mock("gt-react-native", () => ({
 }));
 
 vi.mock("@generaltranslation/react-core/pure", () => ({
+  I18nStore: class {
+    readonly isMock = true;
+  },
+  ReactI18nCache: class {
+    readonly isMock = true;
+  },
+  initializeI18nConfig: (params?: Parameters<typeof initializeGtConfig>[0]) =>
+    initializeGtConfig(params ?? { defaultLocale: "en" }),
+  setI18nStore: () => undefined,
+  setReactI18nCache: () => undefined,
   t: identity,
   msg: identity,
   decodeMsg: (message: unknown) => message,
@@ -147,4 +158,5 @@ vi.mock("gt-i18n", () => ({
   m: identity,
   mFallback: identity,
   decodeMsg: (message: unknown) => message,
+  decodeOptions: () => undefined,
 }));

@@ -31,8 +31,6 @@ import {
 } from "../terminal/terminalMenu";
 import { projectScriptMenuLabel } from "@t3tools/shared/projectScriptsCopy";
 
-import { t } from "../../i18n/gt";
-
 function truncateMiddle(value: string, maxLength: number): string {
   if (value.length <= maxLength) {
     return value;

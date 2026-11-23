@@ -14,7 +14,6 @@ import {
   useThreadGitMenuDefinition,
   type ThreadGitControlsProps,
 } from "./ThreadGitControls";
-import { t } from "../../i18n/gt";
 
 export function ThreadHeader(props: {
   readonly title: string;

@@ -16,10 +16,7 @@ import {
 } from "@expo/ui/swift-ui/modifiers";
 import { createWidget, type WidgetEnvironment } from "expo-widgets";
 
-import {
-  DEFAULT_SUBSCRIPTION_USAGE_LABELS,
-  type SubscriptionUsageSnapshot as SubscriptionUsageProps,
-} from "./subscriptionUsageSnapshot";
+import { type SubscriptionUsageSnapshot as SubscriptionUsageProps } from "./subscriptionUsageSnapshot";
 
 type UsageConfiguration = {
   codexPeriod?: "auto" | "session" | "weekly";
@@ -34,7 +31,6 @@ function SubscriptionUsage(
 ) {
   "widget";
   // The extension evaluates this function without the app's module scope.
-  const labels = props.labels ?? DEFAULT_SUBSCRIPTION_USAGE_LABELS;
   const family = widgetEnvironment.widgetFamily;
   // Gallery snapshots can render an old timeline entry after it has expired.
   const now = Math.max(widgetEnvironment.date?.getTime() ?? 0, Date.now());

@@ -2,7 +2,6 @@ import type { DevicePlatformAvailability } from "@t3tools/contracts";
 import { useGT } from "gt-react";
 import { Check, Minus } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipPopup } from "../ui/tooltip";
-import { t } from "gt-react";
 
 export function DeviceHostAvailability({
   platforms,

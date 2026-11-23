@@ -9,7 +9,6 @@ import { m } from "../../i18n/messages";
 import { isThreadRoutePathname } from "../../threadRoutes";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { placeLinkedPrompt } from "./linkedPrompt";
-import { t } from "gt-react";
 
 const handledLinkKeys = new Set<string>();
 

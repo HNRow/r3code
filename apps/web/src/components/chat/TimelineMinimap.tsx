@@ -12,7 +12,6 @@ import {
 } from "./MessagesTimeline.logic";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "~/lib/utils";
-import { t } from "gt-react";
 
 // A release outside the window can skip `mouseup`, so the next button-free
 // `mousemove` also counts.

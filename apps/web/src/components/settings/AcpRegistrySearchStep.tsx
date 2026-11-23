@@ -33,7 +33,6 @@ import { isConfiguredAcpRegistryAgent } from "./AddProviderInstanceDialog.logic"
 import { ProviderDriverKind } from "@t3tools/contracts";
 import { ProviderInstanceIcon } from "../chat/ProviderInstanceIcon";
 import { providerClients } from "./providerDriverMeta";
-import { t } from "gt-react";
 
 function errorMessage(error: unknown): string {
   return error instanceof Error && error.message.trim()

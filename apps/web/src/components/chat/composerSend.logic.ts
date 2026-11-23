@@ -3,7 +3,6 @@ import { msg } from "gt-react";
 import { m, type MessageResolver } from "../../i18n/messages";
 import { collectInlineContextIds } from "../../lib/composerContextReferences";
 import type { ComposerThreadDraftState } from "../../composerDraftStore";
-import { t } from "gt-react";
 
 /** Compare immutable user content without copying image bytes or upload metadata. */
 export function composerDraftContentChanged(

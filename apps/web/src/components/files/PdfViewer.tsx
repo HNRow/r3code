@@ -34,7 +34,6 @@ import {
   visiblePdfPages,
 } from "./pdfLayout";
 import "./pdfViewer.css";
-import { t } from "gt-react";
 
 const MAX_PAGES = 2000;
 const MAX_FIND_TEXT = 4 * 1024 * 1024;

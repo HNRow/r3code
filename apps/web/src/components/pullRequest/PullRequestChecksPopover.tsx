@@ -27,7 +27,6 @@ import {
   pullRequestChecksStatePresentation,
   summarizePullRequestChecks,
 } from "./pullRequestPresentation";
-import { t } from "gt-react";
 
 // Fetch only on open to avoid per-row requests.
 function LazyChecksBody({

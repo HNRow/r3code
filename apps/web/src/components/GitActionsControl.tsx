@@ -136,7 +136,6 @@ import { scopeProjectRef } from "@t3tools/client-runtime/environment";
 import { formatDiffCount } from "@t3tools/client-runtime/diff-count";
 import { ChangeBreakdownGrid } from "./pullRequest/ChangeBreakdownGrid";
 import { useOpenLink } from "~/browser/useOpenLink";
-import { t } from "gt-react";
 
 /** The folder a Git actions control acts on: a thread's own folder or a tracked repository. */
 export interface GitActionsTarget {

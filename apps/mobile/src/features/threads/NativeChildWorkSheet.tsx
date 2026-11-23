@@ -13,7 +13,6 @@ import { Button } from "../../components/ui/Button";
 import { Sheet } from "../../components/ui/Sheet";
 import { orchestrationEnvironment } from "../../state/orchestration";
 import { useEnvironmentQuery } from "../../state/query";
-import { t } from "../../i18n/gt";
 
 const stepLabel = (type: string) => {
   const words = type.toLowerCase().replaceAll("_", " ");

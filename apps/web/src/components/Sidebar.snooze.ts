@@ -13,7 +13,6 @@ import { appAtomRegistry } from "../rpc/atomRegistry";
 import { serverEnvironment } from "../state/server";
 import { formatShortTimestamp } from "../timestampFormat";
 import { toastManager } from "./ui/toast";
-import { t } from "gt-react";
 
 export { snoozeWakeLabel, type SnoozePreset };
 

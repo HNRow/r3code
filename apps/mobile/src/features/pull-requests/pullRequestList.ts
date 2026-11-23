@@ -15,8 +15,6 @@ import type { PullRequestListControls } from "../../persistence/mobile-preferenc
 import { compareTimestamps } from "../../lib/time";
 import { m, type MessageResolver } from "../../i18n/messages";
 
-import { t } from "../../i18n/gt";
-
 export const PR_LIST_PAGE_SIZE = 30;
 export type { PullRequestListControls } from "../../persistence/mobile-preferences";
 export const DEFAULT_PR_LIST_CONTROLS: PullRequestListControls = {

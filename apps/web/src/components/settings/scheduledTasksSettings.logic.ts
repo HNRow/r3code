@@ -36,7 +36,6 @@ import type { ProviderInstanceEntry } from "../../providerInstances";
 import { formatDateTimeTimestamp, formatTimeOfDay } from "../../timestampFormat";
 
 import type { ResolvedSettingsScope } from "./settingsScope";
-import { t } from "gt-react";
 
 /** Abbreviated weekday name, 0 = Sunday. */
 export function weekdayShortLabel(day: number, locale: string = getActiveLocale()): string {

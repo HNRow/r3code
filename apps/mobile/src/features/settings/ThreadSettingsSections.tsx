@@ -31,7 +31,6 @@ import {
   resolveMobileSettingsTargets,
   uniformMobileSetting,
 } from "./settings-scoped-server";
-import { t } from "../../i18n/gt";
 
 export function SettingsLabsRouteScreen() {
   const gt = useGT();

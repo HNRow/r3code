@@ -26,7 +26,6 @@ import { primaryServerConfigAtom, primaryServerWelcomeAtom } from "../../state/s
 import { environmentShell } from "../../state/shell";
 import { environmentThreadShells } from "../../state/threads";
 import { Button } from "../ui/button";
-import { t } from "gt-react";
 
 /** Pending blocks all rendering, including EventRouter welcome navigation. */
 

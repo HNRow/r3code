@@ -13,8 +13,6 @@ import { LoadingStrip } from "../../../components/ui/LoadingStrip";
 import { SymbolView } from "../../../components/ui/AppSymbol";
 import { isLegalDocumentUrl, LEGAL_URL } from "../lib/legal-document-url";
 import { webViewDecelerationRate } from "../../../lib/webViewDecelerationRate";
-import { Var } from "gt-react-native";
-import { t } from "../../../i18n/gt";
 
 interface SettingsLegalDocumentRouteScreenProps {
   readonly documentName: string;

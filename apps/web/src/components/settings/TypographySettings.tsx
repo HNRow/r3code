@@ -43,7 +43,7 @@ import {
   revealSettingsSearchTarget,
   useSearchableSetting,
 } from "./settingsSearch";
-import { Var, T, t } from "gt-react";
+import { Var, T } from "gt-react";
 
 let fontDefaultFamilies: { readonly sans: string | null; readonly code: string | null } | undefined;
 

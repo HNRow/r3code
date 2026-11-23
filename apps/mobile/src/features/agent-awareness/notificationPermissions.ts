@@ -1,7 +1,6 @@
 import * as Notifications from "expo-notifications";
 import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
-import { t } from "../../i18n/gt";
 import { Platform } from "react-native";
 import { msg } from "gt-react-native";
 

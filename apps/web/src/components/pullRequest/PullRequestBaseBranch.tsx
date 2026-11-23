@@ -9,7 +9,6 @@ import { MiddleTruncate } from "../ui/middle-truncate";
 import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { PullRequestGlyph } from "./pullRequestIcons";
-import { t } from "gt-react";
 
 interface BaseFreshness {
   readonly behindBy: number | null;

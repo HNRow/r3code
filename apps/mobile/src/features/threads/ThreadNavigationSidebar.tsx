@@ -81,7 +81,6 @@ import {
 } from "./threadListV2";
 import { useSelectWorkspaceDetail } from "../layout/workspace/useSelectWorkspaceDetail";
 import { NativeScrollView } from "../../native/NativeScrollViewMarker";
-import { t } from "../../i18n/gt";
 
 type SidebarListItem =
   | ThreadListV2ListItem

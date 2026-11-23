@@ -22,7 +22,6 @@ import {
 } from "./reviewCommentSelection";
 import type { NativeReviewDiffData } from "./nativeReviewDiffAdapter";
 import type { ReviewSectionItem } from "./reviewModel";
-import { t } from "../../i18n/gt";
 
 export function useReviewCommentSelectionController(input: {
   readonly environmentId?: EnvironmentId;

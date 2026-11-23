@@ -4,7 +4,6 @@ import { m } from "../i18n/messages";
 import { appAtomRegistry } from "../rpc/atomRegistry";
 import { primaryServerLegacyThreadMigrationAtom } from "../state/server";
 import { toastManager } from "./ui/toast";
-import { t } from "gt-react";
 
 type MigrationToastId = ReturnType<typeof toastManager.add>;
 

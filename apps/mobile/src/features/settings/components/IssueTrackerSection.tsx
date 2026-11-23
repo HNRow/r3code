@@ -33,7 +33,6 @@ import type { SettingsTarget } from "../settings-environment-filter";
 import { SettingsProviderRow } from "./SettingsProviderRow";
 import { SettingsRow } from "./SettingsRow";
 import { SettingsSection } from "./SettingsSection";
-import { t } from "../../../i18n/gt";
 
 const UNBOUND = "";
 const ThemedSvg = withUniwind(Svg);

@@ -11,7 +11,6 @@ import {
   settlePromise,
   squashAtomCommandFailure,
 } from "@t3tools/client-runtime/state/runtime";
-import { t } from "../../i18n/gt";
 
 import { m } from "../../i18n/messages";
 

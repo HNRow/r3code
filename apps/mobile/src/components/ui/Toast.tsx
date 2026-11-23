@@ -23,7 +23,6 @@ import { useControlTheme } from "./useControlTheme";
 import { IconButton } from "./IconButton";
 import { AppActivityIndicator } from "./AppActivityIndicator";
 import { SymbolView } from "./AppSymbol";
-import { t } from "../../i18n/gt";
 
 export type ToastProps = {
   readonly message: string;

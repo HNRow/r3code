@@ -14,7 +14,6 @@ import { Pressable, View } from "react-native";
 
 import { AppText as Text } from "../../components/ui/AppText";
 import type { PendingApproval } from "../../lib/threadActivity";
-import { t } from "../../i18n/gt";
 
 export interface PendingApprovalCardProps {
   readonly canOperateThread: boolean;

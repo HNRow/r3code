@@ -63,7 +63,6 @@ import {
   captureSetupShouldDisableOnClose,
   type CaptureSetupStep,
 } from "./SnapShotSetupDialog.logic";
-import { t } from "gt-react";
 
 const soundOptionRowClassName = "grid grid-cols-[1fr_auto]";
 

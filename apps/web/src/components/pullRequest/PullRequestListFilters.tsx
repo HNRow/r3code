@@ -59,7 +59,7 @@ import {
 import { resolveFilterOptions } from "./pullRequestListOptions";
 import { PullRequestActorAvatar } from "./pullRequestPresentation";
 import { PullRequestGlyph } from "./pullRequestIcons";
-import { Var, t } from "gt-react";
+import { Var } from "gt-react";
 
 export interface PullRequestFilterOption<Value extends string> {
   readonly value: Value;

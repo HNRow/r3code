@@ -9,7 +9,6 @@ import {
 import { m } from "~/i18n/messages";
 import { toastManager } from "../ui/toast";
 import { observeResize } from "~/lib/observeResize";
-import { t } from "gt-react";
 
 const CITATION_PULSE_DURATION_MS = 650;
 const CITATION_HIGHLIGHT_HOLD_MS = 1575;

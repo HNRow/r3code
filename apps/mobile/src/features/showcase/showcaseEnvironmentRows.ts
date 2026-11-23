@@ -2,7 +2,6 @@ import { EnvironmentId } from "@t3tools/contracts";
 
 import type { RelayEnvironmentView } from "../connection/useConnectionController";
 import type { ConnectedEnvironmentSummary } from "../../state/remote-runtime-types";
-import { t } from "../../i18n/gt";
 
 const SHOWCASE_LOCAL_ENVIRONMENT_DISPLAY_URLS: Readonly<Record<string, string>> = {
   "Moonbase Terminal": "https://moonbase.tail9f3a.ts.net/",

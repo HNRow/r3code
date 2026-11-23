@@ -22,7 +22,6 @@ import { ListRow } from "../../components/ui/ListRow";
 import { SettingsScreen } from "./components/SettingsScreen";
 
 import { getMobileThirdPartyLicenses } from "./mobileThirdPartyLicenses";
-import { t } from "../../i18n/gt";
 
 function useMobileThirdPartyLicenses() {
   return useMemo(() => {

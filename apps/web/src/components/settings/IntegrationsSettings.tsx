@@ -120,7 +120,6 @@ import { AdvancedSettings } from "./AdvancedSettings";
 import { useSettingsScope } from "./SettingsScopeContext";
 import { BrowserImportWizard, type WizardTarget } from "./BrowserImportWizard";
 import type { ImportOutcome } from "./browserImportWizard.logic";
-import { t } from "gt-react";
 
 const FILL_VALUE = "fill";
 const RESPONSIVE_VALUE = "responsive";

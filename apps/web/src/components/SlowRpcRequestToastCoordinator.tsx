@@ -3,7 +3,6 @@ import { msg, T, Var } from "gt-react";
 import { m } from "../i18n/messages";
 import { type SlowRpcAckRequest, subscribeSlowRpcAckRequests } from "../rpc/requestLatencyState";
 import { toastManager } from "./ui/toast";
-import { t } from "gt-react";
 
 function describeSlowRequests(requests: ReadonlyArray<SlowRpcAckRequest>): string {
   const count = requests.length;

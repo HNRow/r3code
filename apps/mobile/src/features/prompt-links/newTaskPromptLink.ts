@@ -55,7 +55,6 @@ import {
   stepPendingPromptLink,
   withoutPromptLinkParams,
 } from "./prompt-link-model";
-import { t } from "../../i18n/gt";
 
 // Found at any depth, both in the parsed link and on the live stack, so the two never disagree on
 // whether the link has landed.

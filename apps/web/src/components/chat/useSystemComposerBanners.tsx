@@ -36,7 +36,6 @@ import {
   resolveServerSelfUpdateCapability,
   supportsDesktopAppUpdate,
 } from "../../versionSkew";
-import { t } from "gt-react";
 
 export type EnvironmentUnavailableState = {
   readonly environmentId: EnvironmentId;

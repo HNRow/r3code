@@ -22,7 +22,6 @@ import { useAssetUrlState, useRefreshAssetUrl } from "../state/assets";
 import { AppText as Text } from "./ui/AppText";
 import { FilePreviewModal } from "./ui/FilePreviewModal";
 import { PresentationSource } from "./ui/NativePresentation";
-import { t } from "../i18n/gt";
 
 export function ComposerContextAttachment(props: {
   record: Extract<ComposerContextRecord, { attachmentId: string }>;

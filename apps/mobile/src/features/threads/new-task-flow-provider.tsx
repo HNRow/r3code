@@ -115,7 +115,6 @@ import {
   type WorktreeRepositorySelection,
 } from "@t3tools/client-runtime/state/thread-repositories";
 import { useConnectionsReady, useWorkspaceEnvironments } from "../../state/workspace";
-import { t } from "../../i18n/gt";
 
 type WorkspaceMode = "local" | "worktree";
 

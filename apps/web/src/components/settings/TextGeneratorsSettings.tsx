@@ -62,7 +62,6 @@ import { WizardFooter, WizardHeader, WizardPanel, WizardPopup, WizardSteps } fro
 import { SecretSourceInput, useSecretSources } from "./SecretSourceInput";
 import { useSearchableSetting } from "./settingsSearch";
 import { SETTINGS_PICKER_TRIGGER_CLASSNAME, SettingsRow, SettingsSection } from "./settingsLayout";
-import { t } from "gt-react";
 
 const decodeTextGenerator = Schema.decodeUnknownOption(TextGeneratorConfig);
 

@@ -12,7 +12,6 @@ import {
   shouldShowInstanceBadge,
   type ProviderInstanceEntry,
 } from "../../providerInstances";
-import { useGT } from "gt-react";
 
 function describeUnavailableInstance(
   entry: ProviderInstanceEntry,

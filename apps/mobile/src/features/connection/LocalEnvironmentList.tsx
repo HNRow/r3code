@@ -6,7 +6,6 @@ import { View } from "react-native";
 import { SymbolView } from "../../components/ui/AppSymbol";
 import { AppText as Text } from "../../components/ui/AppText";
 import { ConnectionEnvironmentRow } from "./ConnectionEnvironmentRow";
-import { Var } from "gt-react-native";
 
 type EnvironmentRowProps = ComponentProps<typeof ConnectionEnvironmentRow>;
 

@@ -31,7 +31,6 @@ import { msg } from "gt-react";
 import { m } from "../../i18n/messages";
 
 import type { ResolvedSettingsScope } from "./settingsScope";
-import { t } from "gt-react";
 
 export type ScopedSettingsPatch = ServerSettingsPatch & ClientSettingsPatch;
 

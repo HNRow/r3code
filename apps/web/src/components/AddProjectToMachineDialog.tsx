@@ -59,7 +59,6 @@ import { Label } from "./ui/label";
 import { MiddleTruncate } from "./ui/middle-truncate";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "./ui/select";
 import { Toggle, ToggleGroup } from "./ui/toggle-group";
-import { t } from "gt-react";
 
 interface AddProjectToMachineRequest {
   readonly projectRef: ScopedProjectRef;

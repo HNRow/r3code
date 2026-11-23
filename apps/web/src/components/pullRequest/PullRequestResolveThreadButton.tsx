@@ -15,7 +15,6 @@ import { useAtomCommand } from "~/state/use-atom-command";
 
 import { Button } from "../ui/button";
 import { toastManager } from "../ui/toast";
-import { t } from "gt-react";
 
 /**
  * Resolves or unresolves a thread from the conversation, so threads without a diff line (such as

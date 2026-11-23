@@ -8,7 +8,6 @@ import {
 } from "../../speech/voiceInputSession";
 import { Button } from "../ui/button";
 import { ComposerSpeechRecordingPill } from "./ComposerSpeechButton";
-import { t } from "gt-react";
 
 /**
  * Keeps the chosen destination's dictation alive across navigation and, while the draft it

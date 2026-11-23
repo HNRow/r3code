@@ -14,7 +14,6 @@ import {
   useComposerDraftSettings,
 } from "../../state/use-composer-drafts";
 import { runtimeModeChoicesForSupportedModes } from "./thread-settings-options";
-import { t } from "../../i18n/gt";
 
 /**
  * Shown while a thread's mode is above its environment's managed ceiling, where the server

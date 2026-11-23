@@ -4,7 +4,6 @@ import { useId } from "react";
 
 import { accessConfig } from "../auth/ConnectAgentSurface";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
-import { Var } from "gt-react";
 
 /** What agents here may do in an environment being linked, with what that does not allow. */
 export function LinkAccessPicker({

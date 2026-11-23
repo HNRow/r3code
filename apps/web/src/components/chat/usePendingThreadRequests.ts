@@ -66,7 +66,6 @@ import { useOrchestrationCommand } from "../../state/use-orchestration-command";
 import { toastManager } from "../ui/toast";
 
 import type { ChatComposerHandle } from "./ChatComposer";
-import { t } from "gt-react";
 
 const EMPTY_PENDING_USER_INPUT_ANSWERS: Record<string, PendingUserInputDraftAnswer> = {};
 const NO_PENDING_REQUESTS = { approvals: [], userInputs: [] } as const;

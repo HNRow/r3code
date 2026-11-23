@@ -27,7 +27,6 @@ import {
   type FileViewedOverlay,
   type FileViewedPress,
 } from "./pullRequestFilesViewed.logic";
-import { t } from "gt-react";
 
 export interface FilesViewedTarget {
   readonly environmentId: EnvironmentId;

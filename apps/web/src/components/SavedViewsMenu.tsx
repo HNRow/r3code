@@ -24,7 +24,6 @@ import { Label } from "./ui/label";
 import { Menu, MenuItem, MenuItemLabel, MenuPopup, MenuSeparator, MenuTrigger } from "./ui/menu";
 import { toastManager } from "./ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
-import { t } from "gt-react";
 
 export interface SavedView<Preferences> {
   readonly id: string;

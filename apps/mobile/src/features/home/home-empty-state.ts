@@ -2,7 +2,6 @@ import { msg } from "gt-react-native";
 
 import { m, type MessageResolver } from "../../i18n/messages";
 import { isWorkspaceCatalogPending, type WorkspaceState } from "../../state/workspaceModel";
-import { t } from "../../i18n/gt";
 
 export interface HomeEmptyState {
   readonly title: string;

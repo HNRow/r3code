@@ -13,7 +13,6 @@ import { useAppearancePreferences } from "../settings/appearance/AppearancePrefe
 import { FileTreeBrowser } from "./FileTreeBrowser";
 import { useFileTreeEntries } from "./useFileTreeEntries";
 import { preloadWorkspaceFileContents } from "./preload-workspace-file";
-import { t } from "../../i18n/gt";
 
 export function ThreadFileNavigatorPane(props: {
   readonly cwd: string;

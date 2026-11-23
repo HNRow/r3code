@@ -6,7 +6,6 @@ import { cn } from "~/lib/utils";
 
 import { Badge } from "../../ui/badge";
 import { stopSubline } from "@t3tools/client-runtime/review-guide-tour";
-import { Var } from "gt-react";
 
 export function GuideRail({
   stops,

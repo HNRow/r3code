@@ -28,7 +28,6 @@ import type {
   FilePreviewSource,
   FilePreviewViewerProps,
 } from "./FilePreviewModal.types";
-import { t } from "../../i18n/gt";
 
 interface FilePreviewSessionOptions {
   /** Opens before every image resolves; the viewer takes later URLs as they arrive. */

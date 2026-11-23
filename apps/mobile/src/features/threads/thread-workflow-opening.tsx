@@ -21,7 +21,6 @@ import { useMarkdownCodeHighlight } from "./markdownCodeHighlightState";
 import { SubagentRow } from "./SubagentRow";
 import { WorkLogBlock } from "./work-log-layout";
 import { useOpenLinkedThread } from "./useOpenLinkedThread";
-import { t } from "../../i18n/gt";
 
 const FOLDED_SCRIPT_LINES = 10;
 

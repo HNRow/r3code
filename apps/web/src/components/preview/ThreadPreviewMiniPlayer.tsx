@@ -75,7 +75,6 @@ import {
   resolveDeviceMiniPlayerSourceSize,
   resolvePreviewMiniPlayerSourceSize,
 } from "./previewMiniPlayerLayout";
-import { t } from "gt-react";
 
 interface Props {
   readonly threadRef: ScopedThreadRef;

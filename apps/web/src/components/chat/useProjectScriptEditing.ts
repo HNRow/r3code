@@ -38,7 +38,6 @@ import { useAtomCommand } from "../../state/use-atom-command";
 import { useProjects } from "../../state/entities";
 import { type NewProjectScriptInput } from "../ProjectScriptsControl";
 import { stackedThreadToast, toastManager } from "../ui/toast";
-import { t } from "gt-react";
 
 /** Write script settings before reconciling shortcuts in environment keybindings. */
 export function useProjectScriptEditing(input: {

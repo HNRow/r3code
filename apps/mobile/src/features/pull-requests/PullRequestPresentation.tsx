@@ -11,7 +11,6 @@ import { AppText as Text } from "../../components/ui/AppText";
 import { cn } from "../../lib/cn";
 import { changeRequestTermKind } from "../../lib/changeRequestTerm";
 import { EmptyState } from "../../components/ui/EmptyState";
-import { t } from "../../i18n/gt";
 
 export function PullRequestReadStatus(props: {
   readonly pending: boolean;

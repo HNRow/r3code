@@ -10,7 +10,6 @@ import { appAtomRegistry } from "../rpc/atomRegistry";
 import { environmentSummaries } from "../state/presentation";
 import { environmentSession } from "../state/session";
 import { toastManager } from "./ui/toast";
-import { t } from "gt-react";
 
 interface LegacyPermissionEnvironment {
   readonly environmentId: EnvironmentId;

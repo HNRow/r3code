@@ -19,7 +19,6 @@ import { useDictationShortcut, type DictationKeyHandlers } from "~/speech/useDic
 import { useEnvironmentSpeechInput } from "~/speech/useEnvironmentSpeechInput";
 import { useProject, useThreadShell } from "~/state/entities";
 import { previewBridge } from "./previewBridge";
-import { t } from "gt-react";
 
 /**
  * The annotation editor lives inside the preview guest, which only forwards trusted gestures

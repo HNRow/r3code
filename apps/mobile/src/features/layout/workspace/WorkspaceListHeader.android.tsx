@@ -12,7 +12,6 @@ import {
   workspaceListFilterIcon,
   type WorkspaceListHeaderProps,
 } from "./WorkspaceListHeader.types";
-import { t } from "../../../i18n/gt";
 
 export function WorkspaceListHeader(props: WorkspaceListHeaderProps) {
   const gt = useGT();

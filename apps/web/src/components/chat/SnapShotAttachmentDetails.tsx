@@ -14,7 +14,6 @@ import {
   showAnchoredCopyErrorToast,
 } from "../ui/anchoredCopyToast";
 import { HighlightedTokens } from "./HighlightedTokens";
-import { t } from "gt-react";
 
 export const SNAP_SHOT_ATTACHMENT_FRAME_CLASS =
   "relative h-28 w-52 max-w-full overflow-hidden rounded-lg border border-border/80";

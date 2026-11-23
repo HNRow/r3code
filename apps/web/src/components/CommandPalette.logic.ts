@@ -37,7 +37,6 @@ import { msg } from "gt-react";
 import { m, type MessageResolver } from "../i18n/messages";
 import { formatRelativeTimeLabel } from "../timestampFormat";
 import { type Project, type SidebarThreadSummary, type Thread } from "../types";
-import { t } from "gt-react";
 
 export const RECENT_THREAD_LIMIT = 12;
 const NO_THREAD_KEYS: ReadonlySet<string> = new Set();

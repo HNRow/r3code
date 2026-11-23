@@ -5,7 +5,6 @@ import { type ComposerThreadTarget, useComposerDraftStore } from "~/composerDraf
 import { m } from "~/i18n/messages";
 
 import { toastManager } from "../ui/toast";
-import { t } from "gt-react";
 
 export function warnAboutHiddenCharacters(prompt: LinkedPrompt): void {
   if (prompt.hiddenCharacters === 0) return;

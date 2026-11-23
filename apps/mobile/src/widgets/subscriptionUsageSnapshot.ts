@@ -47,35 +47,11 @@ export interface WidgetLimitAccount {
   durationMs?: number;
 }
 
-// 小组件在独立 runtime 里跑，GT 未初始化：文案由 App 翻好后经 props 传入。
-export interface SubscriptionUsageLabels {
-  readonly openToConnect: string;
-  readonly openT3: string;
-  readonly notAvailable: string;
-  readonly tapToConnect: string;
-  readonly noLimits: string;
-  readonly percentLeft: string;
-  readonly moreInT3: string;
-  readonly asOf: string;
-}
-
-export const DEFAULT_SUBSCRIPTION_USAGE_LABELS: SubscriptionUsageLabels = {
-  openToConnect: "Open T3 to connect",
-  openT3: "Open T3",
-  notAvailable: "N/A",
-  tapToConnect: "Tap to connect in T3",
-  noLimits: "No subscription limits available.",
-  percentLeft: "%percent%% left",
-  moreInT3: "%count% more in T3",
-  asOf: "As of %time%",
-};
-
 export interface SubscriptionUsageSnapshot {
   theme?: WidgetTheme;
   url?: string;
   text?: SubscriptionUsageText;
   checkedAt: number;
-  labels?: SubscriptionUsageLabels;
   providers: Array<{
     name: string;
     colors?: { light: string; dark: string };

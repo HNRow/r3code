@@ -33,7 +33,6 @@ import { useThreadSelectionStore } from "../threadSelectionStore";
 import { resolveThreadRouteTarget } from "../threadRoutes";
 import { useUiStateStore } from "../uiStateStore";
 import { type CommandHandler, registerCommands } from "./dispatcher";
-import { t } from "gt-react";
 
 const CHAT_ROUTE_ID = "/_chat";
 

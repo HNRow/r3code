@@ -14,7 +14,6 @@ import { formatRelativeHourShort } from "@t3tools/shared/usageFormatCopy";
 import { cn } from "~/lib/utils";
 import { PROVIDER_ORDER, PROVIDER_PRESENTATION } from "./usageProviders";
 import { observeResize } from "~/lib/observeResize";
-import { t } from "gt-react";
 
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 260;

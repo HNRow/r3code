@@ -21,7 +21,6 @@ import {
   DialogPopup,
   DialogTitle,
 } from "../ui/dialog";
-import { t } from "gt-react";
 
 const stepLabel = (type: string) => {
   const words = type.toLowerCase().replaceAll("_", " ");

@@ -10,7 +10,6 @@ import { Button, InlineButton } from "../ui/button";
 import { Menu, MenuItem, MenuPopup, MenuTrigger } from "../ui/menu";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { composerFloatingLayerProps } from "./composerEventScope";
-import { t } from "gt-react";
 
 interface ComposerPendingApprovalActionsProps {
   presentation?: "composer" | "inline";

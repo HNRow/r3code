@@ -16,7 +16,6 @@ import { msg } from "gt-react";
 import { m, type MessageResolver } from "../../i18n/messages";
 
 import { deriveProviderSettingsFields, type SettingsFormDefinition } from "./ProviderSettingsForm";
-import { t } from "gt-react";
 
 type SecretUseSettings = Pick<
   ServerSettings,
