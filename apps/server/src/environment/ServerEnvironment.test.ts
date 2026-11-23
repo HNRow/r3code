@@ -1,3 +1,4 @@
+// @effect-diagnostics nodeBuiltinImport:off -- the fixture needs the synchronous fs call.
 import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import * as NodeFS from "node:fs";
 import * as NodeServices from "@effect/platform-node/NodeServices";

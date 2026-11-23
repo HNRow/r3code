@@ -657,7 +657,7 @@ export const make = Effect.gen(function* () {
     "WorkspaceFileSystem.deleteEntry",
   )(function* (input) {
     yield* knownWorkspaces.assertContains(input.cwd);
-    const target = yield* resolveWriteTarget(input);
+    const target = yield* resolveWriteTarget({ ...input, contents: "" });
     const realWorkspaceRoot = yield* Effect.promise(() =>
       NodeFSP.realpath(path.resolve(input.cwd)),
     );

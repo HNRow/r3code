@@ -78,6 +78,7 @@ import * as McpProviderSessions from "@t3tools/provider-core/server/McpProviderS
 import * as OpenCodeRuntime from "@t3tools/provider-opencode/server/OpenCodeRuntime";
 import * as OpenCodeServerLedger from "@t3tools/provider-opencode/server/OpenCodeServerLedger";
 import * as ProviderHostLive from "./provider/ProviderHostLive.ts";
+import * as ProviderMaintenanceRunner from "./provider/providerMaintenanceRunner.ts";
 import * as DocumentText from "./provider/DocumentText.ts";
 import * as AcpRegistrySupport from "@t3tools/provider-acp-registry/server/AcpRegistrySupport";
 import * as CheckpointDiffQuery from "./checkpointing/CheckpointDiffQuery.ts";
@@ -740,41 +741,49 @@ const layerRuntimeCoreDependenciesBase = Layer.mergeAll(
   layerThreadPullRequestWorker,
   KeepAwake.layer,
   DelegatedTaskAnalytics.layer,
-  Layer.effectDiscard(
-    Effect.gen(function* () {
-      const service = yield* PullRequestSyncReactor.PullRequestSyncReactor;
-      yield* service.start();
-    }),
-  ).pipe(
-    Layer.provideMerge(PullRequestSyncReactor.layer),
-    Layer.provide(layerPullRequestService),
-    Layer.provide(ProjectionStoreV2.layer),
+  // Layer.mergeAll accepts at most 20 layers; keep this call's own count under it.
+  Layer.mergeAll(
+    Layer.effectDiscard(
+      Effect.gen(function* () {
+        const service = yield* PullRequestSyncReactor.PullRequestSyncReactor;
+        yield* service.start();
+      }),
+    ).pipe(
+      Layer.provideMerge(PullRequestSyncReactor.layer),
+      Layer.provide(layerPullRequestService),
+      Layer.provide(ProjectionStoreV2.layer),
+    ),
+    Layer.effectDiscard(
+      Effect.gen(function* () {
+        const service = yield* PullRequestWatchReactor.PullRequestWatchReactor;
+        yield* service.start();
+      }),
+    ).pipe(
+      Layer.provide(PullRequestWatchReactor.layer),
+      Layer.provide(layerPullRequestService),
+      Layer.provide(ProjectionStoreV2.layer),
+    ),
+    Layer.effectDiscard(
+      Effect.gen(function* () {
+        const service = yield* DelegatedTaskQuestionReactor.DelegatedTaskQuestionReactor;
+        yield* service.start();
+      }),
+    ).pipe(
+      Layer.provide(DelegatedTaskQuestionReactor.layer),
+      Layer.provide(ProjectionStoreV2.layer),
+    ),
+    Layer.effectDiscard(
+      Effect.gen(function* () {
+        yield* (yield* OrchestrationMilestones.OrchestrationMilestones).start();
+      }),
+    ).pipe(Layer.provide(OrchestrationMilestones.layer), Layer.provide(ProjectionStoreV2.layer)),
   ),
-  Layer.effectDiscard(
-    Effect.gen(function* () {
-      const service = yield* PullRequestWatchReactor.PullRequestWatchReactor;
-      yield* service.start();
-    }),
-  ).pipe(
-    Layer.provide(PullRequestWatchReactor.layer),
-    Layer.provide(layerPullRequestService),
-    Layer.provide(ProjectionStoreV2.layer),
+  Layer.mergeAll(
+    ProviderUsageLimitsIngestion.layer,
+    layerProviderInstallationRefresh,
+    ProviderInstallation.layer,
+    ReplayMarkers.layer,
   ),
-  Layer.effectDiscard(
-    Effect.gen(function* () {
-      const service = yield* DelegatedTaskQuestionReactor.DelegatedTaskQuestionReactor;
-      yield* service.start();
-    }),
-  ).pipe(Layer.provide(DelegatedTaskQuestionReactor.layer), Layer.provide(ProjectionStoreV2.layer)),
-  Layer.effectDiscard(
-    Effect.gen(function* () {
-      yield* (yield* OrchestrationMilestones.OrchestrationMilestones).start();
-    }),
-  ).pipe(Layer.provide(OrchestrationMilestones.layer), Layer.provide(ProjectionStoreV2.layer)),
-  ProviderUsageLimitsIngestion.layer,
-  layerProviderInstallationRefresh,
-  ProviderInstallation.layer,
-  ReplayMarkers.layer,
   Layer.effectDiscard(ProjectSettingsOverrideSweep.sweep),
 ).pipe(
   Layer.provideMerge(layerOrchestrationApplication),
@@ -793,18 +802,20 @@ const layerRuntimeCoreDependenciesBase = Layer.mergeAll(
   Layer.provideMerge(layerVcs),
   Layer.provideMerge(Layer.mergeAll(layerTerminal, layerPreview, layerDevice)),
   Layer.provideMerge(layerPersistence),
-  Layer.provideMerge(Layer.mergeAll(Keybindings.layer, UsageLimitSources.layer)),
   Layer.provideMerge(
-    SkillManager.layer.pipe(
-      Layer.provideMerge(SkillInventoryService.layer),
-      Layer.provideMerge(ProviderRegistry.layer),
-      Layer.provideMerge(layerKnownWorkspaces),
-    ),
+    Layer.mergeAll(Keybindings.layer, UsageLimitSources.layer, ProviderRegistry.layer),
   ),
   Layer.provideMerge(
-    PluginManager.layer.pipe(
-      Layer.provideMerge(ProviderRegistry.layer),
-      Layer.provideMerge(layerKnownWorkspaces),
+    Layer.mergeAll(
+      SkillManager.layer.pipe(
+        Layer.provideMerge(SkillInventoryService.layer),
+        Layer.provideMerge(ProviderRegistry.layer),
+        Layer.provideMerge(layerKnownWorkspaces),
+      ),
+      PluginManager.layer.pipe(
+        Layer.provideMerge(ProviderRegistry.layer),
+        Layer.provideMerge(layerKnownWorkspaces),
+      ),
     ),
   ),
   Layer.provideMerge(
@@ -972,6 +983,7 @@ const layerMakeRoutes = Layer.mergeAll(
   Layer.provide(layerServerSettings),
   Layer.provide(PreviewAutomationBroker.layer),
   Layer.provide(ServerSelfUpdate.layer.pipe(Layer.provide(layerDesktopAppUpdate))),
+  Layer.provide(ProviderMaintenanceRunner.layer),
   Layer.provide(layerCommandReadiness),
   Layer.provide(ServerHttp.layerBrowserApiCors),
   Layer.provide(ServerHttp.layerHttpCompression),
