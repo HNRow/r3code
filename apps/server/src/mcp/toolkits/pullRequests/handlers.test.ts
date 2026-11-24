@@ -70,12 +70,12 @@ function makeProject(
     locator: {
       source: "git-remote",
       remoteName: "origin",
-      remoteUrl: "git@github.com:T3Tools/R3Code.git",
+      remoteUrl: "git@github.com:T3Tools/T3Code.git",
     },
     provider: SourceControlProviderKind.make("github"),
-    displayName: "T3Tools/R3Code",
+    displayName: "T3Tools/T3Code",
     owner: "T3Tools",
-    name: "R3Code",
+    name: "T3Code",
   },
 ): OrchestrationProjectShell {
   return {
@@ -280,7 +280,7 @@ describe("pull request toolkit handlers", () => {
       });
       expect(result).toEqual({
         host: "github.com",
-        repository: "t3tools/t3code",
+        repository: "t3tools/r3code",
         number: 123,
         url: "https://github.com/T3Tools/R3Code/pull/123/files",
         alreadyLinked: false,
@@ -290,7 +290,7 @@ describe("pull request toolkit handlers", () => {
           type: "thread.pull-request.link",
           threadId: THREAD_ID,
           host: "github.com",
-          repository: "t3tools/t3code",
+          repository: "t3tools/r3code",
           number: 123,
           source: "agent",
         },
@@ -328,10 +328,10 @@ describe("pull request toolkit handlers", () => {
           ]) {
             const harness = yield* makeHarness({ project });
             const result = yield* harness.call("link_pull_request", target);
-            const url = `https://${host}/pingdotgg/t3code/pulls/21353`;
+            const url = `https://${host}/pingdotgg/r3code/pulls/21353`;
             expect(result).toMatchObject({
               host,
-              repository: "pingdotgg/t3code",
+              repository: "pingdotgg/r3code",
               number: 21353,
               url,
             });
@@ -339,7 +339,7 @@ describe("pull request toolkit handlers", () => {
               {
                 type: "thread.pull-request.link",
                 host,
-                repository: "pingdotgg/t3code",
+                repository: "pingdotgg/r3code",
                 number: 21353,
                 url,
               },
@@ -1365,6 +1365,25 @@ describe("source control tools", () => {
         })
         .pipe(Effect.flip);
       expect(error.message).toContain("a.ts line 40 (new side) is not in this PR's diff");
+      expect(reviews).toHaveLength(1);
+
+      // A range whose start the diff shows names its end, the line that is missing.
+      const rangeError = yield* harness
+        .call("pull_request_review", {
+          verdict: "comment",
+          comments: [{ path: "b.ts", line: 40, startLine: 9, body: "Here?" }],
+        })
+        .pipe(Effect.flip);
+      expect(rangeError.message).toContain("b.ts line 40 (new side) is not in this PR's diff");
+
+      // A range whose end the diff shows still names its start.
+      const startError = yield* harness
+        .call("pull_request_review", {
+          verdict: "comment",
+          comments: [{ path: "b.ts", line: 10, startLine: 2, body: "Here?" }],
+        })
+        .pipe(Effect.flip);
+      expect(startError.message).toContain("b.ts line 2 (new side) is not in this PR's diff");
       expect(reviews).toHaveLength(1);
     }),
   );
