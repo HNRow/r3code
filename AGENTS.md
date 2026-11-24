@@ -10,7 +10,7 @@ We have over 500,000 users who love R3 Code. It's important we maintain the thin
 
 ### 1. Open at the core
 
-R3 Code is truly open. We share our roadmap, we share how we think about things, and of course we share all our code. A large number of our users run forks. We work in the open, and should strive to stay that way.
+R3 Code is truly open. We share our roadmap, we share how we think about things, and of course we share all our code. A large number of our users run forks (our MIT license covers source code only, not R3 Code's trademarks or branding; see [TRADEMARK.md](TRADEMARK.md)). We work in the open, and should strive to stay that way.
 
 ### 2. Performance without compromise
 

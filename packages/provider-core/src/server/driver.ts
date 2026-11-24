@@ -117,7 +117,7 @@ export interface ProviderInstance {
   /** Absent for providers whose plugins R3 cannot manage. */
   readonly pluginManagement?: ProviderPluginManagement;
   /**
-   * Cwds whose workspace skills may have changed. The registry rescans only cwds already
+   * Cwds whose workspace skills or models may have changed. The registry rescans only cwds already
    * requested. The stream must end when the instance is torn down.
    */
   readonly workspaceRescans?: Stream.Stream<string>;
